@@ -10,6 +10,7 @@ func ParseString(obj interface{}) string {
 	return string(s)
 }
 
+//  string, &p
 func ParseObj(data string, p interface{}) {
 	// err not handle
 	json.Unmarshal([]byte(data), p)

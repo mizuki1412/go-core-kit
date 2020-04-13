@@ -1,6 +1,7 @@
 package filekit
 
 import (
+	"io/ioutil"
 	"os"
 )
 
@@ -12,4 +13,12 @@ func AppendToFile(fileName string, content string) error {
 	}
 	defer f.Close()
 	return err
+}
+
+func ReadString(fileName string) (string,error) {
+	f, err := ioutil.ReadFile(fileName)
+	if err!=nil {
+		return "",err
+	}
+	return string(f),err
 }
