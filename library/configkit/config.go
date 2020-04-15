@@ -6,7 +6,7 @@ import (
 	"mizuki/project/core-kit/library/jsonkit"
 )
 
-// config 指针
+// Deprecated
 func ConfigInit(filepath string, config interface{})  {
 	f,err := filekit.ReadString(filepath)
 	if err!=nil{

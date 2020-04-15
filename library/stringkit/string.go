@@ -3,6 +3,7 @@ package stringkit
 import (
 	"log"
 	"strconv"
+	"strings"
 )
 
 func ToString(obj interface{}) string {
@@ -38,4 +39,14 @@ func ToString(obj interface{}) string {
 	}
 	log.Println("stringkit.ToString: not supported")
 	return ""
+}
+
+func IsNull(obj interface{}) bool {
+	if obj==nil {
+		return true
+	}
+	if strings.Trim(obj.(string)," ") == ""{
+		return true
+	}
+	return false
 }

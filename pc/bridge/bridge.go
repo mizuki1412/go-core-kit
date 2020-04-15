@@ -63,7 +63,7 @@ func Start() {
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		Server.ServeHTTP(w, r)
 	})
-	http.Handle("/", http.FileServer(http.Dir("./html")))
+	http.Handle("/", http.FileServer(http.Dir("./static")))
 	_ = mime.AddExtensionType(".js", "text/javascript")
 }
 
