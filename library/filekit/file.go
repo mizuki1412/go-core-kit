@@ -22,3 +22,5 @@ func ReadString(fileName string) (string,error) {
 	}
 	return string(f),err
 }
+
+// todo 创建目录

@@ -13,7 +13,7 @@ func ParseString(obj interface{}) string {
 //  string, &p
 func ParseObj(data string, p interface{}) {
 	// err not handle
-	json.Unmarshal([]byte(data), p)
+	_ = json.Unmarshal([]byte(data), p)
 }
 
 func ParseMap(data string) map[string]interface{} {

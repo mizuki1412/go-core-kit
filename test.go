@@ -1,10 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"mizuki/project/core-kit/library/stringkit"
 	"net/http"
-	"time"
 )
 
 func httpServer() {
@@ -16,8 +13,8 @@ func httpServer() {
 }
 
 func main() {
-	fmt.Println(stringkit.ToString(int8(7)))
-	fmt.Println(stringkit.ToString(time.Now().Unix()))
-	fmt.Println(stringkit.ToString(float32(7.101)))
-	fmt.Println(stringkit.ToString("sddd"))
+	//logkit.Info("tets info")
+	//logkit.Info("tets info2", logkit.Param{Key: "key1", Val: 1})
+	//logkit.Info("tets info3")
+	//defer logkit.Sync()
 }
