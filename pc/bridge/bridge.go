@@ -9,6 +9,7 @@ import (
 
 const EventPublic = "event:public"
 const RoomPublic = "public"
+
 var Server *socketio.Server
 var connectFun func(s socketio.Conn)
 
@@ -50,14 +51,15 @@ func SetEventPublicHandle(fun func(s socketio.Conn, msg string)) *socketio.Serve
 	Server.OnEvent("/", EventPublic, fun)
 	return Server
 }
-func SetConnectHandle(fun func(s socketio.Conn)){
+func SetConnectHandle(fun func(s socketio.Conn)) {
 	connectFun = fun
 }
+
 // 开启websocket server并配置http todo
 func Start() {
 	go Server.Serve()
 	defer Server.Close()
-	http.HandleFunc("/socket.io/", func (w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/socket.io/", func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
 		w.Header().Set("Access-Control-Allow-Origin", origin)
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
@@ -73,12 +75,12 @@ func Start() {
 <- result:boolean, data:map, message:string
 */
 type MsgReq struct {
-	Code string		 `json:"code"`
+	Code string      `json:"code"`
 	Data interface{} `json:"data"`
 }
 
 type MsgRes struct {
-	Result bool		 `json:"result"`
-	Message string	 `json:"message"`
-	Data interface{} `json:"data"`
+	Result  bool        `json:"result"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
 }

@@ -20,7 +20,7 @@ func LoadConfig() {
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Println("config load error:" ,err)
+		log.Println("config load error:", err)
 	}
 }
 

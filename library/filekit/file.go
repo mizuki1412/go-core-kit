@@ -15,12 +15,12 @@ func AppendToFile(fileName string, content string) error {
 	return err
 }
 
-func ReadString(fileName string) (string,error) {
+func ReadString(fileName string) (string, error) {
 	f, err := ioutil.ReadFile(fileName)
-	if err!=nil {
-		return "",err
+	if err != nil {
+		return "", err
 	}
-	return string(f),err
+	return string(f), err
 }
 
 // todo 创建目录

@@ -13,7 +13,7 @@ import (
 
 var client *http.Client
 
-func init()  {
+func init() {
 	client = &http.Client{}
 	jar, err := cookiejar.New(nil)
 	if err != nil {
@@ -30,7 +30,7 @@ type Req struct {
 	FormData map[string]string
 }
 
-func Do(reqBean *Req) (string, int, error)  {
+func Do(reqBean *Req) (string, int, error) {
 	data := make(url.Values)
 	for key, val := range reqBean.FormData {
 		data.Add(key, val)
@@ -38,7 +38,7 @@ func Do(reqBean *Req) (string, int, error)  {
 	if reqBean.Method == "" {
 		reqBean.Method = "POST"
 	}
-	req, err := http.NewRequest(reqBean.Method,reqBean.Url, strings.NewReader(data.Encode()))
+	req, err := http.NewRequest(reqBean.Method, reqBean.Url, strings.NewReader(data.Encode()))
 	if err != nil {
 		return "", 0, err
 	}
@@ -57,8 +57,8 @@ func Do(reqBean *Req) (string, int, error)  {
 	return string(body), resp.StatusCode, nil
 }
 
-func DownloadToFile(url string, filePath string){
-	req, err := http.NewRequest("GET",url, nil)
+func DownloadToFile(url string, filePath string) {
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -75,30 +75,30 @@ func DownloadToFile(url string, filePath string){
 	}
 	defer fout.Close()
 	_, err = fout.Write(body)
-	if err!=nil{
+	if err != nil {
 		panic(err)
 	}
 }
 
 func Demo() {
 	ret, _, err := Do(&Req{
-		Url:      "https://www.machplat.com/roms-server-cnc/rest/user/login",
+		Url: "https://www.machplat.com/roms-server-cnc/rest/user/login",
 		FormData: map[string]string{
 			"username": "@staff",
-			"pwd": "666666",
-			"schema": "cnc",
+			"pwd":      "666666",
+			"schema":   "cnc",
 		},
 	})
-	if err!=nil {
+	if err != nil {
 		return
 	}
 	fmt.Println(gjson.Get(ret, "data.user"))
 	fmt.Println(gjson.Parse(ret).Value().(map[string]interface{}))
 	fmt.Println("----")
 	ret, _, err = Do(&Req{
-		Url:      "https://www.machplat.com/roms-server-cnc/rest/user/info",
+		Url: "https://www.machplat.com/roms-server-cnc/rest/user/info",
 	})
-	if err!=nil {
+	if err != nil {
 		return
 	}
 }
