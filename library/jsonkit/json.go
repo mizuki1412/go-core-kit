@@ -5,9 +5,14 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func ParseString(obj interface{}) string {
+func ToString(obj interface{}) string {
 	s, _ := json.Marshal(obj)
 	return string(s)
+}
+
+//Deprecated
+func ParseString(obj interface{}) string {
+	return ToString(obj)
 }
 
 //  string, &p

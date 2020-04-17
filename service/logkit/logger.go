@@ -11,6 +11,7 @@ import (
 	"mizuki/project/core-kit/library/timekit"
 	"mizuki/project/core-kit/service/configkit"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -87,6 +88,9 @@ func Info(msg string, params ...Param) {
 		Logger.Info(msg)
 	}
 }
+func InfoConcat(msg ...string) {
+	Info(strings.Join(msg, " "))
+}
 func Error(msg string, params ...Param) {
 	if Logger == nil {
 		Logger = Init()
@@ -97,6 +101,9 @@ func Error(msg string, params ...Param) {
 	} else {
 		Logger.Error(msg)
 	}
+}
+func ErrorConcat(msg ...string) {
+	Error(strings.Join(msg, " "))
 }
 func Fatal(msg string, params ...Param) {
 	if Logger == nil {
