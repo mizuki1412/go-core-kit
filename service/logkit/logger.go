@@ -4,10 +4,10 @@ package logkit
 
 import (
 	"github.com/arthurkiller/rollingwriter"
+	"github.com/spf13/cast"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"io"
-	"mizuki/project/core-kit/library/stringkit"
 	"mizuki/project/core-kit/library/timekit"
 	"mizuki/project/core-kit/service/configkit"
 	"os"
@@ -123,7 +123,7 @@ func transfer(params []Param, length int) []zapcore.Field {
 		case float32:
 			fields[i] = zap.Float32(p.Key, p.Val.(float32))
 		default:
-			fields[i] = zap.String(p.Key, stringkit.ToString(p.Val))
+			fields[i] = zap.String(p.Key, cast.ToString(p.Val))
 		}
 	}
 	return fields

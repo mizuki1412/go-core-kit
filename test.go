@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"runtime"
 )
 
 func httpServer() {
@@ -9,12 +11,10 @@ func httpServer() {
 		http.ServeFile(w, r, r.URL.Path[1:])
 	})
 	panic(http.ListenAndServe(":8080", nil))
-
 }
 
 func main() {
-	//logkit.Info("tets info")
-	//logkit.Info("tets info2", logkit.Param{Key: "key1", Val: 1})
-	//logkit.Info("tets info3")
-	//defer logkit.Sync()
+	_, file, line, _ := runtime.Caller(0)
+	fmt.Println(file,line)
 }
+

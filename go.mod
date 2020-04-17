@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/arthurkiller/rollingwriter v1.1.2
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
-	github.com/googollee/go-socket.io v1.4.3 // indirect
+	github.com/googollee/go-socket.io v1.4.3
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/mitchellh/mapstructure v1.2.2 // indirect
 	github.com/pelletier/go-toml v1.7.0 // indirect
