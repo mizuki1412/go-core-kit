@@ -3,6 +3,7 @@ package configkit
 import (
 	"github.com/spf13/viper"
 	"log"
+	"mizuki/project/core-kit/library/stringkit"
 	"strings"
 )
 
@@ -24,6 +25,21 @@ func LoadConfig() {
 	}
 }
 
+func Get(key string, defaultVal interface{}) interface{} {
+	if !strings.Contains(key, ".") {
+		return viper.Get(key)
+	}
+	val, ok := keyPool[key]
+	if ok {
+		return val
+	}
+	val1, ok1 := lookupSub(key)
+	if !ok1 {
+		return defaultVal
+	} else {
+		return val1
+	}
+}
 func GetString(key, defaultVal string) string {
 	if !strings.Contains(key, ".") {
 		return viper.GetString(key)
@@ -68,6 +84,10 @@ func GetBool(key string, defaultVal bool) bool {
 	} else {
 		return val1.(bool)
 	}
+}
+func IsNil(key string) bool {
+	// todo only for string
+	return stringkit.IsNull(viper.Get(key))
 }
 
 func lookupSub(key string) (interface{}, bool) {

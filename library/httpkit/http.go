@@ -82,7 +82,7 @@ func DownloadToFile(url string, filePath string) {
 
 func Demo() {
 	ret, _, err := Do(&Req{
-		Url: "https://www.machplat.com/roms-server-cnc/rest/user/login",
+		Url: "https://www.machplat.com/roms-rest-cnc/rest/user/login",
 		FormData: map[string]string{
 			"username": "@staff",
 			"pwd":      "666666",
@@ -96,7 +96,7 @@ func Demo() {
 	fmt.Println(gjson.Parse(ret).Value().(map[string]interface{}))
 	fmt.Println("----")
 	ret, _, err = Do(&Req{
-		Url: "https://www.machplat.com/roms-server-cnc/rest/user/info",
+		Url: "https://www.machplat.com/roms-rest-cnc/rest/user/info",
 	})
 	if err != nil {
 		return
