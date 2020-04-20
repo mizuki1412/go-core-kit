@@ -4,16 +4,14 @@ import (
 	"github.com/spf13/viper"
 	"log"
 	"mizuki/project/core-kit/library/stringkit"
-	"strings"
 )
 
-// config-key(eg: abc.exe.ss) : val
-var keyPool map[string]interface{}
+/**
+viper是大小写不敏感的。
+viper在cobra使用时，bind最好用在cmd.Run中，而不是init中
+ */
 
-func init() {
-	keyPool = make(map[string]interface{})
-}
-
+// 注意，load比一般的init慢
 func LoadConfig() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
@@ -26,81 +24,44 @@ func LoadConfig() {
 }
 
 func Get(key string, defaultVal interface{}) interface{} {
-	if !strings.Contains(key, ".") {
-		return viper.Get(key)
-	}
-	val, ok := keyPool[key]
-	if ok {
-		return val
-	}
-	val1, ok1 := lookupSub(key)
-	if !ok1 {
+	val := viper.Get(key)
+	if val==nil {
 		return defaultVal
-	} else {
-		return val1
 	}
+	return val
 }
 func GetString(key, defaultVal string) string {
-	if !strings.Contains(key, ".") {
-		return viper.GetString(key)
-	}
-	val, ok := keyPool[key]
-	if ok {
-		return val.(string)
-	}
-	val1, ok1 := lookupSub(key)
-	if !ok1 {
+	val := viper.GetString(key)
+	if val==""{
 		return defaultVal
-	} else {
-		return val1.(string)
 	}
+	return val
 }
 func GetInt(key string, defaultVal int) int {
-	if !strings.Contains(key, ".") {
-		return viper.GetInt(key)
-	}
-	val, ok := keyPool[key]
-	if ok {
-		return val.(int)
-	}
-	val1, ok1 := lookupSub(key)
-	if !ok1 {
-		return defaultVal
-	} else {
-		return val1.(int)
-	}
+	return viper.GetInt(key)
 }
 func GetBool(key string, defaultVal bool) bool {
-	if !strings.Contains(key, ".") {
-		return viper.GetBool(key)
-	}
-	val, ok := keyPool[key]
-	if ok {
-		return val.(bool)
-	}
-	val1, ok1 := lookupSub(key)
-	if !ok1 {
-		return defaultVal
-	} else {
-		return val1.(bool)
-	}
+	return viper.GetBool(key)
 }
 func IsNil(key string) bool {
 	// todo only for string
 	return stringkit.IsNull(viper.Get(key))
 }
 
-func lookupSub(key string) (interface{}, bool) {
-	arr := strings.Split(key, ".")
-	temp := viper.GetStringMap(arr[0])
-	for i := 1; i < len(arr)-1; i++ {
-		val1, ok1 := temp[arr[i]]
-		if !ok1 {
-			return nil, false
-		} else {
-			temp = val1.(map[string]interface{})
-		}
-	}
-	val1, ok1 := temp[arr[len(arr)-1]]
-	return val1, ok1
-}
+//func lookupSub(key string) (interface{}, bool) {
+//	arr := strings.Split(key, ".")
+//	temp := viper.GetStringMap(arr[0])
+//	for i := 1; i < len(arr)-1; i++ {
+//		val1, ok1 := temp[arr[i]]
+//		if !ok1 {
+//			return nil, false
+//		} else {
+//			temp = val1.(map[string]interface{})
+//		}
+//	}
+//	val1, ok1 := temp[arr[len(arr)-1]]
+//	if ok1 {
+//		keyPool[key] = val1
+//	}
+//	return val1, ok1
+//}
