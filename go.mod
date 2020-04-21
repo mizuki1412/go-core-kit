@@ -3,16 +3,23 @@ module mizuki/project/core-kit
 go 1.14
 
 require (
-	github.com/alexedwards/scs/v2 v2.3.0
+	github.com/ajg/form v1.5.1 // indirect
 	github.com/arthurkiller/rollingwriter v1.1.2
+	github.com/fasthttp-contrib/websocket v0.0.0-20160511215533-1f3b11f56072 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
-	github.com/gin-gonic/gin v1.6.2
 	github.com/golang/protobuf v1.4.0 // indirect
 	github.com/googollee/go-socket.io v1.4.3
 	github.com/gorilla/websocket v1.4.2 // indirect
+	github.com/imkira/go-interpol v1.1.0 // indirect
 	github.com/jinzhu/gorm v1.9.12 // indirect
+	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
+	github.com/kataras/iris/v12 v12.1.8
+	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/mitchellh/mapstructure v1.2.2 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
+	github.com/moul/http2curl v1.0.0 // indirect
+	github.com/onsi/ginkgo v1.12.0 // indirect
+	github.com/onsi/gomega v1.9.0 // indirect
 	github.com/pelletier/go-toml v1.7.0 // indirect
 	github.com/robfig/cron v1.2.0 // indirect
 	github.com/spf13/afero v1.2.2 // indirect
@@ -22,6 +29,12 @@ require (
 	github.com/spf13/viper v1.6.3
 	github.com/stretchr/testify v1.5.1 // indirect
 	github.com/tidwall/gjson v1.3.5
+	github.com/valyala/fasthttp v1.12.0 // indirect
+	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
+	github.com/yalp/jsonpath v0.0.0-20180802001716-5cc68e5049a0 // indirect
+	github.com/yudai/gojsondiff v1.0.0 // indirect
+	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
+	github.com/yudai/pp v2.0.1+incompatible // indirect
 	go.uber.org/automaxprocs v1.3.0
 	go.uber.org/zap v1.14.1
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect

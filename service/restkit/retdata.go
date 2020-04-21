@@ -1,7 +1,8 @@
 package restkit
 
 import (
-	"github.com/gin-gonic/gin"
+	"mizuki/project/core-kit/service/logkit"
+	"mizuki/project/core-kit/service/restkit/context"
 	"net/http"
 )
 
@@ -16,7 +17,7 @@ const RestRetResultSuccess = 1
 const RestRetResultAuthErr = 2
 
 // http返回json数据
-func RetJson(context *gin.Context, ret RestRet) {
+func RetJson(context *context.Context, ret RestRet) {
 	var code int
 	switch ret.Result {
 	case RestRetResultSuccess:
@@ -26,5 +27,9 @@ func RetJson(context *gin.Context, ret RestRet) {
 	default:
 		code = http.StatusBadRequest
 	}
-	context.JSON(code, ret)
+	context.Proxy.StatusCode(code)
+	_, err := context.Proxy.JSON(ret)
+	if err!=nil{
+		logkit.Error("rest_ret_json_error: "+err.Error())
+	}
 }

@@ -1,19 +1,16 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
 	"mizuki/project/core-kit/service/logkit"
+	"mizuki/project/core-kit/service/restkit/context"
 	"time"
 )
 
-func Log() gin.HandlerFunc  {
-	return func(c *gin.Context) {
+func Log() context.Handler {
+	return func(ctx *context.Context) {
 		t := time.Now()
-		sessionIdc ,err := c.Request.Cookie("session")
-		sessionId := ""
-		if err==nil{
-			sessionId = sessionIdc.Value
-		}
+		// 当前上传的cookies中的session，不一定等于response中的
+		sessionId := ctx.Session().ID()
 		// todo params
 		//params := make(map[interface{}]interface{})
 		//_ = c.Copy().ShouldBind(&params)
@@ -23,17 +20,17 @@ func Log() gin.HandlerFunc  {
 				Val: sessionId,
 			}, logkit.Param{
 				Key: "url",
-				Val: c.Request.URL.String(),
+				Val: ctx.Request.URL.String(),
 			})
 
-		c.Next()
+		ctx.Proxy.Next()
 
 		latency := time.Since(t).Milliseconds()
-		status := c.Writer.Status()
+		status := ctx.Response.StatusCode()
 		logkit.Info("response",
 			logkit.Param{
 				Key: "url",
-				Val: c.Request.URL.String(),
+				Val: ctx.Request.URL.String(),
 			}, logkit.Param{
 				Key: "latency",
 				Val: latency,

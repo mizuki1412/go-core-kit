@@ -1,17 +1,24 @@
 package middleware
 
-import (
-	"github.com/alexedwards/scs/v2"
-	"net/http"
-	"time"
-)
+//var Session *scs.SessionManager
+//
+//func init()  {
+//	Session = scs.New()
+//	Session.IdleTimeout = 3*time.Hour
+//	Session.Cookie.SameSite = http.SameSiteNoneMode
+//}
 
-var Session *scs.SessionManager
+// https://github.com/kataras/iris/wiki/Sessions-database
 
-func init()  {
-	Session = scs.New()
-	// todo 是通过cookies expires的原理？
-	Session.IdleTimeout = 3*time.Hour
-	Session.Cookie.SameSite = http.SameSiteNoneMode
-	// todo 无法在生成时拿到session token
-}
+/**
+	session超时过期而不是生命周期
+	session id
+ */
+//func Session() context.Handler {
+//	return func(ctx *context.Context) {
+//		ctx.Session = sessionManager.Start(ctx.Proxy)
+//		logkit.Info(ctx.Session.ID())
+//		// todo 超期处理
+//		ctx.Proxy.Next()
+//	}
+//}

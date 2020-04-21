@@ -1,9 +1,8 @@
 package main
 
 import (
-	"fmt"
+	"mizuki/project/core-kit/test/gorm"
 	"net/http"
-	"runtime"
 )
 
 func httpServer() {
@@ -14,6 +13,7 @@ func httpServer() {
 }
 
 func main() {
-	_, file, line, _ := runtime.Caller(0)
-	fmt.Println(file, line)
+	//_, file, line, _ := runtime.Caller(0)
+	//fmt.Println(file, line)
+	gorm.Test()
 }
