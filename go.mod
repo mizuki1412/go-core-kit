@@ -6,6 +6,7 @@ require (
 	github.com/Masterminds/squirrel v1.2.0
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/arthurkiller/rollingwriter v1.1.2
+	github.com/eclipse/paho.mqtt.golang v1.2.0 // indirect
 	github.com/fasthttp-contrib/websocket v0.0.0-20160511215533-1f3b11f56072 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/golang/protobuf v1.4.0 // indirect

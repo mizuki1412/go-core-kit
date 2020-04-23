@@ -3,7 +3,6 @@ package configkit
 import (
 	"github.com/spf13/viper"
 	"log"
-	"mizuki/project/core-kit/library/stringkit"
 )
 
 /**
@@ -34,37 +33,23 @@ func Get(key string, defaultVal interface{}) interface{} {
 	return val
 }
 func GetString(key, defaultVal string) string {
-	val := viper.GetString(key)
-	if val == "" {
+	if !viper.IsSet(key) {
 		return defaultVal
 	}
-	return val
+	return viper.GetString(key)
+}
+func GetStringD(key string) string {
+	return viper.GetString(key)
 }
 func GetInt(key string, defaultVal int) int {
+	if !viper.IsSet(key) {
+		return defaultVal
+	}
 	return viper.GetInt(key)
 }
 func GetBool(key string, defaultVal bool) bool {
+	if !viper.IsSet(key) {
+		return defaultVal
+	}
 	return viper.GetBool(key)
 }
-func IsNil(key string) bool {
-	// todo only for string
-	return stringkit.IsNull(viper.Get(key))
-}
-
-//func lookupSub(key string) (interface{}, bool) {
-//	arr := strings.Split(key, ".")
-//	temp := viper.GetStringMap(arr[0])
-//	for i := 1; i < len(arr)-1; i++ {
-//		val1, ok1 := temp[arr[i]]
-//		if !ok1 {
-//			return nil, false
-//		} else {
-//			temp = val1.(map[string]interface{})
-//		}
-//	}
-//	val1, ok1 := temp[arr[len(arr)-1]]
-//	if ok1 {
-//		keyPool[key] = val1
-//	}
-//	return val1, ok1
-//}
