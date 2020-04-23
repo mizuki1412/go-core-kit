@@ -1,13 +1,28 @@
-toolkit for go projects
+toolkit for golang projects
 
-# 引用的库
+# Reference
 
-[cast](github.com/spf13/cast)
+## Common
+- [cast](github.com/spf13/cast)
 
-library/jsonkit: [gjson](github.com/tidwall/gjson)
+## library/jsonkit
+- [jsoniter](github.com/json-iterator/go)
+- [gjson](github.com/tidwall/gjson)
 
-service/logkit : [zap](https://github.com/uber-go/zap), [rollingwriter](github.com/arthurkiller/rollingwriter)
+## service/logkit
+- [zap](https://github.com/uber-go/zap)
+- [rollingwriter](github.com/arthurkiller/rollingwriter)
 
-service/configkit: [viper](github.com/spf13/viper)
+## service/configkit
+- [viper](github.com/spf13/viper)
 
-pc/bridge: [go-socket.io](github.com/googollee/go-socket.io)
+## service/restkit
+- [iris](github.com/kataras/iris)
+
+## service/sqlkit
+- [sqlx](github.com/jmoiron/sqlx)
+- [squirrel](github.com/Masterminds/squirrel)
+- [pgsql driver](github.com/lib/pq)
+
+## pc/bridge
+- [go-socket.io](github.com/googollee/go-socket.io)

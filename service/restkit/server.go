@@ -23,10 +23,10 @@ func init() {
 //	return engine
 //}
 
-func defaultEngine()  {
+func defaultEngine() {
 	router = &context.Router{
 		IsGroup: false,
-		Proxy: iris.New(),
+		Proxy:   iris.New(),
 	}
 	router.Proxy.Use(recover2.New())
 	//router.Use(middleware.Session())
@@ -36,10 +36,10 @@ func defaultEngine()  {
 
 func Run() {
 	port := cast.ToString(configkit.Get(ConfigKeyRestServerPort, 8080))
-	logkit.Info("Listening and serving HTTP on "+port)
+	logkit.Info("Listening and serving HTTP on " + port)
 	//err := http.ListenAndServe(":" + port, middleware.Session.LoadAndSave(router))
-	err := router.Proxy.Run(iris.Addr(":"+port))
-	if err!=nil{
+	err := router.Proxy.Run(iris.Addr(":" + port))
+	if err != nil {
 		logkit.Fatal(err.Error())
 	}
 }

@@ -7,9 +7,9 @@ import (
 )
 
 type RestRet struct {
-	Result int		`json:"result"`
-	Message string	`json:"message"`
-	Data interface{} `json:"data"`
+	Result  int         `json:"result"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
 }
 
 const RestRetResultErr = 0
@@ -29,7 +29,7 @@ func RetJson(context *context.Context, ret RestRet) {
 	}
 	context.Proxy.StatusCode(code)
 	_, err := context.Proxy.JSON(ret)
-	if err!=nil{
-		logkit.Error("rest_ret_json_error: "+err.Error())
+	if err != nil {
+		logkit.Error("rest_ret_json_error: " + err.Error())
 	}
 }

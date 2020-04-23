@@ -9,7 +9,7 @@ import (
 /**
 viper是大小写不敏感的。
 viper在cobra使用时，bind最好用在cmd.Run中，而不是init中
- */
+*/
 
 // 注意，load比一般的init慢
 func LoadConfig() {
@@ -23,16 +23,19 @@ func LoadConfig() {
 	}
 }
 
+func Exist(key string) bool {
+	return viper.IsSet(key)
+}
 func Get(key string, defaultVal interface{}) interface{} {
 	val := viper.Get(key)
-	if val==nil {
+	if val == nil {
 		return defaultVal
 	}
 	return val
 }
 func GetString(key, defaultVal string) string {
 	val := viper.GetString(key)
-	if val==""{
+	if val == "" {
 		return defaultVal
 	}
 	return val

@@ -9,15 +9,16 @@ import (
 )
 
 type Context struct {
-	Proxy iris.Context
-	Request *http.Request
+	Proxy    iris.Context
+	Request  *http.Request
 	Response context.ResponseWriter
 }
 
 var sessionManager *sessions.Sessions
+
 func init() {
 	sessionManager = sessions.New(sessions.Config{
-		Cookie: "session",
+		Cookie:       "session",
 		AllowReclaim: true,
 	})
 }
@@ -37,19 +38,19 @@ func (ctx *Context) RenewSession() *sessions.Session {
 
 // data: query, form, json/xml, param
 
-func (ctx *Context) BindForm(bean interface{})  {
+func (ctx *Context) BindForm(bean interface{}) {
 	//ctx.Proxy.Params().Get("demo")
 	switch bean.(type) {
 	case *map[string]interface{}:
 		// query会和form合并 post时
 		//allQuery := ctx.Proxy.URLParams()
 		allForm := ctx.Proxy.FormValues()
-		for k,v := range allForm{
+		for k, v := range allForm {
 			(*(bean.(*map[string]interface{})))[k] = v[len(v)-1]
 		}
 	default:
 		err := ctx.Proxy.ReadForm(bean)
-		if err!=nil{
+		if err != nil {
 			// todo panic 解析错误
 			logkit.Error(err.Error())
 		}

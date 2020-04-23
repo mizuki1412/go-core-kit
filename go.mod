@@ -3,6 +3,7 @@ module mizuki/project/core-kit
 go 1.14
 
 require (
+	github.com/Masterminds/squirrel v1.2.0
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/arthurkiller/rollingwriter v1.1.2
 	github.com/fasthttp-contrib/websocket v0.0.0-20160511215533-1f3b11f56072 // indirect
@@ -11,9 +12,11 @@ require (
 	github.com/googollee/go-socket.io v1.4.3
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/imkira/go-interpol v1.1.0 // indirect
-	github.com/jinzhu/gorm v1.9.12 // indirect
+	github.com/jmoiron/sqlx v1.2.0
+	github.com/json-iterator/go v1.1.9
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
 	github.com/kataras/iris/v12 v12.1.8
+	github.com/lib/pq v1.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/mitchellh/mapstructure v1.2.2 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
@@ -37,6 +40,7 @@ require (
 	github.com/yudai/pp v2.0.1+incompatible // indirect
 	go.uber.org/automaxprocs v1.3.0
 	go.uber.org/zap v1.14.1
+	golang.org/x/crypto v0.0.0-20200420201142-3c4aac89819a // indirect
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/sys v0.0.0-20200413165638-669c56c373c4 // indirect
 	golang.org/x/tools v0.0.0-20200417140056-c07e33ef3290 // indirect
