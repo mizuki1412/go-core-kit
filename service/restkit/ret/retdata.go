@@ -1,4 +1,4 @@
-package restkit
+package ret
 
 import (
 	"mizuki/project/core-kit/service/logkit"
@@ -12,17 +12,17 @@ type RestRet struct {
 	Data    interface{} `json:"data"`
 }
 
-const RestRetResultErr = 0
-const RestRetResultSuccess = 1
-const RestRetResultAuthErr = 2
+const ResultErr = 0
+const ResultSuccess = 1
+const ResultAuthErr = 2
 
 // http返回json数据
-func RetJson(context *context.Context, ret RestRet) {
+func Json(context *context.Context, ret RestRet) {
 	var code int
 	switch ret.Result {
-	case RestRetResultSuccess:
+	case ResultSuccess:
 		code = http.StatusOK
-	case RestRetResultAuthErr:
+	case ResultAuthErr:
 		code = http.StatusUnauthorized
 	default:
 		code = http.StatusBadRequest

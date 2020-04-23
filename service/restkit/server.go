@@ -2,7 +2,6 @@ package restkit
 
 import (
 	"github.com/kataras/iris/v12"
-	recover2 "github.com/kataras/iris/v12/middleware/recover"
 	"github.com/spf13/cast"
 	"mizuki/project/core-kit/service/configkit"
 	"mizuki/project/core-kit/service/logkit"
@@ -28,8 +27,8 @@ func defaultEngine() {
 		IsGroup: false,
 		Proxy:   iris.New(),
 	}
-	router.Proxy.Use(recover2.New())
-	//router.Use(middleware.Session())
+	//router.Proxy.Use(recover2.New())
+	router.Use(middleware.Recover())
 	router.Use(middleware.Log())
 	router.Use(middleware.Cors())
 }
