@@ -45,6 +45,7 @@ func QueryStruct(dest interface{}, sql string, args []interface{}, err error) {
 	err = DB().Select(dest, sql, args...)
 	if err != nil {
 		//todo
+		panic(err)
 	}
 }
 

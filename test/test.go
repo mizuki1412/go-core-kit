@@ -17,4 +17,6 @@ func main() {
 	_, file, line, _ := runtime.Caller(1)
 	log.Println(file, line)
 	//gorm.Test()
+
+	//corekit.Waiting()
 }

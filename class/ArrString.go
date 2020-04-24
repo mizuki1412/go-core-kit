@@ -3,32 +3,33 @@ package class
 import (
 	"database/sql/driver"
 	"mizuki/project/core-kit/library/jsonkit"
+	"strings"
 )
 
 /**
-针对PG的jsonb
+针对PG的array
 */
 
 // 同时继承scan和value方法
-type MapString struct {
-	Map   map[string]interface{}
+type ArrString struct {
+	Array []string
 	Valid bool
 }
 
-func (th MapString) MarshalJSON() ([]byte, error) {
+func (th ArrString) MarshalJSON() ([]byte, error) {
 	if th.Valid {
-		return jsonkit.JSON().Marshal(th.Map)
+		return jsonkit.JSON().Marshal(th.Array)
 	}
 	return jsonkit.JSON().Marshal(nil)
 }
-func (th *MapString) UnmarshalJSON(data []byte) error {
-	var s *map[string]interface{}
+func (th *ArrString) UnmarshalJSON(data []byte) error {
+	var s *[]string
 	if err := jsonkit.JSON().Unmarshal(data, &s); err != nil {
 		return err
 	}
 	if s != nil {
 		th.Valid = true
-		th.Map = *s
+		th.Array = *s
 	} else {
 		th.Valid = false
 	}
@@ -36,18 +37,24 @@ func (th *MapString) UnmarshalJSON(data []byte) error {
 }
 
 // Scan implements the Scanner interface.
-func (th *MapString) Scan(value interface{}) error {
+func (th *ArrString) Scan(value interface{}) error {
 	if value == nil {
-		th.Map, th.Valid = nil, false
+		th.Array, th.Valid = nil, false
 		return nil
 	}
 	th.Valid = true
-	th.Map = jsonkit.ParseMap(string(value.([]byte)))
+	// parse eg: {abc,qq} to ["abc","qq"]
+	bytes := value.([]byte)
+	if len(bytes) <= 2 {
+		th.Array = []string{}
+		return nil
+	}
+	th.Array = strings.Split(string(bytes[1:len(bytes)-1]), ",")
 	return nil
 }
 
 // Value implements the driver Valuer interface.
-func (th MapString) Value() (driver.Value, error) {
+func (th ArrString) Value() (driver.Value, error) {
 	if !th.Valid {
 		return nil, nil
 	}
