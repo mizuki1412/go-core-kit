@@ -31,9 +31,9 @@ func handlerTrans(handlers ...Handler) []iris.Handler {
 	return list
 }
 
-func (router *Router) Group(path string, handlers ...Handler) Router {
+func (router *Router) Group(path string, handlers ...Handler) *Router {
 	r := router.Proxy.Party(path, handlerTrans(handlers...)...)
-	return Router{
+	return &Router{
 		IsGroup:    true,
 		ProxyGroup: r,
 	}

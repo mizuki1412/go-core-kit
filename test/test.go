@@ -1,9 +1,7 @@
 package main
 
 import (
-	"log"
 	"net/http"
-	"runtime"
 )
 
 func httpServer() {
@@ -14,9 +12,6 @@ func httpServer() {
 }
 
 func main() {
-	_, file, line, _ := runtime.Caller(1)
-	log.Println(file, line)
-	//gorm.Test()
-
-	//corekit.Waiting()
+	//err:= filekit.WriteFile("./t/t.txt", []byte("sddda"))
+	//log.Println(afero.Exists(afero.NewOsFs(),"./test/ss"))
 }

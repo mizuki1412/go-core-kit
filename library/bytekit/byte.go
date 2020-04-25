@@ -56,3 +56,11 @@ func Bytes2Int64(bs []byte) int64 {
 	_ = binary.Read(buf, binary.BigEndian, &i2)
 	return i2
 }
+
+func Float32ToBytes(i interface{}) []byte {
+	return num2Bytes(cast.ToFloat32(i))
+}
+
+func Float64ToBytes(i interface{}) []byte {
+	return num2Bytes(cast.ToFloat64(i))
+}

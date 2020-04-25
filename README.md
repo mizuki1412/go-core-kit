@@ -1,28 +1,43 @@
 toolkit for golang projects
 
-# Reference
+# Related projects
 
 ## Common
-- [cast](github.com/spf13/cast)
+- [cast](https://github.com/spf13/cast)
 
-## library/jsonkit
-- [jsoniter](github.com/json-iterator/go)
-- [gjson](github.com/tidwall/gjson)
+## library
 
-## service/logkit
+### jsonkit
+- [jsoniter](https://github.com/json-iterator/go)
+- [gjson](https://github.com/tidwall/gjson)
+
+### inikit
+- [ini](https://github.com/go-ini/ini)
+
+## service
+
+### cronkit
+- [cron](https://github.com/robfig/cron)
+
+### logkit
 - [zap](https://github.com/uber-go/zap)
-- [rollingwriter](github.com/arthurkiller/rollingwriter)
+- [rollingwriter](https://github.com/arthurkiller/rollingwriter)
 
-## service/configkit
-- [viper](github.com/spf13/viper)
+### configkit
+- [viper](https://github.com/spf13/viper)
 
-## service/restkit
-- [iris](github.com/kataras/iris)
+### restkit
+- [iris](https://github.com/kataras/iris)
 
-## service/sqlkit
-- [sqlx](github.com/jmoiron/sqlx)
-- [squirrel](github.com/Masterminds/squirrel)
-- [pgsql driver](github.com/lib/pq)
+### sqlkit
+- [sqlx](https://github.com/jmoiron/sqlx)
+- [squirrel](https://github.com/Masterminds/squirrel)
+- [pgsql driver](https://github.com/lib/pq)
 
-## pc/bridge
-- [go-socket.io](github.com/googollee/go-socket.io)
+### mqttkit
+- [mqtt](https://github.com/eclipse/paho.mqtt.golang)
+
+## pc
+
+### bridge
+- [go-socket.io](https://github.com/googollee/go-socket.io)
