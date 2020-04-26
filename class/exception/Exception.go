@@ -8,8 +8,12 @@ type Exception struct {
 	Line int
 }
 
-func New(msg string) Exception {
-	_, file, line, _ := runtime.Caller(1)
+func New(msg string, skip1 ...int) Exception {
+	var skip = 1
+	if skip1 != nil && len(skip1) > 0 {
+		skip = skip1[0]
+	}
+	_, file, line, _ := runtime.Caller(skip)
 	return Exception{
 		Msg:  msg,
 		File: file,
