@@ -77,43 +77,43 @@ type Param struct {
 	Val interface{}
 }
 
-func Info(msg string, params ...Param) {
+func Info(msg interface{}, params ...Param) {
 	if Logger == nil {
 		Logger = Init()
 	}
 	if len(params) > 0 {
 		fields := transfer(params, len(params))
-		Logger.Info(msg, fields...)
+		Logger.Info(cast.ToString(msg), fields...)
 	} else {
-		Logger.Info(msg)
+		Logger.Info(cast.ToString(msg))
 	}
 }
 func InfoConcat(msg ...string) {
 	Info(strings.Join(msg, " "))
 }
-func Error(msg string, params ...Param) {
+func Error(msg interface{}, params ...Param) {
 	if Logger == nil {
 		Logger = Init()
 	}
 	if len(params) > 0 {
 		fields := transfer(params, len(params))
-		Logger.Error(msg, fields...)
+		Logger.Error(cast.ToString(msg), fields...)
 	} else {
-		Logger.Error(msg)
+		Logger.Error(cast.ToString(msg))
 	}
 }
 func ErrorConcat(msg ...string) {
 	Error(strings.Join(msg, " "))
 }
-func Fatal(msg string, params ...Param) {
+func Fatal(msg interface{}, params ...Param) {
 	if Logger == nil {
 		Logger = Init()
 	}
 	if len(params) > 0 {
 		fields := transfer(params, len(params))
-		Logger.Fatal(msg, fields...)
+		Logger.Fatal(cast.ToString(msg), fields...)
 	} else {
-		Logger.Fatal(msg)
+		Logger.Fatal(cast.ToString(msg))
 	}
 }
 

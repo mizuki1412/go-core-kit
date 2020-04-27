@@ -4,7 +4,7 @@ import (
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/context"
 	"github.com/kataras/iris/v12/sessions"
-	"mizuki/project/core-kit/service/logkit"
+	"mizuki/project/core-kit/class/exception"
 	"net/http"
 )
 
@@ -51,8 +51,7 @@ func (ctx *Context) BindForm(bean interface{}) {
 	default:
 		err := ctx.Proxy.ReadForm(bean)
 		if err != nil {
-			// todo panic 解析错误
-			logkit.Error(err.Error())
+			panic(exception.New("form解析错误"))
 		}
 	}
 	//_ = ctx.Proxy.ReadJSON(bean)

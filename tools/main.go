@@ -24,5 +24,5 @@ type Bean struct {
 
 func main() {
 	//log.Println(stringkit.Split("var xxx\tsss,233","[ ,\t]+"))
-	SQL2Struct("/Users/ycj/Downloads/demo.sql", "/Users/ycj/Downloads/dest.go")
+	//SQL2Struct("/Users/ycj/Downloads/demo.sql", "/Users/ycj/Downloads/dest.go")
 }
