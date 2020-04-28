@@ -45,10 +45,10 @@ func getWriter() io.Writer {
 	filename := configkit.GetString(ConfigKeyLogName, "main")
 	filepath := configkit.GetString(ConfigKeyLogPath, "./log")
 	config := rollingwriter.Config{
-		LogPath: filepath, //日志路径
-		//TimeTagFormat: "060102150405", //时间格式串
-		FileName:  filename,                                   //日志文件名
-		MaxRemain: configkit.GetInt(ConfigKeyLogMaxRemain, 0), //配置日志最大存留数 0 取消自动清理
+		LogPath:       filepath,                                   //日志路径
+		TimeTagFormat: "20060102",                                 //时间格式串
+		FileName:      filename,                                   //日志文件名
+		MaxRemain:     configkit.GetInt(ConfigKeyLogMaxRemain, 0), //配置日志最大存留数 0 取消自动清理
 		// - 时间滚动: 配置策略如同 crontable, 例如,每天0:0切分, 则配置 0 0 0 * * *
 		// - 大小滚动: 配置单个日志文件(未压缩)的滚动大小门限, 如1G, 500M
 		RollingPolicy:      rollingwriter.TimeRolling, //配置滚动策略 norolling timerolling volumerolling
