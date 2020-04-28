@@ -32,7 +32,12 @@ func handlerTrans(handlers ...Handler) []iris.Handler {
 }
 
 func (router *Router) Group(path string, handlers ...Handler) *Router {
-	r := router.Proxy.Party(path, handlerTrans(handlers...)...)
+	var r iris.Party
+	if router.IsGroup {
+		r = router.ProxyGroup.Party(path, handlerTrans(handlers...)...)
+	} else {
+		r = router.Proxy.Party(path, handlerTrans(handlers...)...)
+	}
 	return &Router{
 		IsGroup:    true,
 		ProxyGroup: r,
