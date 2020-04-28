@@ -1,14 +1,13 @@
 package restkit
 
 import (
-	"github.com/iris-contrib/swagger/v12"
-	"github.com/iris-contrib/swagger/v12/swaggerFiles"
 	"github.com/kataras/iris/v12"
 	"github.com/spf13/cast"
 	"mizuki/project/core-kit/service/configkit"
 	"mizuki/project/core-kit/service/logkit"
 	"mizuki/project/core-kit/service/restkit/context"
 	"mizuki/project/core-kit/service/restkit/middleware"
+	"mizuki/project/core-kit/service/restkit/swagger"
 )
 
 var router *context.Router
@@ -47,7 +46,7 @@ func Run() {
 	port := cast.ToString(configkit.Get(ConfigKeyRestServerPort, 8080))
 	logkit.Info("Listening and serving HTTP on " + port)
 	//err := http.ListenAndServe(":" + port, middleware.Session.LoadAndSave(router))
-	router.Proxy.Get("/swagger/{any:path}", swagger.DisablingWrapHandler(swaggerFiles.Handler, "NAME_OF_ENV_VARIABLE"))
+	swagger.AddHandler(router)
 	err := router.Proxy.Run(iris.Addr(":" + port))
 	if err != nil {
 		logkit.Fatal(err.Error())
