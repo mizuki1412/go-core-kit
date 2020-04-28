@@ -2,6 +2,7 @@ package context
 
 import (
 	"github.com/kataras/iris/v12"
+	"mizuki/project/core-kit/service/restkit/swagger"
 	"net/http"
 )
 
@@ -13,6 +14,7 @@ type Router struct {
 	Proxy      *iris.Application
 	IsGroup    bool
 	ProxyGroup iris.Party
+	Path       string
 }
 type Handler func(ctx *Context)
 
@@ -41,6 +43,7 @@ func (router *Router) Group(path string, handlers ...Handler) *Router {
 	return &Router{
 		IsGroup:    true,
 		ProxyGroup: r,
+		Path:       router.Path + path,
 	}
 }
 
@@ -52,19 +55,21 @@ func (router *Router) Use(handlers ...Handler) {
 	}
 }
 
-func (router *Router) Post(path string, handlers ...Handler) {
+func (router *Router) Post(path string, handlers ...Handler) *swagger.SwaggerPath {
 	if router.IsGroup {
 		router.ProxyGroup.Post(path, handlerTrans(handlers...)...)
 	} else {
 		router.Proxy.Post(path, handlerTrans(handlers...)...)
 	}
+	return &swagger.SwaggerPath{Path: router.Path + path}
 }
-func (router *Router) Get(path string, handlers ...Handler) {
+func (router *Router) Get(path string, handlers ...Handler) *swagger.SwaggerPath {
 	if router.IsGroup {
 		router.ProxyGroup.Get(path, handlerTrans(handlers...)...)
 	} else {
 		router.Proxy.Get(path, handlerTrans(handlers...)...)
 	}
+	return &swagger.SwaggerPath{Path: router.Path + path}
 }
 
 func (router *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {

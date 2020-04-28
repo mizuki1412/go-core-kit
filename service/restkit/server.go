@@ -23,6 +23,7 @@ func defaultEngine() {
 	router = &context.Router{
 		IsGroup: false,
 		Proxy:   iris.New(),
+		Path:    "/",
 	}
 	//router.Proxy.Use(recover2.New())
 	router.Use(middleware.Recover())
@@ -36,6 +37,7 @@ func defaultEngine() {
 		}
 		router.ProxyGroup = router.Proxy.Party(base)
 		router.IsGroup = true
+		router.Path = base
 	}
 }
 
@@ -46,7 +48,7 @@ func Run() {
 	port := cast.ToString(configkit.Get(ConfigKeyRestServerPort, 8080))
 	logkit.Info("Listening and serving HTTP on " + port)
 	//err := http.ListenAndServe(":" + port, middleware.Session.LoadAndSave(router))
-	swagger.AddHandler(router)
+	swagger.Register(router)
 	err := router.Proxy.Run(iris.Addr(":" + port))
 	if err != nil {
 		logkit.Fatal(err.Error())

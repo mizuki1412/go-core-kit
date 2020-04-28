@@ -7,13 +7,30 @@ import (
 	"mizuki/project/core-kit/service/restkit/context"
 )
 
-func AddHandler(router *context.Router) {
+func Register(router *context.Router) {
 	if router.IsGroup {
 		router.ProxyGroup.Get("/swagger/{any:path}", swagger.DisablingWrapHandler(swaggerFiles.Handler, "NAME_OF_ENV_VARIABLE"))
 	} else {
 		router.Proxy.Get("/swagger/{any:path}", swagger.DisablingWrapHandler(swaggerFiles.Handler, "NAME_OF_ENV_VARIABLE"))
 	}
 	swag.Register(swag.Name, &s{})
+}
+
+type SwaggerPath struct {
+	Path string
+}
+
+func (swagger *SwaggerPath) Param(param interface{}) *SwaggerPath {
+	// todo
+	return swagger
+}
+func (swagger *SwaggerPath) Description(val string) *SwaggerPath {
+	// todo
+	return swagger
+}
+func (swagger *SwaggerPath) Summary(val string) *SwaggerPath {
+	// todo
+	return swagger
 }
 
 type s struct{}
@@ -75,4 +92,6 @@ func (s *s) ReadDoc() string {
 /**
 note: https://github.com/swaggo/swag
 直接通过swag库的代码方式实现
+
+标准：https://swagger.io/specification/v2/
 */
