@@ -7,9 +7,10 @@ import (
 	"mizuki/project/core-kit/service/logkit"
 	"mizuki/project/core-kit/service/restkit/context"
 	"mizuki/project/core-kit/service/restkit/ret"
+	"mizuki/project/core-kit/service/restkit/router"
 )
 
-func Recover() context.Handler {
+func Recover() router.Handler {
 	return func(ctx *context.Context) {
 		defer func() {
 			if err := recover(); err != nil {

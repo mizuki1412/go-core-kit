@@ -1,6 +1,8 @@
 package context
 
 import (
+	"fmt"
+	"github.com/go-playground/validator/v10"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/context"
 	"github.com/kataras/iris/v12/sessions"
@@ -52,6 +54,16 @@ func (ctx *Context) BindForm(bean interface{}) {
 		err := ctx.Proxy.ReadForm(bean)
 		if err != nil {
 			panic(exception.New("form解析错误"))
+		}
+		err = Validator.Struct(bean)
+		if err != nil {
+			if _, ok := err.(*validator.InvalidValidationError); ok {
+				panic(exception.New(err.Error()))
+			}
+			for _, err0 := range err.(validator.ValidationErrors) {
+				// todo 格式化err
+				panic(exception.New(fmt.Sprintf("%v", err0)))
+			}
 		}
 	}
 	//_ = ctx.Proxy.ReadJSON(bean)

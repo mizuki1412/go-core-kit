@@ -9,6 +9,7 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/fasthttp-contrib/websocket v0.0.0-20160511215533-1f3b11f56072 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
+	github.com/go-playground/validator/v10 v10.2.0
 	github.com/golang/protobuf v1.4.0 // indirect
 	github.com/googollee/go-socket.io v1.4.3
 	github.com/gorilla/websocket v1.4.2 // indirect

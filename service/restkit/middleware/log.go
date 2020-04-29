@@ -3,10 +3,11 @@ package middleware
 import (
 	"mizuki/project/core-kit/service/logkit"
 	"mizuki/project/core-kit/service/restkit/context"
+	"mizuki/project/core-kit/service/restkit/router"
 	"time"
 )
 
-func Log() context.Handler {
+func Log() router.Handler {
 	return func(ctx *context.Context) {
 		t := time.Now()
 		// 当前上传的cookies中的session，不一定等于response中的

@@ -1,21 +1,5 @@
 package swagger
 
-import (
-	"github.com/iris-contrib/swagger/v12"
-	"github.com/iris-contrib/swagger/v12/swaggerFiles"
-	"github.com/swaggo/swag"
-	"mizuki/project/core-kit/service/restkit/context"
-)
-
-func Register(router *context.Router) {
-	if router.IsGroup {
-		router.ProxyGroup.Get("/swagger/{any:path}", swagger.DisablingWrapHandler(swaggerFiles.Handler, "NAME_OF_ENV_VARIABLE"))
-	} else {
-		router.Proxy.Get("/swagger/{any:path}", swagger.DisablingWrapHandler(swaggerFiles.Handler, "NAME_OF_ENV_VARIABLE"))
-	}
-	swag.Register(swag.Name, &s{})
-}
-
 type SwaggerPath struct {
 	Path string
 }
@@ -33,9 +17,9 @@ func (swagger *SwaggerPath) Summary(val string) *SwaggerPath {
 	return swagger
 }
 
-type s struct{}
+type Doc struct{}
 
-func (s *s) ReadDoc() string {
+func (s *Doc) ReadDoc() string {
 	return `
  {
     "schemes": [],

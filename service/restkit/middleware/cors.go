@@ -2,9 +2,10 @@ package middleware
 
 import (
 	"mizuki/project/core-kit/service/restkit/context"
+	"mizuki/project/core-kit/service/restkit/router"
 )
 
-func Cors() context.Handler {
+func Cors() router.Handler {
 	return func(c *context.Context) {
 		//method := c.Request.Method
 		c.Proxy.Header("Access-Control-Allow-Origin", "*")

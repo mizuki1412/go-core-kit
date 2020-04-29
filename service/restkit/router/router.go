@@ -1,8 +1,12 @@
-package context
+package router
 
 import (
+	"github.com/iris-contrib/swagger/v12"
+	"github.com/iris-contrib/swagger/v12/swaggerFiles"
 	"github.com/kataras/iris/v12"
-	"mizuki/project/core-kit/service/restkit/swagger"
+	"github.com/swaggo/swag"
+	"mizuki/project/core-kit/service/restkit/context"
+	swg "mizuki/project/core-kit/service/restkit/swagger"
 	"net/http"
 )
 
@@ -16,14 +20,14 @@ type Router struct {
 	ProxyGroup iris.Party
 	Path       string
 }
-type Handler func(ctx *Context)
+type Handler func(ctx *context.Context)
 
 func handlerTrans(handlers ...Handler) []iris.Handler {
 	list := make([]iris.Handler, len(handlers), len(handlers))
 	for i, v := range handlers {
 		list[i] = func(ctx iris.Context) {
 			// 实际ctx进入，转为抽象层的context todo 注意field更新
-			v(&Context{
+			v(&context.Context{
 				Proxy:    ctx,
 				Request:  ctx.Request(),
 				Response: ctx.ResponseWriter(),
@@ -55,23 +59,32 @@ func (router *Router) Use(handlers ...Handler) {
 	}
 }
 
-func (router *Router) Post(path string, handlers ...Handler) *swagger.SwaggerPath {
+func (router *Router) Post(path string, handlers ...Handler) *swg.SwaggerPath {
 	if router.IsGroup {
 		router.ProxyGroup.Post(path, handlerTrans(handlers...)...)
 	} else {
 		router.Proxy.Post(path, handlerTrans(handlers...)...)
 	}
-	return &swagger.SwaggerPath{Path: router.Path + path}
+	return &swg.SwaggerPath{Path: router.Path + path}
 }
-func (router *Router) Get(path string, handlers ...Handler) *swagger.SwaggerPath {
+func (router *Router) Get(path string, handlers ...Handler) *swg.SwaggerPath {
 	if router.IsGroup {
 		router.ProxyGroup.Get(path, handlerTrans(handlers...)...)
 	} else {
 		router.Proxy.Get(path, handlerTrans(handlers...)...)
 	}
-	return &swagger.SwaggerPath{Path: router.Path + path}
+	return &swg.SwaggerPath{Path: router.Path + path}
 }
 
 func (router *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	router.Proxy.ServeHTTP(w, req)
+}
+
+func (router *Router) RegisterSwagger() {
+	if router.IsGroup {
+		router.ProxyGroup.Get("/swagger/{any:path}", swagger.DisablingWrapHandler(swaggerFiles.Handler, "NAME_OF_ENV_VARIABLE"))
+	} else {
+		router.Proxy.Get("/swagger/{any:path}", swagger.DisablingWrapHandler(swaggerFiles.Handler, "NAME_OF_ENV_VARIABLE"))
+	}
+	swag.Register(swag.Name, &swg.Doc{})
 }
