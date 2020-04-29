@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"log"
+	"mizuki/project/core-kit/class/exception"
 	"mizuki/project/core-kit/service/configkit"
 )
 
@@ -16,6 +17,8 @@ rows转struct和map
 
 var driver string
 var db *sqlx.DB
+
+const SchemaDefault = "public"
 
 func Driver() string {
 	if db == nil {
@@ -38,30 +41,27 @@ func DB() *sqlx.DB {
 // dest use pointer
 func QueryStruct(dest interface{}, sql string, args []interface{}, err error) {
 	if err != nil {
-		// todo
-		panic(err)
+		panic(exception.New(err.Error(), 2))
 	}
-	log.Println(sql)
+	log.Println("sqlkit: ", sql)
 	err = DB().Select(dest, sql, args...)
 	if err != nil {
-		//todo
-		panic(err)
+		panic(exception.New(err.Error(), 2))
 	}
 }
 
 func QueryMap(sql string, args []interface{}, err error) []map[string]interface{} {
 	if err != nil {
-		// todo
-		panic(err)
+		panic(exception.New(err.Error(), 2))
 	}
-	log.Println(sql)
+	log.Println("sqlkit: ", sql)
 	list := []map[string]interface{}{}
 	rows, _ := DB().Queryx(sql, args...)
 	for rows.Next() {
 		m := map[string]interface{}{}
 		err := rows.MapScan(m)
 		if err != nil {
-			// todo
+			panic(exception.New(err.Error(), 2))
 		}
 		list = append(list, m)
 	}

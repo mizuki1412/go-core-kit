@@ -1,10 +1,8 @@
 package main
 
 import (
-	"log"
 	"mizuki/project/core-kit/class"
 	"net/http"
-	"reflect"
 )
 
 func httpServer() {
@@ -32,15 +30,15 @@ type loginByUsernameParam struct {
 
 func main() {
 	//SQL2Struct("/Users/ycj/Downloads/demo.sql", "/Users/ycj/Downloads/dest.go")
-	v := loginByUsernameParam{
-		Username: "z",
-		Pwd:      class.Int32{Valid: false},
-		Schema:   "pub",
-	}
-	rt := reflect.TypeOf(&v).Elem()
-	rv := reflect.ValueOf(&v).Elem()
-	for i := 0; i < rt.NumField(); i++ {
-		log.Println(1, rv.Field(i))
-		log.Println(2, rt.Field(i).Name)
-	}
+	//v := loginByUsernameParam{
+	//	Username: "z",
+	//	Pwd:      class.Int32{Valid: false},
+	//	Schema:   "pub",
+	//}
+	//rt := reflect.TypeOf(&v).Elem()
+	//rv := reflect.ValueOf(&v).Elem()
+	//for i := 0; i < rt.NumField(); i++ {
+	//	log.Println(1, rv.Field(i))
+	//	log.Println(2, rt.Field(i).Name)
+	//}
 }
