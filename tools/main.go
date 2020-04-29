@@ -1,8 +1,10 @@
 package main
 
 import (
+	"log"
 	"mizuki/project/core-kit/class"
 	"net/http"
+	"reflect"
 )
 
 func httpServer() {
@@ -22,7 +24,23 @@ type Bean struct {
 	List2  class.ArrInt    `json:"list2"`
 }
 
+type loginByUsernameParam struct {
+	Username string      `form:"username" description:"用户名" validate:"required"`
+	Pwd      class.Int32 `form:"pwd" validate:"required" default:"12"`
+	Schema   string      `form:"schema" default:"public"`
+}
+
 func main() {
-	//log.Println(stringkit.Split("var xxx\tsss,233","[ ,\t]+"))
 	//SQL2Struct("/Users/ycj/Downloads/demo.sql", "/Users/ycj/Downloads/dest.go")
+	v := loginByUsernameParam{
+		Username: "z",
+		Pwd:      class.Int32{Valid: false},
+		Schema:   "pub",
+	}
+	rt := reflect.TypeOf(&v).Elem()
+	rv := reflect.ValueOf(&v).Elem()
+	for i := 0; i < rt.NumField(); i++ {
+		log.Println(1, rv.Field(i))
+		log.Println(2, rt.Field(i).Name)
+	}
 }

@@ -6,8 +6,12 @@ import (
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/context"
 	"github.com/kataras/iris/v12/sessions"
+	"github.com/spf13/cast"
+	"mizuki/project/core-kit/class"
 	"mizuki/project/core-kit/class/exception"
+	"mizuki/project/core-kit/library/stringkit"
 	"net/http"
+	"reflect"
 )
 
 type Context struct {
@@ -40,22 +44,24 @@ func (ctx *Context) RenewSession() *sessions.Session {
 
 // data: query, form, json/xml, param
 
+// bean 指针
 func (ctx *Context) BindForm(bean interface{}) {
 	//ctx.Proxy.Params().Get("demo")
 	switch bean.(type) {
 	case *map[string]interface{}:
 		// query会和form合并 post时
-		//allQuery := ctx.Proxy.URLParams()
 		allForm := ctx.Proxy.FormValues()
 		for k, v := range allForm {
 			(*(bean.(*map[string]interface{})))[k] = v[len(v)-1]
 		}
 	default:
-		err := ctx.Proxy.ReadForm(bean)
-		if err != nil {
-			panic(exception.New("form解析错误"))
-		}
-		err = Validator.Struct(bean)
+		//err := ctx.Proxy.ReadForm(bean)
+		//if err != nil {
+		//	panic(exception.New("form解析错误"))
+		//}
+		ctx.bindStruct(bean)
+		// validator
+		err := Validator.Struct(bean)
 		if err != nil {
 			if _, ok := err.(*validator.InvalidValidationError); ok {
 				panic(exception.New(err.Error()))
@@ -66,5 +72,57 @@ func (ctx *Context) BindForm(bean interface{}) {
 			}
 		}
 	}
-	//_ = ctx.Proxy.ReadJSON(bean)
+}
+
+// bean 指针
+func (ctx *Context) bindStruct(bean interface{}) {
+	rt := reflect.TypeOf(bean).Elem()
+	rv := reflect.ValueOf(bean).Elem()
+	for i := 0; i < rt.NumField(); i++ {
+		field := rt.Field(i)
+		fieldV := rv.Field(i)
+		// bind
+		val := ctx.Proxy.FormValue(stringkit.LowerFirst(field.Name))
+		if val == "" {
+			val = ctx.Proxy.URLParam(stringkit.LowerFirst(field.Name))
+		}
+		if val == "" {
+			// default
+			val = field.Tag.Get("default")
+		}
+		switch field.Type.String() {
+		case "string":
+			if !stringkit.IsNull(val) {
+				fieldV.SetString(val)
+			}
+		case "int32", "int", "int64":
+			if !stringkit.IsNull(val) {
+				fieldV.SetInt(cast.ToInt64(val))
+			}
+		case "float64":
+			if !stringkit.IsNull(val) {
+				fieldV.SetFloat(cast.ToFloat64(val))
+			}
+		case "class.Int32":
+			if !stringkit.IsNull(val) {
+				tmp := class.Int32{Int32: cast.ToInt32(val), Valid: true}
+				fieldV.Set(reflect.ValueOf(tmp))
+			}
+		case "class.Int64":
+			if !stringkit.IsNull(val) {
+				tmp := class.Int64{Int64: cast.ToInt64(val), Valid: true}
+				fieldV.Set(reflect.ValueOf(tmp))
+			}
+		case "class.Float64":
+			if !stringkit.IsNull(val) {
+				tmp := class.Float64{Float64: cast.ToFloat64(val), Valid: true}
+				fieldV.Set(reflect.ValueOf(tmp))
+			}
+		case "class.Bool":
+			if !stringkit.IsNull(val) {
+				tmp := class.Bool{Bool: cast.ToBool(val), Valid: true}
+				fieldV.Set(reflect.ValueOf(tmp))
+			}
+		}
+	}
 }

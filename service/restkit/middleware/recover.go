@@ -23,6 +23,7 @@ func Recover() router.Handler {
 					})
 				} else {
 					msg = cast.ToString(err)
+					logkit.Error(msg)
 				}
 				if ctx.Proxy.IsStopped() {
 					return

@@ -1,13 +1,15 @@
 package class
 
 import (
-	"database/sql"
+	"database/sql/driver"
+	"github.com/spf13/cast"
 	"mizuki/project/core-kit/library/jsonkit"
 )
 
 // 同时继承scan和value方法
 type Bool struct {
-	sql.NullBool
+	Bool  bool
+	Valid bool
 }
 
 func (th Bool) MarshalJSON() ([]byte, error) {
@@ -28,4 +30,21 @@ func (th *Bool) UnmarshalJSON(data []byte) error {
 		th.Valid = false
 	}
 	return nil
+}
+func (th *Bool) Scan(value interface{}) error {
+	if value == nil {
+		th.Bool, th.Valid = false, false
+		return nil
+	}
+	th.Valid = true
+	th.Bool = cast.ToBool(value)
+	return nil
+}
+
+// Value implements the driver Valuer interface.
+func (th Bool) Value() (driver.Value, error) {
+	if !th.Valid {
+		return nil, nil
+	}
+	return th.Bool, nil
 }

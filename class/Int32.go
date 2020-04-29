@@ -1,13 +1,15 @@
 package class
 
 import (
-	"database/sql"
+	"database/sql/driver"
+	"github.com/spf13/cast"
 	"mizuki/project/core-kit/library/jsonkit"
 )
 
 // 同时继承scan和value方法
 type Int32 struct {
-	sql.NullInt32
+	Int32 int32
+	Valid bool
 }
 
 func (th Int32) MarshalJSON() ([]byte, error) {
@@ -28,4 +30,21 @@ func (th *Int32) UnmarshalJSON(data []byte) error {
 		th.Valid = false
 	}
 	return nil
+}
+func (th *Int32) Scan(value interface{}) error {
+	if value == nil {
+		th.Int32, th.Valid = 0, false
+		return nil
+	}
+	th.Valid = true
+	th.Int32 = cast.ToInt32(value)
+	return nil
+}
+
+// Value implements the driver Valuer interface.
+func (th Int32) Value() (driver.Value, error) {
+	if !th.Valid {
+		return nil, nil
+	}
+	return th.Int32, nil
 }

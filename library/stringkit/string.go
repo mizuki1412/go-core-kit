@@ -34,7 +34,25 @@ func CamelCase(str string) string {
 	strs := strings.Split(str, "_")
 	temp := ""
 	for _, v := range strs {
-		temp += strings.ToUpper(v[:1]) + v[1:]
+		temp += UpperFirst(v)
 	}
 	return temp
+}
+
+// 首字母大写
+func UpperFirst(str string) string {
+	bytes := []byte(str)
+	if bytes[0] >= 'a' {
+		bytes[0] -= 32
+	}
+	return string(bytes)
+}
+
+// 首字母大写
+func LowerFirst(str string) string {
+	bytes := []byte(str)
+	if bytes[0] < 'a' {
+		bytes[0] += 32
+	}
+	return string(bytes)
 }
