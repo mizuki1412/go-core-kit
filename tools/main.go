@@ -13,7 +13,7 @@ func httpServer() {
 }
 
 type Bean struct {
-	Id     int64           `json:"id"`
+	Id     int64           `json:"id" sql:"pk" db:"id"`
 	Name   class.String    `json:"name"`
 	Age    class.Int32     `json:"age"`
 	Extend class.MapString `json:"extend"`
@@ -29,7 +29,8 @@ type loginByUsernameParam struct {
 }
 
 func main() {
-	//SQL2Struct("/Users/ycj/Downloads/demo.sql", "/Users/ycj/Downloads/dest.go")
+
+	SQL2Struct("/Users/ycj/Downloads/demo.sql", "/Users/ycj/Downloads/dest.go")
 	//v := loginByUsernameParam{
 	//	Username: "z",
 	//	Pwd:      class.Int32{Valid: false},
@@ -41,4 +42,5 @@ func main() {
 	//	log.Println(1, rv.Field(i))
 	//	log.Println(2, rt.Field(i).Name)
 	//}
+
 }

@@ -6,6 +6,8 @@ import (
 	"log"
 	"mizuki/project/core-kit/class/exception"
 	"mizuki/project/core-kit/service/configkit"
+	"reflect"
+	"strings"
 )
 
 /**
@@ -38,12 +40,35 @@ func DB() *sqlx.DB {
 	return db
 }
 
+func GetTable(dest interface{}, schema ...string) string {
+	rt := reflect.TypeOf(dest).Elem()
+	return getTable(rt, schema...)
+}
+
+func getTable(rt reflect.Type, schema ...string) string {
+	var tname string
+	for i := 0; i < rt.NumField(); i++ {
+		if t, ok := rt.Field(i).Tag.Lookup("tablename"); ok {
+			tname = t
+			break
+		}
+	}
+	if tname == "" {
+		panic(exception.New("tablename未设置", 2))
+	}
+	schema0 := SchemaDefault
+	if schema != nil && len(schema) > 0 {
+		schema0 = schema[0]
+	}
+	return schema0 + "." + tname
+}
+
 // dest use pointer
 func QueryStruct(dest interface{}, sql string, args []interface{}, err error) {
 	if err != nil {
 		panic(exception.New(err.Error(), 2))
 	}
-	log.Println("sqlkit: ", sql)
+	log.Println("sqlkit:", sql)
 	err = DB().Select(dest, sql, args...)
 	if err != nil {
 		panic(exception.New(err.Error(), 2))
@@ -68,6 +93,33 @@ func QueryMap(sql string, args []interface{}, err error) []map[string]interface{
 	return list
 }
 
+func QueryById(dest interface{}, schema ...string) {
+	rt := reflect.TypeOf(dest).Elem()
+	rv := reflect.ValueOf(dest).Elem()
+	pks := map[string]interface{}{}
+	for i := 0; i < rt.NumField(); i++ {
+		if t, ok := rt.Field(i).Tag.Lookup("sql"); ok {
+			if strings.Contains(t, "pk") {
+				name := rt.Field(i).Tag.Get("db")
+				if name == "" {
+					panic(exception.New("field "+rt.Field(i).Name+" no db tag", 2))
+				}
+				pks[name] = rv.Field(i).Interface()
+			}
+		}
+	}
+	if len(pks) == 0 {
+		panic(exception.New("未设置pk", 2))
+	}
+	builder := Builder().Select("*").From(getTable(rt, schema...))
+	for k, v := range pks {
+		builder = builder.Where(k+"=?", v)
+	}
+	sql, args, err := builder.ToSql()
+	//log.Println(sql,args,err)
+	QueryStruct(dest, sql, args, err)
+}
+
 func Insert() {
 
 }
@@ -79,3 +131,7 @@ func Update() {
 func Delete() {
 
 }
+
+/**
+struct tag 包括 db:name, sql:pk, tablename:name(只在一个tag)
+*/
