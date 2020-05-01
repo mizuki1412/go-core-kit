@@ -63,16 +63,27 @@ func getTable(rt reflect.Type, schema ...string) string {
 	return schema0 + "." + tname
 }
 
-// dest use pointer
-func QueryStruct(dest interface{}, sql string, args []interface{}, err error) {
+// dest a struct
+// todo select会引起no-struct错误（Scan()导致）；structScan 对interface{}报错
+func QueryStruct(destType func(rs *sqlx.Rows) (interface{}, error), sql string, args []interface{}, err error) []interface{} {
 	if err != nil {
 		panic(exception.New(err.Error(), 2))
 	}
-	log.Println("sqlkit:", sql)
-	err = DB().Select(dest, sql, args...)
+	log.Println("sqlkit:", sql, args)
+	//err = DB().Select(dest, sql, args...)
+	var list []interface{}
+	rows, err := DB().Queryx(sql, args...)
 	if err != nil {
 		panic(exception.New(err.Error(), 2))
 	}
+	for rows.Next() {
+		m, err := destType(rows)
+		if err != nil {
+			panic(exception.New(err.Error(), 2))
+		}
+		list = append(list, m)
+	}
+	return list
 }
 
 func QueryMap(sql string, args []interface{}, err error) []map[string]interface{} {
@@ -80,7 +91,7 @@ func QueryMap(sql string, args []interface{}, err error) []map[string]interface{
 		panic(exception.New(err.Error(), 2))
 	}
 	log.Println("sqlkit: ", sql)
-	list := []map[string]interface{}{}
+	var list []map[string]interface{}
 	rows, _ := DB().Queryx(sql, args...)
 	for rows.Next() {
 		m := map[string]interface{}{}
@@ -93,6 +104,7 @@ func QueryMap(sql string, args []interface{}, err error) []map[string]interface{
 	return list
 }
 
+// dest a pointer
 func QueryById(dest interface{}, schema ...string) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
@@ -116,8 +128,17 @@ func QueryById(dest interface{}, schema ...string) {
 		builder = builder.Where(k+"=?", v)
 	}
 	sql, args, err := builder.ToSql()
-	//log.Println(sql,args,err)
-	QueryStruct(dest, sql, args, err)
+	if err != nil {
+		panic(exception.New(err.Error(), 2))
+	}
+	rows, _ := DB().Queryx(sql, args...)
+	for rows.Next() {
+		err := rows.StructScan(dest)
+		if err != nil {
+			panic(exception.New(err.Error(), 2))
+		}
+		break
+	}
 }
 
 func Insert() {
