@@ -22,7 +22,7 @@ func defaultEngine() {
 	router = &router2.Router{
 		IsGroup: false,
 		Proxy:   iris.New(),
-		Path:    "/",
+		Path:    "",
 	}
 	//router.Proxy.Use(recover2.New())
 	router.Use(middleware.Recover())
@@ -36,7 +36,7 @@ func defaultEngine() {
 		}
 		router.ProxyGroup = router.Proxy.Party(base)
 		router.IsGroup = true
-		router.Path = base
+		//router.Path = base
 	}
 }
 

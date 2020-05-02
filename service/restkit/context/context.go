@@ -1,7 +1,6 @@
 package context
 
 import (
-	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/context"
@@ -67,8 +66,7 @@ func (ctx *Context) BindForm(bean interface{}) {
 				panic(exception.New(err.Error()))
 			}
 			for _, err0 := range err.(validator.ValidationErrors) {
-				// todo 格式化err
-				panic(exception.New(fmt.Sprintf("%v", err0)))
+				panic(exception.New("validation failed: " + stringkit.LowerFirst(err0.Field()) + ", need " + err0.Tag()))
 			}
 		}
 	}

@@ -1,10 +1,8 @@
 package router
 
 import (
-	"github.com/iris-contrib/swagger/v12"
-	"github.com/iris-contrib/swagger/v12/swaggerFiles"
 	"github.com/kataras/iris/v12"
-	"github.com/swaggo/swag"
+	context2 "github.com/kataras/iris/v12/context"
 	"mizuki/project/core-kit/service/restkit/context"
 	swg "mizuki/project/core-kit/service/restkit/swagger"
 	"net/http"
@@ -65,7 +63,7 @@ func (router *Router) Post(path string, handlers ...Handler) *swg.SwaggerPath {
 	} else {
 		router.Proxy.Post(path, handlerTrans(handlers...)...)
 	}
-	return &swg.SwaggerPath{Path: router.Path + path}
+	return swg.NewPath(router.Path+path, "post")
 }
 func (router *Router) Get(path string, handlers ...Handler) *swg.SwaggerPath {
 	if router.IsGroup {
@@ -73,7 +71,7 @@ func (router *Router) Get(path string, handlers ...Handler) *swg.SwaggerPath {
 	} else {
 		router.Proxy.Get(path, handlerTrans(handlers...)...)
 	}
-	return &swg.SwaggerPath{Path: router.Path + path}
+	return swg.NewPath(router.Path+path, "get")
 }
 
 func (router *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -82,9 +80,15 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 func (router *Router) RegisterSwagger() {
 	if router.IsGroup {
-		router.ProxyGroup.Get("/swagger/{any:path}", swagger.DisablingWrapHandler(swaggerFiles.Handler, "NAME_OF_ENV_VARIABLE"))
+		//router.ProxyGroup.Get("/swagger/{any:path}", swagger.DisablingWrapHandler(swaggerFiles.Handler, "NAME_OF_ENV_VARIABLE"))
+		router.ProxyGroup.Get("/swagger/{any:path}", func(c context2.Context) {
+			_, _ = c.Write([]byte(swg.Doc.ReadDoc()))
+		})
 	} else {
-		router.Proxy.Get("/swagger/{any:path}", swagger.DisablingWrapHandler(swaggerFiles.Handler, "NAME_OF_ENV_VARIABLE"))
+		//router.Proxy.Get("/swagger/{any:path}", swagger.DisablingWrapHandler(swaggerFiles.Handler, "NAME_OF_ENV_VARIABLE"))
+		router.Proxy.Get("/swagger/{any:path}", func(c context2.Context) {
+			_, _ = c.Write([]byte(swg.Doc.ReadDoc()))
+		})
 	}
-	swag.Register(swag.Name, &swg.Doc{})
+	//swag.Register(swag.Name, &swg.Doc)
 }
