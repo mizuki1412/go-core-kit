@@ -145,8 +145,30 @@ func getPKs(rt reflect.Type, rv reflect.Value) map[string]interface{} {
 	return pks
 }
 
-func Insert() {
-
+func Insert(dest interface{}, schema ...string) {
+	rt := reflect.TypeOf(dest).Elem()
+	rv := reflect.ValueOf(dest).Elem()
+	builder := Builder().Insert(getTable(rt, schema...))
+	for i := 0; i < rt.NumField(); i++ {
+		db, ok := rt.Field(i).Tag.Lookup("db")
+		var val interface{}
+		// 判断field是否指针
+		if rt.Field(i).Type.Kind() == reflect.Ptr && rv.Field(i).Elem().IsValid() {
+			val = rv.Field(i).Elem().Interface()
+		} else if rt.Field(i).Type.Kind() != reflect.Ptr {
+			val = rv.Field(i).Interface()
+		}
+		method := rv.Field(i).MethodByName("Value")
+		if ok && val != nil && method.IsValid() && method.Call([]reflect.Value{})[0].Interface() != nil {
+			builder = builder.Values(db, val)
+		}
+	}
+	sql, args, err := builder.ToSql()
+	if err != nil {
+		panic(exception.New(err.Error(), 2))
+	}
+	log.Println(sql, args)
+	DB().MustExec(sql, args...)
 }
 
 func Update(dest interface{}, schema ...string) {
@@ -165,7 +187,6 @@ func Update(dest interface{}, schema ...string) {
 		}
 		method := rv.Field(i).MethodByName("Value")
 		if ok && pk != "true" && val != nil && method.IsValid() && method.Call([]reflect.Value{})[0].Interface() != nil {
-			log.Println(val)
 			builder = builder.Set(db, val)
 		}
 	}
@@ -177,12 +198,40 @@ func Update(dest interface{}, schema ...string) {
 	if err != nil {
 		panic(exception.New(err.Error(), 2))
 	}
-	log.Println(sql, args)
+	//log.Println(sql, args)
 	DB().MustExec(sql, args...)
 }
 
-func Delete() {
+func Delete(dest interface{}, schema ...string) {
+	rt := reflect.TypeOf(dest).Elem()
+	rv := reflect.ValueOf(dest).Elem()
+	builder := Builder().Delete(getTable(rt, schema...))
+	pks := getPKs(rt, rv)
+	for k, v := range pks {
+		builder = builder.Where(k+"=?", v)
+	}
+	sql, args, err := builder.ToSql()
+	if err != nil {
+		panic(exception.New(err.Error(), 2))
+	}
+	//log.Println(sql, args)
+	DB().MustExec(sql, args...)
+}
 
+func DeleteOff(dest interface{}, schema ...string) {
+	rt := reflect.TypeOf(dest).Elem()
+	rv := reflect.ValueOf(dest).Elem()
+	builder := Builder().Update(getTable(rt, schema...)).Set("off", true)
+	pks := getPKs(rt, rv)
+	for k, v := range pks {
+		builder = builder.Where(k+"=?", v)
+	}
+	sql, args, err := builder.ToSql()
+	if err != nil {
+		panic(exception.New(err.Error(), 2))
+	}
+	//log.Println(sql, args)
+	DB().MustExec(sql, args...)
 }
 
 /**
