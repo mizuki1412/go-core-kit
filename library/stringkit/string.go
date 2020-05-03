@@ -1,6 +1,7 @@
 package stringkit
 
 import (
+	"github.com/spf13/cast"
 	"mizuki/project/core-kit/class/exception"
 	"regexp"
 	"strings"
@@ -19,6 +20,28 @@ func IsNull(obj interface{}) bool {
 func Concat(strs ...string) string {
 	// 内部用的Builder
 	return strings.Join(strs, "")
+}
+
+func ConcatWith(arr []string, sep, decorate string) string {
+	if len(arr) == 0 {
+		return ""
+	}
+	fin := ""
+	for _, v := range arr {
+		fin += decorate + v + decorate + sep
+	}
+	return fin[:strings.LastIndex(fin, sep)]
+}
+
+func ConcatIntWith(arr []int, sep string) string {
+	if len(arr) == 0 {
+		return ""
+	}
+	fin := ""
+	for _, v := range arr {
+		fin += cast.ToString(v) + sep
+	}
+	return fin[:strings.LastIndex(fin, sep)]
 }
 
 // 正则切割

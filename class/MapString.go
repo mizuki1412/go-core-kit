@@ -51,6 +51,5 @@ func (th MapString) Value() (driver.Value, error) {
 	if !th.Valid {
 		return nil, nil
 	}
-	// todo
-	return nil, nil
+	return jsonkit.ToString(th.Map), nil
 }

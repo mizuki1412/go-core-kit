@@ -81,14 +81,16 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 func (router *Router) RegisterSwagger() {
 	if router.IsGroup {
 		//router.ProxyGroup.Get("/swagger/{any:path}", swagger.DisablingWrapHandler(swaggerFiles.Handler, "NAME_OF_ENV_VARIABLE"))
-		router.ProxyGroup.Get("/swagger/{any:path}", func(c context2.Context) {
+		router.ProxyGroup.Get("/swagger/doc", func(c context2.Context) {
 			_, _ = c.Write([]byte(swg.Doc.ReadDoc()))
 		})
+		router.ProxyGroup.HandleDir("/swagger", "./swagger-ui")
 	} else {
 		//router.Proxy.Get("/swagger/{any:path}", swagger.DisablingWrapHandler(swaggerFiles.Handler, "NAME_OF_ENV_VARIABLE"))
-		router.Proxy.Get("/swagger/{any:path}", func(c context2.Context) {
+		router.Proxy.Get("/swagger/doc", func(c context2.Context) {
 			_, _ = c.Write([]byte(swg.Doc.ReadDoc()))
 		})
+		router.Proxy.HandleDir("/swagger", "./swagger-ui")
 	}
 	//swag.Register(swag.Name, &swg.Doc)
 }

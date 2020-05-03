@@ -2,6 +2,7 @@ package main
 
 import (
 	"mizuki/project/core-kit/class"
+	"mizuki/project/core-kit/service/sqlkit"
 	"net/http"
 )
 
@@ -13,7 +14,7 @@ func httpServer() {
 }
 
 type Bean struct {
-	Id     int64           `json:"id" sql:"pk" db:"id"`
+	Id     int64           `json:"id" pk:"true" db:"id"`
 	Name   class.String    `json:"name"`
 	Age    class.Int32     `json:"age"`
 	Extend class.MapString `json:"extend"`
@@ -30,17 +31,8 @@ type loginByUsernameParam struct {
 
 func main() {
 
-	SQL2Struct("/Users/ycj/Downloads/demo.sql", "/Users/ycj/Downloads/dest.go")
-	//v := loginByUsernameParam{
-	//	Username: "z",
-	//	Pwd:      class.Int32{Valid: false},
-	//	Schema:   "pub",
-	//}
-	//rt := reflect.TypeOf(&v).Elem()
-	//rv := reflect.ValueOf(&v).Elem()
-	//for i := 0; i < rt.NumField(); i++ {
-	//	log.Println(1, rv.Field(i))
-	//	log.Println(2, rt.Field(i).Name)
-	//}
+	//SQL2Struct("/Users/ycj/Downloads/demo.sql", "/Users/ycj/Downloads/dest.go")
+
+	sqlkit.Update(&Bean{Id: 11, Name: class.String{String: "qww", Valid: true}})
 
 }

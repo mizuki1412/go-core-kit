@@ -6,7 +6,6 @@ import (
 	"mizuki/project/core-kit/library/stringkit"
 	"mizuki/project/core-kit/service/logkit"
 	"mizuki/project/core-kit/service/restkit/context"
-	"mizuki/project/core-kit/service/restkit/ret"
 	"mizuki/project/core-kit/service/restkit/router"
 )
 
@@ -28,8 +27,8 @@ func Recover() router.Handler {
 				if ctx.Proxy.IsStopped() {
 					return
 				}
-				ret.Json(ctx, ret.RestRet{
-					Result:  ret.ResultErr,
+				ctx.Json(context.RestRet{
+					Result:  context.ResultErr,
 					Message: msg,
 					Data:    nil,
 				})

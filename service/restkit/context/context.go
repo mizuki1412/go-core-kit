@@ -25,11 +25,36 @@ func init() {
 	sessionManager = sessions.New(sessions.Config{
 		Cookie:       "session",
 		AllowReclaim: true,
+		//DisableSubdomainPersistence: true,	// samesite 去掉，但是对chrome无效
 	})
 }
 
 func (ctx *Context) Session() *sessions.Session {
 	return sessionManager.Start(ctx.Proxy)
+}
+
+func (ctx *Context) SessionSetUser(user interface{}) {
+	ctx.Session().Set("user", user)
+}
+func (ctx *Context) SessionSetSchema(schema string) {
+	ctx.Session().Set("schema", schema)
+}
+func (ctx *Context) SessionSetToken(token string) {
+	ctx.Session().Set("token", token)
+}
+
+// eg *model.User
+func (ctx *Context) SessionGetUser() interface{} {
+	return ctx.Session().Get("user")
+}
+func (ctx *Context) SessionGetSchema() string {
+	return ctx.Session().GetString("schema")
+}
+func (ctx *Context) SessionGetToken() string {
+	return ctx.Session().GetString("token")
+}
+func (ctx *Context) SessionRemoveUser() {
+	ctx.Session().Delete("user")
 }
 
 func (ctx *Context) RenewSession() *sessions.Session {

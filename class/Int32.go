@@ -46,5 +46,5 @@ func (th Int32) Value() (driver.Value, error) {
 	if !th.Valid {
 		return nil, nil
 	}
-	return th.Int32, nil
+	return int64(th.Int32), nil
 }

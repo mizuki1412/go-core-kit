@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"github.com/spf13/cast"
 	"mizuki/project/core-kit/library/jsonkit"
+	"mizuki/project/core-kit/library/stringkit"
 	"strings"
 )
 
@@ -64,6 +65,5 @@ func (th ArrInt) Value() (driver.Value, error) {
 	if !th.Valid {
 		return nil, nil
 	}
-	// todo
-	return nil, nil
+	return "{" + stringkit.ConcatIntWith(th.Array, ", ") + "}", nil
 }

@@ -7,7 +7,6 @@ import (
 	"mizuki/project/core-kit/class/exception"
 	"mizuki/project/core-kit/service/configkit"
 	"reflect"
-	"strings"
 )
 
 /**
@@ -108,21 +107,7 @@ func QueryMap(sql string, args []interface{}, err error) []map[string]interface{
 func QueryById(dest interface{}, schema ...string) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
-	pks := map[string]interface{}{}
-	for i := 0; i < rt.NumField(); i++ {
-		if t, ok := rt.Field(i).Tag.Lookup("sql"); ok {
-			if strings.Contains(t, "pk") {
-				name := rt.Field(i).Tag.Get("db")
-				if name == "" {
-					panic(exception.New("field "+rt.Field(i).Name+" no db tag", 2))
-				}
-				pks[name] = rv.Field(i).Interface()
-			}
-		}
-	}
-	if len(pks) == 0 {
-		panic(exception.New("未设置pk", 2))
-	}
+	pks := getPKs(rt, rv)
 	builder := Builder().Select("*").From(getTable(rt, schema...))
 	for k, v := range pks {
 		builder = builder.Where(k+"=?", v)
@@ -141,12 +126,59 @@ func QueryById(dest interface{}, schema ...string) {
 	}
 }
 
+func getPKs(rt reflect.Type, rv reflect.Value) map[string]interface{} {
+	pks := map[string]interface{}{}
+	for i := 0; i < rt.NumField(); i++ {
+		if t, ok := rt.Field(i).Tag.Lookup("pk"); ok {
+			if t == "true" {
+				name := rt.Field(i).Tag.Get("db")
+				if name == "" {
+					panic(exception.New("field "+rt.Field(i).Name+" no db tag", 2))
+				}
+				pks[name] = rv.Field(i).Interface()
+			}
+		}
+	}
+	if len(pks) == 0 {
+		panic(exception.New("未设置pk", 2))
+	}
+	return pks
+}
+
 func Insert() {
 
 }
 
-func Update() {
-
+func Update(dest interface{}, schema ...string) {
+	rt := reflect.TypeOf(dest).Elem()
+	rv := reflect.ValueOf(dest).Elem()
+	builder := Builder().Update(getTable(rt, schema...))
+	for i := 0; i < rt.NumField(); i++ {
+		db, ok := rt.Field(i).Tag.Lookup("db")
+		pk := rt.Field(i).Tag.Get("pk")
+		var val interface{}
+		// 判断field是否指针
+		if rt.Field(i).Type.Kind() == reflect.Ptr && rv.Field(i).Elem().IsValid() {
+			val = rv.Field(i).Elem().Interface()
+		} else if rt.Field(i).Type.Kind() != reflect.Ptr {
+			val = rv.Field(i).Interface()
+		}
+		method := rv.Field(i).MethodByName("Value")
+		if ok && pk != "true" && val != nil && method.IsValid() && method.Call([]reflect.Value{})[0].Interface() != nil {
+			log.Println(val)
+			builder = builder.Set(db, val)
+		}
+	}
+	pks := getPKs(rt, rv)
+	for k, v := range pks {
+		builder = builder.Where(k+"=?", v)
+	}
+	sql, args, err := builder.ToSql()
+	if err != nil {
+		panic(exception.New(err.Error(), 2))
+	}
+	log.Println(sql, args)
+	DB().MustExec(sql, args...)
 }
 
 func Delete() {
@@ -154,5 +186,5 @@ func Delete() {
 }
 
 /**
-struct tag 包括 db:name, sql:pk, tablename:name(只在一个tag)
+struct tag 包括 db:name, pk:true, tablename:name(只在一个tag)
 */

@@ -48,13 +48,13 @@ func SQL2Struct(sqlFile, destFile string) {
 			f := field{Name: es[0]}
 			f.Tags = append(f.Tags, fmt.Sprintf("json:\"%s\" db:\"%s\"", es[0], es[0]))
 			if stringkit.ArrayContains(es, "primary") {
-				f.Tags = append(f.Tags, fmt.Sprintf("sql:\"pk\" tablename:\"%s\"", table))
+				f.Tags = append(f.Tags, fmt.Sprintf("pk:\"true\" tablename:\"%s\"", table))
 			}
 			switch es[1] {
 			case "varchar", "text":
 				f.Type = "class.String"
 			case "serial":
-				f.Type = "int"
+				f.Type = "int32"
 			case "bigserial":
 				f.Type = "int64"
 			case "int", "smallint":

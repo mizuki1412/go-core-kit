@@ -1,8 +1,7 @@
-package ret
+package context
 
 import (
 	"mizuki/project/core-kit/service/logkit"
-	"mizuki/project/core-kit/service/restkit/context"
 	"net/http"
 )
 
@@ -17,7 +16,7 @@ const ResultSuccess = 1
 const ResultAuthErr = 2
 
 // http返回json数据
-func Json(context *context.Context, ret RestRet) {
+func (ctx *Context) Json(ret RestRet) {
 	var code int
 	switch ret.Result {
 	case ResultSuccess:
@@ -27,9 +26,22 @@ func Json(context *context.Context, ret RestRet) {
 	default:
 		code = http.StatusBadRequest
 	}
-	context.Proxy.StatusCode(code)
-	_, err := context.Proxy.JSON(ret)
+	ctx.Proxy.StatusCode(code)
+	_, err := ctx.Proxy.JSON(ret)
 	if err != nil {
 		logkit.Error("rest_ret_json_error: " + err.Error())
 	}
+}
+
+func (ctx *Context) JsonSuccess(data interface{}) {
+	ctx.Json(RestRet{
+		Result: ResultSuccess,
+		Data:   data,
+	})
+}
+func (ctx *Context) JsonError(msg string) {
+	ctx.Json(RestRet{
+		Result:  ResultErr,
+		Message: msg,
+	})
 }
