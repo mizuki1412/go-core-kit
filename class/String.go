@@ -50,3 +50,8 @@ func (th String) Value() (driver.Value, error) {
 	}
 	return th.String, nil
 }
+
+func (th *String) Set(val string) {
+	th.String = val
+	th.Valid = true
+}

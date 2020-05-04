@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cast"
 	"mizuki/project/core-kit/class"
 	"mizuki/project/core-kit/class/exception"
+	"mizuki/project/core-kit/library/jsonkit"
 	"mizuki/project/core-kit/library/stringkit"
 	"net/http"
 	"reflect"
@@ -48,7 +49,7 @@ func (ctx *Context) SessionGetUser() interface{} {
 	return ctx.Session().Get("user")
 }
 func (ctx *Context) SessionGetSchema() string {
-	return ctx.Session().GetString("schema")
+	return ctx.Session().GetStringDefault("schema", "public")
 }
 func (ctx *Context) SessionGetToken() string {
 	return ctx.Session().GetString("token")
@@ -144,6 +145,32 @@ func (ctx *Context) bindStruct(bean interface{}) {
 		case "class.Bool":
 			if !stringkit.IsNull(val) {
 				tmp := class.Bool{Bool: cast.ToBool(val), Valid: true}
+				fieldV.Set(reflect.ValueOf(tmp))
+			}
+		case "class.String":
+			if !stringkit.IsNull(val) {
+				tmp := class.String{String: val, Valid: true}
+				fieldV.Set(reflect.ValueOf(tmp))
+			}
+		case "class.ArrInt":
+			if !stringkit.IsNull(val) {
+				var p []int32
+				jsonkit.ParseObj(val, &p)
+				tmp := class.ArrInt{Array: p, Valid: true}
+				fieldV.Set(reflect.ValueOf(tmp))
+			}
+		case "class.ArrString":
+			if !stringkit.IsNull(val) {
+				var p []string
+				jsonkit.ParseObj(val, &p)
+				tmp := class.ArrString{Array: p, Valid: true}
+				fieldV.Set(reflect.ValueOf(tmp))
+			}
+		case "class.MapString":
+			if !stringkit.IsNull(val) {
+				var p map[string]interface{}
+				jsonkit.ParseObj(val, &p)
+				tmp := class.MapString{Map: p, Valid: true}
 				fieldV.Set(reflect.ValueOf(tmp))
 			}
 		}

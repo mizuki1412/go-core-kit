@@ -14,7 +14,7 @@ import (
 
 // 同时继承scan和value方法
 type ArrInt struct {
-	Array []int
+	Array []int32
 	Valid bool
 }
 
@@ -25,7 +25,7 @@ func (th ArrInt) MarshalJSON() ([]byte, error) {
 	return jsonkit.JSON().Marshal(nil)
 }
 func (th *ArrInt) UnmarshalJSON(data []byte) error {
-	var s *[]int
+	var s *[]int32
 	if err := jsonkit.JSON().Unmarshal(data, &s); err != nil {
 		return err
 	}
@@ -48,13 +48,13 @@ func (th *ArrInt) Scan(value interface{}) error {
 	// parse eg: {1,2} to [1,2]
 	bytes := value.([]byte)
 	if len(bytes) <= 2 {
-		th.Array = []int{}
+		th.Array = []int32{}
 		return nil
 	}
 	es := strings.Split(string(bytes[1:len(bytes)-1]), ",")
-	var arr []int
+	var arr []int32
 	for _, v := range es {
-		arr = append(arr, cast.ToInt(v))
+		arr = append(arr, cast.ToInt32(v))
 	}
 	th.Array = arr
 	return nil
@@ -66,4 +66,9 @@ func (th ArrInt) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return "{" + stringkit.ConcatIntWith(th.Array, ", ") + "}", nil
+}
+
+func (th *ArrInt) Set(val []int32) {
+	th.Array = val
+	th.Valid = true
 }

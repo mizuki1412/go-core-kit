@@ -31,3 +31,8 @@ func (th *Time) UnmarshalJSON(data []byte) error {
 	}
 	return nil
 }
+
+func (th *Time) Set(val time.Time) {
+	th.Time = val
+	th.Valid = true
+}

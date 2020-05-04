@@ -48,3 +48,8 @@ func (th Bool) Value() (driver.Value, error) {
 	}
 	return th.Bool, nil
 }
+
+func (th *Bool) Set(val bool) {
+	th.Bool = val
+	th.Valid = true
+}

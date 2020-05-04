@@ -48,3 +48,8 @@ func (th Float64) Value() (driver.Value, error) {
 	}
 	return th.Float64, nil
 }
+
+func (th *Float64) Set(val float64) {
+	th.Float64 = val
+	th.Valid = true
+}

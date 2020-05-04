@@ -3,6 +3,7 @@ package class
 import (
 	"database/sql/driver"
 	"mizuki/project/core-kit/library/jsonkit"
+	"mizuki/project/core-kit/library/mapkit"
 )
 
 /**
@@ -52,4 +53,14 @@ func (th MapString) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return jsonkit.ToString(th.Map), nil
+}
+
+func (th *MapString) Set(val map[string]interface{}) {
+	th.Map = val
+	th.Valid = true
+}
+
+func (th *MapString) PutAll(val map[string]interface{}) {
+	mapkit.PutAll(th.Map, val)
+	th.Valid = true
 }

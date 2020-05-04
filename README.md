@@ -1,5 +1,13 @@
 toolkit for golang projects
 
+# Define
+
+action的params tags: `validate:"required" description:"xxx" default:""`
+bean struct tags: `json:"" db:"db-field-name" pk:"true" tablename:"x"`
+
+context BindForm: 将会先trim，空字符串当做nil
+处理bean中field时，注意valid，class中的类可以用Set方法；自定义field struct用指针。
+
 # Related projects
 
 ## Common

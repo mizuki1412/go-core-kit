@@ -61,3 +61,8 @@ func (th ArrString) Value() (driver.Value, error) {
 	}
 	return "{" + stringkit.ConcatWith(th.Array, ",", "'") + "}", nil
 }
+
+func (th *ArrString) Set(val []string) {
+	th.Array = val
+	th.Valid = true
+}

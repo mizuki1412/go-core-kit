@@ -33,7 +33,7 @@ func ConcatWith(arr []string, sep, decorate string) string {
 	return fin[:strings.LastIndex(fin, sep)]
 }
 
-func ConcatIntWith(arr []int, sep string) string {
+func ConcatIntWith(arr []int32, sep string) string {
 	if len(arr) == 0 {
 		return ""
 	}
