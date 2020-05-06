@@ -149,7 +149,19 @@ func Insert(dest interface{}, schema ...string) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
 	builder := Builder().Insert(getTable(rt, schema...))
+	var pks []string
+	var columns []string
+	var vals []interface{}
 	for i := 0; i < rt.NumField(); i++ {
+		// 自增
+		if t, ok := rt.Field(i).Tag.Lookup("autoincrement"); ok && t == "true" {
+			name := rt.Field(i).Tag.Get("db")
+			if name == "" {
+				panic(exception.New("field "+rt.Field(i).Name+" no db tag", 2))
+			}
+			pks = append(pks, name)
+			continue
+		}
 		db, ok := rt.Field(i).Tag.Lookup("db")
 		var val interface{}
 		// 判断field是否指针
@@ -159,16 +171,36 @@ func Insert(dest interface{}, schema ...string) {
 			val = rv.Field(i).Interface()
 		}
 		method := rv.Field(i).MethodByName("Value")
-		if ok && val != nil && method.IsValid() && method.Call([]reflect.Value{})[0].Interface() != nil {
-			builder = builder.Values(db, val)
+		if ok && val != nil && (!method.IsValid() || (method.IsValid() && method.Call([]reflect.Value{})[0].Interface() != nil)) {
+			columns = append(columns, db)
+			vals = append(vals, val)
 		}
+	}
+	if len(columns) == 0 {
+		panic(exception.New("no fields", 2))
+	}
+	builder = builder.Columns(columns...).Values(vals...)
+	// 暂支持一个return
+	if len(pks) > 0 {
+		builder = builder.Suffix("returning " + pks[0])
 	}
 	sql, args, err := builder.ToSql()
 	if err != nil {
 		panic(exception.New(err.Error(), 2))
 	}
 	log.Println(sql, args)
-	DB().MustExec(sql, args...)
+	rows, err := DB().Queryx(sql, args...)
+	if err != nil {
+		panic(exception.New(err.Error(), 2))
+	}
+	for rows.Next() {
+		// return 赋值
+		err := rows.StructScan(dest)
+		if err != nil {
+			panic(exception.New(err.Error(), 2))
+		}
+		break
+	}
 }
 
 func Update(dest interface{}, schema ...string) {
@@ -235,5 +267,5 @@ func DeleteOff(dest interface{}, schema ...string) {
 }
 
 /**
-struct tag 包括 db:name, pk:true, tablename:name(只在一个tag)
+struct tag 包括 db:name, pk:true, tablename:name(只在一个tag), autoincrement:"true"
 */
