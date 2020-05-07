@@ -9,6 +9,9 @@ import (
 	"mizuki/project/core-kit/service/restkit/router"
 )
 
+/**
+错误处理，以及db事务处理。
+*/
 func Recover() router.Handler {
 	return func(ctx *context.Context) {
 		defer func() {
@@ -24,6 +27,10 @@ func Recover() router.Handler {
 					msg = cast.ToString(err)
 					logkit.Error(msg)
 				}
+				// transaction
+				if ctx.DBTxExist() {
+					ctx.DBTx().Rollback()
+				}
 				if ctx.Proxy.IsStopped() {
 					return
 				}
@@ -36,5 +43,9 @@ func Recover() router.Handler {
 			}
 		}()
 		ctx.Proxy.Next()
+		// transaction
+		if ctx.DBTxExist() {
+			ctx.DBTx().Commit()
+		}
 	}
 }

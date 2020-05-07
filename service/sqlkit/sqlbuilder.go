@@ -3,7 +3,7 @@ package sqlkit
 import "github.com/Masterminds/squirrel"
 
 func Builder() squirrel.StatementBuilderType {
-	if Driver() == "postgres" {
+	if driverName() == "postgres" {
 		return squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 	} else {
 		// todo 未处理oracle

@@ -55,8 +55,10 @@ func SQL2Struct(sqlFile, destFile string) {
 				f.Type = "class.String"
 			case "serial":
 				f.Type = "int32"
+				f.Tags = append(f.Tags, "autoincrement:\"true\"")
 			case "bigserial":
 				f.Type = "int64"
+				f.Tags = append(f.Tags, "autoincrement:\"true\"")
 			case "int", "smallint":
 				f.Type = "class.Int32"
 			case "bigint":

@@ -5,15 +5,14 @@ import (
 	"github.com/jmoiron/sqlx"
 	"log"
 	"mizuki/project/core-kit/class/exception"
+	"mizuki/project/core-kit/library/stringkit"
 	"mizuki/project/core-kit/service/configkit"
 	"reflect"
 )
 
 /**
 数据库连接和CRUD的通用接口
-rows转struct和map
 在项目的main中须要导入driver
-//todo middleware中加入事务
 */
 
 var driver string
@@ -21,13 +20,13 @@ var db *sqlx.DB
 
 const SchemaDefault = "public"
 
-func Driver() string {
+func driverName() string {
 	if db == nil {
-		DB()
+		connector()
 	}
 	return driver
 }
-func DB() *sqlx.DB {
+func connector() *sqlx.DB {
 	if !configkit.Exist(ConfigKeyDBDriver) || !configkit.Exist(ConfigKeyDBHost) || !configkit.Exist(ConfigKeyDBPort) || !configkit.Exist(ConfigKeyDBPwd) || !configkit.Exist(ConfigKeyDBUser) || !configkit.Exist(ConfigKeyDBName) {
 		panic("sqlkit: database config error")
 	}
@@ -39,11 +38,43 @@ func DB() *sqlx.DB {
 	return db
 }
 
-func GetTable(dest interface{}, schema ...string) string {
-	rt := reflect.TypeOf(dest).Elem()
-	return getTable(rt, schema...)
+type Dao struct {
+	ResultType byte
+	Schema     string
+	TX         *sqlx.Tx
+	DB         *sqlx.DB
 }
 
+func New(schema string) *Dao {
+	return &Dao{
+		Schema: schema,
+		DB:     connector(),
+	}
+}
+
+// 在context中调用，如果要单独调用，注意commit和rollback的处理
+func NewTX(schema string) *Dao {
+	return &Dao{
+		Schema: schema,
+		TX:     connector().MustBegin(),
+		DB:     connector(),
+	}
+}
+
+func (dao *Dao) SetResultType(rt byte) *Dao {
+	dao.ResultType = rt
+	return dao
+}
+
+func (dao *Dao) SetSchema(schema string) *Dao {
+	dao.Schema = schema
+	return dao
+}
+
+func (dao *Dao) GetTable(dest interface{}) string {
+	rt := reflect.TypeOf(dest).Elem()
+	return getTable(rt, dao.Schema)
+}
 func getTable(rt reflect.Type, schema ...string) string {
 	var tname string
 	for i := 0; i < rt.NumField(); i++ {
@@ -56,25 +87,58 @@ func getTable(rt reflect.Type, schema ...string) string {
 		panic(exception.New("tablename未设置", 2))
 	}
 	schema0 := SchemaDefault
-	if schema != nil && len(schema) > 0 {
+	if schema != nil && len(schema) > 0 && !stringkit.IsNull(schema[0]) {
 		schema0 = schema[0]
 	}
 	return schema0 + "." + tname
 }
 
+// transaction
+func (dao *Dao) Commit() {
+	if dao.TX != nil {
+		err := dao.TX.Commit()
+		if err != nil {
+			panic(exception.New(err.Error(), 2))
+		}
+	}
+}
+func (dao *Dao) Rollback() {
+	if dao.TX != nil {
+		_ = dao.TX.Rollback()
+	}
+}
+
+func (dao *Dao) Query(sql string, args ...interface{}) *sqlx.Rows {
+	var rows *sqlx.Rows
+	var err error
+	if dao.TX != nil {
+		rows, err = dao.TX.Queryx(sql, args...)
+	} else {
+		rows, err = dao.DB.Queryx(sql, args...)
+	}
+	if err != nil {
+		panic(exception.New(err.Error(), 2))
+	}
+	return rows
+}
+func (dao *Dao) Exec(sql string, args ...interface{}) {
+	if dao.TX != nil {
+		dao.TX.MustExec(sql, args...)
+	} else {
+		dao.DB.MustExec(sql, args...)
+	}
+}
+
 // dest a struct
 // todo select会引起no-struct错误（Scan()导致）；structScan 对interface{}报错
-func QueryStruct(destType func(rs *sqlx.Rows) (interface{}, error), sql string, args []interface{}, err error) []interface{} {
+func (dao *Dao) QueryStruct(destType func(rs *sqlx.Rows) (interface{}, error), sql string, args []interface{}, err error) []interface{} {
 	if err != nil {
 		panic(exception.New(err.Error(), 2))
 	}
-	log.Println("sqlkit:", sql, args)
+	//log.Println("sqlkit:", sql, args)
 	//err = DB().Select(dest, sql, args...)
 	var list []interface{}
-	rows, err := DB().Queryx(sql, args...)
-	if err != nil {
-		panic(exception.New(err.Error(), 2))
-	}
+	rows := dao.Query(sql, args...)
 	for rows.Next() {
 		m, err := destType(rows)
 		if err != nil {
@@ -85,13 +149,12 @@ func QueryStruct(destType func(rs *sqlx.Rows) (interface{}, error), sql string, 
 	return list
 }
 
-func QueryMap(sql string, args []interface{}, err error) []map[string]interface{} {
+func (dao *Dao) QueryMap(sql string, args []interface{}, err error) []map[string]interface{} {
 	if err != nil {
 		panic(exception.New(err.Error(), 2))
 	}
-	log.Println("sqlkit: ", sql)
 	var list []map[string]interface{}
-	rows, _ := DB().Queryx(sql, args...)
+	rows := dao.Query(sql, args...)
 	for rows.Next() {
 		m := map[string]interface{}{}
 		err := rows.MapScan(m)
@@ -104,11 +167,11 @@ func QueryMap(sql string, args []interface{}, err error) []map[string]interface{
 }
 
 // dest a pointer
-func QueryById(dest interface{}, schema ...string) {
+func (dao *Dao) QueryById(dest interface{}) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
 	pks := getPKs(rt, rv)
-	builder := Builder().Select("*").From(getTable(rt, schema...))
+	builder := Builder().Select("*").From(getTable(rt))
 	for k, v := range pks {
 		builder = builder.Where(k+"=?", v)
 	}
@@ -116,7 +179,7 @@ func QueryById(dest interface{}, schema ...string) {
 	if err != nil {
 		panic(exception.New(err.Error(), 2))
 	}
-	rows, _ := DB().Queryx(sql, args...)
+	rows := dao.Query(sql, args...)
 	for rows.Next() {
 		err := rows.StructScan(dest)
 		if err != nil {
@@ -145,10 +208,10 @@ func getPKs(rt reflect.Type, rv reflect.Value) map[string]interface{} {
 	return pks
 }
 
-func Insert(dest interface{}, schema ...string) {
+func (dao *Dao) Insert(dest interface{}) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
-	builder := Builder().Insert(getTable(rt, schema...))
+	builder := Builder().Insert(getTable(rt))
 	var pks []string
 	var columns []string
 	var vals []interface{}
@@ -189,10 +252,7 @@ func Insert(dest interface{}, schema ...string) {
 		panic(exception.New(err.Error(), 2))
 	}
 	log.Println(sql, args)
-	rows, err := DB().Queryx(sql, args...)
-	if err != nil {
-		panic(exception.New(err.Error(), 2))
-	}
+	rows := dao.Query(sql, args...)
 	for rows.Next() {
 		// return 赋值
 		err := rows.StructScan(dest)
@@ -203,10 +263,10 @@ func Insert(dest interface{}, schema ...string) {
 	}
 }
 
-func Update(dest interface{}, schema ...string) {
+func (dao *Dao) Update(dest interface{}) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
-	builder := Builder().Update(getTable(rt, schema...))
+	builder := Builder().Update(getTable(rt))
 	for i := 0; i < rt.NumField(); i++ {
 		db, ok := rt.Field(i).Tag.Lookup("db")
 		pk := rt.Field(i).Tag.Get("pk")
@@ -231,13 +291,13 @@ func Update(dest interface{}, schema ...string) {
 		panic(exception.New(err.Error(), 2))
 	}
 	//log.Println(sql, args)
-	DB().MustExec(sql, args...)
+	dao.Exec(sql, args...)
 }
 
-func Delete(dest interface{}, schema ...string) {
+func (dao *Dao) Delete(dest interface{}) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
-	builder := Builder().Delete(getTable(rt, schema...))
+	builder := Builder().Delete(getTable(rt))
 	pks := getPKs(rt, rv)
 	for k, v := range pks {
 		builder = builder.Where(k+"=?", v)
@@ -247,13 +307,13 @@ func Delete(dest interface{}, schema ...string) {
 		panic(exception.New(err.Error(), 2))
 	}
 	//log.Println(sql, args)
-	DB().MustExec(sql, args...)
+	dao.Exec(sql, args...)
 }
 
-func DeleteOff(dest interface{}, schema ...string) {
+func (dao *Dao) DeleteOff(dest interface{}) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
-	builder := Builder().Update(getTable(rt, schema...)).Set("off", true)
+	builder := Builder().Update(getTable(rt)).Set("off", true)
 	pks := getPKs(rt, rv)
 	for k, v := range pks {
 		builder = builder.Where(k+"=?", v)
@@ -263,7 +323,7 @@ func DeleteOff(dest interface{}, schema ...string) {
 		panic(exception.New(err.Error(), 2))
 	}
 	//log.Println(sql, args)
-	DB().MustExec(sql, args...)
+	dao.Exec(sql, args...)
 }
 
 /**

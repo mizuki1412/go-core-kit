@@ -10,6 +10,7 @@ import (
 	"mizuki/project/core-kit/class/exception"
 	"mizuki/project/core-kit/library/jsonkit"
 	"mizuki/project/core-kit/library/stringkit"
+	"mizuki/project/core-kit/service/sqlkit"
 	"net/http"
 	"reflect"
 )
@@ -28,6 +29,29 @@ func init() {
 		AllowReclaim: true,
 		//DisableSubdomainPersistence: true,	// samesite 去掉，但是对chrome无效
 	})
+}
+
+// msg per request
+func (ctx *Context) Set(key string, val interface{}) {
+	ctx.Proxy.Values().Set(key, val)
+}
+
+func (ctx *Context) Get(key string) interface{} {
+	return ctx.Proxy.Values().Get(key)
+}
+
+func (ctx *Context) DBTx() *sqlkit.Dao {
+	var dao *sqlkit.Dao
+	if ctx.Get("dbtx") == nil {
+		dao = sqlkit.NewTX(ctx.SessionGetSchema())
+		ctx.Set("dbtx", dao)
+	} else {
+		dao = ctx.Get("dbtx").(*sqlkit.Dao)
+	}
+	return dao
+}
+func (ctx *Context) DBTxExist() bool {
+	return ctx.Get("dbtx") != nil
 }
 
 func (ctx *Context) Session() *sessions.Session {
