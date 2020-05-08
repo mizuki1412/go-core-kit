@@ -1,6 +1,8 @@
 package sqlkit
 
-import "github.com/Masterminds/squirrel"
+import (
+	"github.com/Masterminds/squirrel"
+)
 
 func Builder() squirrel.StatementBuilderType {
 	if driverName() == "postgres" {

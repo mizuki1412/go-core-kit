@@ -55,9 +55,11 @@ func Run() {
 }
 
 // 导入业务模块，其中的路由和中间件
-func AddMod(modInit func(r *router2.Router)) {
+func AddActions(actionInits ...func(r *router2.Router)) {
 	if router == nil {
 		defaultEngine()
 	}
-	modInit(router)
+	for _, action := range actionInits {
+		action(router)
+	}
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"mizuki/project/core-kit/class"
-	"mizuki/project/core-kit/service/sqlkit"
 	"net/http"
 )
 
@@ -31,8 +30,8 @@ type loginByUsernameParam struct {
 
 func main() {
 
-	//SQL2Struct("/Users/ycj/Downloads/demo.sql", "/Users/ycj/Downloads/dest.go")
+	SQL2Struct("/Users/ycj/Downloads/demo.sql", "/Users/ycj/Downloads/dest.go")
 
-	sqlkit.Update(&Bean{Id: 11, Name: class.String{String: "qww", Valid: true}})
+	//sqlkit.Update(&Bean{Id: 11, Name: class.String{String: "qww", Valid: true}})
 
 }
