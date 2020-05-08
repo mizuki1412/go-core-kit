@@ -8,6 +8,9 @@ bean struct tags: `json:"" db:"db-field-name" pk:"true" tablename:"x" autoincrem
 context BindForm: 将会先trim，空字符串当做nil
 处理bean中field时，注意valid，class中的类可以用Set方法；自定义field struct用指针。
 
+# Attention
+- sqlkit commit: 如果只有select语句，commit将会出错。
+
 # Related projects
 
 ## Common

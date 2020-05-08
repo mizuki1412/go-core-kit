@@ -7,6 +7,7 @@ import (
 	"mizuki/project/core-kit/class/exception"
 	"mizuki/project/core-kit/library/stringkit"
 	"mizuki/project/core-kit/service/configkit"
+	"mizuki/project/core-kit/service/logkit"
 	"reflect"
 )
 
@@ -98,13 +99,17 @@ func (dao *Dao) Commit() {
 	if dao.TX != nil {
 		err := dao.TX.Commit()
 		if err != nil {
-			panic(exception.New(err.Error(), 2))
+			logkit.Error(err.Error())
+			//panic(exception.New(err.Error(), 2))
 		}
 	}
 }
 func (dao *Dao) Rollback() {
 	if dao.TX != nil {
-		_ = dao.TX.Rollback()
+		err := dao.TX.Rollback()
+		if err != nil {
+			logkit.Error(err.Error())
+		}
 	}
 }
 
