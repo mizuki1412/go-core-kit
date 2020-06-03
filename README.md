@@ -1,15 +1,35 @@
 toolkit for golang projects
 
-# Define
+# Usage
 
-action的params tags: `validate:"required" description:"xxx" default:""`
-bean struct tags: `json:"" db:"db-field-name" pk:"true" tablename:"x" autoincrement:"true"`
+## init.go
+应用了automaxprocs，校正docker环境中的cpu核数
 
-context BindForm: 将会先trim，空字符串当做nil
-处理bean中field时，注意valid，class中的类可以用Set方法；自定义field struct用指针。
+```go
+/// 在项目的main中先导入
+package main
+import (_ "mizuki/project/core-kit")
+```
 
-# Attention
-- sqlkit commit: 如果只有select语句，commit将会出错。
+## configconst.go
+关于项目的一些配置key定义。
+
+在service等地方也有此类定义。
+
+## class
+通用的一些类的封装和定义
+
+## library
+通用的工具库
+
+## service
+通用的服务库
+
+## pc
+应用于pc端，web+go的模式，go作为基座的一些封装。
+
+## tools
+本地使用demo。
 
 # Related projects
 
