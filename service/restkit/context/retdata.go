@@ -34,6 +34,8 @@ func (ctx *Context) Json(ret RestRet) {
 }
 
 func (ctx *Context) JsonSuccess(data interface{}) {
+	// todo 更新session的expire 会不会太频繁
+	ctx.UpdateSessionExpire()
 	ctx.Json(RestRet{
 		Result: ResultSuccess,
 		Data:   data,

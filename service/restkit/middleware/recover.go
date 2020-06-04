@@ -34,11 +34,7 @@ func Recover() router.Handler {
 				if ctx.Proxy.IsStopped() {
 					return
 				}
-				ctx.Json(context.RestRet{
-					Result:  context.ResultErr,
-					Message: msg,
-					Data:    nil,
-				})
+				ctx.JsonError(msg)
 				ctx.Proxy.StopExecution()
 			}
 		}()

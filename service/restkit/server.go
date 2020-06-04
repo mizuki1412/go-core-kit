@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/cast"
 	"mizuki/project/core-kit/service/configkit"
 	"mizuki/project/core-kit/service/logkit"
+	"mizuki/project/core-kit/service/restkit/context"
 	"mizuki/project/core-kit/service/restkit/middleware"
 	router2 "mizuki/project/core-kit/service/restkit/router"
 )
@@ -38,6 +39,9 @@ func defaultEngine() {
 		router.IsGroup = true
 		//router.Path = base
 	}
+
+	/// init session
+	context.InitSession()
 }
 
 func Run() {

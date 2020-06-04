@@ -68,6 +68,9 @@ import (_ "mizuki/project/core-kit")
 ### mqttkit
 - [mqtt](https://github.com/eclipse/paho.mqtt.golang)
 
+### rediskit
+- [go-redis](https://github.com/go-redis/redis/v8)
+
 ## pc
 
 ### bridge

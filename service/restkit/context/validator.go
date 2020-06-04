@@ -36,10 +36,3 @@ func validateValuer(field reflect.Value) interface{} {
 	}
 	return nil
 }
-
-/**
-note:
-https://github.com/kataras/iris/wiki/Model-validation
-https://github.com/go-playground/validator
-
-*/

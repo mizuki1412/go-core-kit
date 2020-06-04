@@ -1,6 +1,10 @@
 
 ## config配置项总览
 ```go
+package demo
+
+const ConfigKeyTimeLocation = "time.location"
+
 // 日志目录
 const ConfigKeyLogPath = "logger.path"
 // 文件名，无后缀
@@ -17,6 +21,8 @@ const ConfigKeyMQTTPwd = "mqtt.pwd"
 const ConfigKeyRestServerPort = "rest.port"
 // base path
 const ConfigKeyRestServerBase = "rest.base"
+// session过期时间 默认24h
+const ConfigKeySessionExpire = "rest.sessionExpire"
 
 const ConfigKeySwaggerTitle = "swagger.title"
 const ConfigKeySwaggerDescription = "swagger.description"
@@ -30,6 +36,11 @@ const ConfigKeyDBPort = "db.port"
 const ConfigKeyDBUser = "db.user"
 const ConfigKeyDBPwd = "db.pwd"
 const ConfigKeyDBName = "db.name"
+
+const ConfigKeyRedisHost = "redis.host"
+const ConfigKeyRedisPort = "redis.port"
+const ConfigKeyRedisPwd = "redis.pwd"
+const ConfigKeyRedisDB = "redis.db"
 ```
 
 ## restkit
@@ -37,8 +48,7 @@ const ConfigKeyDBName = "db.name"
 
 ```go
 // 启动rest server，加入Action模块
-restkit.AddActions(
-	user.All()...)
+restkit.AddActions(user.All()...)
 restkit.Run()
 
 /// 例如action mod中需要定义All()
@@ -65,13 +75,35 @@ func Init(router *router.Router) {
 
 ### 约定/注意
 
-action的params tags: `validate:"required" description:"xxx" default:""`
+- action的params tags: `validate:"required" description:"xxx" default:""`
+- bean struct tags: `json:"" db:"db-field-name" pk:"true" tablename:"x" autoincrement:"true"`
+- context BindForm: 将会先trim，空字符串当做nil。
+- 在action中，处理bean中的field时，注意field的valid属性，class中的类可以用Set方法来作为参数设置；自定义的field struct用指针。
+- iris.Context.next() 之后的代码逻辑是在response发出之后的，不能再修改response
 
-bean struct tags: `json:"" db:"db-field-name" pk:"true" tablename:"x" autoincrement:"true"`
+### context/validator
 
-context BindForm: 将会先trim，空字符串当做nil。
+https://github.com/kataras/iris/wiki/Model-validation
 
-在action中，处理bean中的field时，注意field的valid属性，class中的类可以用Set方法来作为参数设置；自定义的field struct用指针。
+https://github.com/go-playground/validator
+
+### context/session
+
+https://github.com/kataras/iris/wiki/Sessions-database
+
+实际iris redis存储的内容有：
+- (prefix)+sessionID
+- (prefix)+sessionID-(session的每个key)
+
+redis session key的expire时间，受iris session config控制，同时renew时，旧的也会删除。
+
+### swagger
+
+需要在实际项目中配合使用swagger-ui，访问地址为 ip:port/projectName/swagger 
 
 ## sqlkit
 - **注意 commit: 如果只有select语句，commit将会出错。**
+
+## configkit
+
+**注意：请勿在init中获取configkit的参数值，那时还未加载。**

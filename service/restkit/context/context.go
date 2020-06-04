@@ -4,7 +4,6 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/context"
-	"github.com/kataras/iris/v12/sessions"
 	"github.com/spf13/cast"
 	"mizuki/project/core-kit/class"
 	"mizuki/project/core-kit/class/exception"
@@ -19,16 +18,6 @@ type Context struct {
 	Proxy    iris.Context
 	Request  *http.Request
 	Response context.ResponseWriter
-}
-
-var sessionManager *sessions.Sessions
-
-func init() {
-	sessionManager = sessions.New(sessions.Config{
-		Cookie:       "session",
-		AllowReclaim: true,
-		//DisableSubdomainPersistence: true,	// samesite 去掉，但是对chrome无效
-	})
 }
 
 // msg per request
@@ -52,43 +41,6 @@ func (ctx *Context) DBTx() *sqlkit.Dao {
 }
 func (ctx *Context) DBTxExist() bool {
 	return ctx.Get("dbtx") != nil
-}
-
-func (ctx *Context) Session() *sessions.Session {
-	return sessionManager.Start(ctx.Proxy)
-}
-
-func (ctx *Context) SessionSetUser(user interface{}) {
-	ctx.Session().Set("user", user)
-}
-func (ctx *Context) SessionSetSchema(schema string) {
-	ctx.Session().Set("schema", schema)
-}
-func (ctx *Context) SessionSetToken(token string) {
-	ctx.Session().Set("token", token)
-}
-
-// eg *model.User
-func (ctx *Context) SessionGetUser() interface{} {
-	return ctx.Session().Get("user")
-}
-func (ctx *Context) SessionGetSchema() string {
-	return ctx.Session().GetStringDefault("schema", "public")
-}
-func (ctx *Context) SessionGetToken() string {
-	return ctx.Session().GetString("token")
-}
-func (ctx *Context) SessionRemoveUser() {
-	ctx.Session().Delete("user")
-}
-
-func (ctx *Context) RenewSession() *sessions.Session {
-	sess := ctx.Session()
-	if !sess.IsNew() {
-		sessionManager.Destroy(ctx.Proxy)
-		return ctx.Session()
-	}
-	return sess
 }
 
 // data: query, form, json/xml, param
