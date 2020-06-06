@@ -2,8 +2,8 @@ package class
 
 import (
 	"database/sql"
-	"mizuki/framework/core-kit/library/jsonkit"
-	"mizuki/framework/core-kit/library/timekit"
+	"github.com/mizuki1412/go-core-kit/library/jsonkit"
+	"github.com/mizuki1412/go-core-kit/library/timekit"
 	"time"
 )
 

@@ -3,8 +3,8 @@ package rediskit
 import (
 	"context"
 	"github.com/go-redis/redis/v8"
+	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/spf13/cast"
-	"mizuki/framework/core-kit/service/configkit"
 )
 
 var client *redis.Client

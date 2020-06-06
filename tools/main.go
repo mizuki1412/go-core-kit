@@ -1,7 +1,7 @@
 package main
 
 import (
-	"mizuki/framework/core-kit/class"
+	"github.com/mizuki1412/go-core-kit/class"
 	"net/http"
 )
 

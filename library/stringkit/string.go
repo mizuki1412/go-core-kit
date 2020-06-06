@@ -1,8 +1,8 @@
 package stringkit
 
 import (
+	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/spf13/cast"
-	"mizuki/framework/core-kit/class/exception"
 	"regexp"
 	"strings"
 )

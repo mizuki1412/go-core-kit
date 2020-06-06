@@ -1,9 +1,9 @@
 package swagger
 
 import (
-	"mizuki/framework/core-kit/library/jsonkit"
-	"mizuki/framework/core-kit/library/stringkit"
-	"mizuki/framework/core-kit/service/configkit"
+	"github.com/mizuki1412/go-core-kit/library/jsonkit"
+	"github.com/mizuki1412/go-core-kit/library/stringkit"
+	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"reflect"
 	"strings"
 )

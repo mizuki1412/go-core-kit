@@ -2,9 +2,9 @@ package class
 
 import (
 	"database/sql/driver"
+	"github.com/mizuki1412/go-core-kit/library/jsonkit"
+	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/spf13/cast"
-	"mizuki/framework/core-kit/library/jsonkit"
-	"mizuki/framework/core-kit/library/stringkit"
 	"strings"
 )
 

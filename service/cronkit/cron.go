@@ -1,8 +1,8 @@
 package cronkit
 
 import (
+	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/robfig/cron/v3"
-	"mizuki/framework/core-kit/service/configkit"
 )
 
 var scheduler *cron.Cron

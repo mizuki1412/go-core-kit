@@ -3,11 +3,11 @@ package sqlkit
 import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/library/stringkit"
+	"github.com/mizuki1412/go-core-kit/service/configkit"
+	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"log"
-	"mizuki/framework/core-kit/class/exception"
-	"mizuki/framework/core-kit/library/stringkit"
-	"mizuki/framework/core-kit/service/configkit"
-	"mizuki/framework/core-kit/service/logkit"
 	"reflect"
 )
 

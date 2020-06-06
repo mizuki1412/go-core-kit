@@ -2,12 +2,12 @@ package restkit
 
 import (
 	"github.com/kataras/iris/v12"
+	"github.com/mizuki1412/go-core-kit/service/configkit"
+	"github.com/mizuki1412/go-core-kit/service/logkit"
+	"github.com/mizuki1412/go-core-kit/service/restkit/context"
+	"github.com/mizuki1412/go-core-kit/service/restkit/middleware"
+	router2 "github.com/mizuki1412/go-core-kit/service/restkit/router"
 	"github.com/spf13/cast"
-	"mizuki/framework/core-kit/service/configkit"
-	"mizuki/framework/core-kit/service/logkit"
-	"mizuki/framework/core-kit/service/restkit/context"
-	"mizuki/framework/core-kit/service/restkit/middleware"
-	router2 "mizuki/framework/core-kit/service/restkit/router"
 )
 
 var router *router2.Router

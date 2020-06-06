@@ -2,8 +2,8 @@ package class
 
 import (
 	"database/sql/driver"
+	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/spf13/cast"
-	"mizuki/framework/core-kit/library/jsonkit"
 )
 
 // 同时继承scan和value方法

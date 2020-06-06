@@ -1,7 +1,7 @@
 package context
 
 import (
-	"mizuki/framework/core-kit/service/logkit"
+	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"net/http"
 )
 

@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"mizuki/framework/core-kit/library/filekit"
-	"mizuki/framework/core-kit/library/stringkit"
+	"github.com/mizuki1412/go-core-kit/library/filekit"
+	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"strings"
 )
 

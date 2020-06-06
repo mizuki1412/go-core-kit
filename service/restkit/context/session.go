@@ -4,10 +4,10 @@ import (
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/sessions"
 	"github.com/kataras/iris/v12/sessions/sessiondb/redis"
+	"github.com/mizuki1412/go-core-kit/service/configkit"
+	"github.com/mizuki1412/go-core-kit/service/logkit"
+	"github.com/mizuki1412/go-core-kit/service/rediskit"
 	"github.com/spf13/cast"
-	"mizuki/framework/core-kit/service/configkit"
-	"mizuki/framework/core-kit/service/logkit"
-	"mizuki/framework/core-kit/service/rediskit"
 	"time"
 )
 

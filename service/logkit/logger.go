@@ -4,12 +4,12 @@ package logkit
 
 import (
 	"github.com/arthurkiller/rollingwriter"
+	"github.com/mizuki1412/go-core-kit/library/timekit"
+	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/spf13/cast"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"io"
-	"mizuki/framework/core-kit/library/timekit"
-	"mizuki/framework/core-kit/service/configkit"
 	"os"
 	"strings"
 	"time"
