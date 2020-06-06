@@ -3,11 +3,11 @@ package restkit
 import (
 	"github.com/kataras/iris/v12"
 	"github.com/spf13/cast"
-	"mizuki/project/core-kit/service/configkit"
-	"mizuki/project/core-kit/service/logkit"
-	"mizuki/project/core-kit/service/restkit/context"
-	"mizuki/project/core-kit/service/restkit/middleware"
-	router2 "mizuki/project/core-kit/service/restkit/router"
+	"mizuki/framework/core-kit/service/configkit"
+	"mizuki/framework/core-kit/service/logkit"
+	"mizuki/framework/core-kit/service/restkit/context"
+	"mizuki/framework/core-kit/service/restkit/middleware"
+	router2 "mizuki/framework/core-kit/service/restkit/router"
 )
 
 var router *router2.Router

@@ -2,8 +2,8 @@ package mqttkit
 
 import (
 	MQTT "github.com/eclipse/paho.mqtt.golang"
-	"mizuki/project/core-kit/service/configkit"
-	"mizuki/project/core-kit/service/logkit"
+	"mizuki/framework/core-kit/service/configkit"
+	"mizuki/framework/core-kit/service/logkit"
 )
 
 var client MQTT.Client

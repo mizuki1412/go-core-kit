@@ -2,7 +2,7 @@ package stringkit
 
 import (
 	"github.com/spf13/cast"
-	"mizuki/project/core-kit/class/exception"
+	"mizuki/framework/core-kit/class/exception"
 	"regexp"
 	"strings"
 )

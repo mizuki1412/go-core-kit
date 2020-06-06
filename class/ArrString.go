@@ -2,8 +2,8 @@ package class
 
 import (
 	"database/sql/driver"
-	"mizuki/project/core-kit/library/jsonkit"
-	"mizuki/project/core-kit/library/stringkit"
+	"mizuki/framework/core-kit/library/jsonkit"
+	"mizuki/framework/core-kit/library/stringkit"
 	"strings"
 )
 

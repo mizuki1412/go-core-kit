@@ -1,4 +1,4 @@
-module mizuki/project/core-kit
+module mizuki/framework/core-kit
 
 go 1.14
 

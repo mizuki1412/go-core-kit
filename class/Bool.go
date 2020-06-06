@@ -3,7 +3,7 @@ package class
 import (
 	"database/sql/driver"
 	"github.com/spf13/cast"
-	"mizuki/project/core-kit/library/jsonkit"
+	"mizuki/framework/core-kit/library/jsonkit"
 )
 
 // 同时继承scan和value方法

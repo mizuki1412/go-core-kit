@@ -3,8 +3,8 @@ package router
 import (
 	"github.com/kataras/iris/v12"
 	context2 "github.com/kataras/iris/v12/context"
-	"mizuki/project/core-kit/service/restkit/context"
-	swg "mizuki/project/core-kit/service/restkit/swagger"
+	"mizuki/framework/core-kit/service/restkit/context"
+	swg "mizuki/framework/core-kit/service/restkit/swagger"
 	"net/http"
 )
 

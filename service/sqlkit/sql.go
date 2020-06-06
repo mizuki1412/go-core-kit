@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"log"
-	"mizuki/project/core-kit/class/exception"
-	"mizuki/project/core-kit/library/stringkit"
-	"mizuki/project/core-kit/service/configkit"
-	"mizuki/project/core-kit/service/logkit"
+	"mizuki/framework/core-kit/class/exception"
+	"mizuki/framework/core-kit/library/stringkit"
+	"mizuki/framework/core-kit/service/configkit"
+	"mizuki/framework/core-kit/service/logkit"
 	"reflect"
 )
 

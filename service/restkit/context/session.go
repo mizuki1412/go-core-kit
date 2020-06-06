@@ -5,9 +5,9 @@ import (
 	"github.com/kataras/iris/v12/sessions"
 	"github.com/kataras/iris/v12/sessions/sessiondb/redis"
 	"github.com/spf13/cast"
-	"mizuki/project/core-kit/service/configkit"
-	"mizuki/project/core-kit/service/logkit"
-	"mizuki/project/core-kit/service/rediskit"
+	"mizuki/framework/core-kit/service/configkit"
+	"mizuki/framework/core-kit/service/logkit"
+	"mizuki/framework/core-kit/service/rediskit"
 	"time"
 )
 

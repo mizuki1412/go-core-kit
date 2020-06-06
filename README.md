@@ -8,7 +8,7 @@ toolkit for golang projects
 ```go
 /// 在项目的main中先导入
 package main
-import (_ "mizuki/project/core-kit")
+import (_ "mizuki/framework/core-kit")
 ```
 
 ## configconst.go

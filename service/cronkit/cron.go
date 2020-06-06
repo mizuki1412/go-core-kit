@@ -2,7 +2,7 @@ package cronkit
 
 import (
 	"github.com/robfig/cron/v3"
-	"mizuki/project/core-kit/service/configkit"
+	"mizuki/framework/core-kit/service/configkit"
 )
 
 var scheduler *cron.Cron

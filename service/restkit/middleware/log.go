@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	"mizuki/project/core-kit/service/logkit"
-	"mizuki/project/core-kit/service/restkit/context"
-	"mizuki/project/core-kit/service/restkit/router"
+	"mizuki/framework/core-kit/service/logkit"
+	"mizuki/framework/core-kit/service/restkit/context"
+	"mizuki/framework/core-kit/service/restkit/router"
 	"time"
 )
 

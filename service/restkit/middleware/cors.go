@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"mizuki/project/core-kit/service/restkit/context"
-	"mizuki/project/core-kit/service/restkit/router"
+	"mizuki/framework/core-kit/service/restkit/context"
+	"mizuki/framework/core-kit/service/restkit/router"
 )
 
 func Cors() router.Handler {

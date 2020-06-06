@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"mizuki/project/core-kit/library/filekit"
-	"mizuki/project/core-kit/library/stringkit"
+	"mizuki/framework/core-kit/library/filekit"
+	"mizuki/framework/core-kit/library/stringkit"
 	"strings"
 )
 

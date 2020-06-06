@@ -3,8 +3,8 @@ package class
 import (
 	"database/sql/driver"
 	"github.com/spf13/cast"
-	"mizuki/project/core-kit/library/jsonkit"
-	"mizuki/project/core-kit/library/stringkit"
+	"mizuki/framework/core-kit/library/jsonkit"
+	"mizuki/framework/core-kit/library/stringkit"
 	"strings"
 )
 

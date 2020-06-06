@@ -2,8 +2,8 @@ package class
 
 import (
 	"database/sql"
-	"mizuki/project/core-kit/library/jsonkit"
-	"mizuki/project/core-kit/library/timekit"
+	"mizuki/framework/core-kit/library/jsonkit"
+	"mizuki/framework/core-kit/library/timekit"
 	"time"
 )
 

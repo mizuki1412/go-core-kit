@@ -1,7 +1,7 @@
 package main
 
 import (
-	"mizuki/project/core-kit/class"
+	"mizuki/framework/core-kit/class"
 	"net/http"
 )
 

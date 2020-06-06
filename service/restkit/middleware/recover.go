@@ -2,11 +2,11 @@ package middleware
 
 import (
 	"github.com/spf13/cast"
-	"mizuki/project/core-kit/class/exception"
-	"mizuki/project/core-kit/library/stringkit"
-	"mizuki/project/core-kit/service/logkit"
-	"mizuki/project/core-kit/service/restkit/context"
-	"mizuki/project/core-kit/service/restkit/router"
+	"mizuki/framework/core-kit/class/exception"
+	"mizuki/framework/core-kit/library/stringkit"
+	"mizuki/framework/core-kit/service/logkit"
+	"mizuki/framework/core-kit/service/restkit/context"
+	"mizuki/framework/core-kit/service/restkit/router"
 )
 
 /**
