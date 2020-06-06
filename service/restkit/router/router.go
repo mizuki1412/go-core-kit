@@ -84,6 +84,7 @@ func (router *Router) RegisterSwagger() {
 		router.ProxyGroup.Get("/swagger/doc", func(c context2.Context) {
 			_, _ = c.Write([]byte(swg.Doc.ReadDoc()))
 		})
+		// todo swagger-ui的文件并未内置，需要在工程或程序的同一目录中放置。
 		router.ProxyGroup.HandleDir("/swagger", "./swagger-ui")
 	} else {
 		//router.Proxy.Get("/swagger/{any:path}", swagger.DisablingWrapHandler(swaggerFiles.Handler, "NAME_OF_ENV_VARIABLE"))

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"log"
@@ -72,11 +71,12 @@ func (dao *Dao) SetSchema(schema string) *Dao {
 	return dao
 }
 
+/// 根据类获取tablename，并判断schema
 func (dao *Dao) GetTable(dest interface{}) string {
 	rt := reflect.TypeOf(dest).Elem()
 	return getTable(rt, dao.Schema)
 }
-func getTable(rt reflect.Type, schema ...string) string {
+func getTable(rt reflect.Type, schema string) string {
 	var tname string
 	for i := 0; i < rt.NumField(); i++ {
 		if t, ok := rt.Field(i).Tag.Lookup("tablename"); ok {
@@ -87,11 +87,36 @@ func getTable(rt reflect.Type, schema ...string) string {
 	if tname == "" {
 		panic(exception.New("tablename未设置", 2))
 	}
-	schema0 := SchemaDefault
-	if schema != nil && len(schema) > 0 && !stringkit.IsNull(schema[0]) {
-		schema0 = schema[0]
+	var schema0 string
+	if schema != "" {
+		schema0 = schema
+	} else if driver == "postgres" {
+		schema0 = SchemaDefault
+	} else {
+		schema0 = ""
 	}
-	return schema0 + "." + tname
+	if schema0 == "" {
+		return tname
+	} else {
+		return schema0 + "." + tname
+	}
+}
+
+/// 直接获取schema+tableName
+func (dao *Dao) GetTableD(tName string) string {
+	var schema0 string
+	if dao.Schema != "" {
+		schema0 = dao.Schema
+	} else if driver == "postgres" {
+		schema0 = SchemaDefault
+	} else {
+		schema0 = ""
+	}
+	if schema0 == "" {
+		return tName
+	} else {
+		return schema0 + "." + tName
+	}
 }
 
 // transaction
@@ -176,7 +201,7 @@ func (dao *Dao) QueryById(dest interface{}) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
 	pks := getPKs(rt, rv)
-	builder := Builder().Select("*").From(getTable(rt))
+	builder := Builder().Select("*").From(getTable(rt, dao.Schema))
 	for k, v := range pks {
 		builder = builder.Where(k+"=?", v)
 	}
@@ -216,7 +241,7 @@ func getPKs(rt reflect.Type, rv reflect.Value) map[string]interface{} {
 func (dao *Dao) Insert(dest interface{}) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
-	builder := Builder().Insert(getTable(rt))
+	builder := Builder().Insert(getTable(rt, dao.Schema))
 	var pks []string
 	var columns []string
 	var vals []interface{}
@@ -238,8 +263,9 @@ func (dao *Dao) Insert(dest interface{}) {
 		} else if rt.Field(i).Type.Kind() != reflect.Ptr {
 			val = rv.Field(i).Interface()
 		}
+		// eg: MapString, 根据类的Value返回判断此field是否可以insert
 		method := rv.Field(i).MethodByName("Value")
-		if ok && val != nil && (!method.IsValid() || (method.IsValid() && method.Call([]reflect.Value{})[0].Interface() != nil)) {
+		if ok && val != nil && (!method.IsValid() || method.Call([]reflect.Value{})[0].Interface() != nil) {
 			columns = append(columns, db)
 			vals = append(vals, val)
 		}
@@ -271,7 +297,7 @@ func (dao *Dao) Insert(dest interface{}) {
 func (dao *Dao) Update(dest interface{}) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
-	builder := Builder().Update(getTable(rt))
+	builder := Builder().Update(getTable(rt, dao.Schema))
 	for i := 0; i < rt.NumField(); i++ {
 		db, ok := rt.Field(i).Tag.Lookup("db")
 		pk := rt.Field(i).Tag.Get("pk")
@@ -302,7 +328,7 @@ func (dao *Dao) Update(dest interface{}) {
 func (dao *Dao) Delete(dest interface{}) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
-	builder := Builder().Delete(getTable(rt))
+	builder := Builder().Delete(getTable(rt, dao.Schema))
 	pks := getPKs(rt, rv)
 	for k, v := range pks {
 		builder = builder.Where(k+"=?", v)
@@ -318,7 +344,7 @@ func (dao *Dao) Delete(dest interface{}) {
 func (dao *Dao) DeleteOff(dest interface{}) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
-	builder := Builder().Update(getTable(rt)).Set("off", true)
+	builder := Builder().Update(getTable(rt, dao.Schema)).Set("off", true)
 	pks := getPKs(rt, rv)
 	for k, v := range pks {
 		builder = builder.Where(k+"=?", v)

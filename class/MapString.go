@@ -61,6 +61,9 @@ func (th *MapString) Set(val map[string]interface{}) {
 }
 
 func (th *MapString) PutAll(val map[string]interface{}) {
+	if th.Map == nil {
+		th.Map = map[string]interface{}{}
+	}
 	mapkit.PutAll(th.Map, val)
 	th.Valid = true
 }

@@ -12,12 +12,12 @@ import (
 
 var router *router2.Router
 
-//func defaultEngine2() *gin.Engine {
-//	engine := gin.New()
-//	//engine.Use(middleware.Log())
-//	//engine.Use(middleware.Cors())
-//	return engine
-//}
+func Engine() *router2.Router {
+	if router == nil {
+		defaultEngine()
+	}
+	return router
+}
 
 func defaultEngine() {
 	router = &router2.Router{
