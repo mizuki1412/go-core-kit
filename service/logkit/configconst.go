@@ -1,6 +1,6 @@
 package logkit
 
-// 日志目录
+// 日志目录；默认在project.dir下
 const ConfigKeyLogPath = "logger.path"
 
 // 文件名，无后缀

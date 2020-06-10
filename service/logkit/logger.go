@@ -4,6 +4,8 @@ package logkit
 
 import (
 	"github.com/arthurkiller/rollingwriter"
+	corekit "github.com/mizuki1412/go-core-kit"
+	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/library/timekit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/spf13/cast"
@@ -43,7 +45,15 @@ func Init() *zap.Logger {
 }
 func getWriter() io.Writer {
 	filename := configkit.GetString(ConfigKeyLogName, "main")
-	filepath := configkit.GetString(ConfigKeyLogPath, "./log")
+	filepath := configkit.GetStringD(ConfigKeyLogPath)
+	if stringkit.IsNull(filepath) {
+		filepath = configkit.GetStringD(corekit.ConfigKeyProjectDir)
+	}
+	if stringkit.IsNull(filepath) {
+		filepath = "./log"
+	} else {
+		filepath += "/log"
+	}
 	config := rollingwriter.Config{
 		LogPath:       filepath,                                   //日志路径
 		TimeTagFormat: "20060102",                                 //时间格式串
