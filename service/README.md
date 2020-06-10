@@ -75,7 +75,7 @@ func Init(router *router.Router) {
 
 ### 约定/注意
 
-- action的params tags: `validate:"required" description:"xxx" default:""`
+- action的params tags: `validate:"required" description:"xxx" default:"" trim:"true"`
 - bean struct tags: `json:"" db:"db-field-name" pk:"true" tablename:"x" autoincrement:"true"`
 - context BindForm: 将会先trim，空字符串当做nil。
 - 在action中，处理bean中的field时，注意field的valid属性，class中的类可以用Set方法来作为参数设置；自定义的field struct用指针。
@@ -102,7 +102,11 @@ redis session key的expire时间，受iris session config控制，同时renew时
 需要在实际项目中配合使用swagger-ui，访问地址为 ip:port/projectName/swagger 
 
 ## sqlkit
+
 - **注意 commit: 如果只有select语句，commit将会出错。**
+- bean struct中如果没有db标签，则不会被通用接口insert/update
+- sqlx的`missing destination name sth in sth`，是查询出来的字段和类字段不符，在select中限定字段即可。
+- update set时：`Set("extend",squirrel.Expr("'{}'::jsonb"))` or `Set("extend","{}")`
 
 ## configkit
 

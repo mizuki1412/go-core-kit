@@ -45,15 +45,22 @@ func (swagger *SwaggerPath) Param(param interface{}) *SwaggerPath {
 	rt := reflect.TypeOf(param)
 	for i := 0; i < rt.NumField(); i++ {
 		e := map[string]interface{}{}
-		if rt.Field(i).Type.Name() == "string" || rt.Field(i).Type.Name() == "class.String" {
+		tname := rt.Field(i).Type.Name()
+		//println(tname)
+		if tname == "string" || tname == "String" {
 			e["type"] = "string"
+			e["in"] = "query"
+		} else if tname == "File" {
+			e["type"] = "file"
+			/// 参数数据所在位置 eg: query/formData/body
+			e["in"] = "formData"
+			Doc.Paths[swagger.Path][swagger.Method]["consumes"] = []string{"multipart/form-data"}
 		}
 		e["description"] = rt.Field(i).Tag.Get("description")
 		if strings.Contains(rt.Field(i).Tag.Get("validate"), "required") {
 			e["required"] = true
 		}
 		e["name"] = stringkit.LowerFirst(rt.Field(i).Name)
-		e["in"] = "query"
 		if v, ok := rt.Field(i).Tag.Lookup("default"); ok {
 			e["default"] = v
 		}

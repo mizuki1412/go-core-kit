@@ -2,6 +2,7 @@ package sqlkit
 
 import (
 	"fmt"
+	"github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
@@ -197,11 +198,18 @@ func (dao *Dao) QueryMap(sql string, args []interface{}, err error) []map[string
 }
 
 // dest a pointer
-func (dao *Dao) QueryById(dest interface{}) {
+func (dao *Dao) QueryById(dest interface{}, selects ...string) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
 	pks := getPKs(rt, rv)
-	builder := Builder().Select("*").From(getTable(rt, dao.Schema))
+	builder0 := Builder()
+	var builder squirrel.SelectBuilder
+	if len(selects) > 0 {
+		builder = builder0.Select(selects...)
+	} else {
+		builder = builder0.Select("*")
+	}
+	builder = builder.From(getTable(rt, dao.Schema))
 	for k, v := range pks {
 		builder = builder.Where(k+"=?", v)
 	}
@@ -238,6 +246,7 @@ func getPKs(rt reflect.Type, rv reflect.Value) map[string]interface{} {
 	return pks
 }
 
+/// dest should be elem
 func (dao *Dao) Insert(dest interface{}) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
@@ -294,6 +303,7 @@ func (dao *Dao) Insert(dest interface{}) {
 	}
 }
 
+/// dest should be elem
 func (dao *Dao) Update(dest interface{}) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
@@ -325,6 +335,7 @@ func (dao *Dao) Update(dest interface{}) {
 	dao.Exec(sql, args...)
 }
 
+/// dest should be elem
 func (dao *Dao) Delete(dest interface{}) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()

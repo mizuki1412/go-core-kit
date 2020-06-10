@@ -46,7 +46,7 @@ func SQL2Struct(sqlFile, destFile string) {
 				continue
 			}
 			f := field{Name: es[0]}
-			f.Tags = append(f.Tags, fmt.Sprintf("json:\"%s\" db:\"%s\"", es[0], es[0]))
+			f.Tags = append(f.Tags, fmt.Sprintf("json:\"%s\" db:\"%s\"", es[0], strings.ToLower(es[0])))
 			if stringkit.ArrayContains(es, "primary") {
 				f.Tags = append(f.Tags, fmt.Sprintf("pk:\"true\" tablename:\"%s\"", table))
 			}

@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/cast"
 	"net/http"
 	"reflect"
+	"strings"
 )
 
 type Context struct {
@@ -74,27 +75,43 @@ func (ctx *Context) BindForm(bean interface{}) {
 	}
 }
 
-// bean 指针
+/// bean 指针
+/// description:"xxx" default:"" trim:"true"
 func (ctx *Context) bindStruct(bean interface{}) {
 	rt := reflect.TypeOf(bean).Elem()
 	rv := reflect.ValueOf(bean).Elem()
 	for i := 0; i < rt.NumField(); i++ {
 		field := rt.Field(i)
 		fieldV := rv.Field(i)
+		typeString := field.Type.String()
+		// multipart file
+		if typeString == "class.File" {
+			file, header, err := ctx.Proxy.FormFile(stringkit.LowerFirst(field.Name))
+			if err != nil {
+				panic(exception.New(err.Error()))
+			}
+			fieldV.Set(reflect.ValueOf(class.File{
+				File:   file,
+				Header: header,
+			}))
+			continue
+		}
 		// bind
 		val := ctx.Proxy.FormValue(stringkit.LowerFirst(field.Name))
 		if val == "" {
 			val = ctx.Proxy.URLParam(stringkit.LowerFirst(field.Name))
 		}
+		// 判断trim
+		if field.Tag.Get("trim") == "true" {
+			val = strings.TrimSpace(val)
+		}
 		if val == "" {
 			// default
 			val = field.Tag.Get("default")
 		}
-		switch field.Type.String() {
+		switch typeString {
 		case "string":
-			if !stringkit.IsNull(val) {
-				fieldV.SetString(val)
-			}
+			fieldV.SetString(val)
 		case "int32", "int", "int64":
 			if !stringkit.IsNull(val) {
 				fieldV.SetInt(cast.ToInt64(val))

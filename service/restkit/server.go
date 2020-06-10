@@ -29,6 +29,8 @@ func defaultEngine() {
 	router.Use(middleware.Recover())
 	router.Use(middleware.Log())
 	router.Use(middleware.Cors())
+	// max request size
+	router.Proxy.Use(iris.LimitRequestBodySize(int64(configkit.GetInt(ConfigKeyRestRequestBodySize, 100)) << 20))
 	// add base path
 	base := configkit.GetStringD(ConfigKeyRestServerBase)
 	if base != "" {
