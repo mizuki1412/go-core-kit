@@ -7,10 +7,23 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 )
 
-func SaveInHome(file *class.File, path string) {
+func getFullPath(path string) string {
 	if path[0] != '/' {
 		path = "/" + path
 	}
-	path = configkit.GetString(corekit.ConfigKeyProjectDir, ".") + path
+	return configkit.GetString(corekit.ConfigKeyProjectDir, ".") + path
+}
+
+func SaveInHome(file *class.File, path string) {
+	path = getFullPath(path)
 	filekit.WriteClassFile(path, file)
+}
+
+func GetInHome(path string) []byte {
+	path = getFullPath(path)
+	//file,err := os.OpenFile(path, os.O_RDONLY, 644)
+	//if err!=nil{
+	//	panic(exception.New("文件打开失败"))
+	//}
+	return filekit.ReadBytes(path)
 }

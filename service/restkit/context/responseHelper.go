@@ -47,3 +47,10 @@ func (ctx *Context) JsonError(msg string) {
 		Message: msg,
 	})
 }
+func (ctx *Context) FileRaw(data []byte, name string) {
+	ctx.Proxy.Header("Content-Disposition", "attachment; filename="+name)
+	_, err := ctx.Proxy.Binary(data)
+	if err != nil {
+		logkit.Error("rest_ret_file_raw_error: " + err.Error())
+	}
+}

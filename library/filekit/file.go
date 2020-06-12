@@ -54,6 +54,14 @@ func ReadString(fileName string) (string, error) {
 	return string(f), err
 }
 
+func ReadBytes(fileName string) []byte {
+	f, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		panic(exception.New("文件读取失败"))
+	}
+	return f
+}
+
 func WriteClassFile(filepath string, file *class.File) {
 	if file.File == nil {
 		panic(exception.New("文件为空"))
