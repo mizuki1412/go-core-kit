@@ -99,6 +99,8 @@ redis session key的expire时间，受iris session config控制，同时renew时
 
 ### swagger
 
+https://swagger.io/specification/
+
 需要在实际项目中配合使用swagger-ui，访问地址为 ip:port/projectName/swagger 
 
 ## sqlkit

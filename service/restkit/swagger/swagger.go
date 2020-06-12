@@ -47,14 +47,24 @@ func (swagger *SwaggerPath) Param(param interface{}) *SwaggerPath {
 		e := map[string]interface{}{}
 		tname := rt.Field(i).Type.Name()
 		//println(tname)
-		if tname == "string" || tname == "String" {
+		switch {
+		case tname == "string", tname == "String":
 			e["type"] = "string"
 			e["in"] = "query"
-		} else if tname == "File" {
+		case tname == "File":
 			e["type"] = "file"
 			/// 参数数据所在位置 eg: query/formData/body
 			e["in"] = "formData"
 			Doc.Paths[swagger.Path][swagger.Method]["consumes"] = []string{"multipart/form-data"}
+		case strings.Index(tname, "int") == 0, strings.Index(tname, "Int") == 0:
+			e["type"] = "integer"
+			e["in"] = "query"
+		case strings.Index(tname, "float") == 0, strings.Index(tname, "Float") == 0:
+			e["type"] = "number"
+			e["in"] = "query"
+		default:
+			e["type"] = "string"
+			e["in"] = "query"
 		}
 		e["description"] = rt.Field(i).Tag.Get("description")
 		if strings.Contains(rt.Field(i).Tag.Get("validate"), "required") {
@@ -117,6 +127,7 @@ func init() {
 }
 
 func (s *SwaggerDoc) ReadDoc() string {
+	// match openapi 3.0
 	s.Swagger = "2.0"
 	s.Info["description"] = configkit.GetStringD(ConfigKeySwaggerDescription)
 	s.Info["title"] = configkit.GetStringD(ConfigKeySwaggerTitle)

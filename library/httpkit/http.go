@@ -30,7 +30,7 @@ type Req struct {
 	FormData map[string]string
 }
 
-func Do(reqBean *Req) (string, int, error) {
+func Do(reqBean Req) (string, int, error) {
 	data := make(url.Values)
 	for key, val := range reqBean.FormData {
 		data.Add(key, val)
@@ -81,7 +81,7 @@ func DownloadToFile(url string, filePath string) {
 }
 
 func Demo() {
-	ret, _, err := Do(&Req{
+	ret, _, err := Do(Req{
 		Url: "https://www.machplat.com/roms-rest-cnc/rest/user/login",
 		FormData: map[string]string{
 			"username": "@staff",
@@ -95,7 +95,7 @@ func Demo() {
 	fmt.Println(gjson.Get(ret, "data.user"))
 	fmt.Println(gjson.Parse(ret).Value().(map[string]interface{}))
 	fmt.Println("----")
-	ret, _, err = Do(&Req{
+	ret, _, err = Do(Req{
 		Url: "https://www.machplat.com/roms-rest-cnc/rest/user/info",
 	})
 	if err != nil {
