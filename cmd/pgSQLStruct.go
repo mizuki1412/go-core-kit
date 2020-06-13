@@ -1,11 +1,28 @@
-package main
+package cmd
 
 import (
 	"fmt"
 	"github.com/mizuki1412/go-core-kit/library/filekit"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
+	"github.com/spf13/cobra"
 	"strings"
+	"time"
 )
+
+func init() {
+	rootCmd.AddCommand(pgssCmd)
+}
+
+var pgssCmd = &cobra.Command{
+	Use:   "pgss",
+	Short: "postgres sql to struct",
+	Long:  ``,
+	Run: func(cmd *cobra.Command, args []string) {
+		t := time.Now()
+		sQL2Struct("/Users/ycj/Downloads/demo.sql", "/Users/ycj/Downloads/dest.go")
+		println(time.Since(t).Milliseconds())
+	},
+}
 
 type field struct {
 	Name string
@@ -13,7 +30,7 @@ type field struct {
 	Tags []string
 }
 
-func SQL2Struct(sqlFile, destFile string) {
+func sQL2Struct(sqlFile, destFile string) {
 	sqls, err := filekit.ReadString(sqlFile)
 	if err != nil {
 		panic(err)

@@ -4,7 +4,7 @@ package logkit
 
 import (
 	"github.com/arthurkiller/rollingwriter"
-	corekit "github.com/mizuki1412/go-core-kit"
+	corekit "github.com/mizuki1412/go-core-kit/init"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/library/timekit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"

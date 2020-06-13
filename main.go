@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/mizuki1412/go-core-kit/class"
+	"github.com/mizuki1412/go-core-kit/cmd"
 	"net/http"
 )
 
@@ -29,8 +30,8 @@ type loginByUsernameParam struct {
 }
 
 func main() {
-
-	SQL2Struct("/Users/ycj/Downloads/demo.sql", "/Users/ycj/Downloads/dest.go")
+	cmd.Execute()
+	//SQL2Struct("/Users/ycj/Downloads/demo.sql", "/Users/ycj/Downloads/dest.go")
 
 	//sqlkit.Update(&Bean{Id: 11, Name: class.String{String: "qww", Valid: true}})
 

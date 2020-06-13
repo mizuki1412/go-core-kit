@@ -2,6 +2,7 @@ package httpkit
 
 import (
 	"fmt"
+	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/tidwall/gjson"
 	"io/ioutil"
 	"net/http"
@@ -23,14 +24,17 @@ func init() {
 }
 
 type Req struct {
-	Method string
-	Url    string
-	Header map[string]string
+	Method      string
+	Url         string
+	Header      map[string]string
+	ContentType string
 	// FormData
 	FormData map[string]string
 }
 
-func Do(reqBean Req) (string, int, error) {
+const ContentTypeForm = "application/x-www-form-urlencoded"
+
+func Request(reqBean Req) (string, int) {
 	data := make(url.Values)
 	for key, val := range reqBean.FormData {
 		data.Add(key, val)
@@ -40,21 +44,24 @@ func Do(reqBean Req) (string, int, error) {
 	}
 	req, err := http.NewRequest(reqBean.Method, reqBean.Url, strings.NewReader(data.Encode()))
 	if err != nil {
-		return "", 0, err
+		panic(exception.New(err.Error()))
 	}
-	if reqBean.Method == "POST" {
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	if reqBean.ContentType == "" {
+		req.Header.Set("Content-Type", ContentTypeForm)
 	}
 	for key, val := range reqBean.Header {
 		req.Header.Set(key, val)
 	}
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", 0, err
+		panic(exception.New(err.Error()))
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
-	return string(body), resp.StatusCode, nil
+	if err != nil {
+		panic(exception.New(err.Error()))
+	}
+	return string(body), resp.StatusCode
 }
 
 func DownloadToFile(url string, filePath string) {
@@ -81,24 +88,17 @@ func DownloadToFile(url string, filePath string) {
 }
 
 func Demo() {
-	ret, _, err := Do(Req{
+	ret, _ := Request(Req{
 		Url: "https://www.machplat.com/roms-rest-cnc/rest/user/login",
 		FormData: map[string]string{
-			"username": "@staff",
-			"pwd":      "666666",
-			"schema":   "cnc",
+			"username": "admin",
+			"pwd":      "123",
 		},
 	})
-	if err != nil {
-		return
-	}
 	fmt.Println(gjson.Get(ret, "data.user"))
 	fmt.Println(gjson.Parse(ret).Value().(map[string]interface{}))
 	fmt.Println("----")
-	ret, _, err = Do(Req{
+	ret, _ = Request(Req{
 		Url: "https://www.machplat.com/roms-rest-cnc/rest/user/info",
 	})
-	if err != nil {
-		return
-	}
 }

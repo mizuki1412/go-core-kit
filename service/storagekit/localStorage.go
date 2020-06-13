@@ -1,8 +1,8 @@
 package storagekit
 
 import (
-	corekit "github.com/mizuki1412/go-core-kit"
 	"github.com/mizuki1412/go-core-kit/class"
+	corekit "github.com/mizuki1412/go-core-kit/init"
 	"github.com/mizuki1412/go-core-kit/library/filekit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 )
