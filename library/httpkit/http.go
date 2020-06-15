@@ -1,6 +1,7 @@
 package httpkit
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/tidwall/gjson"
@@ -29,20 +30,28 @@ type Req struct {
 	Header      map[string]string
 	ContentType string
 	// FormData
-	FormData map[string]string
+	FormData   map[string]string
+	BinaryData []byte
 }
 
-const ContentTypeForm = "application/x-www-form-urlencoded"
+const ContentTypeForm = "application/x-www-form-urlencoded; charset=utf-8"
+const ContentTypeJSON = "application/json; charset=utf-8"
 
 func Request(reqBean Req) (string, int) {
-	data := make(url.Values)
-	for key, val := range reqBean.FormData {
-		data.Add(key, val)
-	}
 	if reqBean.Method == "" {
 		reqBean.Method = "POST"
 	}
-	req, err := http.NewRequest(reqBean.Method, reqBean.Url, strings.NewReader(data.Encode()))
+	var req *http.Request
+	var err error
+	if reqBean.BinaryData != nil {
+		req, err = http.NewRequest(reqBean.Method, reqBean.Url, bytes.NewBuffer(reqBean.BinaryData))
+	} else {
+		data := make(url.Values)
+		for key, val := range reqBean.FormData {
+			data.Add(key, val)
+		}
+		req, err = http.NewRequest(reqBean.Method, reqBean.Url, strings.NewReader(data.Encode()))
+	}
 	if err != nil {
 		panic(exception.New(err.Error()))
 	}
