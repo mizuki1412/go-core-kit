@@ -2,7 +2,6 @@ package class
 
 import (
 	"database/sql/driver"
-	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/spf13/cast"
 )
 
@@ -14,23 +13,19 @@ type String struct {
 
 func (th String) MarshalJSON() ([]byte, error) {
 	if th.Valid {
-		return jsonkit.JSON().Marshal(th.String)
+		return []byte("\"" + th.String + "\""), nil
 	}
 	// 返回json中的null
-	return jsonkit.JSON().Marshal(nil)
+	return []byte("null"), nil
 	//return nil,nil
 }
 func (th *String) UnmarshalJSON(data []byte) error {
-	var s *string
-	if err := jsonkit.JSON().Unmarshal(data, &s); err != nil {
-		return err
-	}
-	if s != nil {
-		th.Valid = true
-		th.String = *s
-	} else {
+	if string(data) == "null" {
 		th.Valid = false
+		return nil
 	}
+	th.String = unquoteIfQuoted(data)
+	th.Valid = true
 	return nil
 }
 func (th *String) Scan(value interface{}) error {

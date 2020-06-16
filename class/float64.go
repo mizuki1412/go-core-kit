@@ -2,7 +2,6 @@ package class
 
 import (
 	"database/sql/driver"
-	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/spf13/cast"
 )
 
@@ -14,21 +13,21 @@ type Float64 struct {
 
 func (th Float64) MarshalJSON() ([]byte, error) {
 	if th.Valid {
-		return jsonkit.JSON().Marshal(th.Float64)
+		return []byte(cast.ToString(th.Float64)), nil
 	}
-	return jsonkit.JSON().Marshal(nil)
+	return []byte("null"), nil
 }
 func (th *Float64) UnmarshalJSON(data []byte) error {
-	var s *float64
-	if err := jsonkit.JSON().Unmarshal(data, &s); err != nil {
+	if string(data) == "null" {
+		th.Valid = false
+		return nil
+	}
+	s, err := cast.ToFloat64E(unquoteIfQuoted(data))
+	if err != nil {
 		return err
 	}
-	if s != nil {
-		th.Valid = true
-		th.Float64 = *s
-	} else {
-		th.Valid = false
-	}
+	th.Valid = true
+	th.Float64 = s
 	return nil
 }
 func (th *Float64) Scan(value interface{}) error {

@@ -2,7 +2,6 @@ package class
 
 import (
 	"database/sql/driver"
-	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/spf13/cast"
 )
 
@@ -14,21 +13,21 @@ type Bool struct {
 
 func (th Bool) MarshalJSON() ([]byte, error) {
 	if th.Valid {
-		return jsonkit.JSON().Marshal(th.Bool)
+		return []byte(cast.ToString(th.Bool)), nil
 	}
-	return jsonkit.JSON().Marshal(nil)
+	return []byte("null"), nil
 }
 func (th *Bool) UnmarshalJSON(data []byte) error {
-	var s *bool
-	if err := jsonkit.JSON().Unmarshal(data, &s); err != nil {
+	if string(data) == "null" {
+		th.Valid = false
+		return nil
+	}
+	s, err := cast.ToBoolE(unquoteIfQuoted(data))
+	if err != nil {
 		return err
 	}
-	if s != nil {
-		th.Valid = true
-		th.Bool = *s
-	} else {
-		th.Valid = false
-	}
+	th.Valid = true
+	th.Bool = s
 	return nil
 }
 func (th *Bool) Scan(value interface{}) error {

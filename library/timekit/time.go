@@ -13,6 +13,7 @@ func UnixMill(t int64) time.Time {
 	return time.Unix(t/1000, t%1000*1000000)
 }
 
+// 用cast
 func ParseString(dtString string, layout string) (time.Time, error) {
 	return time.ParseInLocation(layout, dtString, time.Local)
 }

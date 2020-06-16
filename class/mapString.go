@@ -20,19 +20,19 @@ func (th MapString) MarshalJSON() ([]byte, error) {
 	if th.Valid {
 		return jsonkit.JSON().Marshal(th.Map)
 	}
-	return jsonkit.JSON().Marshal(nil)
+	return []byte("null"), nil
 }
 func (th *MapString) UnmarshalJSON(data []byte) error {
-	var s *map[string]interface{}
+	if string(data) == "null" {
+		th.Valid = false
+		return nil
+	}
+	var s map[string]interface{}
 	if err := jsonkit.JSON().Unmarshal(data, &s); err != nil {
 		return err
 	}
-	if s != nil {
-		th.Valid = true
-		th.Map = *s
-	} else {
-		th.Valid = false
-	}
+	th.Valid = true
+	th.Map = s
 	return nil
 }
 

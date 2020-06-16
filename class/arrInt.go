@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
+	"github.com/spf13/cast"
 	"strings"
 )
 
@@ -12,57 +13,62 @@ import (
 */
 
 // 同时继承scan和value方法
-type ArrString struct {
-	Array []string
+type ArrInt struct {
+	Array []int32
 	Valid bool
 }
 
-func (th ArrString) MarshalJSON() ([]byte, error) {
+func (th ArrInt) MarshalJSON() ([]byte, error) {
 	if th.Valid {
 		return jsonkit.JSON().Marshal(th.Array)
 	}
-	return jsonkit.JSON().Marshal(nil)
+	return []byte("null"), nil
 }
-func (th *ArrString) UnmarshalJSON(data []byte) error {
-	var s *[]string
+func (th *ArrInt) UnmarshalJSON(data []byte) error {
+	if string(data) == "null" {
+		th.Valid = false
+		return nil
+	}
+	var s []int32
 	if err := jsonkit.JSON().Unmarshal(data, &s); err != nil {
 		return err
 	}
-	if s != nil {
-		th.Valid = true
-		th.Array = *s
-	} else {
-		th.Valid = false
-	}
+	th.Valid = true
+	th.Array = s
 	return nil
 }
 
 // Scan implements the Scanner interface.
-func (th *ArrString) Scan(value interface{}) error {
+func (th *ArrInt) Scan(value interface{}) error {
 	if value == nil {
 		th.Array, th.Valid = nil, false
 		return nil
 	}
 	th.Valid = true
-	// parse eg: {abc,qq} to ["abc","qq"]
+	// parse eg: {1,2} to [1,2]
 	bytes := value.([]byte)
 	if len(bytes) <= 2 {
-		th.Array = []string{}
+		th.Array = []int32{}
 		return nil
 	}
-	th.Array = strings.Split(string(bytes[1:len(bytes)-1]), ",")
+	es := strings.Split(string(bytes[1:len(bytes)-1]), ",")
+	var arr []int32
+	for _, v := range es {
+		arr = append(arr, cast.ToInt32(v))
+	}
+	th.Array = arr
 	return nil
 }
 
 // Value implements the driver Valuer interface.
-func (th ArrString) Value() (driver.Value, error) {
+func (th ArrInt) Value() (driver.Value, error) {
 	if !th.Valid {
 		return nil, nil
 	}
-	return "{" + stringkit.ConcatWith(th.Array, ",", "'") + "}", nil
+	return "{" + stringkit.ConcatIntWith(th.Array, ", ") + "}", nil
 }
 
-func (th *ArrString) Set(val []string) {
+func (th *ArrInt) Set(val []int32) {
 	th.Array = val
 	th.Valid = true
 }

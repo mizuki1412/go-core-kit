@@ -1,34 +1,33 @@
 package jsonkit
 
 import (
+	"encoding/json"
 	jsoniter "github.com/json-iterator/go"
-	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/tidwall/gjson"
+	"strings"
 )
 
-var json jsoniter.API
+var jsonAPI jsoniter.API
 
 func JSON() jsoniter.API {
-	if json == nil {
-		json = jsoniter.ConfigCompatibleWithStandardLibrary
+	if jsonAPI == nil {
+		jsonAPI = jsoniter.ConfigCompatibleWithStandardLibrary
 	}
-	return json
+	return jsonAPI
 }
 
 func ToString(obj interface{}) string {
 	s, err := JSON().MarshalToString(obj)
 	if err != nil {
-		panic(exception.New("json parse error"))
+		return "{}"
 	}
 	return s
 }
 
 //  string, &p
-func ParseObj(data string, p interface{}) {
+func ParseObj(data string, p interface{}) error {
 	err := JSON().Unmarshal([]byte(data), p)
-	if err != nil {
-		panic(exception.New("json parse error"))
-	}
+	return err
 }
 
 func ParseMap(data string) map[string]interface{} {
@@ -39,4 +38,19 @@ func ParseMap(data string) map[string]interface{} {
 		return map[string]interface{}{}
 	}
 	return m
+}
+
+// use json.Number，如需要高精度计算用decimal转换
+// d,_:=decimal.NewFromString(jsonkit.ParseMapUseNumber(str)["key"].(json.Number).String())
+// decimal.MarshalJSONWithoutQuotes=true
+func ParseMapUseNumber(data string) map[string]interface{} {
+	para := make(map[string]interface{})
+	// gjson存在精度问题，jsoniter出现nil错误
+	decoder := json.NewDecoder(strings.NewReader(data))
+	decoder.UseNumber()
+	err := decoder.Decode(&para)
+	if err != nil {
+		return map[string]interface{}{}
+	}
+	return para
 }
