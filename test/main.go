@@ -31,8 +31,4 @@ type loginByUsernameParam struct {
 
 func main() {
 	cmd.Execute()
-	//SQL2Struct("/Users/ycj/Downloads/demo.sql", "/Users/ycj/Downloads/dest.go")
-
-	//sqlkit.Update(&Bean{Id: 11, Name: class.String{String: "qww", Valid: true}})
-
 }

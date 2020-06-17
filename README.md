@@ -35,6 +35,7 @@ import (_ "github.com/mizuki1412/go-core-kit/init")
 
 ## Common
 - [cast](https://github.com/spf13/cast)
+- [decimal](https://github.com/shopspring/decimal)
 
 ## library
 
