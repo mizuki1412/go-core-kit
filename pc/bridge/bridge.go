@@ -2,7 +2,8 @@ package bridge
 
 import (
 	socketio "github.com/googollee/go-socket.io"
-	"log"
+	"github.com/mizuki1412/go-core-kit/library/jsonkit"
+	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"mime"
 	"net/http"
 )
@@ -17,21 +18,21 @@ func init() {
 	var err error
 	Server, err = socketio.NewServer(nil)
 	if err != nil {
-		log.Fatal(err)
+		logkit.Fatal(err)
 	}
 	Server.OnConnect("/", func(s socketio.Conn) error {
 		s.SetContext("")
-		log.Println("websocket connected:", s.ID())
+		logkit.Info("websocket connected:" + s.ID())
 		// room name
 		s.Join(RoomPublic)
 		connectFun(s)
 		return nil
 	})
 	Server.OnError("/", func(s socketio.Conn, e error) {
-		log.Println("websocket socket error:", e)
+		logkit.Info("websocket socket error:" + e.Error())
 	})
 	Server.OnDisconnect("/", func(s socketio.Conn, reason string) {
-		log.Println("websocket closed: ", reason)
+		logkit.Info("websocket closed: " + reason)
 	})
 }
 
@@ -39,16 +40,15 @@ func init() {
  *  同一个socket的同一个事件消息，是同步顺序执行的。
  * 约定：event:public 作为通用的消息通道
  */
-func SetEventPublicHandle(fun func(s socketio.Conn, msg string)) *socketio.Server {
-	//Server.OnEvent("/", EventPublic, func(s socketio.Conn, msg string) string{
-	//	if !gjson.Valid(msg) {
-	//		return jsonkit.ParseString(MsgRes{Result:false, Message:"json error"})
-	//	}
-	//	req := &MsgReq{}
-	//	jsonkit.ParseObj(msg, req)
-	//	return jsonkit.ParseString(HandlePublicMsg(*req))
-	//})
-	Server.OnEvent("/", EventPublic, fun)
+func SetEventPublicHandle(fun func(req *MsgReq) string) *socketio.Server {
+	Server.OnEvent("/", EventPublic, func(s socketio.Conn, msg string) string {
+		req := &MsgReq{}
+		err := jsonkit.ParseObj(msg, req)
+		if err != nil {
+			return RetErr("json error")
+		}
+		return fun(req)
+	})
 	return Server
 }
 func SetConnectHandle(fun func(s socketio.Conn)) {
@@ -58,29 +58,14 @@ func SetConnectHandle(fun func(s socketio.Conn)) {
 // 开启websocket server并配置http todo
 func Start() {
 	go Server.Serve()
-	defer Server.Close()
+	// defer Server.Close()
 	http.HandleFunc("/socket.io/", func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
 		w.Header().Set("Access-Control-Allow-Origin", origin)
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		Server.ServeHTTP(w, r)
 	})
-	http.Handle("/", http.FileServer(http.Dir("./static")))
+	// local win ui web, 默认在ui
+	http.Handle("/", http.FileServer(http.Dir("./ui")))
 	_ = mime.AddExtensionType(".js", "text/javascript")
-}
-
-/***
-消息格式：
--> code:string, data:map
-<- result:boolean, data:map, message:string
-*/
-type MsgReq struct {
-	Code string      `json:"code"`
-	Data interface{} `json:"data"`
-}
-
-type MsgRes struct {
-	Result  bool        `json:"result"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
 }

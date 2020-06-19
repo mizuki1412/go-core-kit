@@ -45,6 +45,7 @@ require (
 	github.com/yudai/gojsondiff v1.0.0 // indirect
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	github.com/yudai/pp v2.0.1+incompatible // indirect
+	github.com/zserge/lorca v0.1.9 // indirect
 	go.uber.org/automaxprocs v1.3.0
 	go.uber.org/zap v1.14.1
 	golang.org/x/crypto v0.0.0-20200420201142-3c4aac89819a // indirect
