@@ -19,7 +19,8 @@ var pgssCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		t := time.Now()
-		sQL2Struct("/Users/ycj/Downloads/demo.sql", "/Users/ycj/Downloads/dest.go")
+		//sQL2Struct("/Users/ycj/Downloads/demo.sql", "/Users/ycj/Downloads/dest.go")
+		sQL2Struct("/Users/ycj/Downloads/test.sql", "/Users/ycj/Downloads/test.go")
 		println(time.Since(t).Milliseconds())
 	},
 }
@@ -78,8 +79,14 @@ func sQL2Struct(sqlFile, destFile string) {
 				f.Tags = append(f.Tags, "autoincrement:\"true\"")
 			case "int", "smallint":
 				f.Type = "class.Int32"
+				if stringkit.ArrayContains(es, "primary") {
+					f.Type = "int32"
+				}
 			case "bigint":
 				f.Type = "class.Int64"
+				if stringkit.ArrayContains(es, "primary") {
+					f.Type = "int64"
+				}
 			case "timestamp":
 				f.Type = "class.Time"
 			case "jsonb":

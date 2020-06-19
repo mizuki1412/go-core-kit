@@ -2,7 +2,6 @@ package sqlkit
 
 import (
 	"fmt"
-	"github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
@@ -198,34 +197,35 @@ func (dao *Dao) QueryMap(sql string, args []interface{}, err error) []map[string
 }
 
 // dest a pointer
-func (dao *Dao) QueryById(dest interface{}, selects ...string) {
-	rt := reflect.TypeOf(dest).Elem()
-	rv := reflect.ValueOf(dest).Elem()
-	pks := getPKs(rt, rv)
-	builder0 := Builder()
-	var builder squirrel.SelectBuilder
-	if len(selects) > 0 {
-		builder = builder0.Select(selects...)
-	} else {
-		builder = builder0.Select("*")
-	}
-	builder = builder.From(getTable(rt, dao.Schema))
-	for k, v := range pks {
-		builder = builder.Where(k+"=?", v)
-	}
-	sql, args, err := builder.ToSql()
-	if err != nil {
-		panic(exception.New(err.Error(), 2))
-	}
-	rows := dao.Query(sql, args...)
-	for rows.Next() {
-		err := rows.StructScan(dest)
-		if err != nil {
-			panic(exception.New(err.Error(), 2))
-		}
-		break
-	}
-}
+// todo 此方法不能表示nil
+//func (dao *Dao) QueryById(dest interface{}, selects ...string) {
+//	rt := reflect.TypeOf(dest).Elem()
+//	rv := reflect.ValueOf(dest).Elem()
+//	pks := getPKs(rt, rv)
+//	builder0 := Builder()
+//	var builder squirrel.SelectBuilder
+//	if len(selects) > 0 {
+//		builder = builder0.Select(selects...)
+//	} else {
+//		builder = builder0.Select("*")
+//	}
+//	builder = builder.From(getTable(rt, dao.Schema))
+//	for k, v := range pks {
+//		builder = builder.Where(k+"=?", v)
+//	}
+//	sql, args, err := builder.ToSql()
+//	if err != nil {
+//		panic(exception.New(err.Error(), 2))
+//	}
+//	rows := dao.Query(sql, args...)
+//	for rows.Next() {
+//		err := rows.StructScan(dest)
+//		if err != nil {
+//			panic(exception.New(err.Error(), 2))
+//		}
+//		break
+//	}
+//}
 
 func getPKs(rt reflect.Type, rv reflect.Value) map[string]interface{} {
 	pks := map[string]interface{}{}
