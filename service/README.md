@@ -105,7 +105,7 @@ https://swagger.io/specification/
 
 ## sqlkit
 
-- **注意 commit: 如果只有select语句，commit将会出错。**
+- **注意 commit: 如果事务中第一句是select语句，commit将会出错, 错误提示 parse C 等。**
 - bean struct中如果没有db标签，则不会被通用接口insert/update
 - sqlx的`missing destination name sth in sth`，是查询出来的字段和类字段不符，在select中限定字段即可。
 - update set时：`Set("extend",squirrel.Expr("'{}'::jsonb"))` or `Set("extend","{}")`

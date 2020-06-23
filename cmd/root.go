@@ -16,7 +16,7 @@ type Data struct {
 
 var rootCmd = &cobra.Command{
 	Use:   "go-core-kit",
-	Short: "go core kit",
+	Short: "go core kit test",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		str := "{ \"key\": 123.00020010002224567, \"key2\":123, \"key3\":1592286542000  }"

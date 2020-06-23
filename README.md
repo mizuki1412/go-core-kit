@@ -72,6 +72,9 @@ import (_ "github.com/mizuki1412/go-core-kit/init")
 ### rediskit
 - [go-redis](https://github.com/go-redis/redis/v8)
 
+### serialkit
+- [serial](https://go.bug.st/serial)
+
 ## pc
 
 ### bridge
