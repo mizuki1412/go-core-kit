@@ -19,7 +19,7 @@ func StartLorca(param WinParam) {
 	}()
 	ui, _ := lorca.New("", "", param.Width, param.Height)
 	// local web ui地址
-	_ = ui.Load("http://127.0.0.1:" + p)
+	_ = ui.Load("http://127.0.0.1:" + p + param.Url)
 	if param.FullScreen {
 		_ = ui.SetBounds(lorca.Bounds{
 			WindowState: lorca.WindowStateFullscreen,

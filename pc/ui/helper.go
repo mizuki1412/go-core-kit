@@ -6,4 +6,5 @@ type WinParam struct {
 	Width      int
 	Height     int
 	FullScreen bool
+	Url        string
 }

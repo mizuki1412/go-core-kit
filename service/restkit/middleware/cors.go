@@ -8,7 +8,7 @@ import (
 func Cors() router.Handler {
 	return func(c *context.Context) {
 		//method := c.Request.Method
-		c.Proxy.Header("Access-Control-Allow-Origin", "*")
+		c.Proxy.Header("Access-Control-Allow-Origin", c.Proxy.Request().Header.Get("Origin"))
 		c.Proxy.Header("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token")
 		c.Proxy.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
 		c.Proxy.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type")

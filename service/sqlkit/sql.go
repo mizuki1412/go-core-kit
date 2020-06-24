@@ -8,6 +8,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"log"
 	"reflect"
+	"time"
 )
 
 /**
@@ -33,7 +34,10 @@ func connector() *sqlx.DB {
 	if db == nil {
 		driver = configkit.GetString(ConfigKeyDBDriver, "")
 		db = sqlx.MustConnect(driver, fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", configkit.GetString(ConfigKeyDBHost, ""), configkit.GetInt(ConfigKeyDBPort, 0), configkit.GetString(ConfigKeyDBUser, ""), configkit.GetString(ConfigKeyDBPwd, ""), configkit.GetString(ConfigKeyDBName, "")))
-		//db.SetConnMaxLifetime()
+		db.SetConnMaxLifetime(time.Minute * 60)
+		// todo 需要调优
+		db.SetMaxOpenConns(10)
+		db.SetMaxIdleConns(5)
 	}
 	return db
 }
@@ -58,6 +62,17 @@ func NewTX(schema string) *Dao {
 		Schema: schema,
 		TX:     connector().MustBegin(),
 		DB:     connector(),
+	}
+}
+
+// 用于处理子类Dao New中的通用逻辑
+func (dao *Dao) NewHelper(schema string, tx ...*Dao) {
+	dao.Schema = schema
+	if tx != nil && len(tx) > 0 {
+		dao.DB = tx[0].DB
+		dao.TX = tx[0].TX
+	} else {
+		dao.DB = New(schema).DB
 	}
 }
 
@@ -169,6 +184,7 @@ func (dao *Dao) QueryStruct(destType func(rs *sqlx.Rows) (interface{}, error), s
 	//err = DB().Select(dest, sql, args...)
 	var list []interface{}
 	rows := dao.Query(sql, args...)
+	defer rows.Close()
 	for rows.Next() {
 		m, err := destType(rows)
 		if err != nil {
@@ -185,6 +201,7 @@ func (dao *Dao) QueryMap(sql string, args []interface{}, err error) []map[string
 	}
 	var list []map[string]interface{}
 	rows := dao.Query(sql, args...)
+	defer rows.Close()
 	for rows.Next() {
 		m := map[string]interface{}{}
 		err := rows.MapScan(m)
@@ -218,6 +235,7 @@ func (dao *Dao) QueryMap(sql string, args []interface{}, err error) []map[string
 //		panic(exception.New(err.Error(), 2))
 //	}
 //	rows := dao.Query(sql, args...)
+//  defer rows.Close()
 //	for rows.Next() {
 //		err := rows.StructScan(dest)
 //		if err != nil {
@@ -226,25 +244,6 @@ func (dao *Dao) QueryMap(sql string, args []interface{}, err error) []map[string
 //		break
 //	}
 //}
-
-func getPKs(rt reflect.Type, rv reflect.Value) map[string]interface{} {
-	pks := map[string]interface{}{}
-	for i := 0; i < rt.NumField(); i++ {
-		if t, ok := rt.Field(i).Tag.Lookup("pk"); ok {
-			if t == "true" {
-				name := rt.Field(i).Tag.Get("db")
-				if name == "" {
-					panic(exception.New("field "+rt.Field(i).Name+" no db tag", 2))
-				}
-				pks[name] = rv.Field(i).Interface()
-			}
-		}
-	}
-	if len(pks) == 0 {
-		panic(exception.New("未设置pk", 2))
-	}
-	return pks
-}
 
 /// dest should be elem
 func (dao *Dao) Insert(dest interface{}) {
@@ -293,6 +292,7 @@ func (dao *Dao) Insert(dest interface{}) {
 	}
 	log.Println(sql, args)
 	rows := dao.Query(sql, args...)
+	defer rows.Close()
 	for rows.Next() {
 		// return 赋值
 		err := rows.StructScan(dest)
@@ -368,6 +368,21 @@ func (dao *Dao) DeleteOff(dest interface{}) {
 	dao.Exec(sql, args...)
 }
 
-/**
-struct tag 包括 db:name, pk:true, tablename:name(只在一个tag), autoincrement:"true"
-*/
+func getPKs(rt reflect.Type, rv reflect.Value) map[string]interface{} {
+	pks := map[string]interface{}{}
+	for i := 0; i < rt.NumField(); i++ {
+		if t, ok := rt.Field(i).Tag.Lookup("pk"); ok {
+			if t == "true" {
+				name := rt.Field(i).Tag.Get("db")
+				if name == "" {
+					panic(exception.New("field "+rt.Field(i).Name+" no db tag", 2))
+				}
+				pks[name] = rv.Field(i).Interface()
+			}
+		}
+	}
+	if len(pks) == 0 {
+		panic(exception.New("未设置pk", 2))
+	}
+	return pks
+}

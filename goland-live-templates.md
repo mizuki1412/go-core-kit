@@ -65,32 +65,30 @@ const (
 )
 func New(schema string, tx ...*sqlkit.Dao) *Dao{
 	dao:=&Dao{}
-	dao.Schema = schema
-	if tx!=nil && len(tx)>0{
-		dao.DB = tx[0].DB
-		dao.TX = tx[0].TX
-	}else{
-		dao.DB = sqlkit.New(schema).DB
-	}
+	dao.NewHelper(schema,tx...)
 	return dao
 }
 func (dao *Dao) cascade(obj *$bean$) {
 	switch dao.ResultType {
 	case ResultDefault:
 		// todo 注意校验nil
+		// todo 如果没有级联，此函数删除
 	}
 }
 func (dao *Dao) scan(sql string, args []interface{}) []$bean$ {
 	rows := dao.Query(sql, args...)
 	list := make([]$bean$,0,5)
+	defer rows.Close()
 	for rows.Next() {
 		m := $bean${}
 		err := rows.StructScan(&m)
 		if err != nil {
 			panic(exception.New(err.Error()))
 		}
-		dao.cascade(&m)
 		list = append(list, m)
+	}
+	for i := range list{
+		dao.cascade(&list[i])
 	}
 	return list
 }
@@ -99,6 +97,7 @@ func (dao *Dao) scanOne(sql string, args []interface{}) *$bean$ {
 	for rows.Next() {
 		m := $bean${}
 		err := rows.StructScan(&m)
+		rows.Close()
 		if err != nil {
 			panic(exception.New(err.Error()))
 		}
@@ -106,10 +105,6 @@ func (dao *Dao) scanOne(sql string, args []interface{}) *$bean$ {
 		return &m
 	}
 	return nil
-}
-func (dao *Dao) SetResultType(rt byte) *Dao{
-	dao.ResultType = rt
-	return dao
 }
 ////
 ```
