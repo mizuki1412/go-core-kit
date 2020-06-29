@@ -8,6 +8,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
+	"github.com/mizuki1412/go-core-kit/library/timekit"
 	"github.com/mizuki1412/go-core-kit/service/sqlkit"
 	"github.com/spf13/cast"
 	"net/http"
@@ -162,9 +163,27 @@ func (ctx *Context) bindStruct(bean interface{}) {
 		case "class.MapString":
 			if !stringkit.IsNull(val) {
 				var p map[string]interface{}
-				jsonkit.ParseObj(val, &p)
+				_ = jsonkit.ParseObj(val, &p)
 				tmp := class.MapString{Map: p, Valid: true}
 				fieldV.Set(reflect.ValueOf(tmp))
+			}
+		case "class.Time":
+			if !stringkit.IsNull(val) {
+				temp := class.Time{}
+				if len(val) == 13 && strings.Index(val, "-") < 0 {
+					s, err := cast.ToInt64E(val)
+					if err != nil {
+						panic(exception.New("time cast error"))
+					}
+					temp.Set(timekit.UnixMill(s))
+				} else {
+					s, err := cast.StringToDate(val)
+					if err != nil {
+						panic(exception.New("time cast error"))
+					}
+					temp.Set(s)
+				}
+				fieldV.Set(reflect.ValueOf(temp))
 			}
 		}
 	}

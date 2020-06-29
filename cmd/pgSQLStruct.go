@@ -87,7 +87,7 @@ func sQL2Struct(sqlFile, destFile string) {
 				if stringkit.ArrayContains(es, "primary") {
 					f.Type = "int64"
 				}
-			case "timestamp":
+			case "timestamp", "date":
 				f.Type = "class.Time"
 			case "jsonb":
 				f.Type = "class.MapString"
@@ -97,8 +97,10 @@ func sQL2Struct(sqlFile, destFile string) {
 				f.Type = "class.ArrInt"
 			case "boolean":
 				f.Type = "bool"
-			case "decimal":
-				f.Type = "float64"
+			default:
+				if strings.Index(es[1], "decimal") == 0 {
+					f.Type = "class.Decimal"
+				}
 			}
 			fields = append(fields, f)
 		}

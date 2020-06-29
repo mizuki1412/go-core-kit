@@ -1,5 +1,5 @@
 
-## action-init
+## action_init
 ```
 func Init(router *router.Router) {
 	tag := "$tname$"
@@ -36,7 +36,7 @@ func $name$(ctx *context.Context){
 }
 ```
 
-## bean-extend
+## bean_extend
 ```
 func (th *$struct$) Scan(value interface{}) error {
 	if value == nil {
@@ -109,7 +109,48 @@ func (dao *Dao) scanOne(sql string, args []interface{}) *$bean$ {
 ////
 ```
 
-## dao-demo
+## dao_no_cascade
+```
+/// auto template
+type Dao struct {
+	sqlkit.Dao
+}
+func New(schema string, tx ...*sqlkit.Dao) *Dao{
+	dao:=&Dao{}
+	dao.NewHelper(schema,tx...)
+	return dao
+}
+func (dao *Dao) scan(sql string, args []interface{}) []$bean$ {
+	rows := dao.Query(sql, args...)
+	list := make([]$bean$,0,5)
+	defer rows.Close()
+	for rows.Next() {
+		m := $bean${}
+		err := rows.StructScan(&m)
+		if err != nil {
+			panic(exception.New(err.Error()))
+		}
+		list = append(list, m)
+	}
+	return list
+}
+func (dao *Dao) scanOne(sql string, args []interface{}) *$bean$ {
+	rows := dao.Query(sql, args...)
+	for rows.Next() {
+		m := $bean${}
+		err := rows.StructScan(&m)
+		rows.Close()
+		if err != nil {
+			panic(exception.New(err.Error()))
+		}
+		return &m
+	}
+	return nil
+}
+////
+```
+
+## dao_demo
 ```
 func (dao *Dao) FindById(id int32) *$bean$ {
 	sql, args := sqlkit.Builder().Select("*").From(dao.GetTableD("$name$")).Where("id=?",id).MustSql()

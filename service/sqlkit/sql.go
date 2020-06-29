@@ -254,7 +254,7 @@ func (dao *Dao) Insert(dest interface{}) {
 	var columns []string
 	var vals []interface{}
 	for i := 0; i < rt.NumField(); i++ {
-		// 自增
+		// 自增的排除
 		if t, ok := rt.Field(i).Tag.Lookup("autoincrement"); ok && t == "true" {
 			name := rt.Field(i).Tag.Get("db")
 			if name == "" {
@@ -368,6 +368,7 @@ func (dao *Dao) DeleteOff(dest interface{}) {
 	dao.Exec(sql, args...)
 }
 
+// 多或单主键
 func getPKs(rt reflect.Type, rv reflect.Value) map[string]interface{} {
 	pks := map[string]interface{}{}
 	for i := 0; i < rt.NumField(); i++ {

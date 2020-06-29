@@ -62,6 +62,10 @@ func (swagger *SwaggerPath) Param(param interface{}) *SwaggerPath {
 		case strings.Index(tname, "float") == 0, strings.Index(tname, "Float") == 0:
 			e["type"] = "number"
 			e["in"] = "query"
+		case strings.Index(tname, "time") == 0, strings.Index(tname, "Time") == 0:
+			// todo 对于class.Time，即可以long也可以string(yyyy-MM-dd HH:mm:ss)
+			e["type"] = "integer"
+			e["in"] = "query"
 		default:
 			e["type"] = "string"
 			e["in"] = "query"
