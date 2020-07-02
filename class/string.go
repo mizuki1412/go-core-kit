@@ -2,6 +2,7 @@ package class
 
 import (
 	"database/sql/driver"
+	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/spf13/cast"
 )
 
@@ -13,7 +14,8 @@ type String struct {
 
 func (th String) MarshalJSON() ([]byte, error) {
 	if th.Valid {
-		return []byte("\"" + th.String + "\""), nil
+		// 可能存在逃逸字符
+		return jsonkit.JSON().Marshal(th.String)
 	}
 	// 返回json中的null
 	return []byte("null"), nil

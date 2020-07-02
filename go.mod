@@ -19,7 +19,7 @@ require (
 	github.com/json-iterator/go v1.1.9
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
 	github.com/kataras/iris/v12 v12.1.8
-	github.com/lib/pq v1.4.0 // indirect
+	github.com/lib/pq v1.7.0
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/mitchellh/mapstructure v1.2.2 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect

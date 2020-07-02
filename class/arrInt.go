@@ -2,10 +2,8 @@ package class
 
 import (
 	"database/sql/driver"
+	"github.com/lib/pq"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
-	"github.com/mizuki1412/go-core-kit/library/stringkit"
-	"github.com/spf13/cast"
-	"strings"
 )
 
 /**
@@ -14,7 +12,7 @@ import (
 
 // 同时继承scan和value方法
 type ArrInt struct {
-	Array []int32
+	Array pq.Int64Array
 	Valid bool
 }
 
@@ -29,7 +27,7 @@ func (th *ArrInt) UnmarshalJSON(data []byte) error {
 		th.Valid = false
 		return nil
 	}
-	var s []int32
+	var s []int64
 	if err := jsonkit.JSON().Unmarshal(data, &s); err != nil {
 		return err
 	}
@@ -45,19 +43,7 @@ func (th *ArrInt) Scan(value interface{}) error {
 		return nil
 	}
 	th.Valid = true
-	// parse eg: {1,2} to [1,2]
-	bytes := value.([]byte)
-	if len(bytes) <= 2 {
-		th.Array = []int32{}
-		return nil
-	}
-	es := strings.Split(string(bytes[1:len(bytes)-1]), ",")
-	var arr []int32
-	for _, v := range es {
-		arr = append(arr, cast.ToInt32(v))
-	}
-	th.Array = arr
-	return nil
+	return th.Array.Scan(value)
 }
 
 // Value implements the driver Valuer interface.
@@ -65,10 +51,14 @@ func (th ArrInt) Value() (driver.Value, error) {
 	if !th.Valid {
 		return nil, nil
 	}
-	return "{" + stringkit.ConcatIntWith(th.Array, ", ") + "}", nil
+	return th.Array.Value()
 }
 
-func (th *ArrInt) Set(val []int32) {
+func (th *ArrInt) Set(val []int64) {
 	th.Array = val
 	th.Valid = true
+}
+
+func (th *ArrInt) Length() int {
+	return len(th.Array)
 }

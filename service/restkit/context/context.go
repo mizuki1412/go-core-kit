@@ -148,7 +148,7 @@ func (ctx *Context) bindStruct(bean interface{}) {
 			}
 		case "class.ArrInt":
 			if !stringkit.IsNull(val) {
-				var p []int32
+				var p []int64
 				jsonkit.ParseObj(val, &p)
 				tmp := class.ArrInt{Array: p, Valid: true}
 				fieldV.Set(reflect.ValueOf(tmp))

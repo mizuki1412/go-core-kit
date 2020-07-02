@@ -78,6 +78,7 @@ func Init(router *router.Router) {
 - action的params tags: `validate:"required" description:"xxx" default:"" trim:"true"`
 - bean struct tags: `json:"" db:"db-field-name" pk:"true" tablename:"x" autoincrement:"true"`
 - context BindForm: 将会先trim，空字符串当做nil。
+- context BindForm: 支持在params中直接指定基本类型和class包中的类型。
 - 在action中，处理bean中的field时，注意field的valid属性，class中的类可以用Set方法来作为参数设置；自定义的field struct用指针。
 - iris.Context.next() 之后的代码逻辑是在response发出之后的，不能再修改response
 
@@ -110,6 +111,47 @@ https://swagger.io/specification/
 - bean struct中如果没有db标签，则不会被通用接口insert/update
 - sqlx的`missing destination name sth in sth`，是查询出来的字段和类字段不符，在select中限定字段即可。
 - update set时：`Set("extend",squirrel.Expr("'{}'::jsonb"))` or `Set("extend","{}")`
+
+### demo
+```go
+func (dao *Dao) UpdateConfirm(id int64){
+	sql, args, err := sqlkit.Builder().Update(dao.GetTableD("device_alarm_record")).Set("extend",squirrel.Expr("jsonb_set(extend, '{confirm}','true',true)")).Where("id=?",id).ToSql()
+	if err != nil {
+		panic(exception.New(err.Error()))
+	}
+	dao.Exec(sql, args...)
+}
+
+func (dao *Dao) List(dTypes []string) []model.AlarmMsg {
+	builder := sqlkit.Builder().Select("msg.*").From(dao.GetTableD("alarm_msg msg") + dao.GetTableD("device_type_info info")).Where("msg.deviceType=info.id").OrderBy("msg.deviceType, msg.id")
+	if dTypes!=nil && len(dTypes) > 0 {
+		flag, arg := pghelper.GenUnnestString(dTypes)
+		builder = builder.Where("msg.deviceType in "+flag, arg)
+	}
+	sql, args := builder.MustSql()
+	return dao.scan(sql, args)
+}
+
+func (dao *Dao) ListId(dType []string) []string {
+	builder := sqlkit.Builder().Select("id").From(dao.GetTableD("device")).Where("off=?", false).OrderBy("id")
+	if dType!=nil && len(dType)>0{
+		flag,arg := pghelper.GenUnnestString(dType)
+		builder = builder.Where("type in "+flag, arg)
+	}
+	sql, args := builder.MustSql()
+	rows := dao.Query(sql, args...)
+	list := make([]string, 0, 5)
+	defer rows.Close()
+	for rows.Next() {
+		ret, err := rows.SliceScan()
+		if err != nil {
+			panic(exception.New(err.Error()))
+		}
+		list = append(list, ret[0].(string))
+	}
+	return list
+}
+```
 
 ## configkit
 

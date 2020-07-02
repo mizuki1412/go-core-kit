@@ -45,11 +45,9 @@ func (th *$struct$) Scan(value interface{}) error {
 	th.Id = cast.ToInt32(value)
 	return nil
 }
-func (th *$struct$) Value() (driver.Value, error) {
-	if th == nil {
-		return nil, nil
-	}
-	return th.Id, nil
+func (th $struct$) Value() (driver.Value, error) {
+    // todo 注意返回值类型
+	return int64(th.Id), nil
 }
 ```
 
