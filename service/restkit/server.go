@@ -31,6 +31,8 @@ func defaultEngine() {
 	router.Use(middleware.Cors())
 	// max request size
 	router.Proxy.Use(iris.LimitRequestBodySize(int64(configkit.GetInt(ConfigKeyRestRequestBodySize, 100)) << 20))
+	// 其他错误如404，
+	router.OnError(middleware.Cors())
 	// add base path
 	base := configkit.GetStringD(ConfigKeyRestServerBase)
 	if base != "" {

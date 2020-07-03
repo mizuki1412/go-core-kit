@@ -56,6 +56,9 @@ func (router *Router) Use(handlers ...Handler) {
 		router.Proxy.Use(handlerTrans(handlers...)...)
 	}
 }
+func (router *Router) OnError(handlers ...Handler) {
+	router.Proxy.OnAnyErrorCode(handlerTrans(handlers...)...)
+}
 
 func (router *Router) Post(path string, handlers ...Handler) *swg.SwaggerPath {
 	if router.IsGroup {

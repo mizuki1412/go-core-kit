@@ -35,6 +35,15 @@ func Recover() router.Handler {
 					return
 				}
 				ctx.JsonError(msg)
+				// 打印错误信息
+				logkit.Info("response-error",
+					logkit.Param{
+						Key: "url",
+						Val: ctx.Request.URL.String(),
+					}, logkit.Param{
+						Key: "msg",
+						Val: msg,
+					})
 				ctx.Proxy.StopExecution()
 			}
 		}()

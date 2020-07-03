@@ -66,9 +66,14 @@ func (ctx *Context) SessionSetToken(token string) {
 	ctx.Session().Set("token", token)
 }
 
+var SessionGetUserFunc = func(ctx *Context) interface{} {
+	// 默认处理，在自定义请覆盖
+	return ctx.Session().Get("user")
+}
+
 // eg *model.User
 func (ctx *Context) SessionGetUser() interface{} {
-	return ctx.Session().Get("user")
+	return SessionGetUserFunc(ctx)
 }
 func (ctx *Context) SessionGetSchema() string {
 	return ctx.Session().GetStringDefault("schema", "public")
