@@ -19,8 +19,7 @@ var pgssCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		t := time.Now()
-		//sQL2Struct("/Users/ycj/Downloads/demo.sql", "/Users/ycj/Downloads/dest.go")
-		sQL2Struct("/Users/ycj/Downloads/test.sql", "/Users/ycj/Downloads/test.go")
+		sQL2Struct("/Users/ycj/Downloads/demo.sql", "/Users/ycj/Downloads/dest.go")
 		println(time.Since(t).Milliseconds())
 	},
 }

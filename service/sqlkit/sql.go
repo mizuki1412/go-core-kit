@@ -6,7 +6,6 @@ import (
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
-	"log"
 	"reflect"
 	"time"
 )
@@ -290,7 +289,7 @@ func (dao *Dao) Insert(dest interface{}) {
 	if err != nil {
 		panic(exception.New(err.Error(), 2))
 	}
-	log.Println(sql, args)
+	//log.Println(sql, args)
 	rows := dao.Query(sql, args...)
 	defer rows.Close()
 	for rows.Next() {
