@@ -185,6 +185,13 @@ func (ctx *Context) bindStruct(bean interface{}) {
 				}
 				fieldV.Set(reflect.ValueOf(temp))
 			}
+		case "class.Decimal":
+			if !stringkit.IsNull(val) {
+				tmp := class.Decimal{}
+				tmp.Set(val)
+				fieldV.Set(reflect.ValueOf(tmp))
+			}
 		}
+
 	}
 }
