@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/mizuki1412/go-core-kit/library/arraykit"
 	"github.com/mizuki1412/go-core-kit/library/filekit"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/spf13/cobra"
@@ -64,7 +65,7 @@ func sQL2Struct(sqlFile, destFile string) {
 			}
 			f := field{Name: es[0]}
 			f.Tags = append(f.Tags, fmt.Sprintf("json:\"%s\" db:\"%s\"", es[0], strings.ToLower(es[0])))
-			if stringkit.ArrayContains(es, "primary") {
+			if arraykit.StringContains(es, "primary") {
 				f.Tags = append(f.Tags, fmt.Sprintf("pk:\"true\" tablename:\"%s\"", table))
 			}
 			switch es[1] {
@@ -78,12 +79,12 @@ func sQL2Struct(sqlFile, destFile string) {
 				f.Tags = append(f.Tags, "autoincrement:\"true\"")
 			case "int", "smallint":
 				f.Type = "class.Int32"
-				if stringkit.ArrayContains(es, "primary") {
+				if arraykit.StringContains(es, "primary") {
 					f.Type = "int32"
 				}
 			case "bigint":
 				f.Type = "class.Int64"
-				if stringkit.ArrayContains(es, "primary") {
+				if arraykit.StringContains(es, "primary") {
 					f.Type = "int64"
 				}
 			case "timestamp", "date":

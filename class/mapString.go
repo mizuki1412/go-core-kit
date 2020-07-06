@@ -75,3 +75,12 @@ func (th *MapString) PutAll(val map[string]interface{}) {
 	mapkit.PutAll(th.Map, val)
 	th.Valid = true
 }
+
+func (th *MapString) PutIfAbsent(key string, val interface{}) {
+	if th.Map == nil {
+		th.Map = map[string]interface{}{}
+	}
+	if _, ok := th.Map[key]; !ok {
+		th.Map[key] = val
+	}
+}

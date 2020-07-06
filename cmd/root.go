@@ -3,9 +3,10 @@ package cmd
 import (
 	"fmt"
 	"github.com/mizuki1412/go-core-kit/class"
+	"github.com/mizuki1412/go-core-kit/library/arraykit"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/spf13/cobra"
-	"time"
+	"log"
 )
 
 type Data struct {
@@ -19,14 +20,13 @@ var rootCmd = &cobra.Command{
 	Short: "go core kit test",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		str := "{ \"key\": 123.00020010002224567, \"key2\":123, \"key3\":1592286542000  }"
-		dt := class.Time{}
-		dt.Set(time.Now())
-		d := Data{}
-		jsonkit.ParseObj(str, &d)
-		fmt.Println(d)
-		fmt.Println(jsonkit.ToString(d))
-		fmt.Println(d.Key.Decimal.Float64())
+		var arr []interface{}
+		jsonkit.JSON().Unmarshal([]byte("[1,2,3]"), &arr)
+		fmt.Printf("%T\n", arr[0])
+		log.Println(arraykit.Delete(arr, 2))
+		//math.Dim()
+		//log.Println(arraykit.Delete(arr, cast.ToInt32(2)))
+		//log.Println(arraykit.DeleteAt(arr, 2))
 	},
 }
 

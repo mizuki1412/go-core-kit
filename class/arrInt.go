@@ -58,13 +58,14 @@ func (th ArrInt) Value() (driver.Value, error) {
 func (th *ArrInt) Set(val interface{}) {
 	if v, ok := val.([]int64); ok {
 		th.Array = v
-		th.Valid = true
 	} else if v, ok := val.(ArrInt); ok {
 		th.Array = v.Array
-		th.Valid = true
+	} else if v, ok := val.(pq.Int64Array); ok {
+		th.Array = v
 	} else {
 		panic(exception.New("class.ArrInt set error"))
 	}
+	th.Valid = true
 }
 
 func (th *ArrInt) Length() int {
