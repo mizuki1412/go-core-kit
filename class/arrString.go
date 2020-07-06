@@ -3,6 +3,7 @@ package class
 import (
 	"database/sql/driver"
 	"github.com/lib/pq"
+	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 )
 
@@ -54,9 +55,16 @@ func (th ArrString) Value() (driver.Value, error) {
 	return th.Array.Value()
 }
 
-func (th *ArrString) Set(val []string) {
-	th.Array = val
-	th.Valid = true
+func (th *ArrString) Set(val interface{}) {
+	if v, ok := val.([]string); ok {
+		th.Array = v
+		th.Valid = true
+	} else if v, ok := val.(ArrString); ok {
+		th.Array = v.Array
+		th.Valid = true
+	} else {
+		panic(exception.New("class.ArrString set error"))
+	}
 }
 
 func (th *ArrString) Length() int {

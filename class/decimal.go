@@ -11,11 +11,19 @@ type Decimal struct {
 }
 
 func (th *Decimal) Set(val interface{}) {
-	v, err := decimal.NewFromString(cast.ToString(val))
-	if err != nil {
+	if v, ok := val.(decimal.Decimal); ok {
 		th.Valid = true
 		th.Decimal = v
+	} else if v, ok := val.(Decimal); ok {
+		th.Valid = true
+		th.Decimal = v.Decimal
 	} else {
-		panic(exception.New("decimal set error"))
+		v, err := decimal.NewFromString(cast.ToString(val))
+		if err == nil {
+			th.Valid = true
+			th.Decimal = v
+		} else {
+			panic(exception.New("class.Decimal set error"))
+		}
 	}
 }

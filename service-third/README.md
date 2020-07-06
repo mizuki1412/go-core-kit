@@ -2,3 +2,6 @@
 
 ## amapkit
 高德地图
+
+## locationkit
+基站地理位置服务

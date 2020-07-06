@@ -2,6 +2,8 @@ package class
 
 import (
 	"database/sql"
+	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/class/utils"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/timekit"
 	"github.com/spf13/cast"
@@ -28,7 +30,7 @@ func (th *Time) UnmarshalJSON(data []byte) error {
 	var s time.Time
 	var err error
 	// 日期时间格式 + 毫秒形式
-	str := unquoteIfQuoted(data)
+	str := utils.UnquoteIfQuoted(data)
 	if len(str) == 13 && strings.Index(str, "-") < 0 {
 		s0, err := cast.ToInt64E(str)
 		if err != nil {
@@ -46,7 +48,16 @@ func (th *Time) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (th *Time) Set(val time.Time) {
-	th.Time = val
-	th.Valid = true
+func (th *Time) Set(val interface{}) {
+	if v, ok := val.(Time); ok {
+		th.Time = v.Time
+		th.Valid = true
+	} else {
+		t, err := cast.ToTimeE(val)
+		if err != nil {
+			panic(exception.New("class.Time set error"))
+		}
+		th.Time = t
+		th.Valid = true
+	}
 }

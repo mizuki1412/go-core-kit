@@ -2,6 +2,8 @@ package class
 
 import (
 	"database/sql/driver"
+	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/class/utils"
 	"github.com/spf13/cast"
 )
 
@@ -22,7 +24,7 @@ func (th *Float64) UnmarshalJSON(data []byte) error {
 		th.Valid = false
 		return nil
 	}
-	s, err := cast.ToFloat64E(unquoteIfQuoted(data))
+	s, err := cast.ToFloat64E(utils.UnquoteIfQuoted(data))
 	if err != nil {
 		return err
 	}
@@ -48,7 +50,16 @@ func (th Float64) Value() (driver.Value, error) {
 	return th.Float64, nil
 }
 
-func (th *Float64) Set(val float64) {
-	th.Float64 = val
-	th.Valid = true
+func (th *Float64) Set(val interface{}) {
+	if v, ok := val.(Float64); ok {
+		th.Float64 = v.Float64
+		th.Valid = true
+	} else {
+		i, err := cast.ToFloat64E(val)
+		if err != nil {
+			panic(exception.New("class.Float64 set error"))
+		}
+		th.Float64 = i
+		th.Valid = true
+	}
 }

@@ -2,6 +2,7 @@ package class
 
 import (
 	"database/sql/driver"
+	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/mapkit"
 )
@@ -55,9 +56,16 @@ func (th MapString) Value() (driver.Value, error) {
 	return jsonkit.ToString(th.Map), nil
 }
 
-func (th *MapString) Set(val map[string]interface{}) {
-	th.Map = val
-	th.Valid = true
+func (th *MapString) Set(val interface{}) {
+	if v, ok := val.(MapString); ok {
+		th.Map = v.Map
+		th.Valid = true
+	} else if v, ok := val.(map[string]interface{}); ok {
+		th.Map = v
+		th.Valid = true
+	} else {
+		panic(exception.New("class.MapString set error"))
+	}
 }
 
 func (th *MapString) PutAll(val map[string]interface{}) {

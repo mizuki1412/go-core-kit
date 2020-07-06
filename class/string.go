@@ -2,6 +2,8 @@ package class
 
 import (
 	"database/sql/driver"
+	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/class/utils"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/spf13/cast"
 )
@@ -26,7 +28,7 @@ func (th *String) UnmarshalJSON(data []byte) error {
 		th.Valid = false
 		return nil
 	}
-	th.String = unquoteIfQuoted(data)
+	th.String = utils.UnquoteIfQuoted(data)
 	th.Valid = true
 	return nil
 }
@@ -48,7 +50,16 @@ func (th String) Value() (driver.Value, error) {
 	return th.String, nil
 }
 
-func (th *String) Set(val string) {
-	th.String = val
-	th.Valid = true
+func (th *String) Set(val interface{}) {
+	if v, ok := val.(String); ok {
+		th.String = v.String
+		th.Valid = true
+	} else {
+		s, err := cast.ToStringE(val)
+		if err != nil {
+			panic(exception.New("class.String set error"))
+		}
+		th.String = s
+		th.Valid = true
+	}
 }

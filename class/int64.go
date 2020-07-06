@@ -2,6 +2,8 @@ package class
 
 import (
 	"database/sql/driver"
+	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/class/utils"
 	"github.com/spf13/cast"
 )
 
@@ -22,7 +24,7 @@ func (th *Int64) UnmarshalJSON(data []byte) error {
 		th.Valid = false
 		return nil
 	}
-	s, err := cast.ToInt64E(unquoteIfQuoted(data))
+	s, err := cast.ToInt64E(utils.UnquoteIfQuoted(data))
 	if err != nil {
 		return err
 	}
@@ -48,7 +50,16 @@ func (th Int64) Value() (driver.Value, error) {
 	return th.Int64, nil
 }
 
-func (th *Int64) Set(val int64) {
-	th.Int64 = val
-	th.Valid = true
+func (th *Int64) Set(val interface{}) {
+	if v, ok := val.(Int64); ok {
+		th.Int64 = v.Int64
+		th.Valid = true
+	} else {
+		i, err := cast.ToInt64E(val)
+		if err != nil {
+			panic(exception.New("class.Int64 set error"))
+		}
+		th.Int64 = i
+		th.Valid = true
+	}
 }
