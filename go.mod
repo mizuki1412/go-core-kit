@@ -3,6 +3,7 @@ module github.com/mizuki1412/go-core-kit
 go 1.14
 
 require (
+	github.com/360EntSecGroup-Skylar/excelize v1.4.1
 	github.com/AlecAivazis/survey/v2 v2.0.7 // indirect
 	github.com/Masterminds/semver/v3 v3.1.0 // indirect
 	github.com/Masterminds/squirrel v1.4.0

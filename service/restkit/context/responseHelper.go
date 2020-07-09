@@ -2,6 +2,7 @@ package context
 
 import (
 	"github.com/mizuki1412/go-core-kit/service/logkit"
+	"github.com/mizuki1412/go-core-kit/service/storagekit"
 	"net/http"
 )
 
@@ -47,10 +48,24 @@ func (ctx *Context) JsonError(msg string) {
 		Message: msg,
 	})
 }
+
+func (ctx *Context) SetFileHeader(filename string) {
+	ctx.Proxy.Header("Content-Disposition", "attachment; filename="+filename)
+	ctx.Proxy.Header("Content-Type", "application/octet-stream")
+	ctx.Proxy.Header("Content-Transfer-Encoding", "binary")
+}
 func (ctx *Context) FileRaw(data []byte, name string) {
-	ctx.Proxy.Header("Content-Disposition", "attachment; filename="+name)
+	ctx.SetFileHeader(name)
 	_, err := ctx.Proxy.Binary(data)
 	if err != nil {
 		logkit.Error("rest_ret_file_raw_error: " + err.Error())
+	}
+}
+
+// 相对于项目目录路径的
+func (ctx *Context) File(relativePath, name string) {
+	err := ctx.Proxy.SendFile(storagekit.GetFullPath(relativePath), name)
+	if err != nil {
+		logkit.Error("rest_ret_file_error: " + err.Error())
 	}
 }

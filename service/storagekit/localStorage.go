@@ -7,7 +7,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 )
 
-func getFullPath(path string) string {
+func GetFullPath(path string) string {
 	if path[0] != '/' {
 		path = "/" + path
 	}
@@ -15,12 +15,12 @@ func getFullPath(path string) string {
 }
 
 func SaveInHome(file *class.File, path string) {
-	path = getFullPath(path)
+	path = GetFullPath(path)
 	filekit.WriteClassFile(path, file)
 }
 
 func GetInHome(path string) []byte {
-	path = getFullPath(path)
+	path = GetFullPath(path)
 	//file,err := os.OpenFile(path, os.O_RDONLY, 644)
 	//if err!=nil{
 	//	panic(exception.New("文件打开失败"))

@@ -79,12 +79,3 @@ func LowerFirst(str string) string {
 	}
 	return string(bytes)
 }
-
-func ArrayContains(arr []string, ele string) bool {
-	for _, v := range arr {
-		if v == ele {
-			return true
-		}
-	}
-	return false
-}
