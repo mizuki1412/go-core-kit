@@ -2,6 +2,8 @@ package arraykit
 
 import "github.com/spf13/cast"
 
+// todo sort.searchStrings()
+
 func StringContains(arr []string, ele string) bool {
 	for _, v := range arr {
 		if v == ele {

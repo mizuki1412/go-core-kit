@@ -83,4 +83,13 @@ func (th *MapString) PutIfAbsent(key string, val interface{}) {
 	if _, ok := th.Map[key]; !ok {
 		th.Map[key] = val
 	}
+	th.Valid = true
+}
+
+func (th *MapString) Put(key string, val interface{}) {
+	if th.Map == nil {
+		th.Map = map[string]interface{}{}
+	}
+	th.Map[key] = val
+	th.Valid = true
 }
