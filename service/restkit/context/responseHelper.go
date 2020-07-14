@@ -54,6 +54,9 @@ func (ctx *Context) SetFileHeader(filename string) {
 	ctx.Proxy.Header("Content-Type", "application/octet-stream")
 	ctx.Proxy.Header("Content-Transfer-Encoding", "binary")
 }
+func (ctx *Context) SetJsonHeader() {
+	ctx.Proxy.Header("Content-Type", "application/json")
+}
 func (ctx *Context) FileRaw(data []byte, name string) {
 	ctx.SetFileHeader(name)
 	_, err := ctx.Proxy.Binary(data)
@@ -64,8 +67,11 @@ func (ctx *Context) FileRaw(data []byte, name string) {
 
 // 相对于项目目录路径的
 func (ctx *Context) File(relativePath, name string) {
+	// todo 直接返回的了
 	err := ctx.Proxy.SendFile(storagekit.GetFullPath(relativePath), name)
 	if err != nil {
 		logkit.Error("rest_ret_file_error: " + err.Error())
+		//ctx.SetJsonHeader()
+		//panic(exception.New(err.Error()))
 	}
 }

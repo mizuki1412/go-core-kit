@@ -1,6 +1,7 @@
 package timekit
 
 import (
+	"github.com/mizuki1412/go-core-kit/class/exception"
 	"time"
 )
 
@@ -14,8 +15,12 @@ func UnixMill(t int64) time.Time {
 }
 
 // 用cast
-func ParseString(dtString string, layout string) (time.Time, error) {
-	return time.ParseInLocation(layout, dtString, time.Local)
+func ParseString(dtString string, layout string) time.Time {
+	t, err := time.ParseInLocation(layout, dtString, time.Local)
+	if err != nil {
+		panic(exception.New(err.Error()))
+	}
+	return t
 }
 
 // 修整为当日开始时间

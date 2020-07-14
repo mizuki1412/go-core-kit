@@ -4,6 +4,7 @@ import "strings"
 
 // 生成sql中: in (select unnest(Array[?,?,?])) []interface{}
 // arr必须不能空
+// 注意使用时 args...
 func GenUnnestString(arr []string) (string, []interface{}) {
 	flags := make([]string, len(arr))
 	args := make([]interface{}, len(arr))

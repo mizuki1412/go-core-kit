@@ -22,3 +22,18 @@ func Map2Struct(input map[string]interface{}, obj interface{}) error {
 	//return mapstructure.Decode(input, obj)
 	return jsonkit.ParseObj(jsonkit.ToString(input), obj)
 }
+
+func Merge(dest, src map[string]interface{}) {
+	if dest == nil || src == nil {
+		return
+	}
+	for key, val := range src {
+		destVal, destOk := dest[key].(map[string]interface{})
+		srcVal, srcOk := val.(map[string]interface{})
+		if destOk && srcOk {
+			Merge(destVal, srcVal)
+		} else if val != nil {
+			dest[key] = val
+		}
+	}
+}

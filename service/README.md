@@ -136,7 +136,7 @@ func (dao *Dao) ListId(dType []string) []string {
 	builder := sqlkit.Builder().Select("id").From(dao.GetTableD("device")).Where("off=?", false).OrderBy("id")
 	if dType!=nil && len(dType)>0{
 		flag,arg := pghelper.GenUnnestString(dType)
-		builder = builder.Where("type in "+flag, arg)
+		builder = builder.Where("type in "+flag, arg...)
 	}
 	sql, args := builder.MustSql()
 	rows := dao.Query(sql, args...)
