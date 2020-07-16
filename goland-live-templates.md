@@ -78,12 +78,12 @@ func (dao *Dao) scan(sql string, args []interface{}) []*$bean$ {
 	list := make([]*$bean$,0,5)
 	defer rows.Close()
 	for rows.Next() {
-		m := $bean${}
-		err := rows.StructScan(&m)
+		m := &$bean${}
+		err := rows.StructScan(m)
 		if err != nil {
 			panic(exception.New(err.Error()))
 		}
-		list = append(list, &m)
+		list = append(list, m)
 	}
 	for i := range list{
 		dao.cascade(list[i])
