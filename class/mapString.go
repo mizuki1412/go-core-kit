@@ -93,3 +93,18 @@ func (th *MapString) Put(key string, val interface{}) {
 	th.Map[key] = val
 	th.Valid = true
 }
+
+func (th *MapString) Remove() {
+	th.Valid = false
+	th.Map = map[string]interface{}{}
+}
+
+func (th *MapString) IsEmpty() bool {
+	if !th.Valid {
+		return true
+	}
+	if len(th.Map) == 0 {
+		return true
+	}
+	return false
+}

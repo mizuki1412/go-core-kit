@@ -71,3 +71,7 @@ func (th *ArrString) Set(val interface{}) {
 func (th *ArrString) Length() int {
 	return len(th.Array)
 }
+func (th *ArrString) Remove() {
+	th.Valid = false
+	th.Array = []string{}
+}

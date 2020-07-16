@@ -18,6 +18,7 @@ func JSON() jsoniter.API {
 
 func ToString(obj interface{}) string {
 	s, err := JSON().MarshalToString(obj)
+	// todo ?
 	if err != nil {
 		return "{}"
 	}

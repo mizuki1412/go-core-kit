@@ -71,3 +71,8 @@ func (th *ArrInt) Set(val interface{}) {
 func (th *ArrInt) Length() int {
 	return len(th.Array)
 }
+
+func (th *ArrInt) Remove() {
+	th.Valid = false
+	th.Array = []int64{}
+}

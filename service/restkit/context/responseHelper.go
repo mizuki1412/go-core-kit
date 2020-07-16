@@ -1,15 +1,16 @@
 package context
 
 import (
+	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/mizuki1412/go-core-kit/service/storagekit"
 	"net/http"
 )
 
 type RestRet struct {
-	Result  int         `json:"result"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
+	Result  int          `json:"result"`
+	Message class.String `json:"message"`
+	Data    interface{}  `json:"data"`
 }
 
 const ResultErr = 0
@@ -44,8 +45,11 @@ func (ctx *Context) JsonSuccess(data interface{}) {
 }
 func (ctx *Context) JsonError(msg string) {
 	ctx.Json(RestRet{
-		Result:  ResultErr,
-		Message: msg,
+		Result: ResultErr,
+		Message: class.String{
+			String: msg,
+			Valid:  true,
+		},
 	})
 }
 

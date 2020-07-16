@@ -63,3 +63,8 @@ func (th *String) Set(val interface{}) {
 		th.Valid = true
 	}
 }
+
+func (th *String) Remove() {
+	th.Valid = false
+	th.String = ""
+}
