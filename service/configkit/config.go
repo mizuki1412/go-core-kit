@@ -53,3 +53,7 @@ func GetBool(key string, defaultVal bool) bool {
 	}
 	return viper.GetBool(key)
 }
+
+func GetBoolD(key string) bool {
+	return viper.GetBool(key)
+}

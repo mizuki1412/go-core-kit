@@ -1,6 +1,9 @@
 package arraykit
 
-import "github.com/spf13/cast"
+import (
+	"github.com/mizuki1412/go-core-kit/library/jsonkit"
+	"github.com/spf13/cast"
+)
 
 // todo sort.searchStrings()
 
@@ -55,4 +58,9 @@ func DeleteAt(arr []interface{}, index int) []interface{} {
 		}
 	}
 	return arr[:j]
+}
+
+// obj need pointer
+func Array2ArrayStruct(input interface{}, obj interface{}) error {
+	return jsonkit.ParseObj(jsonkit.ToString(input), obj)
 }

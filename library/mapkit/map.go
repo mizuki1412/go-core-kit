@@ -17,6 +17,7 @@ func PutAll(target, origin map[string]interface{}) {
 	}
 }
 
+// obj need pointer
 func Map2Struct(input map[string]interface{}, obj interface{}) error {
 	// todo 自定义的一些class出错
 	//return mapstructure.Decode(input, obj)
