@@ -1,6 +1,8 @@
 package markdown
 
 import (
+	"bytes"
+	"fmt"
 	"github.com/Depado/bfchroma"
 	"github.com/alecthomas/chroma/formatters/html"
 	"github.com/mizuki1412/go-core-kit/library/filekit"
@@ -10,14 +12,14 @@ import (
 func Test() {
 	content, _ := filekit.ReadString("./README.md")
 
-	// todo 加入head+css
 	//render:=blackfriday.NewHTMLRenderer(blackfriday.HTMLRendererParameters{
 	//	Flags: blackfriday.CommonHTMLFlags|blackfriday.TOC,
 	//})
 	render := bfchroma.NewRenderer(
-		bfchroma.WithoutAutodetect(),
+		//bfchroma.WithoutAutodetect(),
 		bfchroma.ChromaOptions(
 			html.WithLineNumbers(true),
+			html.WithClasses(true),
 		),
 		bfchroma.Extend(
 			blackfriday.NewHTMLRenderer(blackfriday.HTMLRendererParameters{
@@ -26,6 +28,21 @@ func Test() {
 		),
 	)
 	extensions := blackfriday.WithExtensions(blackfriday.CommonExtensions)
+	data := blackfriday.Run([]byte(content), blackfriday.WithRenderer(render), extensions)
+	// html
+	// code css
+	styles := make([]byte, 0)
+	buffer := bytes.NewBuffer(styles)
+	_ = render.ChromaCSS(buffer)
+	// custom css
+	// todo 加入css
+	css := ""
 
-	_ = filekit.WriteFile("/Users/ycj/Downloads/test.html", blackfriday.Run([]byte(content), blackfriday.WithRenderer(render), extensions))
+	fin := fmt.Sprintf(`<html>
+	<head>
+		<style>%s</style>
+		<style>%s</style>
+	</head>
+	<body>%s</body></html>`, buffer.String(), css, string(data))
+	_ = filekit.WriteFile("/Users/ycj/Downloads/test.html", []byte(fin))
 }

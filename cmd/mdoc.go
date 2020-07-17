@@ -6,12 +6,12 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(mdcmd)
+	rootCmd.AddCommand(mdocCmd)
 }
 
-var mdcmd = &cobra.Command{
-	Use:   "md",
-	Short: "handle readme",
+var mdocCmd = &cobra.Command{
+	Use:   "mdoc",
+	Short: "gen readme md doc",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		markdown.Test()
