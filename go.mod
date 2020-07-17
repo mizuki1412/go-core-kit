@@ -5,9 +5,11 @@ go 1.14
 require (
 	github.com/360EntSecGroup-Skylar/excelize v1.4.1
 	github.com/AlecAivazis/survey/v2 v2.0.7 // indirect
+	github.com/Depado/bfchroma v1.3.0
 	github.com/Masterminds/semver/v3 v3.1.0 // indirect
 	github.com/Masterminds/squirrel v1.4.0
 	github.com/ajg/form v1.5.1 // indirect
+	github.com/alecthomas/chroma v0.7.3
 	github.com/arthurkiller/rollingwriter v1.1.2
 	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/fasthttp-contrib/websocket v0.0.0-20160511215533-1f3b11f56072 // indirect
@@ -17,6 +19,7 @@ require (
 	github.com/googollee/go-socket.io v1.4.3
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/imkira/go-interpol v1.1.0 // indirect
+	github.com/iris-contrib/blackfriday v2.0.0+incompatible
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/json-iterator/go v1.1.10
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
@@ -32,6 +35,7 @@ require (
 	github.com/pelletier/go-toml v1.7.0 // indirect
 	github.com/robfig/cron v1.2.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1
+	github.com/russross/blackfriday/v2 v2.0.1
 	github.com/shopspring/decimal v1.2.0
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/spf13/afero v1.3.2
