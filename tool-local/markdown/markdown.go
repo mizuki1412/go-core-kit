@@ -9,7 +9,7 @@ import (
 	"github.com/russross/blackfriday/v2"
 )
 
-func Test() {
+func Html() {
 	content, _ := filekit.ReadString("./README.md")
 
 	//render:=blackfriday.NewHTMLRenderer(blackfriday.HTMLRendererParameters{

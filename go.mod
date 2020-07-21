@@ -4,9 +4,7 @@ go 1.14
 
 require (
 	github.com/360EntSecGroup-Skylar/excelize v1.4.1
-	github.com/AlecAivazis/survey/v2 v2.0.7 // indirect
 	github.com/Depado/bfchroma v1.3.0
-	github.com/Masterminds/semver/v3 v3.1.0 // indirect
 	github.com/Masterminds/squirrel v1.4.0
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/alecthomas/chroma v0.7.3
@@ -17,9 +15,7 @@ require (
 	github.com/go-playground/validator/v10 v10.3.0
 	github.com/go-redis/redis/v8 v8.0.0-beta.6
 	github.com/googollee/go-socket.io v1.4.3
-	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/imkira/go-interpol v1.1.0 // indirect
-	github.com/iris-contrib/blackfriday v2.0.0+incompatible
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/json-iterator/go v1.1.10
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
@@ -27,9 +23,7 @@ require (
 	github.com/lib/pq v1.7.0
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/mitchellh/mapstructure v1.2.2 // indirect
-	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/moul/http2curl v1.0.0 // indirect
-	github.com/oligot/go-mod-upgrade v0.1.2 // indirect
 	github.com/onsi/ginkgo v1.12.0 // indirect
 	github.com/onsi/gomega v1.9.0 // indirect
 	github.com/pelletier/go-toml v1.7.0 // indirect
@@ -37,7 +31,6 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/russross/blackfriday/v2 v2.0.1
 	github.com/shopspring/decimal v1.2.0
-	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/spf13/afero v1.3.2
 	github.com/spf13/cast v1.3.1
 	github.com/spf13/cobra v1.0.0
@@ -51,8 +44,8 @@ require (
 	github.com/yudai/gojsondiff v1.0.0 // indirect
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	github.com/yudai/pp v2.0.1+incompatible // indirect
-	github.com/zserge/lorca v0.1.9 // indirect
-	go.bug.st/serial v1.1.0 // indirect
+	github.com/zserge/lorca v0.1.9
+	go.bug.st/serial v1.1.0
 	go.uber.org/automaxprocs v1.3.0
 	go.uber.org/zap v1.15.0
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect
