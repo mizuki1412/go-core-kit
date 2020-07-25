@@ -13,14 +13,14 @@ require (
 	github.com/fasthttp-contrib/websocket v0.0.0-20160511215533-1f3b11f56072 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-playground/validator/v10 v10.3.0
-	github.com/go-redis/redis/v8 v8.0.0-beta.6
+	github.com/go-redis/redis/v8 v8.0.0-beta.7
 	github.com/googollee/go-socket.io v1.4.3
 	github.com/imkira/go-interpol v1.1.0 // indirect
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/json-iterator/go v1.1.10
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
 	github.com/kataras/iris/v12 v12.1.8
-	github.com/lib/pq v1.7.0
+	github.com/lib/pq v1.7.1
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/mitchellh/mapstructure v1.2.2 // indirect
 	github.com/moul/http2curl v1.0.0 // indirect

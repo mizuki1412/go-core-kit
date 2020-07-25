@@ -79,6 +79,8 @@ func (dao *Dao) cascade(obj *$bean$) {
 	case ResultDefault:
 		// todo 注意校验nil
 		// todo 如果没有级联，此函数删除
+    case ResultNone:
+		// todo 将外联的置为nil
 	}
 }
 func (dao *Dao) scan(sql string, args []interface{}) []*$bean$ {
