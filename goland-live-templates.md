@@ -51,6 +51,14 @@ func (th $struct$) Value() (driver.Value, error) {
 }
 ```
 
+## bean_sort
+```
+type $name$sSort []*$name$
+func (l $name$sSort) Len() int           { return len(l) }
+func (l $name$sSort) Swap(i, j int)      { l[i], l[j] = l[j], l[i] }
+func (l $name$sSort) Less(i, j int) bool { return l[i].Id.String < l[j].Id.String }
+```
+
 ## dao
 ```
 /// auto template
