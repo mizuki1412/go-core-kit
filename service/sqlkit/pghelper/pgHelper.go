@@ -33,7 +33,7 @@ func GenArrayFlagString(arr []string) (string, []interface{}) {
 		flags[i] = "?"
 		args[i] = arr[i]
 	}
-	return "Array[" + strings.Join(flags, ", ") + "]", args
+	return "Array[" + strings.Join(flags, ", ") + "]::varchar[]", args
 }
 
 func GenArrayFlagInt(arr []int32) (string, []interface{}) {
@@ -43,5 +43,5 @@ func GenArrayFlagInt(arr []int32) (string, []interface{}) {
 		flags[i] = "?"
 		args[i] = arr[i]
 	}
-	return "Array[" + strings.Join(flags, ", ") + "]", args
+	return "Array[" + strings.Join(flags, ", ") + "]::int[]", args
 }
