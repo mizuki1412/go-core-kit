@@ -24,3 +24,24 @@ func GenUnnestInt(arr []int32) (string, []interface{}) {
 	}
 	return "(select unnest(Array[" + strings.Join(flags, ", ") + "]))", args
 }
+
+// 返回 Array[?,?,?]
+func GenArrayFlagString(arr []string) (string, []interface{}) {
+	flags := make([]string, len(arr))
+	args := make([]interface{}, len(arr))
+	for i := 0; i < len(arr); i++ {
+		flags[i] = "?"
+		args[i] = arr[i]
+	}
+	return "Array[" + strings.Join(flags, ", ") + "]", args
+}
+
+func GenArrayFlagInt(arr []int32) (string, []interface{}) {
+	flags := make([]string, len(arr))
+	args := make([]interface{}, len(arr))
+	for i := 0; i < len(arr); i++ {
+		flags[i] = "?"
+		args[i] = arr[i]
+	}
+	return "Array[" + strings.Join(flags, ", ") + "]", args
+}
