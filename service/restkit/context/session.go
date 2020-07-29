@@ -17,7 +17,7 @@ func InitSession() {
 	sessionManager = sessions.New(sessions.Config{
 		Cookie:                      "session",
 		AllowReclaim:                true,
-		Expires:                     time.Duration(cast.ToInt(configkit.GetString(ConfigKeySessionExpire, "12"))) * time.Hour,
+		Expires:                     time.Duration(configkit.GetInt(ConfigKeySessionExpire, 12)) * time.Hour,
 		DisableSubdomainPersistence: true, // samesite 去掉，但是对chrome无效?
 	})
 	// redis

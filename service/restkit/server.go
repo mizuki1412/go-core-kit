@@ -7,7 +7,6 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
 	"github.com/mizuki1412/go-core-kit/service/restkit/middleware"
 	router2 "github.com/mizuki1412/go-core-kit/service/restkit/router"
-	"github.com/spf13/cast"
 )
 
 var router *router2.Router
@@ -52,7 +51,7 @@ func Run() {
 	if router == nil {
 		defaultEngine()
 	}
-	port := cast.ToString(configkit.Get(ConfigKeyRestServerPort, 8080))
+	port := configkit.GetString(ConfigKeyRestServerPort, "8080")
 	logkit.Info("Listening and serving HTTP on " + port)
 	//err := http.ListenAndServe(":" + port, middleware.Session.LoadAndSave(router))
 	router.RegisterSwagger()

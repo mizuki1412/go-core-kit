@@ -2,25 +2,7 @@ package configkit
 
 import (
 	"github.com/spf13/viper"
-	"log"
 )
-
-/**
-viper是大小写不敏感的。
-viper在cobra使用时，bind最好用在cmd.Run中，而不是init中
-*/
-
-// 注意，load比一般的init慢
-func LoadConfig() {
-	viper.SetConfigName("config")
-	viper.SetConfigType("json")
-	// 这里可以执行多次的 搜索多个地址
-	viper.AddConfigPath(".")
-	err := viper.ReadInConfig()
-	if err != nil {
-		log.Println("no config load")
-	}
-}
 
 func Exist(key string) bool {
 	return viper.IsSet(key)
@@ -33,7 +15,7 @@ func Get(key string, defaultVal interface{}) interface{} {
 	return val
 }
 func GetString(key, defaultVal string) string {
-	if !viper.IsSet(key) {
+	if !viper.IsSet(key) || viper.GetString(key) == "" {
 		return defaultVal
 	}
 	return viper.GetString(key)
