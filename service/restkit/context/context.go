@@ -177,7 +177,7 @@ func (ctx *Context) bindStruct(bean interface{}) {
 					}
 					temp.Set(timekit.UnixMill(s))
 				} else {
-					s, err := cast.StringToDate(val)
+					s, err := timekit.Parse(val)
 					if err != nil {
 						panic(exception.New("time cast error"))
 					}
