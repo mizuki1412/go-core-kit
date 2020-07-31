@@ -3,8 +3,10 @@ package rediskit
 import (
 	"context"
 	"github.com/go-redis/redis/v8"
+	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/spf13/cast"
+	"time"
 )
 
 var client *redis.Client
@@ -28,4 +30,20 @@ func Get(ctx context.Context, key string, defaultVal string) string {
 	} else {
 		return val
 	}
+}
+
+func Set(ctx context.Context, key string, val interface{}, expire time.Duration) {
+	client = Instance()
+	_, err := client.Set(ctx, key, val, expire).Result()
+	if err != nil {
+		panic(exception.New("redis 存入失败：" + err.Error()))
+	}
+}
+
+func GetKeyPrefix() string {
+	name := configkit.GetStringD(ConfigKeyRedisPrefix)
+	if name != "" {
+		name += "_"
+	}
+	return name
 }
