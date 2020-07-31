@@ -135,7 +135,7 @@ func (s *SwaggerDoc) ReadDoc() string {
 	s.Swagger = "2.0"
 	s.Info["description"] = configkit.GetStringD(ConfigKeySwaggerDescription)
 	s.Info["title"] = configkit.GetStringD(ConfigKeySwaggerTitle)
-	s.Info["version"] = configkit.GetStringD(ConfigKeySwaggerVersion)
+	s.Info["version"] = configkit.GetString(ConfigKeySwaggerVersion, "1.0.0")
 	s.Host = configkit.GetStringD(ConfigKeySwaggerHost)
 	s.BasePath = configkit.GetStringD(ConfigKeySwaggerBasePath)
 	return jsonkit.ToString(*s)

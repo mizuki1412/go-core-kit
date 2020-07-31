@@ -2,6 +2,8 @@ package initkit
 
 import (
 	corekit "github.com/mizuki1412/go-core-kit/init"
+	"github.com/mizuki1412/go-core-kit/service-third/aliosskit"
+	"github.com/mizuki1412/go-core-kit/service-third/alismskit"
 	"github.com/mizuki1412/go-core-kit/service-third/amapkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/influxkit"
@@ -29,6 +31,7 @@ func LoadConfig() {
 }
 
 func DefFlags(cmd *cobra.Command) {
+	// todo 默认值不起效？
 	cmd.Flags().String(corekit.ConfigKeyProjectDir, ".", "项目目录")
 	cmd.Flags().String(configkit.ConfigKeyTimeLocation, "Asia/Shanghai", "项目中用到的时区")
 	cmd.Flags().String(rediskit.ConfigKeyRedisPrefix, "", "redis key的前缀")
@@ -60,6 +63,18 @@ func DefFlags(cmd *cobra.Command) {
 	cmd.Flags().String(swagger.ConfigKeySwaggerVersion, "1.0.0", "")
 
 	cmd.Flags().String(amapkit.ConfigKeyAmapKey, "", "高德key")
+
+	cmd.Flags().String(alismskit.ConfigKeyAliSMSRegionId, "cn-hangzhou", "ali sms")
+	cmd.Flags().String(alismskit.ConfigKeyAliSMSAccessKey, "", "ali sms")
+	cmd.Flags().String(alismskit.ConfigKeyAliSMSAccessKeySecret, "", "ali sms")
+	cmd.Flags().String(alismskit.ConfigKeyAliSMSTemplate1, "", "ali sms 模板1")
+	cmd.Flags().String(alismskit.ConfigKeyAliSMSSign1, "", "ali sms 签名1")
+
+	cmd.Flags().String(aliosskit.ConfigKeyAliSTSRegionId, "cn-hangzhou", "ali sts")
+	cmd.Flags().String(aliosskit.ConfigKeyAliSTSAccessKey, "", "ali sts")
+	cmd.Flags().String(aliosskit.ConfigKeyAliSTSAccessKeySecret, "", "ali sts")
+	cmd.Flags().String(aliosskit.ConfigKeyAliSTSRoleArn, "", "ali sts")
+	cmd.Flags().String(aliosskit.ConfigKeyAliOSSBucketName, "", "ali oss default bucket")
 }
 
 func BindFlags(cmd *cobra.Command) {

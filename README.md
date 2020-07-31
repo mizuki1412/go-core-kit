@@ -3,21 +3,8 @@
 
 toolkit for golang projects
 
-# usage
-
-## init.go
-应用了automaxprocs，校正docker环境中的cpu核数
-
-```go
-/// 在项目的main中先导入
-package main
-import (_ "github.com/mizuki1412/go-core-kit/init")
-```
-
-## configconst.go
-关于项目的一些配置key定义。
-
-在service等地方也有此类定义。
+# init
+本库使用的入口，以及配置参数信息相关的绑定函数
 
 # class
 通用的一些类的封装和定义
@@ -36,6 +23,12 @@ import (_ "github.com/mizuki1412/go-core-kit/init")
 
 # tool-local
 本地使用的一些小工具
+
+# 其他
+
+## 可替换的函数
+
+- service.restkit.context.session.SessionGetUserFunc: 获取session中user对象的转换处理函数
 
 # related projects
 

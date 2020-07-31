@@ -8,6 +8,7 @@ require (
 	github.com/Masterminds/squirrel v1.4.0
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/alecthomas/chroma v0.7.3
+	github.com/aliyun/alibaba-cloud-sdk-go v1.61.369
 	github.com/arthurkiller/rollingwriter v1.1.2
 	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/fasthttp-contrib/websocket v0.0.0-20160511215533-1f3b11f56072 // indirect
@@ -16,6 +17,7 @@ require (
 	github.com/go-redis/redis/v8 v8.0.0-beta.7
 	github.com/googollee/go-socket.io v1.4.3
 	github.com/imkira/go-interpol v1.1.0 // indirect
+	github.com/jmespath/go-jmespath v0.3.0 // indirect
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/json-iterator/go v1.1.10
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
