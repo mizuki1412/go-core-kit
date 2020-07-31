@@ -308,6 +308,7 @@ func (dao *Dao) Update(dest interface{}) {
 	rv := reflect.ValueOf(dest).Elem()
 	builder := Builder().Update(getTable(rt, dao.Schema))
 	for i := 0; i < rt.NumField(); i++ {
+		// db字段
 		db, ok := rt.Field(i).Tag.Lookup("db")
 		pk := rt.Field(i).Tag.Get("pk")
 		var val interface{}
@@ -318,7 +319,7 @@ func (dao *Dao) Update(dest interface{}) {
 			val = rv.Field(i).Interface()
 		}
 		method := rv.Field(i).MethodByName("Value")
-		if ok && pk != "true" && val != nil && method.IsValid() && method.Call([]reflect.Value{})[0].Interface() != nil {
+		if ok && pk != "true" && val != nil && (!method.IsValid() || (method.IsValid() && method.Call([]reflect.Value{})[0].Interface() != nil)) {
 			builder = builder.Set(db, val)
 		}
 	}
