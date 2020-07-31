@@ -60,7 +60,7 @@ func GetSTS(roleSession, bucket string, paths ...string) STSData {
 			AccessKeySecret: response.Credentials.AccessKeySecret,
 			StsToken:        response.Credentials.SecurityToken,
 			Expiration:      response.Credentials.Expiration,
-			Region:          region,
+			Region:          "oss-" + region,
 			Bucket:          bucket,
 		}
 	} else {
