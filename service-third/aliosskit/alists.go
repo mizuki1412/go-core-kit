@@ -17,7 +17,7 @@ type STSData struct {
 }
 
 // path是在bucket下的相对路径(eg:*), paths将用于resource
-func Get(roleSession, bucket string, paths ...string) STSData {
+func GetSTS(roleSession, bucket string, paths ...string) STSData {
 	ak := configkit.GetString(ConfigKeyAliSTSAccessKey, "")
 	aks := configkit.GetString(ConfigKeyAliSTSAccessKeySecret, "")
 	role := configkit.GetString(ConfigKeyAliSTSRoleArn, "")
