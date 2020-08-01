@@ -1,3 +1,3 @@
-package amapkit
+package locationkit
 
 const ConfigKeyAmapKey = "amap.key"

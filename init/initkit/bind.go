@@ -4,7 +4,7 @@ import (
 	corekit "github.com/mizuki1412/go-core-kit/init"
 	"github.com/mizuki1412/go-core-kit/service-third/aliosskit"
 	"github.com/mizuki1412/go-core-kit/service-third/alismskit"
-	"github.com/mizuki1412/go-core-kit/service-third/amapkit"
+	"github.com/mizuki1412/go-core-kit/service-third/locationkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/influxkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
@@ -62,7 +62,7 @@ func DefFlags(cmd *cobra.Command) {
 	cmd.Flags().String(swagger.ConfigKeySwaggerTitle, "", "")
 	cmd.Flags().String(swagger.ConfigKeySwaggerVersion, "1.0.0", "")
 
-	cmd.Flags().String(amapkit.ConfigKeyAmapKey, "", "高德key")
+	cmd.Flags().String(locationkit.ConfigKeyAmapKey, "", "高德key")
 
 	cmd.Flags().String(alismskit.ConfigKeyAliSMSRegionId, "cn-hangzhou", "ali sms")
 	cmd.Flags().String(alismskit.ConfigKeyAliSMSAccessKey, "", "ali sms")
