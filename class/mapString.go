@@ -108,3 +108,8 @@ func (th *MapString) IsEmpty() bool {
 	}
 	return false
 }
+
+func (th *MapString) Contains(key string) bool {
+	_, ok := th.Map[key]
+	return ok
+}

@@ -3,6 +3,9 @@
 
 toolkit for golang projects
 
+## 可替换的函数目录
+- session.SessionGetUserFunc 获取session中user对象的转换处理函数
+
 # init
 本库使用的入口，以及配置参数信息相关的绑定函数
 

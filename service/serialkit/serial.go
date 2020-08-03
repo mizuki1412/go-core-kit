@@ -2,7 +2,6 @@ package serialkit
 
 import (
 	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/library/timekit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"go.bug.st/serial"
 )
@@ -16,8 +15,6 @@ type Config struct {
 }
 
 var connect serial.Port
-
-//var config Config
 
 func ListPorts() []string {
 	ports, err := serial.GetPortsList()
@@ -61,13 +58,13 @@ func Send(data []byte) {
 // timeoutMill 超时时间，0表示不处理超时
 func Receive(handle func([]byte, []byte) ([]byte, bool), timeoutMill int64) chan []byte {
 	data := make(chan []byte)
-	if timeoutMill > 0 {
-		go func() {
-			timekit.Sleep(timeoutMill)
-			logkit.Error("serial read timeout")
-			data <- nil
-		}()
-	}
+	//if timeoutMill > 0 {
+	//	go func() {
+	//		timekit.Sleep(timeoutMill)
+	//		logkit.Error("serial read timeout")
+	//		data <- nil
+	//	}()
+	//}
 	go func() {
 		all := make([]byte, 0)
 		buff := make([]byte, 100)
@@ -84,6 +81,7 @@ func Receive(handle func([]byte, []byte) ([]byte, bool), timeoutMill int64) chan
 			all, ok = handle(all, buff[:n])
 			if ok {
 				data <- all
+				break
 			}
 		}
 	}()

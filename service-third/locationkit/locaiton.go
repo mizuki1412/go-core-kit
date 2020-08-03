@@ -23,7 +23,12 @@ type Location struct {
 	Address      string        `json:"address"`
 }
 
-func Geo(cityCode, address string) Location {
+func Geo(cityCode, address string) (loc *Location) {
+	defer func() {
+		if err := recover(); err != nil {
+			loc = nil
+		}
+	}()
 	// 应用amap
 	if len(cityCode) == 4 {
 		cityCode += "00"
@@ -38,7 +43,7 @@ func Geo(cityCode, address string) Location {
 		if l != "" {
 			arrs := stringkit.Split(l, ",")
 			if len(arrs) == 2 {
-				location := Location{}
+				location := &Location{}
 				location.Lon.Set(arrs[0])
 				location.Lat.Set(arrs[1])
 				return location
@@ -52,7 +57,12 @@ func Geo(cityCode, address string) Location {
 	panic(exception.New("geo 失败"))
 }
 
-func ReGeo(lon, lat class.Decimal) Location {
+func ReGeo(lon, lat class.Decimal) (loc *Location) {
+	defer func() {
+		if err := recover(); err != nil {
+			loc = nil
+		}
+	}()
 	url := fmt.Sprintf("https://restapi.amap.com/v3/geocode/regeo?key=%s&location=%s,%s", configkit.GetStringD(ConfigKeyAmapKey), lon.Decimal.String(), lat.Decimal.String())
 	ret, _ := httpkit.Request(httpkit.Req{
 		Method: httpkit.MethodGet,
@@ -60,7 +70,7 @@ func ReGeo(lon, lat class.Decimal) Location {
 	})
 	res1 := gjson.Get(ret, "regeocode")
 	if gjson.Get(ret, "status").String() == "1" && res1.Exists() {
-		location := Location{}
+		location := &Location{}
 		address := res1.Get("formatted_address").String()
 		res2 := res1.Get("addressComponent")
 		if res2.Exists() {
@@ -91,7 +101,12 @@ var header = map[string]string{
 }
 
 // 基站转， 十进制的lac和ci
-func LacCiTransfer(lac, ci int32) Location {
+func LacCiTransfer(lac, ci int32) (loc *Location) {
+	defer func() {
+		if err := recover(); err != nil {
+			loc = nil
+		}
+	}()
 	ret, _ := httpkit.Request(httpkit.Req{
 		Method: httpkit.MethodGet,
 		Url:    "http://cellid.cn/",
@@ -120,7 +135,7 @@ func LacCiTransfer(lac, ci int32) Location {
 	if len(arr) < 2 || !strings.Contains(arr[0], "(") {
 		panic(exception.New("lac ci transfer error 1"))
 	}
-	location := Location{}
+	location := &Location{}
 	location.Lon.Set(arr[1])
 	location.Lat.Set(strings.Split(arr[0], "(")[1])
 	return location

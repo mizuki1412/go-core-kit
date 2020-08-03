@@ -33,6 +33,7 @@ func LoadConfig() {
 func DefFlags(cmd *cobra.Command) {
 	// todo 默认值不起效？
 	cmd.Flags().String(corekit.ConfigKeyProjectDir, ".", "项目目录")
+	cmd.Flags().String(corekit.ConfigKeyProfileDev, "", "开发模式 default:false")
 	cmd.Flags().String(configkit.ConfigKeyTimeLocation, "Asia/Shanghai", "项目中用到的时区")
 	cmd.Flags().String(rediskit.ConfigKeyRedisPrefix, "", "redis key的前缀")
 	cmd.Flags().String(rediskit.ConfigKeyRedisHost, "", "redis host")

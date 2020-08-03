@@ -2,12 +2,11 @@ package cmd
 
 import (
 	"github.com/mizuki1412/go-core-kit/class"
-	"github.com/mizuki1412/go-core-kit/iot/modbus"
-	"github.com/mizuki1412/go-core-kit/library/bytekit"
+	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/mapkit"
+	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cobra"
-	"log"
 )
 
 type Data struct {
@@ -22,10 +21,20 @@ var rootCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		val := modbus.CRC16([]byte{01, 0x06, 0x09, 0xc5, 0x00, 0x01})
-		log.Println(bytekit.Bytes2HexArray([]byte{byte(val), byte(val >> 8)}))
+		//val := modbus.CRC16([]byte{01, 0x01, 0x01, 0x00})
+		//logkit.Error()(bytekit.Bytes2HexArray([]byte{byte(val), byte(val >> 8)}))
 
 	},
+}
+
+func TestCatch() (ret int) {
+	defer func() {
+		if err := recover(); err != nil {
+			ret = 11
+		}
+	}()
+	panic(exception.New("123"))
+	return 10
 }
 
 func testMapMerge() {
@@ -51,7 +60,7 @@ func testMapMerge() {
 		},
 	}
 	mapkit.Merge(map1, map2)
-	log.Println(jsonkit.ToString(map1))
+	logkit.Error(jsonkit.ToString(map1))
 }
 
 func Execute() {

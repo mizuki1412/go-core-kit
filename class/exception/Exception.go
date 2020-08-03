@@ -1,6 +1,9 @@
 package exception
 
-import "runtime"
+import (
+	"runtime"
+	"strconv"
+)
 
 type Exception struct {
 	Msg  string
@@ -22,5 +25,5 @@ func New(msg string, skip1 ...int) Exception {
 }
 
 func (th Exception) Error() string {
-	return th.Msg
+	return th.Msg + " at " + th.File + ":" + strconv.Itoa(th.Line)
 }
