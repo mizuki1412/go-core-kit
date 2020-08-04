@@ -23,6 +23,7 @@ type Location struct {
 	Address      string        `json:"address"`
 }
 
+// 只返回lat/lon
 func Geo(cityCode, address string) (loc *Location) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -57,6 +58,7 @@ func Geo(cityCode, address string) (loc *Location) {
 	panic(exception.New("geo 失败"))
 }
 
+// 不返回lat/lon
 func ReGeo(lon, lat class.Decimal) (loc *Location) {
 	defer func() {
 		if err := recover(); err != nil {

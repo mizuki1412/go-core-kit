@@ -18,7 +18,7 @@ func Recover() router.Handler {
 			if err := recover(); err != nil {
 				var msg string
 				if e, ok := err.(exception.Exception); ok {
-					msg = e.Error()
+					msg = e.Msg
 					logkit.Error(e.Error(), logkit.Param{
 						Key: "position",
 						Val: stringkit.Concat(e.File, ":", cast.ToString(e.Line)),
