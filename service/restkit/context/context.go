@@ -167,6 +167,13 @@ func (ctx *Context) bindStruct(bean interface{}) {
 				tmp := class.MapString{Map: p, Valid: true}
 				fieldV.Set(reflect.ValueOf(tmp))
 			}
+		case "class.MapStringArr":
+			if !stringkit.IsNull(val) {
+				var p []map[string]interface{}
+				_ = jsonkit.ParseObj(val, &p)
+				tmp := class.MapStringArr{Arr: p, Valid: true}
+				fieldV.Set(reflect.ValueOf(tmp))
+			}
 		case "class.Time":
 			if !stringkit.IsNull(val) {
 				temp := class.Time{}

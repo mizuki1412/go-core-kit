@@ -7,6 +7,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/library/mapkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cobra"
+	"log"
 )
 
 type Data struct {
@@ -25,6 +26,15 @@ var rootCmd = &cobra.Command{
 		//logkit.Error()(bytekit.Bytes2HexArray([]byte{byte(val), byte(val >> 8)}))
 
 	},
+}
+
+func testJsonArr() {
+	arr := &class.MapStringArr{}
+	jsonkit.ParseObj(`[{"key":["a","b"]}]`, arr)
+	log.Println(arr.Arr)
+	for _, e := range arr.Arr {
+		log.Println(e["key"].([]interface{}))
+	}
 }
 
 func TestCatch() (ret int) {
