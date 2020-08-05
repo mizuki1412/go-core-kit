@@ -30,15 +30,15 @@ var rootCmd = &cobra.Command{
 				var msg string
 				if e, ok := err.(exception.Exception); ok {
 					msg = e.Msg
-					// 带代码位置信息
 					logkit.Error(e.Error())
 				} else {
 					msg = cast.ToString(err)
-					logkit.Error(msg)
+					excep := exception.New(msg, 3)
+					logkit.Error(excep.Error())
 				}
 			}
 		}()
-
+		testJsonArr()
 	},
 }
 
@@ -49,6 +49,7 @@ func testJsonArr() {
 	for _, e := range arr.Arr {
 		log.Println(e["key"].([]interface{}))
 	}
+	test()
 }
 
 func TestCatch() (ret int) {
@@ -62,7 +63,9 @@ func TestCatch() (ret int) {
 }
 
 func test() {
-	panic(exception.New("test"))
+	//panic(exception.New("test"))
+	arr := []string{}
+	arr[1] = ""
 }
 
 func testMapMerge() {

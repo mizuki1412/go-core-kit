@@ -20,7 +20,7 @@ func Recover() router.Handler {
 					logkit.Error(e.Error())
 				} else {
 					msg = cast.ToString(err)
-					logkit.Error(msg)
+					logkit.Error(exception.New(msg, 3))
 				}
 				// transaction
 				if ctx.DBTxExist() {
