@@ -2,16 +2,13 @@ package middleware
 
 import (
 	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
 	"github.com/mizuki1412/go-core-kit/service/restkit/router"
 	"github.com/spf13/cast"
 )
 
-/**
-错误处理，以及db事务处理。
-*/
+/** 错误处理，以及db事务处理。 */
 func Recover() router.Handler {
 	return func(ctx *context.Context) {
 		defer func() {
@@ -19,10 +16,8 @@ func Recover() router.Handler {
 				var msg string
 				if e, ok := err.(exception.Exception); ok {
 					msg = e.Msg
-					logkit.Error(e.Error(), logkit.Param{
-						Key: "position",
-						Val: stringkit.Concat(e.File, ":", cast.ToString(e.Line)),
-					})
+					// 带代码位置信息
+					logkit.Error(e.Error())
 				} else {
 					msg = cast.ToString(err)
 					logkit.Error(msg)

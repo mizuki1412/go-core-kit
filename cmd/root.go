@@ -6,6 +6,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/mapkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
+	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"log"
 )
@@ -24,6 +25,19 @@ var rootCmd = &cobra.Command{
 
 		//val := modbus.CRC16([]byte{01, 0x01, 0x01, 0x00})
 		//logkit.Error()(bytekit.Bytes2HexArray([]byte{byte(val), byte(val >> 8)}))
+		defer func() {
+			if err := recover(); err != nil {
+				var msg string
+				if e, ok := err.(exception.Exception); ok {
+					msg = e.Msg
+					// 带代码位置信息
+					logkit.Error(e.Error())
+				} else {
+					msg = cast.ToString(err)
+					logkit.Error(msg)
+				}
+			}
+		}()
 
 	},
 }
@@ -45,6 +59,10 @@ func TestCatch() (ret int) {
 	}()
 	panic(exception.New("123"))
 	return 10
+}
+
+func test() {
+	panic(exception.New("test"))
 }
 
 func testMapMerge() {
