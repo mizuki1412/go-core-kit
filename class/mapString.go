@@ -23,6 +23,7 @@ func (th MapString) MarshalJSON() ([]byte, error) {
 	}
 	return []byte("null"), nil
 }
+
 func (th *MapString) UnmarshalJSON(data []byte) error {
 	if string(data) == "null" {
 		th.Valid = false
@@ -54,6 +55,10 @@ func (th MapString) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return jsonkit.ToString(th.Map), nil
+}
+
+func (th MapString) IsValid() bool {
+	return th.Valid
 }
 
 func (th *MapString) Set(val interface{}) {

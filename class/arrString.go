@@ -37,6 +37,10 @@ func (th *ArrString) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (th ArrString) IsValid() bool {
+	return th.Valid
+}
+
 // Scan implements the Scanner interface.
 func (th *ArrString) Scan(value interface{}) error {
 	if value == nil {

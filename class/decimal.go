@@ -27,3 +27,7 @@ func (th *Decimal) Set(val interface{}) {
 		}
 	}
 }
+
+func (th Decimal) IsValid() bool {
+	return th.Valid
+}

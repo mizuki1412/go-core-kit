@@ -61,6 +61,10 @@ func (th MapStringArr) Value() (driver.Value, error) {
 	return jsonkit.ToString(th.Arr), nil
 }
 
+func (th MapStringArr) IsValid() bool {
+	return th.Valid
+}
+
 func (th *MapStringArr) Set(val interface{}) {
 	if v, ok := val.(MapStringArr); ok {
 		th.Arr = v.Arr

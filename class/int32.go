@@ -50,6 +50,10 @@ func (th Int32) Value() (driver.Value, error) {
 	return int64(th.Int32), nil
 }
 
+func (th Int32) IsValid() bool {
+	return th.Valid
+}
+
 func (th *Int32) Set(val interface{}) {
 	if v, ok := val.(Int32); ok {
 		th.Int32 = v.Int32

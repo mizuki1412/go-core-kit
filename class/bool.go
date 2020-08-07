@@ -50,6 +50,10 @@ func (th Bool) Value() (driver.Value, error) {
 	return th.Bool, nil
 }
 
+func (th Bool) IsValid() bool {
+	return th.Valid
+}
+
 func (th *Bool) Set(val interface{}) {
 	if v, ok := val.(Bool); ok {
 		th.Bool = v.Bool

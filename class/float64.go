@@ -50,6 +50,10 @@ func (th Float64) Value() (driver.Value, error) {
 	return th.Float64, nil
 }
 
+func (th Float64) IsValid() bool {
+	return th.Valid
+}
+
 func (th *Float64) Set(val interface{}) {
 	if v, ok := val.(Float64); ok {
 		th.Float64 = v.Float64

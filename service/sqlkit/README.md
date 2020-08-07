@@ -2,11 +2,14 @@
 
 ## sqlkit
 
+### 注意
+
 - **注意 commit: 如果事务中第一句是select语句，commit将会出错, 错误提示 parse C 等。**
 - 在rows遍历时，注意close，特别是有级联查询存在时，如果不close将会占用连接。
 - bean struct中如果没有db标签，则不会被通用接口insert/update
 - sqlx的`missing destination name sth in sth`，是查询出来的字段和类字段不符，在select中限定字段即可。
 - update set时：`Set("extend",squirrel.Expr("'{}'::jsonb"))` or `Set("extend","{}")`
+- class.mapString在插入数据库时将用jsonb格式，并且不是完全替换，而是merge的方式(```coalesce(extend, '{}'::jsonb) || '$param'::jsonb```)。如果要删除其中的key，需要设置key为null。 merge时只会merge顶层的keys。
 
 ### demo
 ```go

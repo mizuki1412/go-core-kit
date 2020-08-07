@@ -2,6 +2,7 @@ package sqlkit
 
 import (
 	"fmt"
+	"github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
@@ -309,7 +310,7 @@ func (dao *Dao) Update(dest interface{}) {
 	builder := Builder().Update(getTable(rt, dao.Schema))
 	for i := 0; i < rt.NumField(); i++ {
 		// db字段
-		db, ok := rt.Field(i).Tag.Lookup("db")
+		dbKey, ok := rt.Field(i).Tag.Lookup("db")
 		pk := rt.Field(i).Tag.Get("pk")
 		var val interface{}
 		// 判断field是否指针
@@ -318,9 +319,16 @@ func (dao *Dao) Update(dest interface{}) {
 		} else if rt.Field(i).Type.Kind() != reflect.Ptr {
 			val = rv.Field(i).Interface()
 		}
-		method := rv.Field(i).MethodByName("Value")
-		if ok && pk != "true" && val != nil && (!method.IsValid() || (method.IsValid() && method.Call([]reflect.Value{})[0].Interface() != nil)) {
-			builder = builder.Set(db, val)
+		method := rv.Field(i).MethodByName("IsValid")
+		// method.Call([]reflect.Value{})[0].Interface() != nil
+		// 非主键 或 IsValid函数不存在 或 IsValid==true
+		if ok && pk != "true" && val != nil && (!method.IsValid() || (method.IsValid() && method.Call([]reflect.Value{})[0].Bool())) {
+			// 针对class.MapString 采用merge方式
+			if rt.Field(i).Type.String() == "class.MapString" {
+				builder = builder.Set(dbKey, squirrel.Expr("coalesce("+dbKey+",'{}'::jsonb) || ?", val))
+			} else {
+				builder = builder.Set(dbKey, val)
+			}
 		}
 	}
 	pks := getPKs(rt, rv)
@@ -331,7 +339,7 @@ func (dao *Dao) Update(dest interface{}) {
 	if err != nil {
 		panic(exception.New(err.Error(), 2))
 	}
-	//log.Println(sql, args)
+	logkit.Info(sql)
 	dao.Exec(sql, args...)
 }
 

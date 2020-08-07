@@ -7,9 +7,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 )
 
-/**
-针对PG的array
-*/
+/** 针对PG的array */
 
 // 同时继承scan和value方法
 type ArrInt struct {
@@ -53,6 +51,10 @@ func (th ArrInt) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return th.Array.Value()
+}
+
+func (th ArrInt) IsValid() bool {
+	return th.Valid
 }
 
 func (th *ArrInt) Set(val interface{}) {

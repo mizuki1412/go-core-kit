@@ -73,6 +73,10 @@ func (th Time) Value() (driver.Value, error) {
 	return th.Time, nil
 }
 
+func (th Time) IsValid() bool {
+	return th.Valid
+}
+
 func (th *Time) Set(val interface{}) {
 	if v, ok := val.(Time); ok {
 		th.Time = v.Time
