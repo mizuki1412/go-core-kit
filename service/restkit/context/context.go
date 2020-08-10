@@ -121,6 +121,10 @@ func (ctx *Context) bindStruct(bean interface{}) {
 			if !stringkit.IsNull(val) {
 				fieldV.SetFloat(cast.ToFloat64(val))
 			}
+		case "bool":
+			if !stringkit.IsNull(val) {
+				fieldV.SetBool(cast.ToBool(val))
+			}
 		case "class.Int32":
 			if !stringkit.IsNull(val) {
 				tmp := class.Int32{Int32: cast.ToInt32(val), Valid: true}

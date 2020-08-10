@@ -115,6 +115,9 @@ func (th *MapString) IsEmpty() bool {
 }
 
 func (th *MapString) Contains(key string) bool {
-	_, ok := th.Map[key]
+	v, ok := th.Map[key]
+	if ok {
+		return v != nil
+	}
 	return ok
 }

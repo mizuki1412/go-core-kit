@@ -4,6 +4,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"go.bug.st/serial"
+	"time"
 )
 
 type Config struct {
@@ -58,31 +59,39 @@ func Send(data []byte) {
 // timeoutMill 超时时间，0表示不处理超时
 func Receive(handle func([]byte, []byte) ([]byte, bool), timeoutMill int64) chan []byte {
 	data := make(chan []byte)
-	//if timeoutMill > 0 {
-	//	go func() {
-	//		timekit.Sleep(timeoutMill)
-	//		logkit.Error("serial read timeout")
-	//		data <- nil
-	//	}()
-	//}
 	go func() {
-		all := make([]byte, 0)
-		buff := make([]byte, 100)
-		for {
-			n, err := connect.Read(buff)
-			if err != nil {
-				logkit.Error("serial read error: " + err.Error())
-				data <- nil
+		// 实际执行
+		chRun := make(chan []byte)
+		go func(ch chan []byte) {
+			all := make([]byte, 0)
+			buff := make([]byte, 100)
+			for {
+				n, err := connect.Read(buff)
+				if err != nil {
+					logkit.Error("serial read error: " + err.Error())
+					ch <- nil
+					close(ch)
+				}
+				if n == 0 {
+					ch <- nil
+					close(ch)
+				}
+				var ok bool
+				all, ok = handle(all, buff[:n])
+				if ok {
+					ch <- all
+					close(ch)
+					break
+				}
 			}
-			if n == 0 {
-				data <- nil
-			}
-			var ok bool
-			all, ok = handle(all, buff[:n])
-			if ok {
-				data <- all
-				break
-			}
+		}(chRun)
+		select {
+		case re := <-chRun:
+			data <- re
+			close(data)
+		case <-time.After(time.Duration(timeoutMill) * time.Millisecond):
+			data <- nil
+			close(data)
 		}
 	}()
 	return data

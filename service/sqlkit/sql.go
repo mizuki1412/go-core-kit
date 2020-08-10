@@ -339,7 +339,6 @@ func (dao *Dao) Update(dest interface{}) {
 	if err != nil {
 		panic(exception.New(err.Error(), 2))
 	}
-	logkit.Info(sql)
 	dao.Exec(sql, args...)
 }
 

@@ -43,13 +43,21 @@ func SQL2Struct(sqlFile, destFile string) {
 		} else if temp != "" {
 			es := stringkit.Split(val, "[ ,\t]+")
 			if es[0] == "primary" {
-				// todo
+				// todo 单独定义primary key 时
 				continue
 			}
 			f := Field{Name: es[0]}
 			f.Tags = append(f.Tags, fmt.Sprintf("json:\"%s\" db:\"%s\"", es[0], strings.ToLower(es[0])))
 			if arraykit.StringContains(es, "primary") {
 				f.Tags = append(f.Tags, fmt.Sprintf("pk:\"true\" tablename:\"%s\"", table))
+			}
+			// 注释 -- 分隔
+			commentIndex := strings.Index(val, "--")
+			if commentIndex > 0 {
+				comment := strings.TrimSpace(val[commentIndex+2:])
+				if comment != "" {
+					f.Tags = append(f.Tags, fmt.Sprintf(`description:"%s"`, comment))
+				}
 			}
 			switch es[1] {
 			case "varchar", "text":
@@ -79,7 +87,7 @@ func SQL2Struct(sqlFile, destFile string) {
 			case "int[]":
 				f.Type = "class.ArrInt"
 			case "boolean":
-				f.Type = "bool"
+				f.Type = "class.Bool"
 			default:
 				if strings.Index(es[1], "decimal") == 0 {
 					f.Type = "class.Decimal"

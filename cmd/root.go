@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"log"
+	"strings"
 )
 
 type Data struct {
@@ -22,7 +23,6 @@ var rootCmd = &cobra.Command{
 	Short: "go core kit test",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-
 		//val := modbus.CRC16([]byte{01, 0x01, 0x01, 0x00})
 		//logkit.Error()(bytekit.Bytes2HexArray([]byte{byte(val), byte(val >> 8)}))
 		defer func() {
@@ -38,7 +38,8 @@ var rootCmd = &cobra.Command{
 				}
 			}
 		}()
-		testJsonArr()
+
+		log.Print(strings.TrimSpace("  dsjd   "))
 	},
 }
 

@@ -19,7 +19,7 @@ func NewPath(path string, method string) *SwaggerPath {
 		Doc.Paths[path] = map[string]map[string]interface{}{}
 	}
 	Doc.Paths[path][method] = map[string]interface{}{}
-	Doc.Paths[path][method]["consumes"] = []string{"application/json"}
+	Doc.Paths[path][method]["consumes"] = []string{"application/x-www-form-urlencoded", "multipart/form-data"}
 	Doc.Paths[path][method]["produces"] = []string{"*/*", "application/json"}
 	Doc.Paths[path][method]["operationId"] = path
 	Doc.Paths[path][method]["parameters"] = []map[string]interface{}{}
@@ -45,30 +45,29 @@ func (swagger *SwaggerPath) Param(param interface{}) *SwaggerPath {
 	rt := reflect.TypeOf(param)
 	for i := 0; i < rt.NumField(); i++ {
 		e := map[string]interface{}{}
-		tname := rt.Field(i).Type.Name()
+		tname := stringkit.LowerFirst(rt.Field(i).Type.Name())
 		//println(tname)
 		switch {
-		case tname == "string", tname == "String":
+		case tname == "string":
 			e["type"] = "string"
-			e["in"] = "query"
-		case tname == "File":
+			e["in"] = "formData"
+		case tname == "file":
 			e["type"] = "file"
 			/// 参数数据所在位置 eg: query/formData/body
 			e["in"] = "formData"
-			Doc.Paths[swagger.Path][swagger.Method]["consumes"] = []string{"multipart/form-data"}
-		case strings.Index(tname, "int") == 0, strings.Index(tname, "Int") == 0:
+			//Doc.Paths[swagger.Path][swagger.Method]["consumes"] = []string{"multipart/form-data"}
+		case strings.Index(tname, "int") == 0:
 			e["type"] = "integer"
-			e["in"] = "query"
-		case strings.Index(tname, "float") == 0, strings.Index(tname, "Float") == 0:
+			e["in"] = "formData"
+		case strings.Index(tname, "float") == 0:
 			e["type"] = "number"
-			e["in"] = "query"
-		case strings.Index(tname, "time") == 0, strings.Index(tname, "Time") == 0:
-			// todo 对于class.Time，即可以long也可以string(yyyy-MM-dd HH:mm:ss)
-			e["type"] = "integer"
-			e["in"] = "query"
+			e["in"] = "formData"
+		case strings.Index(tname, "time") == 0:
+			e["type"] = "string"
+			e["in"] = "formData"
 		default:
 			e["type"] = "string"
-			e["in"] = "query"
+			e["in"] = "formData"
 		}
 		e["description"] = rt.Field(i).Tag.Get("description")
 		if strings.Contains(rt.Field(i).Tag.Get("validate"), "required") {
