@@ -86,6 +86,9 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 func swaggerHtmlHandle(c context2.Context) {
 	p := c.Params().Get("path")
+	if p == "" {
+		p = "index.html"
+	}
 	f, err := pkger.Open("/swagger-ui/" + p)
 	if err != nil {
 		_, _ = c.Write([]byte(err.Error()))
