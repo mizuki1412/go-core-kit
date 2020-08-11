@@ -62,6 +62,9 @@ func (swagger *SwaggerPath) Param(param interface{}) *SwaggerPath {
 		case strings.Index(tname, "float") == 0:
 			e["type"] = "number"
 			e["in"] = "formData"
+		case strings.Index(tname, "bool") == 0:
+			e["type"] = "boolean"
+			e["in"] = "formData"
 		case strings.Index(tname, "time") == 0:
 			e["type"] = "string"
 			e["in"] = "formData"

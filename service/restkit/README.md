@@ -61,3 +61,12 @@ https://swagger.io/specification/
 
 需要在实际项目中配合使用swagger-ui，访问地址为 ip:port/projectName/swagger 
 
+### swagger-ui
+
+用github.com/markbates/pkger打包静态资源。swagger-ui需要放置在子项目根目录下。
+
+需要在子项目中的main.go顶行写入 ```//go:generate pkger -include /swagger-ui```，然后运行 ```go generate``` 生成pkged.go。
+
+在router/router.go中将自动配置```<base>/swagger```为访问地址。
+
+todo： 暂不能从core/swagger-ui导入资源。
