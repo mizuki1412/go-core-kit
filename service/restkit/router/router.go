@@ -3,9 +3,12 @@ package router
 import (
 	"github.com/kataras/iris/v12"
 	context2 "github.com/kataras/iris/v12/context"
+	"github.com/markbates/pkger"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
 	swg "github.com/mizuki1412/go-core-kit/service/restkit/swagger"
+	"mime"
 	"net/http"
+	"strings"
 )
 
 /**
@@ -15,7 +18,7 @@ router的抽象
 type Router struct {
 	Proxy      *iris.Application
 	IsGroup    bool
-	ProxyGroup iris.Party
+	ProxyGroup iris.Party // 存在项目前缀时，base path
 	Path       string
 }
 type Handler func(ctx *context.Context)
@@ -81,20 +84,48 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	router.Proxy.ServeHTTP(w, req)
 }
 
+func swaggerHtmlHandle(c context2.Context) {
+	p := c.Params().Get("path")
+	f, err := pkger.Open("/swagger-ui/" + p)
+	if err != nil {
+		_, _ = c.Write([]byte(err.Error()))
+		return
+	}
+	data := make([]byte, 0, 1024*5)
+	for true {
+		temp := make([]byte, 1024)
+		n, _ := f.Read(temp)
+		if n == 0 {
+			break
+		} else {
+			data = append(data, temp[:n]...)
+		}
+	}
+	// mine
+	i := strings.LastIndex(p, ".")
+	if i > 0 {
+		c.ContentType(mime.TypeByExtension(p[i:]))
+	}
+	_, _ = c.Write(data)
+}
+
 func (router *Router) RegisterSwagger() {
 	if router.IsGroup {
 		//router.ProxyGroup.Get("/swagger/{any:path}", swagger.DisablingWrapHandler(swaggerFiles.Handler, "NAME_OF_ENV_VARIABLE"))
 		router.ProxyGroup.Get("/swagger/doc", func(c context2.Context) {
 			_, _ = c.Write([]byte(swg.Doc.ReadDoc()))
 		})
-		// todo swagger-ui的文件并未内置，需要在工程或程序的同一目录中放置。
-		router.ProxyGroup.HandleDir("/swagger", "./swagger-ui")
+		// swagger-ui 需要被pkger打包，第二个path表示匹配路径
+		router.ProxyGroup.Get("/swagger/{path:path}", swaggerHtmlHandle)
+		router.ProxyGroup.Get("/swagger", swaggerHtmlHandle)
 	} else {
 		//router.Proxy.Get("/swagger/{any:path}", swagger.DisablingWrapHandler(swaggerFiles.Handler, "NAME_OF_ENV_VARIABLE"))
 		router.Proxy.Get("/swagger/doc", func(c context2.Context) {
 			_, _ = c.Write([]byte(swg.Doc.ReadDoc()))
 		})
-		router.Proxy.HandleDir("/swagger", "./swagger-ui")
+		//router.Proxy.HandleDir("/swagger", "./swagger-ui")
+		router.ProxyGroup.Get("/swagger/{path:path}", swaggerHtmlHandle)
+		router.ProxyGroup.Get("/swagger", swaggerHtmlHandle)
 	}
 	//swag.Register(swag.Name, &swg.Doc)
 }
