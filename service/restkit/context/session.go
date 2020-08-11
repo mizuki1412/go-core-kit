@@ -18,13 +18,14 @@ func InitSession() {
 		Cookie:                      "session",
 		AllowReclaim:                true,
 		Expires:                     time.Duration(configkit.GetInt(ConfigKeySessionExpire, 12)) * time.Hour,
-		DisableSubdomainPersistence: true, // samesite 去掉，但是对chrome无效?
+		DisableSubdomainPersistence: true, // todo samesite 去掉，但是对chrome无效?
 	})
 	// redis
 	redisHost := configkit.GetStringD(rediskit.ConfigKeyRedisHost)
 	redisPort := configkit.GetString(rediskit.ConfigKeyRedisPort, "6379")
 	redisPwd := configkit.GetStringD(rediskit.ConfigKeyRedisPwd)
 	redisDB := configkit.GetStringD(rediskit.ConfigKeyRedisDB)
+	redisPrefix := configkit.GetString(rediskit.ConfigKeyRedisPrefix, "default")
 	if redisHost != "" {
 		db := redis.New(redis.Config{
 			Network:   "tcp",
@@ -33,7 +34,7 @@ func InitSession() {
 			MaxActive: 10,
 			Password:  redisPwd,
 			Database:  redisDB,
-			Prefix:    "session-",
+			Prefix:    redisPrefix + "-session-",
 			Delim:     "-",
 			Driver:    redis.Redigo(), // redis.Radix() can be used instead.
 		})

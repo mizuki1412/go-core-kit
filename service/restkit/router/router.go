@@ -89,7 +89,7 @@ func swaggerHtmlHandle(c context2.Context) {
 	if p == "" {
 		p = "index.html"
 	}
-	f, err := pkger.Open("/swagger-ui/" + p)
+	f, err := pkger.Open("github.com/mizuki1412/go-core-kit:/swagger-ui/" + p)
 	if err != nil {
 		_, _ = c.Write([]byte(err.Error()))
 		return
