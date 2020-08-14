@@ -5,6 +5,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
+	"github.com/spf13/cast"
 )
 
 /** 针对PG的array */
@@ -77,4 +78,12 @@ func (th *ArrInt) Length() int {
 func (th *ArrInt) Remove() {
 	th.Valid = false
 	th.Array = []int64{}
+}
+
+func (th *ArrInt) toInt32Slice() []int32 {
+	list := make([]int32, 0, len(th.Array))
+	for _, e := range th.Array {
+		list = append(list, cast.ToInt32(e))
+	}
+	return list
 }
