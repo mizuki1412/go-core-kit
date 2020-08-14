@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bytes"
 	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
@@ -8,8 +9,10 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
+	"io/ioutil"
 	"log"
-	"strings"
 )
 
 type Data struct {
@@ -39,7 +42,7 @@ var rootCmd = &cobra.Command{
 			}
 		}()
 
-		log.Print(strings.TrimSpace("  dsjd   "))
+		//log.Println(time.Now().)
 	},
 }
 
@@ -93,6 +96,14 @@ func testMapMerge() {
 	}
 	mapkit.Merge(map1, map2)
 	logkit.Error(jsonkit.ToString(map1))
+}
+
+func decodeGBK() {
+	data := []byte{0xB2, 0xBB, 0xCA, 0xC7, 0xC4, 0xDA, 0xB2, 0xBF, 0xBB, 0xF2, 0xCD, 0xE2, 0xB2, 0xBF, 0xC3, 0xFC, 0xC1, 0xEE, 0xA3, 0xAC, 0xD2, 0xB2, 0xB2, 0xBB, 0xCA, 0xC7, 0xBF, 0xC9, 0xD4, 0xCB, 0xD0, 0xD0, 0xB5, 0xC4, 0xB3, 0xCC, 0xD0, 0xF2, 0xBB, 0xF2, 0xC5, 0xFA, 0xB4, 0xA6, 0xC0, 0xED, 0xCE, 0xC4, 0xBC, 0xFE, 0xA1, 0xA3}
+	r := transform.NewReader(bytes.NewReader(data), simplifiedchinese.GBK.NewDecoder())
+	b, err := ioutil.ReadAll(r)
+	log.Println(err)
+	log.Println(string(b))
 }
 
 func Execute() {
