@@ -80,7 +80,7 @@ func (th *ArrInt) Remove() {
 	th.Array = []int64{}
 }
 
-func (th *ArrInt) toInt32Slice() []int32 {
+func (th *ArrInt) ToInt32Slice() []int32 {
 	list := make([]int32, 0, len(th.Array))
 	for _, e := range th.Array {
 		list = append(list, cast.ToInt32(e))
