@@ -42,7 +42,6 @@ var rootCmd = &cobra.Command{
 			}
 		}()
 
-		//log.Println(time.Now().)
 	},
 }
 

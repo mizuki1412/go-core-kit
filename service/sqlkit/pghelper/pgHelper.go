@@ -22,7 +22,7 @@ func GenUnnestInt(arr []int32) (string, []interface{}) {
 		flags[i] = "?"
 		args[i] = arr[i]
 	}
-	return "(select unnest(Array[" + strings.Join(flags, ", ") + "]))", args
+	return "(select unnest(Array[" + strings.Join(flags, ", ") + "]::int[]))", args
 }
 
 // 返回 Array[?,?,?]
