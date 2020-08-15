@@ -57,7 +57,9 @@ redis session key的expire时间，受iris session config控制，同时renew时
 
 ### swagger
 
-https://swagger.io/specification/
+标准：https://swagger.io/specification/v2/
+
+swagger-ui可以单独部署，后端只提供doc.json
 
 需要在实际项目中配合使用swagger-ui，访问地址为 ip:port/projectName/swagger 
 

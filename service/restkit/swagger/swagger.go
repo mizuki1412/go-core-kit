@@ -21,17 +21,14 @@ func NewPath(path string, method string) *SwaggerPath {
 	Doc.Paths[path][method] = map[string]interface{}{}
 	Doc.Paths[path][method]["consumes"] = []string{"application/x-www-form-urlencoded", "multipart/form-data"}
 	Doc.Paths[path][method]["produces"] = []string{"*/*", "application/json"}
-	Doc.Paths[path][method]["operationId"] = path
+	Doc.Paths[path][method]["operationId"] = path + "-" + method
 	Doc.Paths[path][method]["parameters"] = []map[string]interface{}{}
 	Doc.Paths[path][method]["responses"] = map[string]interface{}{
 		"200": map[string]interface{}{
 			"description": "OK",
 		},
 		"400": map[string]interface{}{
-			"description": "参数校验错误",
-		},
-		"401": map[string]interface{}{
-			"description": "业务逻辑错误",
+			"description": "参数校验/业务逻辑错误",
 		},
 	}
 	return sp
@@ -142,8 +139,3 @@ func (s *SwaggerDoc) ReadDoc() string {
 	s.BasePath = configkit.GetStringD(ConfigKeySwaggerBasePath)
 	return jsonkit.ToString(*s)
 }
-
-/**
-标准：https://swagger.io/specification/v2/
-swagger-ui可以单独部署，后端只提供doc.json
-*/
