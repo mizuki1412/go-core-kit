@@ -3,7 +3,7 @@ module github.com/mizuki1412/go-core-kit
 go 1.15
 
 require (
-	github.com/360EntSecGroup-Skylar/excelize v1.4.1
+	github.com/360EntSecGroup-Skylar/excelize/v2 v2.3.0
 	github.com/Depado/bfchroma v1.3.0
 	github.com/Masterminds/squirrel v1.4.0
 	github.com/ajg/form v1.5.1 // indirect
@@ -23,7 +23,7 @@ require (
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
 	github.com/kataras/iris/v12 v12.1.8
 	github.com/lib/pq v1.8.0
-	github.com/markbates/pkger v0.17.0 // indirect
+	github.com/markbates/pkger v0.17.0
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/mitchellh/mapstructure v1.2.2 // indirect
 	github.com/moul/http2curl v1.0.0 // indirect

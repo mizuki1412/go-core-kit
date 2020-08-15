@@ -1,12 +1,13 @@
 package excelkit
 
 import (
-	"github.com/360EntSecGroup-Skylar/excelize"
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
 	"github.com/spf13/cast"
+	"strconv"
 )
 
 type Param struct {
@@ -64,16 +65,16 @@ func Export(param Param, ctx *context.Context) {
 		panic(exception.New(err.Error()))
 	}
 	// title
-	f.MergeCell(param.Sheet, "A1", string('A'+len(param.Keys)-1)+"1")
-	f.SetCellStyle(param.Sheet, "A1", string('A'+len(param.Keys)-1)+"1", titleStyle)
-	f.SetCellValue(param.Sheet, "A1", param.Title)
+	_ = f.MergeCell(param.Sheet, "A1", strconv.Itoa('A'+len(param.Keys)-1)+"1")
+	_ = f.SetCellStyle(param.Sheet, "A1", strconv.Itoa('A'+len(param.Keys)-1)+"1", titleStyle)
+	_ = f.SetCellValue(param.Sheet, "A1", param.Title)
 	// key title
 	for _, v := range keyMap {
-		cell := string('A'+v.Index) + "2"
-		f.SetCellStyle(param.Sheet, cell, cell, cellStyle)
-		f.SetCellValue(param.Sheet, cell, v.Name)
+		cell := strconv.Itoa('A'+v.Index) + "2"
+		_ = f.SetCellStyle(param.Sheet, cell, cell, cellStyle)
+		_ = f.SetCellValue(param.Sheet, cell, v.Name)
 		if v.Width > 0 {
-			f.SetColWidth(param.Sheet, string('A'+v.Index), string('A'+v.Index), v.Width)
+			_ = f.SetColWidth(param.Sheet, strconv.Itoa('A'+v.Index), strconv.Itoa('A'+v.Index), v.Width)
 		}
 	}
 	// data
@@ -81,12 +82,12 @@ func Export(param Param, ctx *context.Context) {
 		index := i + 3
 		// 每个cell加style
 		for j := range param.Keys {
-			cell := string('A'+j) + cast.ToString(index)
-			f.SetCellStyle(param.Sheet, cell, cell, cellStyle)
+			cell := strconv.Itoa('A'+j) + cast.ToString(index)
+			_ = f.SetCellStyle(param.Sheet, cell, cell, cellStyle)
 		}
 		for k, v := range data {
-			cell := string('A'+keyMap[k].Index) + cast.ToString(index)
-			f.SetCellValue(param.Sheet, cell, v)
+			cell := strconv.Itoa('A'+keyMap[k].Index) + cast.ToString(index)
+			_ = f.SetCellValue(param.Sheet, cell, v)
 		}
 	}
 	// 发送至web stream
@@ -133,10 +134,10 @@ func Load(param Param) []map[string]string {
 	var names []string
 	for rows.Next() {
 		if index == 2 {
-			names = rows.Columns()
+			names, _ = rows.Columns()
 		} else if index > 2 {
 			m := map[string]string{}
-			values := rows.Columns()
+			values, _ := rows.Columns()
 			for i, v := range values {
 				if names != nil {
 					m[nameMap[names[i]]] = v
