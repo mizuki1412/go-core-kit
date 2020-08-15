@@ -7,7 +7,6 @@ import (
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
 	"github.com/spf13/cast"
-	"strconv"
 )
 
 type Param struct {
@@ -30,15 +29,16 @@ type KeyDef struct {
 }
 
 // title/_sheet:x/key:name/key:name:width
+// todo 其中的err仍未处理
 func Export(param Param, ctx *context.Context) {
 	if len(param.Keys) == 0 {
 		panic(exception.New("excel keys empty"))
 	}
 	f := excelize.NewFile()
 	if param.Sheet == "" {
-		param.Sheet = f.GetSheetName(1)
-	} else if f.GetSheetName(1) != param.Sheet {
-		f.SetSheetName(f.GetSheetName(1), param.Sheet)
+		param.Sheet = f.GetSheetName(0)
+	} else if f.GetSheetName(0) != param.Sheet {
+		f.SetSheetName(f.GetSheetName(0), param.Sheet)
 	}
 	keyMap := map[string]KeyDef{}
 	for i, key := range param.Keys {
@@ -65,16 +65,16 @@ func Export(param Param, ctx *context.Context) {
 		panic(exception.New(err.Error()))
 	}
 	// title
-	_ = f.MergeCell(param.Sheet, "A1", strconv.Itoa('A'+len(param.Keys)-1)+"1")
-	_ = f.SetCellStyle(param.Sheet, "A1", strconv.Itoa('A'+len(param.Keys)-1)+"1", titleStyle)
-	_ = f.SetCellValue(param.Sheet, "A1", param.Title)
+	err = f.MergeCell(param.Sheet, "A1", string(rune('A'+len(param.Keys)-1))+"1")
+	err = f.SetCellStyle(param.Sheet, "A1", string(rune('A'+len(param.Keys)-1))+"1", titleStyle)
+	err = f.SetCellValue(param.Sheet, "A1", param.Title)
 	// key title
 	for _, v := range keyMap {
-		cell := strconv.Itoa('A'+v.Index) + "2"
-		_ = f.SetCellStyle(param.Sheet, cell, cell, cellStyle)
-		_ = f.SetCellValue(param.Sheet, cell, v.Name)
+		cell := string(rune('A'+v.Index)) + "2"
+		err = f.SetCellStyle(param.Sheet, cell, cell, cellStyle)
+		err = f.SetCellValue(param.Sheet, cell, v.Name)
 		if v.Width > 0 {
-			_ = f.SetColWidth(param.Sheet, strconv.Itoa('A'+v.Index), strconv.Itoa('A'+v.Index), v.Width)
+			err = f.SetColWidth(param.Sheet, string(rune('A'+v.Index)), string(rune('A'+v.Index)), v.Width)
 		}
 	}
 	// data
@@ -82,19 +82,19 @@ func Export(param Param, ctx *context.Context) {
 		index := i + 3
 		// 每个cell加style
 		for j := range param.Keys {
-			cell := strconv.Itoa('A'+j) + cast.ToString(index)
-			_ = f.SetCellStyle(param.Sheet, cell, cell, cellStyle)
+			cell := string(rune('A'+j)) + cast.ToString(index)
+			err = f.SetCellStyle(param.Sheet, cell, cell, cellStyle)
 		}
 		for k, v := range data {
-			cell := strconv.Itoa('A'+keyMap[k].Index) + cast.ToString(index)
-			_ = f.SetCellValue(param.Sheet, cell, v)
+			cell := string(rune('A'+keyMap[k].Index)) + cast.ToString(index)
+			err = f.SetCellValue(param.Sheet, cell, v)
 		}
 	}
 	// 发送至web stream
 	if param.FileName == "" {
 		param.FileName = "export.xlsx"
 	}
-	//f.SaveAs("/Users/ycj/Downloads/test.xlsx")
+	//err = f.SaveAs("/Users/ycj/Downloads/test.xlsx")
 	ctx.SetFileHeader(param.FileName)
 	err = f.Write(ctx.Proxy.ResponseWriter())
 	if err != nil {
