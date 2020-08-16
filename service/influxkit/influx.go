@@ -108,6 +108,10 @@ func WriteDefaultDB(sql string) {
 	writeData(configkit.GetStringD(ConfigKeyInfluxDBName), sql)
 }
 
+func WriteWithDBName(dbName, sql string) {
+	writeData(dbName, sql)
+}
+
 func writeData(dbName, sql string) {
 	ret, code := httpkit.Request(httpkit.Req{
 		Url:        url("write", dbName),

@@ -1,7 +1,7 @@
 package initkit
 
 import (
-	corekit "github.com/mizuki1412/go-core-kit/init"
+	"github.com/mizuki1412/go-core-kit/init"
 	"github.com/mizuki1412/go-core-kit/service-third/aliosskit"
 	"github.com/mizuki1412/go-core-kit/service-third/alismskit"
 	"github.com/mizuki1412/go-core-kit/service-third/locationkit"

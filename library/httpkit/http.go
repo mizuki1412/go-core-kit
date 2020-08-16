@@ -16,6 +16,10 @@ import (
 var client *http.Client
 
 func init() {
+	// 忽略证书校验 todo
+	//tr := &http.Transport{
+	//	TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	//}
 	client = &http.Client{}
 	jar, err := cookiejar.New(nil)
 	if err != nil {

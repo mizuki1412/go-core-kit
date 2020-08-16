@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/library/commonkit"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/mapkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
@@ -26,8 +27,7 @@ var rootCmd = &cobra.Command{
 	Short: "go core kit test",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		//val := modbus.CRC16([]byte{01, 0x01, 0x01, 0x00})
-		//logkit.Error()(bytekit.Bytes2HexArray([]byte{byte(val), byte(val >> 8)}))
+
 		defer func() {
 			if err := recover(); err != nil {
 				var msg string
@@ -42,6 +42,7 @@ var rootCmd = &cobra.Command{
 			}
 		}()
 
+		//testJsonArr()
 	},
 }
 
@@ -52,7 +53,10 @@ func testJsonArr() {
 	for _, e := range arr.Arr {
 		log.Println(e["key"].([]interface{}))
 	}
-	test()
+	commonkit.RecoverFuncWrapper(func() {
+		test()
+	})
+	log.Println(123)
 }
 
 func TestCatch() (ret int) {
