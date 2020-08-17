@@ -50,6 +50,7 @@ func DefFlags(cmd *cobra.Command) {
 	cmd.Flags().String(restkit.ConfigKeyRestServerBase, "", "rest base url")
 	cmd.Flags().String(restkit.ConfigKeyRestServerPort, "", "")
 	cmd.Flags().String(restkit.ConfigKeyRestRequestBodySize, "", "限制request最大，单位MB")
+	cmd.Flags().String(restkit.ConfigKeyRestPPROF, "", "开启pprof, /debug/pprof")
 	cmd.Flags().String(sqlkit.ConfigKeyDBDriver, "", "")
 	cmd.Flags().String(sqlkit.ConfigKeyDBHost, "", "")
 	cmd.Flags().String(sqlkit.ConfigKeyDBPort, "", "")

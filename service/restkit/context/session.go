@@ -57,6 +57,7 @@ func (ctx *Context) Session() *sessions.Session {
 	return sessionManager.Start(ctx.Proxy)
 }
 
+// session每次请求时都会从redis中获取，所以在session中存储的务必是string，如果是对象，会被自动转为json，但如果其中有unicode，可能造成斜杆指数增加
 func (ctx *Context) SessionSetUser(user interface{}) {
 	ctx.Session().Set("user", user)
 }
@@ -69,7 +70,12 @@ func (ctx *Context) SessionSetToken(token string) {
 
 var SessionGetUserFunc = func(ctx *Context) interface{} {
 	// 默认处理，在自定义请覆盖
-	return ctx.Session().Get("user")
+	json := ctx.Session().GetString("user")
+	if json != "" {
+		return json
+	} else {
+		return nil
+	}
 }
 
 // eg *model.User

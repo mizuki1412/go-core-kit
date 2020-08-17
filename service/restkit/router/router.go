@@ -122,13 +122,12 @@ func (router *Router) RegisterSwagger() {
 		router.ProxyGroup.Get("/swagger/{path:path}", swaggerHtmlHandle)
 		router.ProxyGroup.Get("/swagger", swaggerHtmlHandle)
 	} else {
-		//router.Proxy.Get("/swagger/{any:path}", swagger.DisablingWrapHandler(swaggerFiles.Handler, "NAME_OF_ENV_VARIABLE"))
 		router.Proxy.Get("/swagger/doc", func(c context2.Context) {
 			_, _ = c.Write([]byte(swg.Doc.ReadDoc()))
 		})
 		//router.Proxy.HandleDir("/swagger", "./swagger-ui")
-		router.ProxyGroup.Get("/swagger/{path:path}", swaggerHtmlHandle)
-		router.ProxyGroup.Get("/swagger", swaggerHtmlHandle)
+		router.Proxy.Get("/swagger/{path:path}", swaggerHtmlHandle)
+		router.Proxy.Get("/swagger", swaggerHtmlHandle)
 	}
 	//swag.Register(swag.Name, &swg.Doc)
 }

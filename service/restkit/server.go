@@ -2,6 +2,7 @@ package restkit
 
 import (
 	"github.com/kataras/iris/v12"
+	"github.com/kataras/iris/v12/middleware/pprof"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
@@ -54,6 +55,16 @@ func Run() {
 	port := configkit.GetString(ConfigKeyRestServerPort, "8080")
 	logkit.Info("Listening and serving HTTP on " + port)
 	//err := http.ListenAndServe(":" + port, middleware.Session.LoadAndSave(router))
+	if configkit.GetBool(ConfigKeyRestPPROF, false) {
+		p := pprof.New()
+		if router.IsGroup {
+			router.ProxyGroup.Any("/debug/pprof", p)
+			router.ProxyGroup.Any("/debug/pprof/{action:path}", p)
+		} else {
+			router.Proxy.Any("/debug/pprof", p)
+			router.Proxy.Any("/debug/pprof/{action:path}", p)
+		}
+	}
 	router.RegisterSwagger()
 	err := router.Proxy.Run(iris.Addr(":" + port))
 	if err != nil {
