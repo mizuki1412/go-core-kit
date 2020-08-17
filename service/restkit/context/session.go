@@ -4,6 +4,7 @@ import (
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/sessions"
 	"github.com/kataras/iris/v12/sessions/sessiondb/redis"
+	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/mizuki1412/go-core-kit/service/rediskit"
@@ -59,7 +60,14 @@ func (ctx *Context) Session() *sessions.Session {
 
 // session每次请求时都会从redis中获取，所以在session中存储的务必是string，如果是对象，会被自动转为json，但如果其中有unicode，可能造成斜杆指数增加
 func (ctx *Context) SessionSetUser(user interface{}) {
-	ctx.Session().Set("user", user)
+	if user == nil {
+		return
+	}
+	if _, ok := user.(string); !ok {
+		ctx.Session().Set("user", jsonkit.ToString(user))
+	} else {
+		ctx.Session().Set("user", user)
+	}
 }
 func (ctx *Context) SessionSetSchema(schema string) {
 	ctx.Session().Set("schema", schema)

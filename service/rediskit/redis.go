@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/go-redis/redis/v8"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/spf13/cast"
 	"time"
@@ -32,8 +33,12 @@ func Get(ctx context.Context, key string, defaultVal string) string {
 	}
 }
 
+// val将会以json形式存储，如果不是string的话
 func Set(ctx context.Context, key string, val interface{}, expire time.Duration) {
 	client = Instance()
+	if _, ok := val.(string); !ok {
+		val = jsonkit.ToString(val)
+	}
 	_, err := client.Set(ctx, key, val, expire).Result()
 	if err != nil {
 		panic(exception.New("redis 存入失败：" + err.Error()))
