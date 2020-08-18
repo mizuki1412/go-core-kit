@@ -6,6 +6,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/spf13/cast"
 	"github.com/tidwall/gjson"
+	"strings"
 )
 
 func QueryDefaultDB(sql string) []map[string]interface{} {
@@ -21,9 +22,12 @@ func QueryWithDBName(dbName, sql string) []map[string]interface{} {
 	return queryResult(dbName, sql)
 }
 
-func QueryMultiDefaultDB(sql string) [][]map[string]interface{} {
-	// todo
-	return nil
+func QueryMultiDefaultDB(sql []string) [][]map[string]interface{} {
+	return queryMultiResult(configkit.GetStringD(ConfigKeyInfluxDBName), sql)
+}
+
+func QueryMultiWithDBName(dbName string, sql []string) [][]map[string]interface{} {
+	return queryMultiResult(dbName, sql)
 }
 
 func url(action, dbName string) string {
@@ -85,6 +89,48 @@ func queryResult(dbName, sql string) []map[string]interface{} {
 		}
 	}
 	return []map[string]interface{}{}
+}
+
+// 数组中可能出现nil
+func queryMultiResult(dbName string, sql []string) [][]map[string]interface{} {
+	sqls := strings.Join(sql, ";")
+	ret, code := httpkit.Request(httpkit.Req{
+		Url: url("query", dbName),
+		FormData: map[string]string{
+			"epoch": "ms",
+			"q":     sqls,
+		},
+	})
+	err := gjson.Get(ret, "error").String()
+	if err != "" {
+		panic(exception.New("influx query error: " + err))
+	}
+	if code > 300 {
+		panic(exception.New("influx query error: " + cast.ToString(code)))
+	}
+	results := gjson.Get(ret, "results").Array()
+	data := make([][]map[string]interface{}, len(results))
+	for index, result := range results {
+		series := result.Map()["series"].Array()
+		if len(series) > 0 {
+			serie := series[0]
+			columns := serie.Map()["columns"].Array()
+			values := serie.Map()["values"].Array()
+			if len(columns) > 0 && len(values) > 0 {
+				list := make([]map[string]interface{}, len(values))
+				for i, v := range values {
+					e := map[string]interface{}{}
+					for ii, vv := range columns {
+						e[vv.String()] = v.Array()[ii].Value()
+					}
+					// 不用append，直接赋值
+					list[i] = e
+				}
+				data[index] = list
+			}
+		}
+	}
+	return data
 }
 
 func CreateDB(name string) {
