@@ -1,6 +1,8 @@
 package bridge
 
-import "github.com/mizuki1412/go-core-kit/library/jsonkit"
+import (
+	"github.com/mizuki1412/go-core-kit/library/jsonkit"
+)
 
 /***
 消息格式：
@@ -34,7 +36,13 @@ func RetSuccess(data interface{}) string {
 	})
 }
 
-// send broadcast message
+// send broadcast message， server主动发送给client
 func Send(req MsgReq) {
+	// todo client callback未成功，socket.io-client不支持？目前只能server单向推送
+	//for _,c:=range Clients{
+	//	c.Emit(EventPublic, jsonkit.ToString(req), func (so socketio.Conn, data string) {
+	//		log.Println("Client ACK with data: ", data)
+	//	})
+	//}
 	Server.BroadcastToRoom("/", RoomPublic, EventPublic, jsonkit.ToString(req))
 }
