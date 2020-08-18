@@ -11,6 +11,9 @@ type RestRet struct {
 	Result  int          `json:"result"`
 	Message class.String `json:"message"`
 	Data    interface{}  `json:"data"`
+	// 分页信息
+	CurrentPage class.Int32 `json:"currentPage"`
+	TotalPage   class.Int32 `json:"totalPage"`
 }
 
 const ResultErr = 0
@@ -42,6 +45,18 @@ func (ctx *Context) JsonSuccess(data interface{}) {
 		Result: ResultSuccess,
 		Data:   data,
 	})
+}
+
+// 带分页信息
+func (ctx *Context) JsonSuccessWithPage(data interface{}, currentPage, totalPage int32) {
+	ctx.UpdateSessionExpire()
+	ret := RestRet{
+		Result: ResultSuccess,
+		Data:   data,
+	}
+	ret.CurrentPage.Set(currentPage)
+	ret.TotalPage.Set(totalPage)
+	ctx.Json(ret)
 }
 func (ctx *Context) JsonError(msg string) {
 	ctx.Json(RestRet{

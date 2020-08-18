@@ -84,3 +84,20 @@ func FormatMillSecondHMS(mill int64) string {
 	ss := mill % 60
 	return fmt.Sprintf("%02d:%02d:%02d", hh, mm, ss)
 }
+
+// 计算一个月的最大天数
+func CountDaysInMonth(year int, month time.Month) (days int) {
+	if month != time.February {
+		if month == time.April || month == time.June || month == time.September || month == time.November {
+			return 30
+		} else {
+			return 31
+		}
+	} else {
+		if ((year%4) == 0 && (year%100) != 0) || (year%400) == 0 {
+			return 29
+		} else {
+			return 28
+		}
+	}
+}
