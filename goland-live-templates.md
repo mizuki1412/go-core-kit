@@ -52,13 +52,13 @@ func (th $struct$) Value() (driver.Value, error) {
 ```
 
 ## bean_extend_list
-bean list的sort和filter功能
+bean list的sort/filter/find功能
 ```
 type $name$List []*$name$
 func (l $name$List) Len() int           { return len(l) }
 func (l $name$List) Swap(i, j int)      { l[i], l[j] = l[j], l[i] }
 func (l $name$List) Less(i, j int) bool { return l[i].Id.String < l[j].Id.String }
-func (l $name$List) Filter(fun func(device *$name$) bool) $name$List {
+func (l $name$List) Filter(fun func(ele *$name$) bool) $name$List {
 	arr:=make($name$List, 0, len(l))
 	for _,e:=range l{
 		if fun(e) {
@@ -66,6 +66,14 @@ func (l $name$List) Filter(fun func(device *$name$) bool) $name$List {
 		}
 	}
 	return arr
+}
+func (l $name$List) Find(fun func(ele *$name$) bool) *$name$ {
+	for _, e := range l {
+		if fun(e) {
+			return e
+		}
+	}
+	return nil
 }
 ```
 
