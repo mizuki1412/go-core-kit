@@ -33,22 +33,16 @@ type Req struct {
 	Url         string
 	Header      map[string]string
 	ContentType string
-	// FormData
-	FormData   map[string]string
-	BinaryData []byte
+	FormData    map[string]string
+	BinaryData  []byte
 }
-
-const MethodGet = "GET"
-const MethodPost = "POST"
-const MethodPut = "PUT"
-const MethodDelete = "DELETE"
 
 const ContentTypeForm = "application/x-www-form-urlencoded; charset=utf-8"
 const ContentTypeJSON = "application/json; charset=utf-8"
 
 func Request(reqBean Req) (string, int) {
 	if reqBean.Method == "" {
-		reqBean.Method = "POST"
+		reqBean.Method = http.MethodPost
 	}
 	var req *http.Request
 	var err error

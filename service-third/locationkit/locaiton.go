@@ -8,6 +8,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/tidwall/gjson"
+	"net/http"
 	"strings"
 )
 
@@ -36,7 +37,7 @@ func Geo(cityCode, address string) (loc *Location) {
 	}
 	url := fmt.Sprintf("https://restapi.amap.com/v3/geocode/geo?key=%s&address=%s&city=%s", configkit.GetStringD(ConfigKeyAmapKey), address, cityCode)
 	ret, _ := httpkit.Request(httpkit.Req{
-		Method: httpkit.MethodGet,
+		Method: http.MethodGet,
 		Url:    url,
 	})
 	if gjson.Get(ret, "status").String() == "1" && len(gjson.Get(ret, "geocodes").Array()) > 0 {
@@ -67,7 +68,7 @@ func ReGeo(lon, lat class.Decimal) (loc *Location) {
 	}()
 	url := fmt.Sprintf("https://restapi.amap.com/v3/geocode/regeo?key=%s&location=%s,%s", configkit.GetStringD(ConfigKeyAmapKey), lon.Decimal.String(), lat.Decimal.String())
 	ret, _ := httpkit.Request(httpkit.Req{
-		Method: httpkit.MethodGet,
+		Method: http.MethodGet,
 		Url:    url,
 	})
 	res1 := gjson.Get(ret, "regeocode")
@@ -110,7 +111,7 @@ func LacCiTransfer(lac, ci int32) (loc *Location) {
 		}
 	}()
 	ret, _ := httpkit.Request(httpkit.Req{
-		Method: httpkit.MethodGet,
+		Method: http.MethodGet,
 		Url:    "http://cellid.cn/",
 		Header: header,
 	})
@@ -128,7 +129,7 @@ func LacCiTransfer(lac, ci int32) (loc *Location) {
 		}
 	}
 	ret, _ = httpkit.Request(httpkit.Req{
-		Method: httpkit.MethodPost,
+		Method: http.MethodPost,
 		Url:    fmt.Sprintf("http://cellid.cn/cidInfo.php?lac=%d&cell_id=%d&hex=false&flag=%s", lac, ci, flag),
 		Header: header,
 	})

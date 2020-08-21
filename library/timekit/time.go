@@ -101,3 +101,16 @@ func CountDaysInMonth(year int, month time.Month) (days int) {
 		}
 	}
 }
+
+// 相差月份数, 不算day
+func MonthInterval(t1 time.Time, t2 time.Time) int {
+	yearInterval := t1.Year() - t2.Year()
+	if yearInterval > 0 {
+		monthInterval := int(t1.Month()) - int(t2.Month())
+		return yearInterval*12 + monthInterval
+	} else {
+		yearInterval = 0 - yearInterval
+		monthInterval := int(t2.Month()) - int(t1.Month())
+		return yearInterval*12 + monthInterval
+	}
+}
