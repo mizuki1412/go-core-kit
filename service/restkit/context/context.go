@@ -98,7 +98,10 @@ func (ctx *Context) bindStruct(bean interface{}) {
 			continue
 		}
 		// bind
-		val := ctx.Proxy.FormValue(stringkit.LowerFirst(field.Name))
+		key := stringkit.LowerFirst(field.Name)
+		val := ctx.Proxy.FormValue(key)
+		// 判断是否存在key，用于空字符串和无的区分
+		_, ok := ctx.Proxy.FormValues()[key]
 		if val == "" {
 			val = ctx.Proxy.URLParam(stringkit.LowerFirst(field.Name))
 		}
@@ -107,8 +110,11 @@ func (ctx *Context) bindStruct(bean interface{}) {
 			val = strings.TrimSpace(val)
 		}
 		if val == "" {
-			// default
-			val = field.Tag.Get("default")
+			if _, tagExist := field.Tag.Lookup("default"); tagExist {
+				// default
+				val = field.Tag.Get("default")
+				ok = true
+			}
 		}
 		switch typeString {
 		case "string":
@@ -146,7 +152,7 @@ func (ctx *Context) bindStruct(bean interface{}) {
 				fieldV.Set(reflect.ValueOf(tmp))
 			}
 		case "class.String":
-			if !stringkit.IsNull(val) {
+			if ok {
 				tmp := class.String{String: val, Valid: true}
 				fieldV.Set(reflect.ValueOf(tmp))
 			}
