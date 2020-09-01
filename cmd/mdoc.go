@@ -14,6 +14,6 @@ var mdocCmd = &cobra.Command{
 	Short: "gen readme md doc",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		markdown.Html()
+		markdown.Run("go-core-kit 说明文档")
 	},
 }
