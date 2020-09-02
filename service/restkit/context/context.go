@@ -119,7 +119,7 @@ func (ctx *Context) bindStruct(bean interface{}) {
 		switch typeString {
 		case "string":
 			fieldV.SetString(val)
-		case "int32", "int", "int64":
+		case "int32", "int", "int64", "int8", "int16":
 			if !stringkit.IsNull(val) {
 				fieldV.SetInt(cast.ToInt64(val))
 			}
