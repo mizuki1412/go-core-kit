@@ -51,7 +51,7 @@ func (th *MapString) Scan(value interface{}) error {
 
 // Value implements the driver Valuer interface.
 func (th MapString) Value() (driver.Value, error) {
-	if !th.Valid {
+	if !th.Valid || th.Map == nil {
 		return nil, nil
 	}
 	return jsonkit.ToString(th.Map), nil
@@ -63,7 +63,11 @@ func (th MapString) IsValid() bool {
 
 func (th *MapString) Set(val interface{}) {
 	if v, ok := val.(MapString); ok {
-		th.Map = v.Map
+		if v.Map == nil {
+			th.Map = map[string]interface{}{}
+		} else {
+			th.Map = v.Map
+		}
 		th.Valid = true
 	} else if v, ok := val.(map[string]interface{}); ok {
 		th.Map = v
