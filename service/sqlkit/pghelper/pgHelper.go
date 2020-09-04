@@ -28,6 +28,16 @@ func GenUnnestInt(arr []int32) (string, []interface{}) {
 	return "(select unnest(Array[" + strings.Join(flags, ", ") + "]::int[]))", args
 }
 
+func GenUnnestInt64(arr []int64) (string, []interface{}) {
+	flags := make([]string, len(arr))
+	args := make([]interface{}, len(arr))
+	for i := 0; i < len(arr); i++ {
+		flags[i] = "?"
+		args[i] = arr[i]
+	}
+	return "(select unnest(Array[" + strings.Join(flags, ", ") + "]::int[]))", args
+}
+
 // 返回 Array[?,?,?] todo 将改为内部函数
 func GenArrayFlagString(arr []string) (string, []interface{}) {
 	flags := make([]string, len(arr))
@@ -57,6 +67,11 @@ func WhereUnnestString(builder squirrel.SelectBuilder, sqlPrefix string, arr []s
 
 func WhereUnnestInt(builder squirrel.SelectBuilder, sqlPrefix string, arr []int32) squirrel.SelectBuilder {
 	flag, arg := GenUnnestInt(arr)
+	return builder.Where(sqlPrefix+flag, arg...)
+}
+
+func WhereUnnestInt64(builder squirrel.SelectBuilder, sqlPrefix string, arr []int64) squirrel.SelectBuilder {
+	flag, arg := GenUnnestInt64(arr)
 	return builder.Where(sqlPrefix+flag, arg...)
 }
 
