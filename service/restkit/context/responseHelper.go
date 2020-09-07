@@ -12,8 +12,9 @@ type RestRet struct {
 	Message class.String `json:"message"`
 	Data    interface{}  `json:"data"`
 	// 分页信息
-	CurrentPage class.Int32 `json:"currentPage"`
-	TotalPage   class.Int32 `json:"totalPage"`
+	CurrentPage class.Int32 `json:"currentPage" description:"分页的当前页"`
+	TotalPage   class.Int32 `json:"totalPage" description:"分页的总页数"`
+	Total       class.Int32 `json:"total" description:"总数，如果data是列表并且分页"`
 }
 
 const ResultErr = 0
