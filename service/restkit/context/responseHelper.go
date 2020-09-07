@@ -49,7 +49,7 @@ func (ctx *Context) JsonSuccess(data interface{}) {
 }
 
 // 带分页信息
-func (ctx *Context) JsonSuccessWithPage(data interface{}, currentPage, totalPage int32) {
+func (ctx *Context) JsonSuccessWithPage(data interface{}, currentPage, totalPage, total int32) {
 	ctx.UpdateSessionExpire()
 	ret := RestRet{
 		Result: ResultSuccess,
@@ -57,6 +57,7 @@ func (ctx *Context) JsonSuccessWithPage(data interface{}, currentPage, totalPage
 	}
 	ret.CurrentPage.Set(currentPage)
 	ret.TotalPage.Set(totalPage)
+	ret.Total.Set(total)
 	ctx.Json(ret)
 }
 func (ctx *Context) JsonError(msg string) {
