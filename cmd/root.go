@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/library/bytekit"
 	"github.com/mizuki1412/go-core-kit/library/commonkit"
+	"github.com/mizuki1412/go-core-kit/library/cryptokit"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/mapkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
@@ -41,7 +43,9 @@ var rootCmd = &cobra.Command{
 				}
 			}
 		}()
-
+		bs := []byte{0x01, 0x02, 0x03, 0xff}
+		log.Println(cryptokit.BytesEncode(bs))
+		log.Println(bytekit.Bytes2HexArray(cryptokit.BytesDecode(cryptokit.BytesEncode(bs))))
 		//testJsonArr()
 	},
 }
