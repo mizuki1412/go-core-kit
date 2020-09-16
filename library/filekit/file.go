@@ -1,6 +1,7 @@
 package filekit
 
 import (
+	"bytes"
 	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/spf13/afero"
@@ -76,4 +77,12 @@ func WriteClassFile(filepath string, file *class.File) {
 	if err != nil {
 		panic(exception.New(err.Error()))
 	}
+}
+
+func ReadBytesFromClassFile(file *class.File) []byte {
+	buf := bytes.NewBuffer(nil)
+	if _, err := io.Copy(buf, file.File); err != nil {
+		return []byte{}
+	}
+	return buf.Bytes()
 }
