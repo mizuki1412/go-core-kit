@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/library/bytekit"
 	"github.com/mizuki1412/go-core-kit/library/commonkit"
-	"github.com/mizuki1412/go-core-kit/library/cryptokit"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/mapkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
@@ -14,6 +12,7 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
+	"io"
 	"io/ioutil"
 	"log"
 )
@@ -43,11 +42,16 @@ var rootCmd = &cobra.Command{
 				}
 			}
 		}()
-		bs := []byte{0x01, 0x02, 0x03, 0xff}
-		log.Println(cryptokit.BytesEncode(bs))
-		log.Println(bytekit.Bytes2HexArray(cryptokit.BytesDecode(cryptokit.BytesEncode(bs))))
-		//testJsonArr()
 	},
+}
+
+type fake struct{ io.Writer }
+
+func fred(logger io.Writer) {
+	log.Println(logger != nil)
+	if logger != nil {
+		logger.Write([]byte("..."))
+	}
 }
 
 func testJsonArr() {

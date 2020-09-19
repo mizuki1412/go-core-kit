@@ -84,3 +84,29 @@ func WhereArrayInt(builder squirrel.SelectBuilder, sqlPrefix string, arr []int32
 	flag, arg := GenArrayFlagInt(arr)
 	return builder.Where(sqlPrefix+flag, arg...)
 }
+
+// 封装到builder
+func WhereUnnestStringU(builder squirrel.UpdateBuilder, sqlPrefix string, arr []string) squirrel.UpdateBuilder {
+	flag, arg := GenUnnestString(arr)
+	return builder.Where(sqlPrefix+flag, arg...)
+}
+
+func WhereUnnestIntU(builder squirrel.UpdateBuilder, sqlPrefix string, arr []int32) squirrel.UpdateBuilder {
+	flag, arg := GenUnnestInt(arr)
+	return builder.Where(sqlPrefix+flag, arg...)
+}
+
+func WhereUnnestInt64U(builder squirrel.UpdateBuilder, sqlPrefix string, arr []int64) squirrel.UpdateBuilder {
+	flag, arg := GenUnnestInt64(arr)
+	return builder.Where(sqlPrefix+flag, arg...)
+}
+
+func WhereArrayStringU(builder squirrel.UpdateBuilder, sqlPrefix string, arr []string) squirrel.UpdateBuilder {
+	flag, arg := GenArrayFlagString(arr)
+	return builder.Where(sqlPrefix+flag, arg...)
+}
+
+func WhereArrayIntU(builder squirrel.UpdateBuilder, sqlPrefix string, arr []int32) squirrel.UpdateBuilder {
+	flag, arg := GenArrayFlagInt(arr)
+	return builder.Where(sqlPrefix+flag, arg...)
+}
