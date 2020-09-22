@@ -12,7 +12,6 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
-	"io"
 	"io/ioutil"
 	"log"
 )
@@ -43,15 +42,6 @@ var rootCmd = &cobra.Command{
 			}
 		}()
 	},
-}
-
-type fake struct{ io.Writer }
-
-func fred(logger io.Writer) {
-	log.Println(logger != nil)
-	if logger != nil {
-		logger.Write([]byte("..."))
-	}
 }
 
 func testJsonArr() {
