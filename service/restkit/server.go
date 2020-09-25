@@ -48,7 +48,7 @@ func defaultEngine() {
 	context.InitSession()
 }
 
-func Run() {
+func Run() error {
 	if router == nil {
 		defaultEngine()
 	}
@@ -66,10 +66,14 @@ func Run() {
 		}
 	}
 	router.RegisterSwagger()
-	err := router.Proxy.Run(iris.Addr(":" + port))
-	if err != nil {
-		logkit.Fatal(err.Error())
-	}
+	err := router.Proxy.Run(
+		iris.Addr(":"+port),
+		// 禁用，阻止如 /xx/ 自动重定向到 /xx，而不经过handle
+		iris.WithoutPathCorrection)
+	return err
+	//if err != nil {
+	//	logkit.Fatal(err.Error())
+	//}
 }
 
 // 导入业务模块，其中的路由和中间件
@@ -80,4 +84,11 @@ func AddActions(actionInits ...func(r *router2.Router)) {
 	for _, action := range actionInits {
 		action(router)
 	}
+}
+
+func GetRouter() *router2.Router {
+	if router == nil {
+		defaultEngine()
+	}
+	return router
 }

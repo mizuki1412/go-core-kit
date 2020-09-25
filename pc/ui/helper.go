@@ -4,14 +4,16 @@ import (
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/pc/bridge"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
+	"github.com/mizuki1412/go-core-kit/service/restkit"
 	"github.com/spf13/cast"
+	"github.com/spf13/viper"
 	"net"
 	"net/http"
 )
 
 /// ui window params
 type WinParam struct {
-	// 默认0则开启随机端口
+	// 默认0则开启随机端口; 这里的port将替代config中的默认port
 	Port       int
 	Width      int
 	Height     int
@@ -36,15 +38,20 @@ func startServer(param *WinParam) (chan error, string) {
 			panic(exception.New("随机端口开启失败"))
 		}
 		param.Port = listener.Addr().(*net.TCPAddr).Port
+		//listener.Close()
 	}
 	p := cast.ToString(param.Port)
+	// 设置restkit的port
+	viper.Set(restkit.ConfigKeyRestServerPort, p)
 	// 启动ui的http server
 	go func() {
 		logkit.Info("pc ui http server start at: " + p)
 		if listener != nil {
+			// todo 和restkit整合, 随机端口
 			ch <- http.Serve(listener, nil)
 		} else {
-			ch <- http.ListenAndServe(":"+p, nil)
+			ch <- restkit.Run()
+			//ch <- http.ListenAndServe(":"+p, nil)
 		}
 	}()
 	return ch, p

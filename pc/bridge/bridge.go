@@ -2,11 +2,14 @@ package bridge
 
 import (
 	socketio "github.com/googollee/go-socket.io"
+	"github.com/kataras/iris/v12"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
+	"github.com/mizuki1412/go-core-kit/service/restkit"
+	"github.com/mizuki1412/go-core-kit/service/restkit/router"
 	"github.com/spf13/cast"
-	"mime"
+	"log"
 	"net/http"
 )
 
@@ -77,13 +80,24 @@ func SetEventPublicHandle(fun func(req *MsgReq) string) *socketio.Server {
 func Start() {
 	go Server.Serve()
 	// defer Server.Close()
-	http.HandleFunc("/socket.io/", func(w http.ResponseWriter, r *http.Request) {
+	// restkit方式：根目录下，而非proxyGroup下； 和其他action共存
+	socketHandle := func(w http.ResponseWriter, r *http.Request) {
+		log.Println(123)
 		origin := r.Header.Get("Origin")
 		w.Header().Set("Access-Control-Allow-Origin", origin)
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		Server.ServeHTTP(w, r)
-	})
-	// local win ui web, 默认在ui todo
-	http.Handle("/", http.FileServer(http.Dir("./ui")))
-	_ = mime.AddExtensionType(".js", "text/javascript")
+	}
+	// 和rest base地址区分开; POST和GET都可能
+	restkit.GetRouter().Proxy.Any("/socket.io/**", iris.FromStd(socketHandle))
+	//http.HandleFunc("/socket.io/", func(w http.ResponseWriter, r *http.Request) {
+	//	origin := r.Header.Get("Origin")
+	//	w.Header().Set("Access-Control-Allow-Origin", origin)
+	//	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	//	Server.ServeHTTP(w, r)
+	//})
+	// local win ui web, 默认在ui
+	restkit.GetRouter().Proxy.Any("/ui/{path:path}", router.EmbedHtmlHandle("/ui/"))
+	//http.Handle("/", http.FileServer(http.Dir("./ui")))
+	//_ = mime.AddExtensionType(".js", "text/javascript")
 }

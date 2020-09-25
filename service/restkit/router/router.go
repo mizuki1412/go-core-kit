@@ -84,32 +84,37 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	router.Proxy.ServeHTTP(w, req)
 }
 
-func swaggerHtmlHandle(c context2.Context) {
-	p := c.Params().Get("path")
-	if p == "" {
-		p = "index.html"
-	}
-	f, err := pkger.Open("/swagger-ui/" + p)
-	if err != nil {
-		_, _ = c.Write([]byte(err.Error()))
-		return
-	}
-	data := make([]byte, 0, 1024*5)
-	for true {
-		temp := make([]byte, 1024)
-		n, _ := f.Read(temp)
-		if n == 0 {
-			break
-		} else {
-			data = append(data, temp[:n]...)
+// 用于pkger打包资源的html访问设置
+// 注意path pattern中加入{path:path}
+func EmbedHtmlHandle(pkPath string) func(c context2.Context) {
+	return func(c context2.Context) {
+		p := c.Params().Get("path")
+		if p == "" {
+			p = "index.html"
 		}
+		f, err := pkger.Open(pkPath + p)
+		if err != nil {
+			_, _ = c.Write([]byte(err.Error()))
+			return
+		}
+		data := make([]byte, 0, 1024*5)
+		for true {
+			temp := make([]byte, 1024)
+			n, _ := f.Read(temp)
+			if n == 0 {
+				break
+			} else {
+				data = append(data, temp[:n]...)
+			}
+		}
+		//_ = mime.AddExtensionType(".js", "text/javascript")
+		// mine
+		i := strings.LastIndex(p, ".")
+		if i > 0 {
+			c.ContentType(mime.TypeByExtension(p[i:]))
+		}
+		_, _ = c.Write(data)
 	}
-	// mine
-	i := strings.LastIndex(p, ".")
-	if i > 0 {
-		c.ContentType(mime.TypeByExtension(p[i:]))
-	}
-	_, _ = c.Write(data)
 }
 
 func (router *Router) RegisterSwagger() {
@@ -119,15 +124,15 @@ func (router *Router) RegisterSwagger() {
 			_, _ = c.Write([]byte(swg.Doc.ReadDoc()))
 		})
 		// swagger-ui 需要被pkger打包，第二个path表示匹配路径
-		router.ProxyGroup.Get("/swagger/{path:path}", swaggerHtmlHandle)
-		router.ProxyGroup.Get("/swagger", swaggerHtmlHandle)
+		router.ProxyGroup.Get("/swagger/{path:path}", EmbedHtmlHandle("/swagger-ui/"))
+		router.ProxyGroup.Get("/swagger", EmbedHtmlHandle("/swagger-ui/"))
 	} else {
 		router.Proxy.Get("/swagger/doc", func(c context2.Context) {
 			_, _ = c.Write([]byte(swg.Doc.ReadDoc()))
 		})
 		//router.Proxy.HandleDir("/swagger", "./swagger-ui")
-		router.Proxy.Get("/swagger/{path:path}", swaggerHtmlHandle)
-		router.Proxy.Get("/swagger", swaggerHtmlHandle)
+		router.Proxy.Get("/swagger/{path:path}", EmbedHtmlHandle("/swagger-ui/"))
+		router.Proxy.Get("/swagger", EmbedHtmlHandle("/swagger-ui/"))
 	}
 	//swag.Register(swag.Name, &swg.Doc)
 }
