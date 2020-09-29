@@ -4,15 +4,34 @@ import (
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
+	"github.com/spf13/cast"
+	"time"
 )
 
 var client MQTT.Client
 
+var subscribeList []func()
+var first bool = true
+
 func New() *MQTT.Client {
 	opts := MQTT.NewClientOptions()
 	opts.AddBroker(configkit.GetStringD(ConfigKeyMQTTBroker))
+	opts.SetKeepAlive(time.Duration(1) * time.Minute)
+	opts.SetAutoReconnect(true)
 	opts.SetClientID(configkit.GetStringD(ConfigKeyMQTTClientID))
 	opts.SetUsername(configkit.GetStringD(ConfigKeyMQTTUsername)).SetPassword(configkit.GetStringD(ConfigKeyMQTTPwd))
+	var lostHan MQTT.OnConnectHandler = func(c MQTT.Client) {
+		if first {
+			first = false
+			return
+		}
+		// 重连后重新订阅
+		logkit.Info("mqtt reconnect, subs:" + cast.ToString(len(subscribeList)))
+		for _, sub := range subscribeList {
+			sub()
+		}
+	}
+	opts.SetOnConnectHandler(lostHan)
 	//opts.SetDefaultPublishHandler(func(client MQTT.Client, msg MQTT.Message) {
 	//})
 	//create and start a client using the above ClientOptions
@@ -28,10 +47,14 @@ func Subscribe(topic string, qos byte, callback MQTT.MessageHandler) {
 	if client == nil {
 		New()
 	}
-	if token := client.Subscribe(topic, qos, callback); token.Wait() && token.Error() != nil {
-		logkit.Error(token.Error().Error())
+	f := func() {
+		if token := client.Subscribe(topic, qos, callback); token.Wait() && token.Error() != nil {
+			logkit.Error(token.Error().Error())
+		}
+		logkit.Info("mqtt subscribe success: " + topic)
 	}
-	logkit.Info("mqtt subscribe success: " + topic)
+	subscribeList = append(subscribeList, f)
+	f()
 }
 
 func Publish(topic string, qos byte, retained bool, payload interface{}) {
