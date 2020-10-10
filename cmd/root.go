@@ -41,6 +41,7 @@ var rootCmd = &cobra.Command{
 				}
 			}
 		}()
+
 	},
 }
 
