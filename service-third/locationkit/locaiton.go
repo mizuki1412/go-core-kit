@@ -93,7 +93,25 @@ func ReGeo(lon, lat class.Decimal) (loc *Location) {
 	panic(exception.New("regeo 失败"))
 }
 
-// todo weather
+// params：city code
+func Weather(city string) []map[string]interface{} {
+	ret, _ := httpkit.Request(httpkit.Req{
+		Method: http.MethodGet,
+		Url:    "https://restapi.amap.com/v3/weather/weatherInfo?key=" + configkit.GetStringD(ConfigKeyAmapKey) + "&city=" + city + "&extensions=all",
+	})
+	rs := gjson.Parse(ret).Get("forecasts").Array()
+	cast := rs[0].Get("casts").Array()
+	data := make([]map[string]interface{}, 0, len(cast))
+	for _, v := range cast {
+		tmp := v.Map()
+		m := map[string]interface{}{}
+		for k, v := range tmp {
+			m[k] = v.Value()
+		}
+		data = append(data, m)
+	}
+	return data
+}
 
 var header = map[string]string{
 	"Accept":     "*/*",
