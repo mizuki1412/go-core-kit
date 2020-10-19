@@ -1,5 +1,5 @@
 BINARY=go-core-kit
-VERSION=0.1.7
+VERSION=0.3.6
 DATE=`date +%FT%T%z`
 .PHONY: init
 
