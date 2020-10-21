@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/tidwall/gjson"
 	"io/ioutil"
 	"net/http"
@@ -28,12 +29,14 @@ func init() {
 	client.Jar = jar
 }
 
+// 填写FormData、JsonData时可缺省contentType
 type Req struct {
 	Method      string
 	Url         string
 	Header      map[string]string
 	ContentType string
 	FormData    map[string]string
+	JsonData    interface{}
 	BinaryData  []byte
 }
 
@@ -48,6 +51,8 @@ func Request(reqBean Req) (string, int) {
 	var err error
 	if reqBean.BinaryData != nil {
 		req, err = http.NewRequest(reqBean.Method, reqBean.Url, bytes.NewBuffer(reqBean.BinaryData))
+	} else if reqBean.JsonData != nil {
+		req, err = http.NewRequest(reqBean.Method, reqBean.Url, bytes.NewBuffer([]byte(jsonkit.ToString(reqBean.JsonData))))
 	} else {
 		data := make(url.Values)
 		for key, val := range reqBean.FormData {
@@ -59,7 +64,11 @@ func Request(reqBean Req) (string, int) {
 		panic(exception.New(err.Error()))
 	}
 	if reqBean.ContentType == "" {
-		req.Header.Set("Content-Type", ContentTypeForm)
+		if reqBean.FormData != nil {
+			req.Header.Set("Content-Type", ContentTypeForm)
+		} else if reqBean.JsonData != nil {
+			req.Header.Set("Content-Type", ContentTypeJSON)
+		}
 	}
 	for key, val := range reqBean.Header {
 		req.Header.Set(key, val)
