@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
 )
 
 var client *http.Client
@@ -38,6 +39,7 @@ type Req struct {
 	FormData    map[string]string
 	JsonData    interface{}
 	BinaryData  []byte
+	Timeout     int // seconds
 }
 
 const ContentTypeForm = "application/x-www-form-urlencoded; charset=utf-8"
@@ -72,6 +74,9 @@ func Request(reqBean Req) (string, int) {
 	}
 	for key, val := range reqBean.Header {
 		req.Header.Set(key, val)
+	}
+	if reqBean.Timeout > 0 {
+		client.Timeout = time.Duration(reqBean.Timeout) * time.Second
 	}
 	resp, err := client.Do(req)
 	if err != nil {
