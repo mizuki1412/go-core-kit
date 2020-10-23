@@ -66,10 +66,10 @@ func Request(reqBean Req) (string, int) {
 		panic(exception.New(err.Error()))
 	}
 	if reqBean.ContentType == "" {
-		if reqBean.FormData != nil {
-			req.Header.Set("Content-Type", ContentTypeForm)
-		} else if reqBean.JsonData != nil {
+		if reqBean.JsonData != nil {
 			req.Header.Set("Content-Type", ContentTypeJSON)
+		} else {
+			req.Header.Set("Content-Type", ContentTypeForm)
 		}
 	}
 	for key, val := range reqBean.Header {

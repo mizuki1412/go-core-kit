@@ -20,8 +20,12 @@ type WinParam struct {
 	FullScreen bool
 	// url中的项目路径 eg：/base/xxx。如果前端是hash模式：/#/xxx
 	Url string
+	// 完整的url
+	CompleteUrl string
 	// true：只开启服务，不开启ui
 	NoUI bool
+	// 关闭ui时不关闭主线程
+	KeepMain bool
 }
 
 // 开启websocket server
