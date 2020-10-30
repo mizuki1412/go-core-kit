@@ -40,6 +40,7 @@ func StartLorca(param *WinParam) {
 	sign := make(chan os.Signal)
 	signal.Notify(sign, os.Interrupt)
 	if Self == nil || param.KeepMain {
+		// todo Self.Done()时 设置为nil
 		select {
 		case <-sign:
 			logkit.Info("close main")
