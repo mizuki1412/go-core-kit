@@ -67,6 +67,7 @@ func (th *MapStringSync) IsValid() bool {
 
 func (th *MapStringSync) Set(val interface{}) {
 	th.Lock()
+	defer th.Unlock()
 	if v, ok := val.(MapStringSync); ok {
 		if v.Map == nil {
 			th.Map = map[string]interface{}{}
@@ -74,47 +75,44 @@ func (th *MapStringSync) Set(val interface{}) {
 			th.Map = v.Map
 		}
 		th.Valid = true
-		th.Unlock()
 	} else if v, ok := val.(map[string]interface{}); ok {
 		th.Map = v
 		th.Valid = true
-		th.Unlock()
 	} else {
-		th.Unlock()
 		panic(exception.New("class.MapStringSync set error"))
 	}
 }
 
 func (th *MapStringSync) PutAll(val map[string]interface{}) {
+	th.Lock()
+	defer th.Unlock()
 	if th.Map == nil {
 		th.Map = map[string]interface{}{}
 	}
-	th.Lock()
 	mapkit.PutAll(th.Map, val)
 	th.Valid = true
-	th.Unlock()
 }
 
 func (th *MapStringSync) PutIfAbsent(key string, val interface{}) {
+	th.Lock()
+	defer th.Unlock()
 	if th.Map == nil {
 		th.Map = map[string]interface{}{}
 	}
-	th.Lock()
 	if _, ok := th.Map[key]; !ok {
 		th.Map[key] = val
 	}
 	th.Valid = true
-	th.Unlock()
 }
 
 func (th *MapStringSync) Put(key string, val interface{}) {
+	th.Lock()
+	defer th.Unlock()
 	if th.Map == nil {
 		th.Map = map[string]interface{}{}
 	}
-	th.Lock()
 	th.Map[key] = val
 	th.Valid = true
-	th.Unlock()
 }
 
 func (th *MapStringSync) Remove() {

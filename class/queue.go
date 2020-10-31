@@ -8,7 +8,8 @@ type (
 		top    *node
 		rear   *node
 		length int
-		sync.RWMutex
+		lock1  sync.Mutex
+		lock2  sync.Mutex
 	}
 	//双向链表节点
 	node struct {
@@ -42,7 +43,8 @@ func (th *Queue) Peek() interface{} {
 
 //入队操作
 func (th *Queue) Push(v interface{}) {
-	th.Lock()
+	th.lock1.Lock()
+	defer th.lock1.Unlock()
 	n := &node{nil, nil, v}
 	if th.length == 0 {
 		th.top = n
@@ -53,12 +55,12 @@ func (th *Queue) Push(v interface{}) {
 		th.rear = n
 	}
 	th.length++
-	th.Unlock()
 }
 
 //出队操作
 func (th *Queue) Pop() interface{} {
-	th.Lock()
+	//th.lock2.Lock()
+	//th.lock2.Unlock()
 	if th.length == 0 {
 		return nil
 	}
@@ -71,6 +73,5 @@ func (th *Queue) Pop() interface{} {
 		th.top.pre = nil
 	}
 	th.length--
-	th.Unlock()
 	return n.value
 }
