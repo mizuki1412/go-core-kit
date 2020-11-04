@@ -16,9 +16,10 @@ var sessionManager *sessions.Sessions
 
 func InitSession() {
 	sessionManager = sessions.New(sessions.Config{
-		Cookie:       "session",
-		AllowReclaim: true,
-		Expires:      time.Duration(configkit.GetInt(ConfigKeySessionExpire, 12)) * time.Hour,
+		Cookie:                      "session",
+		AllowReclaim:                true,
+		Expires:                     time.Duration(configkit.GetInt(ConfigKeySessionExpire, 12)) * time.Hour,
+		DisableSubdomainPersistence: true, // 开发环境跨域时对火狐有效
 	})
 	// redis
 	redisHost := configkit.GetStringD(rediskit.ConfigKeyRedisHost)
