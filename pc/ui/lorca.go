@@ -14,8 +14,12 @@ var port string
 
 // 单独启动ui时，用于重开ui
 func StartUI(param *WinParam) {
-	Self, _ = lorca.New("", "", param.Width, param.Height)
+	var err error
+	Self, err = lorca.New("", "", param.Width, param.Height)
 	// local web ui地址。
+	if err != nil {
+		panic(exception.New(err.Error()))
+	}
 	if param.Url != "" {
 		_ = Self.Load("http://127.0.0.1:" + port + param.Url)
 	} else if param.CompleteUrl != "" {

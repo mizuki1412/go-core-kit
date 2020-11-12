@@ -34,12 +34,20 @@ func Init() *zap.Logger {
 		EncodeDuration: zapcore.SecondsDurationEncoder,
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
-	core := zapcore.NewTee(
-		// 日志中json方式输出
-		zapcore.NewCore(zapcore.NewJSONEncoder(config), zapcore.AddSync(getWriter()), zap.InfoLevel),
-		// console中基本展示
-		zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout)), zap.InfoLevel),
-	)
+	var core zapcore.Core
+	if configkit.GetBoolD(ConfigKeyLogFileOff) {
+		core = zapcore.NewTee(
+			// console中基本展示
+			zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout)), zap.InfoLevel),
+		)
+	} else {
+		core = zapcore.NewTee(
+			// 日志中json方式输出
+			zapcore.NewCore(zapcore.NewJSONEncoder(config), zapcore.AddSync(getWriter()), zap.InfoLevel),
+			// console中基本展示
+			zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout)), zap.InfoLevel),
+		)
+	}
 	Logger = zap.New(core)
 	return Logger
 }

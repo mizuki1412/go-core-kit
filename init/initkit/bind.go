@@ -51,6 +51,7 @@ func DefFlags(cmd *cobra.Command) {
 	cmd.Flags().String(logkit.ConfigKeyLogPath, "", "日志目录；默认在project.dir下")
 	cmd.Flags().String(logkit.ConfigKeyLogName, "main", "日志文件名，无后缀")
 	cmd.Flags().String(logkit.ConfigKeyLogMaxRemain, "", "最大保留天数")
+	cmd.Flags().String(logkit.ConfigKeyLogFileOff, "", "关闭文件日志")
 
 	cmd.Flags().String(restkit.ConfigKeyRestServerBase, "", "rest base url")
 	cmd.Flags().String(restkit.ConfigKeyRestServerPort, "", "")

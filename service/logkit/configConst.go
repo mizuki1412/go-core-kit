@@ -8,3 +8,6 @@ const ConfigKeyLogName = "logger.name"
 
 // 最大保留天数
 const ConfigKeyLogMaxRemain = "logger.max-remain"
+
+// 关闭文件日志,只留console
+const ConfigKeyLogFileOff = "logger.file-off"
