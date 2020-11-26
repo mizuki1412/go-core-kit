@@ -26,7 +26,7 @@ func InitSession() {
 	redisPort := configkit.GetString(rediskit.ConfigKeyRedisPort, "6379")
 	redisPwd := configkit.GetStringD(rediskit.ConfigKeyRedisPwd)
 	redisDB := configkit.GetStringD(rediskit.ConfigKeyRedisDB)
-	redisPrefix := configkit.GetString(rediskit.ConfigKeyRedisPrefix, "default")
+	redisPrefix := configkit.GetString(rediskit.ConfigKeyRedisPrefix, "")
 	if redisHost != "" {
 		db := redis.New(redis.Config{
 			Network:   "tcp",
@@ -48,6 +48,7 @@ func InitSession() {
 		// Close connection when control+C/cmd+C
 		iris.RegisterOnInterrupt(func() {
 			_ = db.Close()
+			logkit.Error("session in redis: error")
 		})
 		sessionManager.UseDatabase(db)
 		logkit.Info("session use redis")
