@@ -149,7 +149,7 @@ func CreateDB(name string) {
 	}
 }
 
-// sql: dv_x key1=val1,key2=val2 timestamp
+// sql: dv_x key1=1,key2="val2" timestamp
 func WriteDefaultDB(sql string) {
 	writeData(configkit.GetStringD(ConfigKeyInfluxDBName), sql)
 }

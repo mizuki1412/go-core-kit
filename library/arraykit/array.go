@@ -16,6 +16,15 @@ func StringContains(arr []string, ele string) bool {
 	return false
 }
 
+func AnyContains(arr []interface{}, ele interface{}) bool {
+	for _, v := range arr {
+		if cast.ToString(v) == cast.ToString(ele) {
+			return true
+		}
+	}
+	return false
+}
+
 func StringDelete(arr []string, ele string) []string {
 	j := 0
 	for _, val := range arr {
