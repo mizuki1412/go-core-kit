@@ -5,108 +5,108 @@ import (
 	"strings"
 )
 
-// 生成sql中: in (select unnest(Array[?,?,?])) []interface{}
+// 生成sql中: sth in (select unnest(Array[?,?,?])) []interface{}
 // arr必须不能空
-// 注意使用时 args... todo 将会转为内部函数
-func GenUnnestString(arr []string) (string, []interface{}) {
+// 注意使用时 args...
+func genUnnestString(arr []string) (string, []interface{}) {
 	flags := make([]string, len(arr))
 	args := make([]interface{}, len(arr))
 	for i := 0; i < len(arr); i++ {
 		flags[i] = "?"
 		args[i] = arr[i]
 	}
-	return "(select unnest(Array[" + strings.Join(flags, ", ") + "]))", args
+	return " (select unnest(Array[" + strings.Join(flags, ", ") + "]))", args
 }
 
-func GenUnnestInt(arr []int32) (string, []interface{}) {
+func genUnnestInt(arr []int32) (string, []interface{}) {
 	flags := make([]string, len(arr))
 	args := make([]interface{}, len(arr))
 	for i := 0; i < len(arr); i++ {
 		flags[i] = "?"
 		args[i] = arr[i]
 	}
-	return "(select unnest(Array[" + strings.Join(flags, ", ") + "]::int[]))", args
+	return " (select unnest(Array[" + strings.Join(flags, ", ") + "]::int[]))", args
 }
 
-func GenUnnestInt64(arr []int64) (string, []interface{}) {
+func genUnnestInt64(arr []int64) (string, []interface{}) {
 	flags := make([]string, len(arr))
 	args := make([]interface{}, len(arr))
 	for i := 0; i < len(arr); i++ {
 		flags[i] = "?"
 		args[i] = arr[i]
 	}
-	return "(select unnest(Array[" + strings.Join(flags, ", ") + "]::int[]))", args
+	return " (select unnest(Array[" + strings.Join(flags, ", ") + "]::int[]))", args
 }
 
-// 返回 Array[?,?,?] todo 将改为内部函数
-func GenArrayFlagString(arr []string) (string, []interface{}) {
+// 返回 Array[?,?,?]
+func genArrayFlagString(arr []string) (string, []interface{}) {
 	flags := make([]string, len(arr))
 	args := make([]interface{}, len(arr))
 	for i := 0; i < len(arr); i++ {
 		flags[i] = "?"
 		args[i] = arr[i]
 	}
-	return "Array[" + strings.Join(flags, ", ") + "]::varchar[]", args
+	return " Array[" + strings.Join(flags, ", ") + "]::varchar[]", args
 }
 
-func GenArrayFlagInt(arr []int32) (string, []interface{}) {
+func genArrayFlagInt(arr []int32) (string, []interface{}) {
 	flags := make([]string, len(arr))
 	args := make([]interface{}, len(arr))
 	for i := 0; i < len(arr); i++ {
 		flags[i] = "?"
 		args[i] = arr[i]
 	}
-	return "Array[" + strings.Join(flags, ", ") + "]::int[]", args
+	return " Array[" + strings.Join(flags, ", ") + "]::int[]", args
 }
 
 // 封装到builder
 func WhereUnnestString(builder squirrel.SelectBuilder, sqlPrefix string, arr []string) squirrel.SelectBuilder {
-	flag, arg := GenUnnestString(arr)
+	flag, arg := genUnnestString(arr)
 	return builder.Where(sqlPrefix+flag, arg...)
 }
 
 func WhereUnnestInt(builder squirrel.SelectBuilder, sqlPrefix string, arr []int32) squirrel.SelectBuilder {
-	flag, arg := GenUnnestInt(arr)
+	flag, arg := genUnnestInt(arr)
 	return builder.Where(sqlPrefix+flag, arg...)
 }
 
 func WhereUnnestInt64(builder squirrel.SelectBuilder, sqlPrefix string, arr []int64) squirrel.SelectBuilder {
-	flag, arg := GenUnnestInt64(arr)
+	flag, arg := genUnnestInt64(arr)
 	return builder.Where(sqlPrefix+flag, arg...)
 }
 
 func WhereArrayString(builder squirrel.SelectBuilder, sqlPrefix string, arr []string) squirrel.SelectBuilder {
-	flag, arg := GenArrayFlagString(arr)
+	flag, arg := genArrayFlagString(arr)
 	return builder.Where(sqlPrefix+flag, arg...)
 }
 
 func WhereArrayInt(builder squirrel.SelectBuilder, sqlPrefix string, arr []int32) squirrel.SelectBuilder {
-	flag, arg := GenArrayFlagInt(arr)
+	flag, arg := genArrayFlagInt(arr)
 	return builder.Where(sqlPrefix+flag, arg...)
 }
 
 // 封装到builder
 func WhereUnnestStringU(builder squirrel.UpdateBuilder, sqlPrefix string, arr []string) squirrel.UpdateBuilder {
-	flag, arg := GenUnnestString(arr)
+	flag, arg := genUnnestString(arr)
 	return builder.Where(sqlPrefix+flag, arg...)
 }
 
 func WhereUnnestIntU(builder squirrel.UpdateBuilder, sqlPrefix string, arr []int32) squirrel.UpdateBuilder {
-	flag, arg := GenUnnestInt(arr)
+	flag, arg := genUnnestInt(arr)
 	return builder.Where(sqlPrefix+flag, arg...)
 }
 
 func WhereUnnestInt64U(builder squirrel.UpdateBuilder, sqlPrefix string, arr []int64) squirrel.UpdateBuilder {
-	flag, arg := GenUnnestInt64(arr)
+	flag, arg := genUnnestInt64(arr)
 	return builder.Where(sqlPrefix+flag, arg...)
 }
 
 func WhereArrayStringU(builder squirrel.UpdateBuilder, sqlPrefix string, arr []string) squirrel.UpdateBuilder {
-	flag, arg := GenArrayFlagString(arr)
+	flag, arg := genArrayFlagString(arr)
 	return builder.Where(sqlPrefix+flag, arg...)
 }
 
 func WhereArrayIntU(builder squirrel.UpdateBuilder, sqlPrefix string, arr []int32) squirrel.UpdateBuilder {
-	flag, arg := GenArrayFlagInt(arr)
+	flag, arg := genArrayFlagInt(arr)
 	return builder.Where(sqlPrefix+flag, arg...)
 }

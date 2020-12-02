@@ -183,8 +183,13 @@ func (dao *Dao) FindById(id int32) *$bean$ {
 	return dao.scanOne(sql, args)
 }
 
-func (dao *Dao) ListAll() []*$bean$ {
-	sql, args := sqlkit.Builder().Select("*").From(dao.GetTableD("$name$")).OrderBy("id").MustSql()
+type ListParam struct {
+	IdList []int32
+}
+
+func (dao *Dao) List(param ListParam) []*$bean$ {
+	builder := sqlkit.Builder().Select("*").From(dao.GetTableD("$name$")).Where("off=false").OrderBy("id")
+	sql, args := builder.MustSql()
 	return dao.scan(sql, args)
 }
 ```
