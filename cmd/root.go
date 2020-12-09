@@ -14,6 +14,7 @@ import (
 	"golang.org/x/text/transform"
 	"io/ioutil"
 	"log"
+	"time"
 )
 
 type Data struct {
@@ -41,36 +42,11 @@ var rootCmd = &cobra.Command{
 				}
 			}
 		}()
-
-		// test
-		//f, err := excelize.OpenFile("/Users/ycj/Downloads/test.xlsx")
-		//log.Println(err)
-		//rows, err := f.Rows(f.GetSheetName(0))
-		//if err != nil {
-		//	panic(exception.New(err.Error()))
-		//}
-		//var res []map[string]string
-		////index := 1
-		////var names []string
-		//for rows.Next() {
-		//	values, _ := rows.Columns()
-		//	m:=map[string]string{}
-		//	for i, v := range values {
-		//		if i==0{
-		//			m["no"] = v
-		//		}else if i==1{
-		//			m["name"] = v
-		//		}else if i==2{
-		//			m["model"] = v
-		//		}else{
-		//			m["unit"] = v
-		//		}
-		//	}
-		//	res = append(res, m)
-		//}
-		//for _,v:=range res{
-		//	log.Println(fmt.Sprintf("('%s','%s','{\"model\":\"%s\",\"unit\":\"%s\"}',37,2),", v["no"], v["name"], v["model"], v["unit"]))
-		//}
+		t := class.Time{
+			Time:  time.Now(),
+			Valid: true,
+		}
+		print(jsonkit.ToString(t))
 	},
 }
 

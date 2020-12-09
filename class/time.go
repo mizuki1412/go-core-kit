@@ -97,3 +97,7 @@ func (th *Time) Set(val interface{}) {
 		th.Valid = true
 	}
 }
+
+func (th *Time) UnixMill() int64 {
+	return timekit.GetUnixMill(th.Time)
+}
