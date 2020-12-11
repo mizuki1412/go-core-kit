@@ -14,6 +14,7 @@ type Field struct {
 	Tags []string
 }
 
+// todo 外联指针对象无法区分；json的omitempty标记不够精确（只能对class或指针）
 func SQL2Struct(sqlFile, destFile string) {
 	sqls, err := filekit.ReadString(sqlFile)
 	if err != nil {
@@ -47,18 +48,6 @@ func SQL2Struct(sqlFile, destFile string) {
 				continue
 			}
 			f := Field{Name: es[0]}
-			f.Tags = append(f.Tags, fmt.Sprintf("json:\"%s\" db:\"%s\"", es[0], strings.ToLower(es[0])))
-			if arraykit.StringContains(es, "primary") {
-				f.Tags = append(f.Tags, fmt.Sprintf("pk:\"true\" tablename:\"%s\"", table))
-			}
-			// 注释 -- 分隔
-			commentIndex := strings.Index(val, "--")
-			if commentIndex > 0 {
-				comment := strings.TrimSpace(val[commentIndex+2:])
-				if comment != "" {
-					f.Tags = append(f.Tags, fmt.Sprintf(`description:"%s"`, comment))
-				}
-			}
 			switch es[1] {
 			case "varchar", "text":
 				f.Type = "class.String"
@@ -91,6 +80,22 @@ func SQL2Struct(sqlFile, destFile string) {
 			default:
 				if strings.Index(es[1], "decimal") == 0 {
 					f.Type = "class.Decimal"
+				}
+			}
+			if strings.Index(f.Type, "class") >= 0 || strings.Index(f.Type, "*") >= 0 {
+				f.Tags = append(f.Tags, fmt.Sprintf("json:\"%s,omitempty\" db:\"%s\"", es[0], strings.ToLower(es[0])))
+			} else {
+				f.Tags = append(f.Tags, fmt.Sprintf("json:\"%s\" db:\"%s\"", es[0], strings.ToLower(es[0])))
+			}
+			if arraykit.StringContains(es, "primary") {
+				f.Tags = append(f.Tags, fmt.Sprintf("pk:\"true\" tablename:\"%s\"", table))
+			}
+			// 注释 -- 分隔
+			commentIndex := strings.Index(val, "--")
+			if commentIndex > 0 {
+				comment := strings.TrimSpace(val[commentIndex+2:])
+				if comment != "" {
+					f.Tags = append(f.Tags, fmt.Sprintf(`description:"%s"`, comment))
 				}
 			}
 			fields = append(fields, f)
