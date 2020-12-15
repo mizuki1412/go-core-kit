@@ -10,7 +10,15 @@ type Decimal struct {
 	decimal.NullDecimal
 }
 
-func (th *Decimal) Set(val interface{}) {
+func NewDecimal(val interface{}) *Decimal {
+	th := &Decimal{}
+	if val != nil {
+		th.Set(val)
+	}
+	return th
+}
+
+func (th *Decimal) Set(val interface{}) *Decimal {
 	if v, ok := val.(decimal.Decimal); ok {
 		th.Valid = true
 		th.Decimal = v
@@ -26,8 +34,19 @@ func (th *Decimal) Set(val interface{}) {
 			panic(exception.New("class.Decimal set error"))
 		}
 	}
+	return th
+}
+
+func (th *Decimal) Round(place int32) *Decimal {
+	th.Decimal = th.Decimal.Round(place)
+	return th
 }
 
 func (th Decimal) IsValid() bool {
 	return th.Valid
+}
+
+func (th *Decimal) Float64() float64 {
+	val, _ := th.Decimal.Float64()
+	return val
 }

@@ -54,11 +54,19 @@ func (th ArrInt) Value() (driver.Value, error) {
 	return th.Array.Value()
 }
 
+func NewArrInt(val interface{}) *ArrInt {
+	th := &ArrInt{}
+	if val != nil {
+		th.Set(val)
+	}
+	return th
+}
+
 func (th ArrInt) IsValid() bool {
 	return th.Valid
 }
 
-func (th *ArrInt) Set(val interface{}) {
+func (th *ArrInt) Set(val interface{}) *ArrInt {
 	if v, ok := val.([]int64); ok {
 		th.Array = v
 	} else if v, ok := val.(ArrInt); ok {
@@ -69,15 +77,17 @@ func (th *ArrInt) Set(val interface{}) {
 		panic(exception.New("class.ArrInt set error"))
 	}
 	th.Valid = true
+	return th
 }
 
 func (th *ArrInt) Length() int {
 	return len(th.Array)
 }
 
-func (th *ArrInt) Remove() {
+func (th *ArrInt) Remove() *ArrInt {
 	th.Valid = false
 	th.Array = []int64{}
+	return th
 }
 
 func (th *ArrInt) ToInt32Slice() []int32 {

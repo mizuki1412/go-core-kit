@@ -54,7 +54,15 @@ func (th String) IsValid() bool {
 	return th.Valid
 }
 
-func (th *String) Set(val interface{}) {
+func NewString(val interface{}) *String {
+	th := &String{}
+	if val != nil {
+		th.Set(val)
+	}
+	return th
+}
+
+func (th *String) Set(val interface{}) *String {
 	if v, ok := val.(String); ok {
 		th.String = v.String
 		th.Valid = true
@@ -66,9 +74,11 @@ func (th *String) Set(val interface{}) {
 		th.String = s
 		th.Valid = true
 	}
+	return th
 }
 
-func (th *String) Remove() {
+func (th *String) Remove() *String {
 	th.Valid = false
 	th.String = ""
+	return th
 }

@@ -54,7 +54,15 @@ func (th Bool) IsValid() bool {
 	return th.Valid
 }
 
-func (th *Bool) Set(val interface{}) {
+func NewBool(val interface{}) *Bool {
+	th := &Bool{}
+	if val != nil {
+		th.Set(val)
+	}
+	return th
+}
+
+func (th *Bool) Set(val interface{}) *Bool {
 	if v, ok := val.(Bool); ok {
 		th.Bool = v.Bool
 		th.Valid = true
@@ -66,4 +74,5 @@ func (th *Bool) Set(val interface{}) {
 		th.Bool = i
 		th.Valid = true
 	}
+	return th
 }

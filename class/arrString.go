@@ -59,7 +59,15 @@ func (th ArrString) Value() (driver.Value, error) {
 	return th.Array.Value()
 }
 
-func (th *ArrString) Set(val interface{}) {
+func NewArrString(val interface{}) *ArrString {
+	th := &ArrString{}
+	if val != nil {
+		th.Set(val)
+	}
+	return th
+}
+
+func (th *ArrString) Set(val interface{}) *ArrString {
 	if v, ok := val.([]string); ok {
 		th.Array = v
 	} else if v, ok := val.(ArrString); ok {
@@ -70,12 +78,14 @@ func (th *ArrString) Set(val interface{}) {
 		panic(exception.New("class.ArrString set error"))
 	}
 	th.Valid = true
+	return th
 }
 
 func (th *ArrString) Length() int {
 	return len(th.Array)
 }
-func (th *ArrString) Remove() {
+func (th *ArrString) Remove() *ArrString {
 	th.Valid = false
 	th.Array = []string{}
+	return th
 }

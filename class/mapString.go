@@ -61,7 +61,15 @@ func (th MapString) IsValid() bool {
 	return th.Valid
 }
 
-func (th *MapString) Set(val interface{}) {
+func NewMapString(val interface{}) *MapString {
+	th := &MapString{}
+	if val != nil {
+		th.Set(val)
+	}
+	return th
+}
+
+func (th *MapString) Set(val interface{}) *MapString {
 	if v, ok := val.(MapString); ok {
 		if v.Map == nil {
 			th.Map = map[string]interface{}{}
@@ -75,17 +83,19 @@ func (th *MapString) Set(val interface{}) {
 	} else {
 		panic(exception.New("class.MapString set error"))
 	}
+	return th
 }
 
-func (th *MapString) PutAll(val map[string]interface{}) {
+func (th *MapString) PutAll(val map[string]interface{}) *MapString {
 	if th.Map == nil {
 		th.Map = map[string]interface{}{}
 	}
 	mapkit.PutAll(th.Map, val)
 	th.Valid = true
+	return th
 }
 
-func (th *MapString) PutIfAbsent(key string, val interface{}) {
+func (th *MapString) PutIfAbsent(key string, val interface{}) *MapString {
 	if th.Map == nil {
 		th.Map = map[string]interface{}{}
 	}
@@ -93,19 +103,22 @@ func (th *MapString) PutIfAbsent(key string, val interface{}) {
 		th.Map[key] = val
 	}
 	th.Valid = true
+	return th
 }
 
-func (th *MapString) Put(key string, val interface{}) {
+func (th *MapString) Put(key string, val interface{}) *MapString {
 	if th.Map == nil {
 		th.Map = map[string]interface{}{}
 	}
 	th.Map[key] = val
 	th.Valid = true
+	return th
 }
 
-func (th *MapString) Remove() {
+func (th *MapString) Remove() *MapString {
 	th.Valid = false
 	th.Map = map[string]interface{}{}
+	return th
 }
 
 func (th *MapString) IsEmpty() bool {

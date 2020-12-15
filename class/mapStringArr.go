@@ -65,7 +65,15 @@ func (th MapStringArr) IsValid() bool {
 	return th.Valid
 }
 
-func (th *MapStringArr) Set(val interface{}) {
+func NewMapStringArr(val interface{}) *MapStringArr {
+	th := &MapStringArr{}
+	if val != nil {
+		th.Set(val)
+	}
+	return th
+}
+
+func (th *MapStringArr) Set(val interface{}) *MapStringArr {
 	if v, ok := val.(MapStringArr); ok {
 		th.Arr = v.Arr
 		th.Valid = true
@@ -75,14 +83,16 @@ func (th *MapStringArr) Set(val interface{}) {
 	} else {
 		panic(exception.New("class.MapStringArr set error"))
 	}
+	return th
 }
 
 func (th *MapStringArr) Length() int {
 	return len(th.Arr)
 }
-func (th *MapStringArr) Remove() {
+func (th *MapStringArr) Remove() *MapStringArr {
 	th.Valid = false
 	th.Arr = []map[string]interface{}{}
+	return th
 }
 
 func (th *MapStringArr) IsEmpty() bool {

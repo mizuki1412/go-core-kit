@@ -65,7 +65,15 @@ func (th *MapStringSync) IsValid() bool {
 	return th.Valid
 }
 
-func (th *MapStringSync) Set(val interface{}) {
+func NewMapStringSync(val interface{}) *MapStringSync {
+	th := &MapStringSync{}
+	if val != nil {
+		th.Set(val)
+	}
+	return th
+}
+
+func (th *MapStringSync) Set(val interface{}) *MapStringSync {
 	th.Lock()
 	defer th.Unlock()
 	if v, ok := val.(MapStringSync); ok {
@@ -81,9 +89,10 @@ func (th *MapStringSync) Set(val interface{}) {
 	} else {
 		panic(exception.New("class.MapStringSync set error"))
 	}
+	return th
 }
 
-func (th *MapStringSync) PutAll(val map[string]interface{}) {
+func (th *MapStringSync) PutAll(val map[string]interface{}) *MapStringSync {
 	th.Lock()
 	defer th.Unlock()
 	if th.Map == nil {
@@ -91,9 +100,10 @@ func (th *MapStringSync) PutAll(val map[string]interface{}) {
 	}
 	mapkit.PutAll(th.Map, val)
 	th.Valid = true
+	return th
 }
 
-func (th *MapStringSync) PutIfAbsent(key string, val interface{}) {
+func (th *MapStringSync) PutIfAbsent(key string, val interface{}) *MapStringSync {
 	th.Lock()
 	defer th.Unlock()
 	if th.Map == nil {
@@ -103,9 +113,10 @@ func (th *MapStringSync) PutIfAbsent(key string, val interface{}) {
 		th.Map[key] = val
 	}
 	th.Valid = true
+	return th
 }
 
-func (th *MapStringSync) Put(key string, val interface{}) {
+func (th *MapStringSync) Put(key string, val interface{}) *MapStringSync {
 	th.Lock()
 	defer th.Unlock()
 	if th.Map == nil {
@@ -113,20 +124,23 @@ func (th *MapStringSync) Put(key string, val interface{}) {
 	}
 	th.Map[key] = val
 	th.Valid = true
+	return th
 }
 
-func (th *MapStringSync) Remove() {
+func (th *MapStringSync) Remove() *MapStringSync {
 	th.Lock()
+	defer th.Unlock()
 	th.Valid = false
 	th.Map = map[string]interface{}{}
-	th.Unlock()
+	return th
 }
 
-func (th *MapStringSync) Delete(key string) {
+func (th *MapStringSync) Delete(key string) *MapStringSync {
 	th.Lock()
+	defer th.Unlock()
 	th.Valid = false
 	delete(th.Map, key)
-	th.Unlock()
+	return th
 }
 
 func (th *MapStringSync) IsEmpty() bool {

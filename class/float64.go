@@ -54,7 +54,15 @@ func (th Float64) IsValid() bool {
 	return th.Valid
 }
 
-func (th *Float64) Set(val interface{}) {
+func NewFloat64(val interface{}) *Float64 {
+	th := &Float64{}
+	if val != nil {
+		th.Set(val)
+	}
+	return th
+}
+
+func (th *Float64) Set(val interface{}) *Float64 {
 	if v, ok := val.(Float64); ok {
 		th.Float64 = v.Float64
 		th.Valid = true
@@ -66,4 +74,5 @@ func (th *Float64) Set(val interface{}) {
 		th.Float64 = i
 		th.Valid = true
 	}
+	return th
 }

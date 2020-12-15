@@ -54,7 +54,15 @@ func (th Int32) IsValid() bool {
 	return th.Valid
 }
 
-func (th *Int32) Set(val interface{}) {
+func NewInt32(val interface{}) *Int32 {
+	th := &Int32{}
+	if val != nil {
+		th.Set(val)
+	}
+	return th
+}
+
+func (th *Int32) Set(val interface{}) *Int32 {
 	if v, ok := val.(Int32); ok {
 		th.Int32 = v.Int32
 		th.Valid = true
@@ -66,4 +74,5 @@ func (th *Int32) Set(val interface{}) {
 		th.Int32 = i
 		th.Valid = true
 	}
+	return th
 }

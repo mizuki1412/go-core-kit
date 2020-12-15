@@ -54,7 +54,15 @@ func (th Int64) IsValid() bool {
 	return th.Valid
 }
 
-func (th *Int64) Set(val interface{}) {
+func NewInt64(val interface{}) *Int64 {
+	th := &Int64{}
+	if val != nil {
+		th.Set(val)
+	}
+	return th
+}
+
+func (th *Int64) Set(val interface{}) *Int64 {
 	if v, ok := val.(Int64); ok {
 		th.Int64 = v.Int64
 		th.Valid = true
@@ -66,4 +74,5 @@ func (th *Int64) Set(val interface{}) {
 		th.Int64 = i
 		th.Valid = true
 	}
+	return th
 }

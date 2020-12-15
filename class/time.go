@@ -77,7 +77,15 @@ func (th Time) IsValid() bool {
 	return th.Valid
 }
 
-func (th *Time) Set(val interface{}) {
+func NewTime(val interface{}) *Time {
+	th := &Time{}
+	if val != nil {
+		th.Set(val)
+	}
+	return th
+}
+
+func (th *Time) Set(val interface{}) *Time {
 	if v, ok := val.(Time); ok {
 		th.Time = v.Time
 		th.Valid = true
@@ -96,6 +104,7 @@ func (th *Time) Set(val interface{}) {
 		th.Time = t
 		th.Valid = true
 	}
+	return th
 }
 
 func (th *Time) UnixMill() int64 {

@@ -28,7 +28,6 @@ var rootCmd = &cobra.Command{
 	Short: "go core kit test",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-
 		defer func() {
 			if err := recover(); err != nil {
 				var msg string
