@@ -92,14 +92,14 @@ func (th *Time) Set(val interface{}) *Time {
 	} else if v, ok := val.(string); ok {
 		t, err := timekit.Parse(v)
 		if err != nil {
-			panic(exception.New("class.Time set error"))
+			panic(exception.New("class.Time set error: " + err.Error()))
 		}
 		th.Time = t
 		th.Valid = true
 	} else {
 		t, err := cast.ToTimeE(val)
 		if err != nil {
-			panic(exception.New("class.Time set error"))
+			panic(exception.New("class.Time set error: " + err.Error()))
 		}
 		th.Time = t
 		th.Valid = true

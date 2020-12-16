@@ -69,7 +69,7 @@ func (th *Float64) Set(val interface{}) *Float64 {
 	} else {
 		i, err := cast.ToFloat64E(val)
 		if err != nil {
-			panic(exception.New("class.Float64 set error"))
+			panic(exception.New("class.Float64 set error: " + err.Error()))
 		}
 		th.Float64 = i
 		th.Valid = true

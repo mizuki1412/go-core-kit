@@ -69,7 +69,7 @@ func (th *String) Set(val interface{}) *String {
 	} else {
 		s, err := cast.ToStringE(val)
 		if err != nil {
-			panic(exception.New("class.String set error"))
+			panic(exception.New("class.String set error: " + err.Error()))
 		}
 		th.String = s
 		th.Valid = true

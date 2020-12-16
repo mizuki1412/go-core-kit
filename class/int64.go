@@ -69,7 +69,7 @@ func (th *Int64) Set(val interface{}) *Int64 {
 	} else {
 		i, err := cast.ToInt64E(val)
 		if err != nil {
-			panic(exception.New("class.Int64 set error"))
+			panic(exception.New("class.Int64 set error: " + err.Error()))
 		}
 		th.Int64 = i
 		th.Valid = true

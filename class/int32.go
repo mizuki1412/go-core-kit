@@ -69,7 +69,7 @@ func (th *Int32) Set(val interface{}) *Int32 {
 	} else {
 		i, err := cast.ToInt32E(val)
 		if err != nil {
-			panic(exception.New("class.Int32 set error"))
+			panic(exception.New("class.Int32 set error: " + err.Error()))
 		}
 		th.Int32 = i
 		th.Valid = true

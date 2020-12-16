@@ -31,7 +31,7 @@ func (th *Decimal) Set(val interface{}) *Decimal {
 			th.Valid = true
 			th.Decimal = v
 		} else {
-			panic(exception.New("class.Decimal set error"))
+			panic(exception.New("class.Decimal set error: " + err.Error()))
 		}
 	}
 	return th

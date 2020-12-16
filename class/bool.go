@@ -69,7 +69,7 @@ func (th *Bool) Set(val interface{}) *Bool {
 	} else {
 		i, err := cast.ToBoolE(val)
 		if err != nil {
-			panic(exception.New("class.Bool set error"))
+			panic(exception.New("class.Bool set error: " + err.Error()))
 		}
 		th.Bool = i
 		th.Valid = true
