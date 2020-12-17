@@ -65,7 +65,7 @@ func NewFloat64(val interface{}) *Float64 {
 func (th *Float64) Set(val interface{}) *Float64 {
 	if v, ok := val.(Float64); ok {
 		th.Float64 = v.Float64
-		th.Valid = true
+		th.Valid = v.Valid
 	} else {
 		i, err := cast.ToFloat64E(val)
 		if err != nil {

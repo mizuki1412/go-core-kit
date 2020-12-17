@@ -65,7 +65,7 @@ func NewInt64(val interface{}) *Int64 {
 func (th *Int64) Set(val interface{}) *Int64 {
 	if v, ok := val.(Int64); ok {
 		th.Int64 = v.Int64
-		th.Valid = true
+		th.Valid = v.Valid
 	} else {
 		i, err := cast.ToInt64E(val)
 		if err != nil {

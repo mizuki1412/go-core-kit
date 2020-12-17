@@ -65,7 +65,7 @@ func NewInt32(val interface{}) *Int32 {
 func (th *Int32) Set(val interface{}) *Int32 {
 	if v, ok := val.(Int32); ok {
 		th.Int32 = v.Int32
-		th.Valid = true
+		th.Valid = v.Valid
 	} else {
 		i, err := cast.ToInt32E(val)
 		if err != nil {

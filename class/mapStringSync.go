@@ -82,7 +82,7 @@ func (th *MapStringSync) Set(val interface{}) *MapStringSync {
 		} else {
 			th.Map = v.Map
 		}
-		th.Valid = true
+		th.Valid = v.Valid
 	} else if v, ok := val.(map[string]interface{}); ok {
 		th.Map = v
 		th.Valid = true

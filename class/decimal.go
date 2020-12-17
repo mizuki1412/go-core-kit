@@ -23,7 +23,7 @@ func (th *Decimal) Set(val interface{}) *Decimal {
 		th.Valid = true
 		th.Decimal = v
 	} else if v, ok := val.(Decimal); ok {
-		th.Valid = true
+		th.Valid = v.Valid
 		th.Decimal = v.Decimal
 	} else {
 		v, err := decimal.NewFromString(cast.ToString(val))

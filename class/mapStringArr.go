@@ -76,7 +76,7 @@ func NewMapStringArr(val interface{}) *MapStringArr {
 func (th *MapStringArr) Set(val interface{}) *MapStringArr {
 	if v, ok := val.(MapStringArr); ok {
 		th.Arr = v.Arr
-		th.Valid = true
+		th.Valid = v.Valid
 	} else if v, ok := val.([]map[string]interface{}); ok {
 		th.Arr = v
 		th.Valid = true

@@ -65,7 +65,7 @@ func NewString(val interface{}) *String {
 func (th *String) Set(val interface{}) *String {
 	if v, ok := val.(String); ok {
 		th.String = v.String
-		th.Valid = true
+		th.Valid = v.Valid
 	} else {
 		s, err := cast.ToStringE(val)
 		if err != nil {

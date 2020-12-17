@@ -88,7 +88,7 @@ func NewTime(val interface{}) *Time {
 func (th *Time) Set(val interface{}) *Time {
 	if v, ok := val.(Time); ok {
 		th.Time = v.Time
-		th.Valid = true
+		th.Valid = v.Valid
 	} else if v, ok := val.(string); ok {
 		t, err := timekit.Parse(v)
 		if err != nil {

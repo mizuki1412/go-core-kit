@@ -65,7 +65,7 @@ func NewBool(val interface{}) *Bool {
 func (th *Bool) Set(val interface{}) *Bool {
 	if v, ok := val.(Bool); ok {
 		th.Bool = v.Bool
-		th.Valid = true
+		th.Valid = v.Valid
 	} else {
 		i, err := cast.ToBoolE(val)
 		if err != nil {
