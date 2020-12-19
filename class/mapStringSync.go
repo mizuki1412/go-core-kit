@@ -160,3 +160,5 @@ func (th *MapStringSync) Contains(key string) bool {
 	}
 	return ok
 }
+
+// todo 读写锁，测试同时读写时
