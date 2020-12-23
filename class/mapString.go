@@ -138,3 +138,11 @@ func (th *MapString) Contains(key string) bool {
 	}
 	return ok
 }
+
+func (th *MapString) GetOrDefault(key string, d interface{}) interface{} {
+	v, ok := th.Map[key]
+	if ok {
+		return v
+	}
+	return d
+}

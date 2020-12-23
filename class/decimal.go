@@ -18,6 +18,10 @@ func NewDecimal(val interface{}) *Decimal {
 	return th
 }
 
+func ConstDecimal(v int32) decimal.Decimal {
+	return decimal.NewFromInt32(v)
+}
+
 func (th *Decimal) Set(val interface{}) *Decimal {
 	if v, ok := val.(decimal.Decimal); ok {
 		th.Valid = true
