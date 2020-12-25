@@ -97,3 +97,17 @@ func (th *ArrInt) ToInt32Slice() []int32 {
 	}
 	return list
 }
+
+func (th *ArrInt) Add(vals ...int64) *ArrInt {
+	th.Array = append(th.Array, vals...)
+	th.Valid = true
+	return th
+}
+
+func (th *ArrInt) Add32(vals ...int32) *ArrInt {
+	for _, e := range vals {
+		th.Array = append(th.Array, cast.ToInt64(e))
+	}
+	th.Valid = true
+	return th
+}

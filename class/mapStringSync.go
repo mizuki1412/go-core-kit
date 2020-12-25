@@ -8,9 +8,7 @@ import (
 	"sync"
 )
 
-/**
-针对PG的jsonb
-*/
+/** 针对PG的jsonb */
 
 // 同时继承scan和value方法
 type MapStringSync struct {
@@ -154,6 +152,8 @@ func (th *MapStringSync) IsEmpty() bool {
 }
 
 func (th *MapStringSync) Contains(key string) bool {
+	th.RLock()
+	defer th.RUnlock()
 	v, ok := th.Map[key]
 	if ok {
 		return v != nil
@@ -161,4 +161,9 @@ func (th *MapStringSync) Contains(key string) bool {
 	return ok
 }
 
-// todo 读写锁，测试同时读写时
+func (th *MapStringSync) Get(key string) interface{} {
+	th.RLock()
+	defer th.RUnlock()
+	v, _ := th.Map[key]
+	return v
+}

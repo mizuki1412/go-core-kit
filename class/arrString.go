@@ -89,3 +89,9 @@ func (th *ArrString) Remove() *ArrString {
 	th.Array = []string{}
 	return th
 }
+
+func (th *ArrString) Add(vals ...string) *ArrString {
+	th.Array = append(th.Array, vals...)
+	th.Valid = true
+	return th
+}

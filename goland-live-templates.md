@@ -6,7 +6,7 @@ func Init(router *router.Router) {
 	r := router.Group("/rest/$tag$")
 	r.Use(middleware.AuthUsernameAndPwd())
 	{
-		r.Post("/$name$", $name$).Tag(tag).Summary("$summary$").Param($name$Params{})
+		r.Post("/$name$", $name$).Swagger.Tag(tag).Summary("$summary$").Param($name$Params{})
 	}
 }
 
