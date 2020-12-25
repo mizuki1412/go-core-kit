@@ -20,6 +20,7 @@ type Router struct {
 	IsGroup    bool
 	ProxyGroup iris.Party // 存在项目前缀时，base path
 	Path       string
+	Swagger    *swg.SwaggerPath
 }
 type Handler func(ctx *context.Context)
 
@@ -52,32 +53,35 @@ func (router *Router) Group(path string, handlers ...Handler) *Router {
 	}
 }
 
-func (router *Router) Use(handlers ...Handler) {
+func (router *Router) Use(handlers ...Handler) *Router {
 	if router.IsGroup {
 		router.ProxyGroup.Use(handlerTrans(handlers...)...)
 	} else {
 		router.Proxy.Use(handlerTrans(handlers...)...)
 	}
+	return router
 }
 func (router *Router) OnError(handlers ...Handler) {
 	router.Proxy.OnAnyErrorCode(handlerTrans(handlers...)...)
 }
 
-func (router *Router) Post(path string, handlers ...Handler) *swg.SwaggerPath {
+func (router *Router) Post(path string, handlers ...Handler) *Router {
 	if router.IsGroup {
 		router.ProxyGroup.Post(path, handlerTrans(handlers...)...)
 	} else {
 		router.Proxy.Post(path, handlerTrans(handlers...)...)
 	}
-	return swg.NewPath(router.Path+path, "post")
+	router.Swagger = swg.NewPath(router.Path+path, "post")
+	return router
 }
-func (router *Router) Get(path string, handlers ...Handler) *swg.SwaggerPath {
+func (router *Router) Get(path string, handlers ...Handler) *Router {
 	if router.IsGroup {
 		router.ProxyGroup.Get(path, handlerTrans(handlers...)...)
 	} else {
 		router.Proxy.Get(path, handlerTrans(handlers...)...)
 	}
-	return swg.NewPath(router.Path+path, "get")
+	router.Swagger = swg.NewPath(router.Path+path, "get")
+	return router
 }
 
 func (router *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {

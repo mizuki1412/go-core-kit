@@ -23,3 +23,22 @@ func RecoverFuncWrapper(fun func()) {
 	}()
 	fun()
 }
+
+func RecoverGoFuncWrapper(fun func()) {
+	go func() {
+		defer func() {
+			if err := recover(); err != nil {
+				var msg string
+				if e, ok := err.(exception.Exception); ok {
+					msg = e.Msg
+					// 带代码位置信息
+					logkit.Error(e.Error())
+				} else {
+					msg = cast.ToString(err)
+					logkit.Error(msg)
+				}
+			}
+		}()
+		fun()
+	}()
+}
