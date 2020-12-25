@@ -21,3 +21,13 @@ func FormatSecondHMS(second int64, zh bool) string {
 		return fmt.Sprintf("%02d:%02d:%02d", hh, mm, ss)
 	}
 }
+
+func FormatSecondHM(second int64, zh bool) string {
+	hh := second / 60 / 60
+	mm := (second / 60) % 60
+	if zh {
+		return fmt.Sprintf("%02d时%02d分", hh, mm)
+	} else {
+		return fmt.Sprintf("%02d:%02d", hh, mm)
+	}
+}
