@@ -11,7 +11,8 @@ func GetFullPath(path string) string {
 	if path[0] != '/' {
 		path = "/" + path
 	}
-	return configkit.GetString(corekit.ConfigKeyProjectDir, ".") + path
+	p := configkit.GetString(corekit.ConfigKeyProjectDir, ".") + path
+	return p
 }
 
 func SaveInHome(file *class.File, path string) {

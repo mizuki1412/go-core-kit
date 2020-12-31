@@ -34,16 +34,17 @@ func WriteFile(fileName string, data []byte) error {
 func checkDir(fileName string) {
 	i := strings.LastIndex(fileName, "/")
 	if i > 0 {
-		exist, err := afero.Exists(afero.NewOsFs(), fileName[:i])
-		if err != nil {
-			panic(exception.New(err.Error()))
-		}
-		if !exist {
-			err = os.MkdirAll(fileName[:i], 0755)
-		}
-		if err != nil {
-			panic(exception.New(err.Error()))
-		}
+		CheckDir(fileName[:i])
+	}
+}
+
+func CheckDir(path string) {
+	exist, err := afero.Exists(afero.NewOsFs(), path)
+	if err != nil {
+		panic(exception.New(err.Error()))
+	}
+	if !exist {
+		_ = os.MkdirAll(path, 0755)
 	}
 }
 
