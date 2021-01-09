@@ -14,7 +14,6 @@ import (
 	"golang.org/x/text/transform"
 	"io/ioutil"
 	"log"
-	"time"
 )
 
 type Data struct {
@@ -41,11 +40,7 @@ var rootCmd = &cobra.Command{
 				}
 			}
 		}()
-		t := class.Time{
-			Time:  time.Now(),
-			Valid: true,
-		}
-		print(jsonkit.ToString(t))
+
 	},
 }
 
