@@ -11,12 +11,10 @@ func init() {
 }
 
 var pgssCmd = &cobra.Command{
-	Use:   "pgss",
-	Short: "postgres sql to struct",
-	Long:  ``,
+	Use: "pgss",
 	Run: func(cmd *cobra.Command, args []string) {
 		t := time.Now()
-		pgsql.SQL2Struct("/Users/ycj/Downloads/demo.sql", "/Users/ycj/Downloads/dest.go")
+		pgsql.SQL2Struct("/Users/ycj/Downloads/init.sql", "/Users/ycj/Downloads/init.go")
 		println(time.Since(t).Milliseconds())
 	},
 }
