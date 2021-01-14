@@ -20,3 +20,16 @@ func HexString2Bytes1(src string) []byte {
 	}
 	return ret
 }
+
+// format: 0102030a0d
+func Bytes2HexString1(data []byte) string {
+	ret := ""
+	for _, e := range data {
+		v := strconv.FormatInt(int64(e), 16)
+		if len(v) == 1 {
+			v = "0" + v
+		}
+		ret += v
+	}
+	return ret
+}
