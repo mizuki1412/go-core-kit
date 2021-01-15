@@ -19,6 +19,12 @@ func CRC16(bs []byte) uint16 {
 	return val
 }
 
+// crc16 计算完后转成字节数组
+func CRC16Bytes(crc16 uint16) []byte {
+	// 高低字节对调
+	return []byte{byte(crc16 & 0xffff), byte(crc16 >> 8 & 0xffff)}
+}
+
 func CheckCRC16(all []byte) bool {
 	return CRC16(all) == 0
 }
