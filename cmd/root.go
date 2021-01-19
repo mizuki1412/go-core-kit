@@ -23,9 +23,7 @@ type Data struct {
 }
 
 var rootCmd = &cobra.Command{
-	Use:   "go-core-kit",
-	Short: "go core kit test",
-	Long:  ``,
+	Use: "go-core-kit",
 	Run: func(cmd *cobra.Command, args []string) {
 		defer func() {
 			if err := recover(); err != nil {
@@ -40,7 +38,6 @@ var rootCmd = &cobra.Command{
 				}
 			}
 		}()
-
 	},
 }
 

@@ -65,3 +65,8 @@ func Parse(dt string) (time.Time, error) {
 		return s, fmt.Errorf("unable to parse date: %s", dt)
 	}
 }
+
+func ParseD(dt string) time.Time {
+	t, _ := Parse(dt)
+	return t
+}
