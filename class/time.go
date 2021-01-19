@@ -113,30 +113,3 @@ func (th *Time) Set(val interface{}) *Time {
 func (th *Time) UnixMill() int64 {
 	return timekit.GetUnixMill(th.Time)
 }
-
-//
-// 两个时间一组的数组
-//
-
-type TimeArrGroup [][]time.Time
-
-// 累计时间长，s
-func (th TimeArrGroup) Sum() int64 {
-	var all int64 = 0
-	for _, t := range th {
-		if len(t) != 2 {
-			continue
-		}
-		dif := t[1].Unix() - t[0].Unix()
-		if dif <= 0 {
-			continue
-		}
-		all += dif
-	}
-	return all
-}
-
-type TimeSegment struct {
-	Start Time `json:"start"`
-	End   Time `json:"end"`
-}
