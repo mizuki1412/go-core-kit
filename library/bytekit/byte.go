@@ -51,14 +51,45 @@ func Float64ToBytes(i interface{}) []byte {
 	return num2Bytes(cast.ToFloat64(i))
 }
 
+// 必须是4个字节
 func Bytes2Int32(bs []byte) int32 {
-	buf := bytes.NewBuffer(bs)
-	var i2 int32
-	_ = binary.Read(buf, binary.BigEndian, &i2)
-	return i2
+	length := len(bs)
+	switch length {
+	case 0:
+		return 0
+	case 1:
+		return cast.ToInt32(bs[0])
+	case 2:
+		buf := bytes.NewBuffer(bs)
+		var target int16
+		_ = binary.Read(buf, binary.BigEndian, &target)
+		return cast.ToInt32(target)
+	case 3:
+		data := []byte{0x00}
+		data = append(data, bs...)
+		bs = data
+		fallthrough
+	default:
+		buf := bytes.NewBuffer(bs)
+		var target int32
+		_ = binary.Read(buf, binary.BigEndian, &target)
+		return target
+	}
 }
 
 func Bytes2Int64(bs []byte) int64 {
+	length := len(bs)
+	if length <= 4 {
+		return cast.ToInt64(Bytes2Int32(bs))
+	}
+	if length < 8 {
+		data := make([]byte, 0, 8)
+		for k := 0; k < 8-length; k++ {
+			data = append(data, 0x00)
+		}
+		data = append(data, bs...)
+		bs = data
+	}
 	buf := bytes.NewBuffer(bs)
 	var i2 int64
 	_ = binary.Read(buf, binary.BigEndian, &i2)
