@@ -3,8 +3,8 @@ package bytekit
 import (
 	"bytes"
 	"encoding/binary"
+	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cast"
-	"log"
 	"strconv"
 )
 
@@ -29,7 +29,7 @@ func num2Bytes(i interface{}) []byte {
 	// 数字转 []byte, 网络字节序为大端字节序
 	err := binary.Write(buf, binary.BigEndian, i)
 	if err != nil {
-		log.Println(err)
+		logkit.Error(err)
 		return arr
 	}
 	return buf.Bytes()
@@ -41,6 +41,14 @@ func Int32ToBytes(i interface{}) []byte {
 
 func Int64ToBytes(i interface{}) []byte {
 	return num2Bytes(cast.ToInt64(i))
+}
+
+func Float32ToBytes(i interface{}) []byte {
+	return num2Bytes(cast.ToFloat32(i))
+}
+
+func Float64ToBytes(i interface{}) []byte {
+	return num2Bytes(cast.ToFloat64(i))
 }
 
 func Bytes2Int32(bs []byte) int32 {
@@ -57,10 +65,16 @@ func Bytes2Int64(bs []byte) int64 {
 	return i2
 }
 
-func Float32ToBytes(i interface{}) []byte {
-	return num2Bytes(cast.ToFloat32(i))
+func Bytes2Float32(bs []byte) float32 {
+	buf := bytes.NewBuffer(bs)
+	var i2 float32
+	_ = binary.Read(buf, binary.BigEndian, &i2)
+	return i2
 }
 
-func Float64ToBytes(i interface{}) []byte {
-	return num2Bytes(cast.ToFloat64(i))
+func Bytes2Float64(bs []byte) float64 {
+	buf := bytes.NewBuffer(bs)
+	var i2 float64
+	_ = binary.Read(buf, binary.BigEndian, &i2)
+	return i2
 }
