@@ -127,13 +127,14 @@ func (th TimeArrGroup) Eliminate(obj TimeArrGroup) TimeArrGroup {
 		switch e.Type {
 		case 1:
 			temp1[e.Id] = true
+			// 不存在截断并且无初始
 			if len(temp2) == 0 && startTemp.IsZero() {
 				startTemp = e.Time
 			}
 		case 11:
 			temp2[e.Id] = true
-			// 被截断的情况
-			if len(temp1) > 0 {
+			// 被截断的情况，可能出现temp1存在同时已有截断
+			if len(temp1) > 0 && !startTemp.IsZero() {
 				ret = append(ret, []time.Time{startTemp, e.Time})
 			}
 			startTemp = time.Time{}
