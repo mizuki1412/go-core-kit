@@ -39,6 +39,7 @@ func (th TimeArrGroup) Sum() int64 {
 }
 
 // typeFlag=10表示是剔除
+// type 1、2：本体数组的进和出；11、12 剔除数组的进和出
 func _group2TimeArr(a, b TimeArrGroup, typeFlag int32) TimePointList {
 	list := make(TimePointList, 0, len(a)*2+len(b)*2)
 	for i, e := range a {

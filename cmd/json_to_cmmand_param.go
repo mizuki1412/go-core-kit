@@ -14,8 +14,8 @@ func init() {
 }
 
 var json2CliCmd = &cobra.Command{
-	Use:  "json2cli",
-	Long: `json config file转命令行的参数形式`,
+	Use:   "json2cli",
+	Short: `json config file转命令行的参数形式`,
 	Run: func(cmd *cobra.Command, args []string) {
 		json, _ := filekit.ReadString("config.deploy.json")
 		config := jsonkit.ParseMap(json)

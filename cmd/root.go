@@ -16,10 +16,9 @@ import (
 	"log"
 )
 
-type Data struct {
-	Key  class.Decimal
-	Key2 class.Int64
-	Key3 class.Time
+func init() {
+	rootCmd.AddCommand(PGSqlToStructCMD("", ""))
+	rootCmd.AddCommand(MarkdownDocCMD("go-core-kit 说明文档"))
 }
 
 var rootCmd = &cobra.Command{

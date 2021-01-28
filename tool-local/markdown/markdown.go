@@ -6,14 +6,15 @@ import (
 	"github.com/Depado/bfchroma"
 	"github.com/alecthomas/chroma/formatters/html"
 	"github.com/mizuki1412/go-core-kit/library/filekit"
+	"github.com/mizuki1412/go-core-kit/service/pdfkit"
 	"github.com/russross/blackfriday/v2"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-func Run(title string) {
-	genHtml(title, integrate())
+func Run(title, dest string) {
+	genHtml(title, dest, integrate())
 }
 
 type mdData struct {
@@ -85,7 +86,7 @@ func integrate() string {
 	return ret
 }
 
-func genHtml(title, content string) {
+func genHtml(title, dest, content string) {
 	//render:=blackfriday.NewHTMLRenderer(blackfriday.HTMLRendererParameters{
 	//	Flags: blackfriday.CommonHTMLFlags|blackfriday.TOC,
 	//})
@@ -111,28 +112,90 @@ func genHtml(title, content string) {
 	// custom css
 	// todo 加入css
 	css := `
+body{
+	font-size: 24px;
+}
+.flex {
+  display: -webkit-box; /* wkhtmltopdf uses this one */
+  -webkit-box-orient: horizontal;
+  /* display: flex; */
+}
+.inline {
+  display: inline-flex;
+}
+
+.center {
+  -webkit-box-pack: center; /* wkhtmltopdf uses this one */
+  -webkit-box-align: center;
+}
+
+.around {
+  -webkit-box-pack: justify;
+}
+
+.start {
+  -webkit-box-pack: start;
+}
+
+.end {
+  -webkit-box-pack: end;
+}
+
+.align-center {
+  -webkit-box-pack: center;
+}
+
+.content-center {
+  -webkit-box-pack: center;
+}
+
 .title{
 	font-size: 1.3rem;
 	text-align: center;
 	padding: 10px 0 20px 0;
 }
+// 主体内容部分
 .content{
 	padding: 0 1rem;
+}
+.chroma{
+	box-shadow: 0px 0px 5px black;
+    border-radius: 8px;
+    padding: 12px 0;
 }
 p{
 	padding-left: 1rem;
 }
+
+h1{
+  	counter-increment: h1counter;
+  	counter-reset: h2counter;
+}
+h1:before {
+	content: counter(h1counter) " ";
+}
 h2{
 	color: midnightblue;
+  	counter-increment: h2counter;
+	counter-reset: h3counter;
+}
+h2:before {
+  content: counter(h1counter) "." counter(h2counter) " ";
 }
 h3{
 	color: brown;
+	counter-increment: h3counter;
+}
+h3:before
+{
+  content: counter(h1counter) "." counter(h2counter) "." counter(h3counter) " ";
 }
 `
-
 	fin := fmt.Sprintf(`
 <html>
 	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
 		<style>%s</style>
 		<style>%s</style>
 	</head>
@@ -141,5 +204,6 @@ h3{
 		<div class="content">%s</div>
 	</body>
 </html>`, buffer.String(), css, title, string(data))
+	pdfkit.Gen2File(fin, dest)
 	_ = filekit.WriteFile("/Users/ycj/Downloads/doc.html", []byte(fin))
 }

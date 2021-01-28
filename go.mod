@@ -6,6 +6,7 @@ require (
 	github.com/360EntSecGroup-Skylar/excelize/v2 v2.3.2
 	github.com/Depado/bfchroma v1.3.0
 	github.com/Masterminds/squirrel v1.5.0
+	github.com/SebastiaanKlippert/go-wkhtmltopdf v1.6.1
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/alecthomas/chroma v0.8.1
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.369

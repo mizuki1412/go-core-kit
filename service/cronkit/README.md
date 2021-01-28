@@ -25,6 +25,8 @@ inspect(c.Entries())
 c.Stop()  // Stop the scheduler (does not stop any jobs already running).
 ```
 
+cron库语法说明：
+```text
 cron format: 
 Field name   | Mandatory? | Allowed values  | Allowed special characters
 ----------   | ---------- | --------------  | --------------------------
@@ -39,4 +41,4 @@ job wrappers:
 - Delay a job's execution if the previous run hasn't completed yet
 - Skip a job's execution if the previous run hasn't completed yet
 - Log each job's invocations
-
+```
