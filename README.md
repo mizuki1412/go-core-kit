@@ -29,7 +29,7 @@ toolkit for golang projects
 
 # 其他
 
-## 可替换的函数
+## 可替换的函数列表
 
 - service.restkit.context.session.SessionGetUserFunc: 获取session中user对象的转换处理函数
 
