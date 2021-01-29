@@ -204,6 +204,6 @@ h3:before
 		<div class="content">%s</div>
 	</body>
 </html>`, buffer.String(), css, title, string(data))
-	pdfkit.Gen2File(fin, dest)
-	_ = filekit.WriteFile("/Users/ycj/Downloads/doc.html", []byte(fin))
+	pdfkit.Gen2File(fin, dest+"/"+title+".pdf")
+	//_ = filekit.WriteFile("/Users/ycj/Downloads/doc.html", []byte(fin))
 }

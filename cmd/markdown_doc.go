@@ -20,6 +20,6 @@ func MarkdownDocCMD(title string) *cobra.Command {
 			markdown.Run(title, configkit.GetStringD("dest"))
 		},
 	}
-	cmd.Flags().StringP("dest", "", "", "生成目标路径文件")
+	cmd.Flags().StringP("dest", "", "", "生成目标路径 /xx/xx")
 	return cmd
 }
