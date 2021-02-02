@@ -38,33 +38,55 @@ func handlerTrans(handlers ...Handler) []iris.Handler {
 	}
 	return list
 }
+func handlerTransOne(handler Handler) iris.Handler {
+	return func(ctx iris.Context) {
+		// 实际ctx进入，转为抽象层的context todo 注意field更新
+		handler(&context.Context{
+			Proxy:    ctx,
+			Request:  ctx.Request(),
+			Response: ctx.ResponseWriter(),
+		})
+	}
+}
 
 func (router *Router) Group(path string, handlers ...Handler) *Router {
 	var r iris.Party
 	if router.IsGroup {
-		r = router.ProxyGroup.Party(path, handlerTrans(handlers...)...)
+		r = router.ProxyGroup.Party(path)
 	} else {
-		r = router.Proxy.Party(path, handlerTrans(handlers...)...)
+		r = router.Proxy.Party(path)
 	}
-	return &Router{
+	r0 := &Router{
 		IsGroup:    true,
 		ProxyGroup: r,
 		Path:       router.Path + path,
 	}
+	if len(handlers) > 0 {
+		r0.Use(handlers...)
+	}
+	return r0
 }
 
 func (router *Router) Use(handlers ...Handler) *Router {
+	// ？多参数handlers会多次执行最后一个handle？
 	if router.IsGroup {
-		router.ProxyGroup.Use(handlerTrans(handlers...)...)
+		for _, v := range handlers {
+			router.ProxyGroup.Use(handlerTransOne(v))
+		}
 	} else {
-		router.Proxy.Use(handlerTrans(handlers...)...)
+		for _, v := range handlers {
+			router.Proxy.Use(handlerTransOne(v))
+		}
 	}
 	return router
 }
 func (router *Router) OnError(handlers ...Handler) {
-	router.Proxy.OnAnyErrorCode(handlerTrans(handlers...)...)
+	for _, v := range handlers {
+		router.Proxy.OnAnyErrorCode(handlerTransOne(v))
+	}
 }
 
+// 此处handle不能当成是use
 func (router *Router) Post(path string, handlers ...Handler) *Router {
 	if router.IsGroup {
 		router.ProxyGroup.Post(path, handlerTrans(handlers...)...)
