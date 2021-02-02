@@ -122,7 +122,8 @@ var header = map[string]string{
 }
 
 // 基站转， 十进制的lac和ci
-func LacCiTransfer(lac, ci int32) (loc *Location) {
+// http://www.cellocation.com/api/
+func LacCiTransfer(mnc, lac, ci int32) (loc *Location) {
 	defer func() {
 		if err := recover(); err != nil {
 			loc = nil
@@ -130,34 +131,54 @@ func LacCiTransfer(lac, ci int32) (loc *Location) {
 	}()
 	ret, _ := httpkit.Request(httpkit.Req{
 		Method: http.MethodGet,
-		Url:    "http://cellid.cn/",
+		Url:    fmt.Sprintf("http://api.cellocation.com:81/cell/?mcc=460&mnc=%d&lac=%d&ci=%d&output=json", mnc, lac, ci),
 		Header: header,
 	})
-	arr := strings.Split(ret, "<input type=\"hidden\" id=\"flag\" name=\"flag\" value=\"")
-	if len(arr) < 2 {
-		panic(exception.New("lac ci transfer error 1"))
+	if ret != "" && gjson.Get(ret, "errcode").Int() == 0 {
+		location := &Location{}
+		location.Lon.Set(gjson.Get(ret, "lon").Float())
+		location.Lat.Set(gjson.Get(ret, "lat").Float())
+		return location
 	}
-	flag := ""
-	for i := 0; i < len(arr[1]); i++ {
-		c := arr[1][i : i+1]
-		if c != "\"" {
-			flag += c
-		} else {
-			break
-		}
-	}
-	ret, _ = httpkit.Request(httpkit.Req{
-		Method: http.MethodPost,
-		Url:    fmt.Sprintf("http://cellid.cn/cidInfo.php?lac=%d&cell_id=%d&hex=false&flag=%s", lac, ci, flag),
-		Header: header,
-	})
-	// cidMap(30.30xxxx,120.xxxx,
-	arr = strings.Split(ret, ",")
-	if len(arr) < 2 || !strings.Contains(arr[0], "(") {
-		panic(exception.New("lac ci transfer error 1"))
-	}
-	location := &Location{}
-	location.Lon.Set(arr[1])
-	location.Lat.Set(strings.Split(arr[0], "(")[1])
-	return location
+	return nil
 }
+
+//func LacCiTransfer(lac, ci int32) (loc *Location) {
+//	defer func() {
+//		if err := recover(); err != nil {
+//			loc = nil
+//		}
+//	}()
+//	ret, _ := httpkit.Request(httpkit.Req{
+//		Method: http.MethodGet,
+//		Url:    "http://cellid.cn/",
+//		Header: header,
+//	})
+//	arr := strings.Split(ret, "<input type=\"hidden\" id=\"flag\" name=\"flag\" value=\"")
+//	if len(arr) < 2 {
+//		panic(exception.New("lac ci transfer error 1"))
+//	}
+//	flag := ""
+//	for i := 0; i < len(arr[1]); i++ {
+//		c := arr[1][i : i+1]
+//		if c != "\"" {
+//			flag += c
+//		} else {
+//			break
+//		}
+//	}
+//	ret, _ = httpkit.Request(httpkit.Req{
+//		Method: http.MethodPost,
+//		Url:    fmt.Sprintf("http://cellid.cn/cidInfo.php?lac=%d&cell_id=%d&hex=false&flag=%s", lac, ci, flag),
+//		Header: header,
+//	})
+//	// cidMap(30.30xxxx,120.xxxx,
+//	arr = strings.Split(ret, ",")
+//	if len(arr) < 2 || !strings.Contains(arr[0], "(") {
+//		panic(exception.New("lac ci transfer error 1"))
+//	}
+//	location := &Location{}
+//	location.Lon.Set(arr[1])
+//	location.Lat.Set(strings.Split(arr[0], "(")[1])
+//	return location
+//}

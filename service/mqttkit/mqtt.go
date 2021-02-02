@@ -11,6 +11,8 @@ import (
 var client MQTT.Client
 
 var subscribeList []func()
+
+// 第一次连接
 var first bool = true
 
 func New() *MQTT.Client {
