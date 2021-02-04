@@ -1,6 +1,7 @@
 package configkit
 
 import (
+	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/spf13/viper"
 )
 
@@ -38,4 +39,14 @@ func GetBool(key string, defaultVal bool) bool {
 
 func GetBoolD(key string) bool {
 	return viper.GetBool(key)
+}
+
+func GetStringListD(key string) []string {
+	str := GetStringD(key)
+	if str == "" {
+		return nil
+	}
+	var arr []string
+	_ = jsonkit.ParseObj(key, &arr)
+	return arr
 }

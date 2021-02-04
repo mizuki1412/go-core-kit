@@ -79,3 +79,11 @@ func LowerFirst(str string) string {
 	}
 	return string(bytes)
 }
+
+func MatchReg(reg string, target string) bool {
+	r, err := regexp.Compile(reg)
+	if err == nil {
+		return r.Match([]byte(target))
+	}
+	return false
+}

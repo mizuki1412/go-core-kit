@@ -7,8 +7,8 @@ import (
 	"github.com/mizuki1412/go-core-kit/library/commonkit"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/mapkit"
+	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
-	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
@@ -24,19 +24,8 @@ func init() {
 var rootCmd = &cobra.Command{
 	Use: "go-core-kit",
 	Run: func(cmd *cobra.Command, args []string) {
-		defer func() {
-			if err := recover(); err != nil {
-				var msg string
-				if e, ok := err.(exception.Exception); ok {
-					msg = e.Msg
-					logkit.Error(e.Error())
-				} else {
-					msg = cast.ToString(err)
-					excep := exception.New(msg, 3)
-					logkit.Error(excep.Error())
-				}
-			}
-		}()
+		log.Println(stringkit.MatchReg("[A-Z]{5}\\d{10}", "xxcc"))
+		log.Println(stringkit.MatchReg("[A-Z]{5}\\d{10}", "RMNTW2004080003"))
 	},
 }
 

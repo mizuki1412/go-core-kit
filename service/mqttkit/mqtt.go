@@ -60,6 +60,9 @@ func Subscribe(topic string, qos byte, callback MQTT.MessageHandler) {
 }
 
 func Publish(topic string, qos byte, retained bool, payload interface{}) {
+	if client == nil {
+		New()
+	}
 	token := client.Publish(topic, qos, retained, payload)
 	token.Wait()
 	if token.Error() != nil {
