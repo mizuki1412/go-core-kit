@@ -20,17 +20,13 @@ type (
 )
 
 // Create a new queue
-//func New() *Queue {
-//	return &Queue{}
-//}
+func NewQueue() *Queue {
+	return &Queue{}
+}
+
 //获取队列长度
 func (th *Queue) Len() int {
 	return th.length
-}
-
-//返回true队列不为空
-func (th *Queue) Any() bool {
-	return th.length > 0
 }
 
 //返回队列顶端元素
@@ -59,8 +55,8 @@ func (th *Queue) Push(v interface{}) {
 
 //出队操作
 func (th *Queue) Pop() interface{} {
-	//th.lock2.Lock()
-	//th.lock2.Unlock()
+	th.lock2.Lock()
+	defer th.lock2.Unlock()
 	if th.length == 0 {
 		return nil
 	}

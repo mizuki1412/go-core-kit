@@ -2,12 +2,10 @@ package cmd
 
 import (
 	"bytes"
-	"github.com/mizuki1412/go-core-kit/class"
+	"fmt"
 	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/library/commonkit"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/mapkit"
-	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cobra"
 	"golang.org/x/text/encoding/simplifiedchinese"
@@ -24,22 +22,7 @@ func init() {
 var rootCmd = &cobra.Command{
 	Use: "go-core-kit",
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Println(stringkit.MatchReg("[A-Z]{5}\\d{10}", "xxcc"))
-		log.Println(stringkit.MatchReg("[A-Z]{5}\\d{10}", "RMNTW2004080003"))
 	},
-}
-
-func testJsonArr() {
-	arr := &class.MapStringArr{}
-	jsonkit.ParseObj(`[{"key":["a","b"]}]`, arr)
-	log.Println(arr.Arr)
-	for _, e := range arr.Arr {
-		log.Println(e["key"].([]interface{}))
-	}
-	commonkit.RecoverFuncWrapper(func() {
-		test()
-	})
-	log.Println(123)
 }
 
 func TestCatch() (ret int) {
@@ -52,10 +35,8 @@ func TestCatch() (ret int) {
 	return 10
 }
 
-func test() {
-	//panic(exception.New("test"))
-	arr := []string{}
-	arr[1] = ""
+func test(t map[string]interface{}) {
+	fmt.Printf("%p \n", &t)
 }
 
 func testMapMerge() {
