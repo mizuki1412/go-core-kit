@@ -2,8 +2,44 @@ package bytekit
 
 import (
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"strconv"
 )
+
+func Bytes2HexArray(bytes []byte) string {
+	str := "["
+	//str2 := "["
+	for _, v := range bytes {
+		//str2 = str2+fmt.Sprintf("0x%02x ", v)
+		val := strconv.FormatInt(int64(v), 16)
+		if len(val) == 1 {
+			val = "0" + val
+		}
+		str = str + "0x" + val + " "
+	}
+	str = str[:len(str)-1] + "]"
+	return str
+}
+
+// [0x00 0x00]
+func HexString2Bytes(src string) []byte {
+	if len(src) < 6 {
+		panic(exception.New("数据长度错误"))
+	}
+	if src[0] != '[' || src[len(src)-1] != ']' {
+		panic(exception.New("数据长度错误"))
+	}
+	src = src[1 : len(src)-1]
+	var ret []byte
+	for _, e := range stringkit.Split(src, " ") {
+		v, err := strconv.ParseUint(e, 0, 0)
+		if err != nil {
+			panic(exception.New(err.Error()))
+		}
+		ret = append(ret, byte(v))
+	}
+	return ret
+}
 
 // format: 0102030a0d
 func HexString2Bytes1(src string) []byte {
