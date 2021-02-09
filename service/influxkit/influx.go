@@ -1,6 +1,7 @@
 package influxkit
 
 import (
+	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/httpkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
@@ -169,5 +170,26 @@ func writeData(dbName, sql string) {
 	}
 	if code > 300 {
 		panic(exception.New("influx query error: " + cast.ToString(code)))
+	}
+}
+
+// 用于insert时或query时，val的装饰转换
+func Decorate(val interface{}) string {
+	if val == nil {
+		return ""
+	}
+	switch val.(type) {
+	case string:
+		v := val.(string)
+		v = strings.ReplaceAll(v, "\"", "\\\"")
+		return "\"" + v + "\""
+	case class.String:
+		v := val.(class.String).String
+		v = strings.ReplaceAll(v, "\"", "\\\"")
+		return "\"" + v + "\""
+	case class.Decimal:
+		return val.(class.Decimal).Decimal.String()
+	default:
+		return cast.ToString(val)
 	}
 }
