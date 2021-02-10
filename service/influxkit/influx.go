@@ -187,8 +187,18 @@ func Decorate(val interface{}) string {
 		v := val.(class.String).String
 		v = strings.ReplaceAll(v, "\"", "\\\"")
 		return "\"" + v + "\""
+	case *class.String:
+		v := val.(*class.String).String
+		v = strings.ReplaceAll(v, "\"", "\\\"")
+		return "\"" + v + "\""
 	case class.Decimal:
 		return val.(class.Decimal).Decimal.String()
+	case *class.Decimal:
+		return val.(*class.Decimal).Decimal.String()
+	case *class.Int32:
+		return cast.ToString(val.(*class.Int32).Int32)
+	case *class.Int64:
+		return cast.ToString(val.(*class.Int64).Int64)
 	default:
 		return cast.ToString(val)
 	}

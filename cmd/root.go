@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/init/initkit"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/mapkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
@@ -15,6 +16,7 @@ import (
 )
 
 func init() {
+	initkit.DefFlags(rootCmd)
 	rootCmd.AddCommand(PGSqlToStructCMD("", ""))
 	rootCmd.AddCommand(MarkdownDocCMD("go-core-kit 说明文档"))
 }
@@ -22,6 +24,7 @@ func init() {
 var rootCmd = &cobra.Command{
 	Use: "go-core-kit",
 	Run: func(cmd *cobra.Command, args []string) {
+		initkit.BindFlags(cmd)
 
 	},
 }
