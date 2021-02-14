@@ -2,7 +2,6 @@ package class
 
 import (
 	"database/sql/driver"
-	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/class/utils"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/spf13/cast"
@@ -68,11 +67,10 @@ func (th *String) Set(val interface{}) *String {
 		th.Valid = v.Valid
 	} else {
 		s, err := cast.ToStringE(val)
-		if err != nil {
-			panic(exception.New("class.String set error: " + err.Error()))
+		if err == nil {
+			th.String = s
+			th.Valid = true
 		}
-		th.String = s
-		th.Valid = true
 	}
 	return th
 }

@@ -2,7 +2,6 @@ package class
 
 import (
 	"database/sql/driver"
-	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/class/utils"
 	"github.com/spf13/cast"
 )
@@ -68,11 +67,10 @@ func (th *Float64) Set(val interface{}) *Float64 {
 		th.Valid = v.Valid
 	} else {
 		i, err := cast.ToFloat64E(val)
-		if err != nil {
-			panic(exception.New("class.Float64 set error: " + err.Error()))
+		if err == nil {
+			th.Float64 = i
+			th.Valid = true
 		}
-		th.Float64 = i
-		th.Valid = true
 	}
 	return th
 }

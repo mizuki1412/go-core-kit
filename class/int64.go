@@ -2,7 +2,6 @@ package class
 
 import (
 	"database/sql/driver"
-	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/class/utils"
 	"github.com/spf13/cast"
 )
@@ -68,11 +67,10 @@ func (th *Int64) Set(val interface{}) *Int64 {
 		th.Valid = v.Valid
 	} else {
 		i, err := cast.ToInt64E(val)
-		if err != nil {
-			panic(exception.New("class.Int64 set error: " + err.Error()))
+		if err == nil {
+			th.Int64 = i
+			th.Valid = true
 		}
-		th.Int64 = i
-		th.Valid = true
 	}
 	return th
 }

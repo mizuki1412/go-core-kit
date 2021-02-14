@@ -2,7 +2,6 @@ package class
 
 import (
 	"database/sql/driver"
-	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/class/utils"
 	"github.com/spf13/cast"
 )
@@ -68,11 +67,10 @@ func (th *Bool) Set(val interface{}) *Bool {
 		th.Valid = v.Valid
 	} else {
 		i, err := cast.ToBoolE(val)
-		if err != nil {
-			panic(exception.New("class.Bool set error: " + err.Error()))
+		if err == nil {
+			th.Bool = i
+			th.Valid = true
 		}
-		th.Bool = i
-		th.Valid = true
 	}
 	return th
 }

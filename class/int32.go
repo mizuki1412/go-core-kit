@@ -2,7 +2,6 @@ package class
 
 import (
 	"database/sql/driver"
-	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/class/utils"
 	"github.com/spf13/cast"
 )
@@ -68,11 +67,10 @@ func (th *Int32) Set(val interface{}) *Int32 {
 		th.Valid = v.Valid
 	} else {
 		i, err := cast.ToInt32E(val)
-		if err != nil {
-			panic(exception.New("class.Int32 set error: " + err.Error()))
+		if err == nil {
+			th.Int32 = i
+			th.Valid = true
 		}
-		th.Int32 = i
-		th.Valid = true
 	}
 	return th
 }
