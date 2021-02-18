@@ -15,9 +15,13 @@ var pool map[string]*cron.Cron
 
 func Scheduler() *cron.Cron {
 	if scheduler == nil {
-		scheduler = cron.New(cron.WithSeconds(), cron.WithLocation(configkit.GetLocation()))
+		scheduler = NewScheduler()
 	}
 	return scheduler
+}
+
+func NewScheduler() *cron.Cron {
+	return cron.New(cron.WithSeconds(), cron.WithLocation(configkit.GetLocation()))
 }
 
 func AddPool(key string, cron *cron.Cron) {
