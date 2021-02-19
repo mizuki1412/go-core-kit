@@ -11,3 +11,5 @@ const ConfigKeyLogMaxRemain = "logger.max-remain"
 
 // 关闭文件日志,只留console
 const ConfigKeyLogFileOff = "logger.file-off"
+
+const ConfigKeyLogLevel = "logger.level"

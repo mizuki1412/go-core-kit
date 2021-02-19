@@ -35,17 +35,26 @@ func Init() *zap.Logger {
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
 	var core zapcore.Core
+	level := zap.InfoLevel
+	switch configkit.GetStringD(ConfigKeyLogLevel) {
+	case "debug":
+		level = zap.DebugLevel
+	case "warn":
+		level = zap.WarnLevel
+	case "error":
+		level = zap.ErrorLevel
+	}
 	if configkit.GetBoolD(ConfigKeyLogFileOff) {
 		core = zapcore.NewTee(
 			// console中基本展示
-			zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout)), zap.InfoLevel),
+			zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout)), level),
 		)
 	} else {
 		core = zapcore.NewTee(
 			// 日志中json方式输出
-			zapcore.NewCore(zapcore.NewJSONEncoder(config), zapcore.AddSync(getWriter()), zap.InfoLevel),
+			zapcore.NewCore(zapcore.NewJSONEncoder(config), zapcore.AddSync(getWriter()), level),
 			// console中基本展示
-			zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout)), zap.InfoLevel),
+			zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout)), level),
 		)
 	}
 	Logger = zap.New(core)
@@ -95,6 +104,20 @@ type Param struct {
 	Val interface{}
 }
 
+func Debug(msg interface{}, params ...Param) {
+	if Logger == nil {
+		Logger = Init()
+	}
+	if len(params) > 0 {
+		fields := transfer(params, len(params))
+		Logger.Debug(cast.ToString(msg), fields...)
+	} else {
+		Logger.Debug(cast.ToString(msg))
+	}
+}
+func DebugConcat(msg ...string) {
+	Debug(strings.Join(msg, " "))
+}
 func Info(msg interface{}, params ...Param) {
 	if Logger == nil {
 		Logger = Init()
