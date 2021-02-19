@@ -2,7 +2,7 @@ package timekit
 
 import (
 	"fmt"
-	"log"
+	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"time"
 )
 
@@ -15,11 +15,11 @@ func NewTimeCost(title string) TimeCost {
 	t := TimeCost{
 		Start: time.Now(),
 	}
-	log.Println(title + ": " + t.Start.Format(TimeLayoutAll))
+	logkit.Debug(title + ": " + t.Start.Format(TimeLayout))
 	return t
 }
 
 func (th *TimeCost) PrintCost(msg string) {
-	log.Print(fmt.Sprintf("%s: %dms", msg, time.Since(th.Start).Milliseconds()))
+	logkit.Debug(fmt.Sprintf("%s: %dms", msg, time.Since(th.Start).Milliseconds()))
 	th.Start = time.Now()
 }

@@ -65,6 +65,8 @@ func NewMapString(val interface{}) *MapString {
 	th := &MapString{}
 	if val != nil {
 		th.Set(val)
+	} else {
+		th.Set(map[string]interface{}{})
 	}
 	return th
 }

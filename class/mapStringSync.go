@@ -67,6 +67,8 @@ func NewMapStringSync(val interface{}) *MapStringSync {
 	th := &MapStringSync{}
 	if val != nil {
 		th.Set(val)
+	} else {
+		th.Set(map[string]interface{}{})
 	}
 	return th
 }
