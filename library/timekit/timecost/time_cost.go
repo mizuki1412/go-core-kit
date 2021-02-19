@@ -1,7 +1,8 @@
-package timekit
+package timecost
 
 import (
 	"fmt"
+	"github.com/mizuki1412/go-core-kit/library/timekit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"time"
 )
@@ -11,11 +12,21 @@ type TimeCost struct {
 	Start time.Time
 }
 
-func NewTimeCost(title string) TimeCost {
+type Params struct {
+	showTitleMsg bool
+}
+
+func NewTimeCost(title string, params ...Params) TimeCost {
 	t := TimeCost{
 		Start: time.Now(),
 	}
-	logkit.Debug(title + ": " + t.Start.Format(TimeLayout))
+	param := Params{}
+	if len(params) > 0 {
+		param = params[0]
+	}
+	if param.showTitleMsg {
+		logkit.Debug(title + ": " + t.Start.Format(timekit.TimeLayout))
+	}
 	return t
 }
 
