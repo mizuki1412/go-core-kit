@@ -17,7 +17,7 @@ func RecoverFuncWrapper(fun func()) {
 				logkit.Error(e.Error())
 			} else {
 				msg = cast.ToString(err)
-				logkit.Error(msg)
+				logkit.Error(exception.New(msg, 3).Error())
 			}
 		}
 	}()
@@ -35,7 +35,7 @@ func RecoverGoFuncWrapper(fun func()) {
 					logkit.Error(e.Error())
 				} else {
 					msg = cast.ToString(err)
-					logkit.Error(msg)
+					logkit.Error(exception.New(msg, 3).Error())
 				}
 			}
 		}()
