@@ -8,7 +8,7 @@ note: https://ini.unknwon.cn/docs/intro/getting_started
 cfg, err := ini.Load(
     []byte("raw data"), // 原始数据
     "filename",         // 文件路径
-    ioutil.NopCloser(bytes.NewReader([]byte("some other data"))),
+    io.NopCloser(bytes.NewReader([]byte("some other data"))),
 )
 
 // 典型读取操作，默认分区可以使用空字符串表示

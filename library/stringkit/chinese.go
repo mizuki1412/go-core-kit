@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
-	"io/ioutil"
+	"io"
 	"strconv"
 )
 
@@ -107,7 +107,7 @@ func GetChineseFirstLetter(chinese string) string {
 // Utf8ToGbk
 func Utf8ToGbk(s []byte) ([]byte, error) {
 	reader := transform.NewReader(bytes.NewReader(s), simplifiedchinese.GBK.NewEncoder())
-	d, e := ioutil.ReadAll(reader)
+	d, e := io.ReadAll(reader)
 	if e != nil {
 		return nil, e
 	}

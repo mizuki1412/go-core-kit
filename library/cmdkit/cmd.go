@@ -6,7 +6,6 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cast"
 	"io"
-	"io/ioutil"
 	"os/exec"
 	"path/filepath"
 	"time"
@@ -75,7 +74,7 @@ func getRet(stdout io.ReadCloser, stderr io.ReadCloser, cmd *exec.Cmd) (string, 
 		}
 		ret += line
 	}
-	bytesErr, err := ioutil.ReadAll(stderr)
+	bytesErr, err := io.ReadAll(stderr)
 	if err != nil {
 		return ret, err
 	}

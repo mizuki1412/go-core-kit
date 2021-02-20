@@ -6,7 +6,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/tidwall/gjson"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
@@ -83,7 +83,7 @@ func Request(reqBean Req) (string, int) {
 		panic(exception.New(err.Error()))
 	}
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		panic(exception.New(err.Error()))
 	}
@@ -100,7 +100,7 @@ func DownloadToFile(url string, filePath string) {
 		panic(err)
 	}
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	// write
 	fout, err := os.Create(filePath)
 	if err != nil {

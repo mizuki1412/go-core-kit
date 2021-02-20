@@ -6,7 +6,6 @@ import (
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/spf13/afero"
 	"io"
-	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -49,7 +48,7 @@ func CheckDir(path string) {
 }
 
 func ReadString(fileName string) (string, error) {
-	f, err := ioutil.ReadFile(fileName)
+	f, err := os.ReadFile(fileName)
 	if err != nil {
 		return "", err
 	}
@@ -57,7 +56,7 @@ func ReadString(fileName string) (string, error) {
 }
 
 func ReadBytes(fileName string) []byte {
-	f, err := ioutil.ReadFile(fileName)
+	f, err := os.ReadFile(fileName)
 	if err != nil {
 		panic(exception.New("文件读取失败"))
 	}
