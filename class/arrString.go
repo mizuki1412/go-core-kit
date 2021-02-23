@@ -95,3 +95,12 @@ func (th *ArrString) Add(vals ...string) *ArrString {
 	th.Valid = true
 	return th
 }
+
+func (th *ArrString) Contains(val string) bool {
+	for _, e := range th.Array {
+		if e == val {
+			return true
+		}
+	}
+	return false
+}

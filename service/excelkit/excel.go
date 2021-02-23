@@ -15,9 +15,9 @@ type Param struct {
 	// export时，key:name:width
 	Keys []string
 	Data []map[string]interface{}
-	// load时, name:key
-	Names []string
-	File  class.File
+	// load时, name:key，选填，自动生成
+	//Names []string
+	File class.File
 	// 导出文件名
 	FileName string
 }
@@ -104,16 +104,16 @@ func Export(param Param, ctx *context.Context) {
 
 // name(题头):key(map-key):type(number)
 func Load(param Param) []map[string]string {
-	if len(param.Names) == 0 {
+	if len(param.Keys) == 0 {
 		panic(exception.New("excel names empty"))
 	}
 	nameMap := map[string]string{}
-	for _, key := range param.Names {
+	for _, key := range param.Keys {
 		ts := stringkit.Split(key, ":")
 		if len(ts) < 2 {
-			panic(exception.New("excel names param 语法错误"))
+			panic(exception.New("excel keys param 语法错误"))
 		}
-		nameMap[ts[0]] = ts[1]
+		nameMap[ts[1]] = ts[0]
 	}
 	var f *excelize.File
 	var err error
