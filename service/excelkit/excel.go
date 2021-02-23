@@ -125,7 +125,7 @@ func Load(param Param) []map[string]string {
 	if err != nil {
 		panic(exception.New(err.Error()))
 	}
-	rows, err := f.Rows(f.GetSheetName(1))
+	rows, err := f.Rows(f.GetSheetName(0))
 	if err != nil {
 		panic(exception.New(err.Error()))
 	}
@@ -144,6 +144,9 @@ func Load(param Param) []map[string]string {
 				}
 			}
 			res = append(res, m)
+		} else {
+			// 需要取出，否则后续names重叠
+			_, _ = rows.Columns()
 		}
 		index++
 	}
