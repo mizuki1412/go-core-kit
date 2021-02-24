@@ -59,6 +59,17 @@ func GenArrayFlagInt(arr []int32) (string, []interface{}) {
 	return " Array[" + strings.Join(flags, ", ") + "]::int[]", args
 }
 
+// extend->'key' @> '[3]'::jsonb
+func GenJsonArrayFlagInt(arr []int32) (string, []interface{}) {
+	flags := make([]string, len(arr))
+	args := make([]interface{}, len(arr))
+	for i := 0; i < len(arr); i++ {
+		flags[i] = "?"
+		args[i] = arr[i]
+	}
+	return " @> '" + strings.Join(flags, ", ") + "'::jsonb", args
+}
+
 // 封装到builder
 func WhereUnnestString(builder squirrel.SelectBuilder, sqlPrefix string, arr []string) squirrel.SelectBuilder {
 	flag, arg := GenUnnestString(arr)
@@ -85,7 +96,12 @@ func WhereArrayInt(builder squirrel.SelectBuilder, sqlPrefix string, arr []int32
 	return builder.Where(sqlPrefix+flag, arg...)
 }
 
-// 封装到builder
+func WhereJsonArrayInt(builder squirrel.SelectBuilder, sqlPrefix string, arr []int32) squirrel.SelectBuilder {
+	flag, arg := GenJsonArrayFlagInt(arr)
+	return builder.Where(sqlPrefix+flag, arg...)
+}
+
+// update, 封装到builder
 func WhereUnnestStringU(builder squirrel.UpdateBuilder, sqlPrefix string, arr []string) squirrel.UpdateBuilder {
 	flag, arg := GenUnnestString(arr)
 	return builder.Where(sqlPrefix+flag, arg...)

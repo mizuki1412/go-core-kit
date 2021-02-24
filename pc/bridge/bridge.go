@@ -1,6 +1,7 @@
 package bridge
 
 import (
+	"embed"
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/kataras/iris/v12"
 	"github.com/mizuki1412/go-core-kit/class/exception"
@@ -76,6 +77,8 @@ func SetEventPublicHandle(fun func(req *MsgReq) string) *socketio.Server {
 	return Server
 }
 
+var UiAssets embed.FS
+
 // 开启websocket server并配置http todo
 func Start() {
 	go Server.Serve()
@@ -97,7 +100,7 @@ func Start() {
 	//	Server.ServeHTTP(w, r)
 	//})
 	// local win ui web, 默认在ui
-	restkit.GetRouter().Proxy.Any("/ui/{path:path}", router.EmbedHtmlHandle("/ui/"))
+	restkit.GetRouter().Proxy.Any("/ui/{path:path}", router.EmbedHtmlHandle(UiAssets, "./ui"))
 	//http.Handle("/", http.FileServer(http.Dir("./ui")))
 	//_ = mime.AddExtensionType(".js", "text/javascript")
 }

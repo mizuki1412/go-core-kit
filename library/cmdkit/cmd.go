@@ -8,6 +8,7 @@ import (
 	"io"
 	"os/exec"
 	"path/filepath"
+	"syscall"
 	"time"
 )
 
@@ -26,6 +27,8 @@ func Run(command string, params ...RunParams) (string, error) {
 	}
 
 	cmd := exec.Command("/bin/sh", "-c", command)
+	// 程序退出时Kill子进程
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return "", err

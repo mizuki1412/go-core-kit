@@ -24,7 +24,6 @@ require (
 	github.com/kataras/iris/v12 v12.1.8
 	github.com/kr/text v0.2.0 // indirect
 	github.com/lib/pq v1.9.0
-	github.com/markbates/pkger v0.17.1
 	github.com/mitchellh/mapstructure v1.2.2 // indirect
 	github.com/moul/http2curl v1.0.0 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
