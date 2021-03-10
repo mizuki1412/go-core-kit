@@ -52,3 +52,52 @@ func GetKeyPrefix() string {
 	}
 	return name
 }
+
+func LPush(ctx context.Context, key string, val interface{}) {
+	client = Instance()
+	if _, ok := val.(string); !ok {
+		val = jsonkit.ToString(val)
+		_, err := client.LPush(ctx, key, val).Result()
+		if err != nil {
+			panic(exception.New("redis 入队失败：" + err.Error()))
+		}
+	}
+}
+
+func LPop(ctx context.Context, key string, defaultVal string) string {
+	client = Instance()
+	val, err := client.LPop(ctx, key).Result()
+	if err != nil || val == "" {
+		return defaultVal
+	}
+	return val
+}
+
+func RPush(ctx context.Context, key string, val interface{}) {
+	client = Instance()
+	if _, ok := val.(string); !ok {
+		val = jsonkit.ToString(val)
+		_, err := client.RPush(ctx, key, val).Result()
+		if err != nil {
+			panic(exception.New("redis 入队失败：" + err.Error()))
+		}
+	}
+}
+
+func RPop(ctx context.Context, key string, defaultVal string) string {
+	client = Instance()
+	val, err := client.RPop(ctx, key).Result()
+	if err != nil || val == "" {
+		return defaultVal
+	}
+	return val
+}
+
+func LLen(ctx context.Context, key string) int64 {
+	client = Instance()
+	val, err := client.LLen(ctx, key).Result()
+	if err != nil {
+		panic(exception.New("获取redis队列失败"))
+	}
+	return val
+}
