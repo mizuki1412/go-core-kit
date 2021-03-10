@@ -50,6 +50,11 @@ func (ctx *Context) DBTxExist() bool {
 // bean 指针
 func (ctx *Context) BindForm(bean interface{}) {
 	//ctx.Proxy.Params().Get("demo")
+	//log.Println(ctx.Proxy.Request())
+	//r:= ctx.Proxy.Request().Body
+	//bytes:=make([]byte,2048)
+	//_, _ = r.Read(bytes)
+	//log.Println(string(bytes))
 	switch bean.(type) {
 	case *map[string]interface{}:
 		// query会和form合并 post时

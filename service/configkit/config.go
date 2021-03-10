@@ -6,7 +6,7 @@ import (
 )
 
 func Exist(key string) bool {
-	return viper.IsSet(key)
+	return viper.IsSet(key) || viper.GetString(key) != ""
 }
 func Get(key string, defaultVal interface{}) interface{} {
 	val := viper.Get(key)
@@ -16,7 +16,7 @@ func Get(key string, defaultVal interface{}) interface{} {
 	return val
 }
 func GetString(key, defaultVal string) string {
-	if !viper.IsSet(key) || viper.GetString(key) == "" {
+	if !Exist(key) {
 		return defaultVal
 	}
 	return viper.GetString(key)
@@ -25,13 +25,13 @@ func GetStringD(key string) string {
 	return viper.GetString(key)
 }
 func GetInt(key string, defaultVal int) int {
-	if !viper.IsSet(key) {
+	if !Exist(key) {
 		return defaultVal
 	}
 	return viper.GetInt(key)
 }
 func GetBool(key string, defaultVal bool) bool {
-	if !viper.IsSet(key) {
+	if !Exist(key) {
 		return defaultVal
 	}
 	return viper.GetBool(key)
