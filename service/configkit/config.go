@@ -6,15 +6,9 @@ import (
 )
 
 func Exist(key string) bool {
-	return viper.IsSet(key) || viper.GetString(key) != ""
+	return viper.IsSet(key) && viper.GetString(key) != ""
 }
-func Get(key string, defaultVal interface{}) interface{} {
-	val := viper.Get(key)
-	if val == nil {
-		return defaultVal
-	}
-	return val
-}
+
 func GetString(key, defaultVal string) string {
 	if !Exist(key) {
 		return defaultVal
