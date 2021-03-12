@@ -8,7 +8,6 @@ import (
 	"io"
 	"os/exec"
 	"path/filepath"
-	"syscall"
 	"time"
 )
 
@@ -28,20 +27,19 @@ func Run(command string, params ...RunParams) (string, error) {
 
 	cmd := exec.Command("/bin/sh", "-c", command)
 	// 程序退出时Kill子进程
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		return "", err
-	}
-	stderr, err := cmd.StderrPipe()
-	if err != nil {
-		return "", err
-	}
-
-	if err = cmd.Start(); err != nil {
-		return "", err
-	}
+	//cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	if !param.Async {
+		stdout, err := cmd.StdoutPipe()
+		if err != nil {
+			return "", err
+		}
+		stderr, err := cmd.StderrPipe()
+		if err != nil {
+			return "", err
+		}
+		if err = cmd.Start(); err != nil {
+			return "", err
+		}
 		if param.Timeout > 0 {
 			to := make(chan map[string]interface{})
 			go func() {
@@ -62,6 +60,10 @@ func Run(command string, params ...RunParams) (string, error) {
 		} else {
 			ret, err := getRet(stdout, stderr, cmd)
 			return ret, err
+		}
+	} else {
+		if err := cmd.Start(); err != nil {
+			return "", err
 		}
 	}
 	return "", nil

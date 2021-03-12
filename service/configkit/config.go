@@ -2,13 +2,28 @@ package configkit
 
 import (
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
+	"github.com/spf13/cast"
 	"github.com/spf13/viper"
 )
 
 func Exist(key string) bool {
-	return viper.IsSet(key) && viper.GetString(key) != ""
+	if !viper.IsSet(key) {
+		return false
+	}
+	switch viper.Get(key).(type) {
+	case string:
+		if cast.ToString(viper.Get(key)) == "" {
+			return false
+		}
+	}
+	return true
 }
-
+func Get(key string, defaultVal interface{}) interface{} {
+	if !Exist(key) {
+		return defaultVal
+	}
+	return viper.Get(key)
+}
 func GetString(key, defaultVal string) string {
 	if !Exist(key) {
 		return defaultVal
