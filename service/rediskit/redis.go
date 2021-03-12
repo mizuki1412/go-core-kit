@@ -101,3 +101,11 @@ func LLen(ctx context.Context, key string) int64 {
 	}
 	return val
 }
+
+func LClear(ctx context.Context, key string) {
+	client = Instance()
+	_, err := client.LTrim(ctx, key, 1, 0).Result()
+	if err != nil {
+		panic(exception.New("清除redis队列失败"))
+	}
+}
