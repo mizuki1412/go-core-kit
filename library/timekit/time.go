@@ -13,9 +13,19 @@ func TrimDayStart(t time.Time) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
 }
 
+// 修整为当月开始时间
+func TrimMonthStart(t time.Time) time.Time {
+	return time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, t.Location())
+}
+
 // 修整为下一日开始时间
 func TrimDayNext(t time.Time) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day()+1, 0, 0, 0, 0, t.Location())
+}
+
+// 修整为下月开始时间
+func TrimMonthNext(t time.Time) time.Time {
+	return time.Date(t.Year(), t.Month()+1, 1, 0, 0, 0, 0, t.Location())
 }
 
 // 计算一个月的最大天数

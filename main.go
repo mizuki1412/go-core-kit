@@ -1,4 +1,3 @@
-//go:generate pkger -include /swagger-ui
 package main
 
 import (
