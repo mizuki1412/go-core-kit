@@ -38,7 +38,8 @@ func (th TimeArrGroup) Sum() int64 {
 	return all
 }
 
-// typeFlag=10表示是剔除
+// 原理：将两个时间范围的数组，每个起止点打散放入一个数组中
+// typeFlag=10表示是剔除，0表示合并
 // type 1、2：本体数组的进和出；11、12 剔除数组的进和出
 func _group2TimeArr(a, b TimeArrGroup, typeFlag int32) TimePointList {
 	list := make(TimePointList, 0, len(a)*2+len(b)*2)
@@ -78,9 +79,11 @@ func _group2TimeArr(a, b TimeArrGroup, typeFlag int32) TimePointList {
 func (th TimeArrGroup) Merge(obj TimeArrGroup) TimeArrGroup {
 	list := _group2TimeArr(th, obj, 0)
 	ret := TimeArrGroup{}
+	// 临时标记缓存：存放已经入列的point
 	temp := map[string]bool{}
 	var startTemp time.Time
 	for _, e := range list {
+		// 第一个值
 		if startTemp.IsZero() && e.Type != 1 {
 			continue
 		}
@@ -138,11 +141,12 @@ func (th TimeArrGroup) Eliminate(obj TimeArrGroup) TimeArrGroup {
 			if len(temp1) > 0 && !startTemp.IsZero() {
 				ret = append(ret, []time.Time{startTemp, e.Time})
 			}
+			// 重置
 			startTemp = time.Time{}
 		case 2:
 			if _, ok := temp1[e.Id]; ok {
 				delete(temp1, e.Id)
-				if len(temp1) == 0 && len(temp2) == 0 {
+				if len(temp1) == 0 && len(temp2) == 0 && !startTemp.IsZero() {
 					// 封包
 					ret = append(ret, []time.Time{startTemp, e.Time})
 					startTemp = time.Time{}
@@ -154,6 +158,59 @@ func (th TimeArrGroup) Eliminate(obj TimeArrGroup) TimeArrGroup {
 				if len(temp1) > 0 {
 					// 存在截断
 					startTemp = e.Time
+				}
+			}
+		}
+	}
+	return ret
+}
+
+// 交集
+// 两个缓存区a和b，当一个点进来时，必须遇见结束点，才能从缓存区中踢出。
+func (th TimeArrGroup) Mixed(obj TimeArrGroup) TimeArrGroup {
+	list := _group2TimeArr(th, obj, 10)
+	ret := TimeArrGroup{}
+	// type=1/2的临时存放
+	temp1 := map[string]bool{}
+	// type=11/12 的临时存放
+	temp2 := map[string]bool{}
+	var startTemp time.Time
+	for i, e := range list {
+		if i == 0 && e.Type != 1 && e.Type != 11 {
+			continue
+		}
+		switch e.Type {
+		case 1:
+			// 进入缓存区
+			temp1[e.Id] = true
+			// 当对方缓存区中有值时，才会发起startTemp
+			if len(temp2) > 0 && startTemp.IsZero() {
+				startTemp = e.Time
+			}
+		case 11:
+			temp2[e.Id] = true
+			// 当对方缓存区中有值时，才会发起startTemp
+			if len(temp1) > 0 && startTemp.IsZero() {
+				startTemp = e.Time
+			}
+		case 2:
+			if _, ok := temp1[e.Id]; ok {
+				// 找到对象并解除
+				delete(temp1, e.Id)
+				if len(temp1) == 0 && !startTemp.IsZero() {
+					// 封包
+					ret = append(ret, []time.Time{startTemp, e.Time})
+					startTemp = time.Time{}
+				}
+			}
+		case 12:
+			if _, ok := temp2[e.Id]; ok {
+				// 找到对象并解除
+				delete(temp2, e.Id)
+				if len(temp2) == 0 && !startTemp.IsZero() {
+					// 封包
+					ret = append(ret, []time.Time{startTemp, e.Time})
+					startTemp = time.Time{}
 				}
 			}
 		}
