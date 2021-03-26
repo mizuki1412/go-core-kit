@@ -6,9 +6,7 @@ import (
 	"time"
 )
 
-//
 // 两个时间一组的数组
-//
 type TimeArrGroup [][]time.Time
 
 type TimePoint struct {
