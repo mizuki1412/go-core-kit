@@ -46,6 +46,11 @@ func (th *Decimal) Round(place int32) *Decimal {
 	return th
 }
 
+func (th *Decimal) DivRound(d2 *Decimal, place int32) *Decimal {
+	th.Decimal = th.Decimal.DivRound(d2.Decimal, place)
+	return th
+}
+
 func (th Decimal) IsValid() bool {
 	return th.Valid
 }
