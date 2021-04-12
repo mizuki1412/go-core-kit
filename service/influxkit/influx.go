@@ -110,8 +110,8 @@ func queryMultiResult(dbName string, sql []string) [][]map[string]interface{} {
 		panic(exception.New("influx query error: " + cast.ToString(code)))
 	}
 	results := gjson.Get(ret, "results").Array()
-	data := make([][]map[string]interface{}, len(results))
-	for index, result := range results {
+	data := make([][]map[string]interface{}, 0, len(results))
+	for _, result := range results {
 		series := result.Map()["series"].Array()
 		if len(series) > 0 {
 			serie := series[0]
@@ -127,7 +127,7 @@ func queryMultiResult(dbName string, sql []string) [][]map[string]interface{} {
 					// 不用append，直接赋值
 					list[i] = e
 				}
-				data[index] = list
+				data = append(data, list)
 			}
 		}
 	}

@@ -13,6 +13,8 @@ import (
 	"golang.org/x/text/transform"
 	"io"
 	"log"
+	"net"
+	"time"
 )
 
 func init() {
@@ -25,7 +27,60 @@ var rootCmd = &cobra.Command{
 	Use: "go-core-kit",
 	Run: func(cmd *cobra.Command, args []string) {
 		initkit.BindFlags(cmd)
+
 	},
+}
+
+func tcpServer() {
+	service := ":5000"
+	// 绑定
+	tcpAddr, _ := net.ResolveTCPAddr("tcp", service)
+	// 监听
+	listener, _ := net.ListenTCP("tcp", tcpAddr)
+	for {
+		// 接受
+		conn, err := listener.Accept()
+		if err != nil {
+			continue
+		}
+		// 创建 Goroutine
+		go handleClient(conn)
+	}
+}
+
+func handleClient(conn net.Conn) {
+	// 逆序调用 Close() 保证连接能正常关闭
+	defer conn.Close()
+	var buf [512]byte
+	for {
+		// 接收数据
+		n, err := conn.Read(buf[0:])
+		if err != nil {
+			return
+		}
+		rAddr := conn.RemoteAddr()
+		fmt.Println("Receive from client", rAddr.String(), string(buf[0:n]))
+		_, err2 := conn.Write([]byte("Welcome client"))
+		if err2 != nil {
+			return
+		}
+	}
+}
+
+func tcpClient() {
+	var buf [2048]byte
+	// 绑定
+	tcpAddr, _ := net.ResolveTCPAddr("tcp", "192.168.0.118:9999")
+	// 连接
+	conn, _ := net.DialTCP("tcp", nil, tcpAddr)
+	rAddr := conn.RemoteAddr()
+	//for {
+	// 发送
+	n, _ := conn.Write([]byte("Hello server"))
+	// 接收
+	n, _ = conn.Read(buf[0:])
+	fmt.Println("Reply form server", rAddr.String(), string(buf[0:n]))
+	time.Sleep(time.Second * 2)
 }
 
 func TestCatch() (ret int) {

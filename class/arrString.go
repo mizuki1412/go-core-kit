@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"github.com/lib/pq"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/library/arraykit"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 )
 
@@ -87,6 +88,15 @@ func (th *ArrString) Length() int {
 func (th *ArrString) Remove() *ArrString {
 	th.Valid = false
 	th.Array = []string{}
+	return th
+}
+
+func (th *ArrString) Delete(vals ...string) *ArrString {
+	temp := th.Array
+	for _, e := range vals {
+		temp = arraykit.StringDelete(temp, e)
+	}
+	th.Array = temp
 	return th
 }
 
