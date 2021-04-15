@@ -30,6 +30,11 @@ func WriteFile(fileName string, data []byte) error {
 	return err
 }
 
+func DelFile(fileName string) error {
+	checkDir(fileName)
+	return os.Remove(fileName)
+}
+
 func checkDir(fileName string) {
 	i := strings.LastIndex(fileName, "/")
 	if i > 0 {
