@@ -88,8 +88,12 @@ func (ctx *Context) FileRaw(data []byte, name string) {
 
 // 相对于项目目录路径的
 func (ctx *Context) File(relativePath, name string) {
+	ctx.FileDirect(storagekit.GetFullPath(relativePath), name)
+}
+
+func (ctx *Context) FileDirect(obsolutePath, name string) {
 	// todo 直接返回的了
-	err := ctx.Proxy.SendFile(storagekit.GetFullPath(relativePath), name)
+	err := ctx.Proxy.SendFile(obsolutePath, name)
 	if err != nil {
 		logkit.Error("rest_ret_file_error: " + err.Error())
 		//ctx.SetJsonHeader()

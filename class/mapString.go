@@ -148,3 +148,11 @@ func (th *MapString) GetOrDefault(key string, d interface{}) interface{} {
 	}
 	return d
 }
+
+func (th *MapString) Get(key string) interface{} {
+	v, ok := th.Map[key]
+	if ok {
+		return v
+	}
+	return nil
+}
