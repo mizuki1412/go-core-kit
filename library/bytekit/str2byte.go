@@ -7,7 +7,7 @@ import (
 )
 
 func Bytes2HexArray(bytes []byte) string {
-	str := "["
+	str := ""
 	//str2 := "["
 	for _, v := range bytes {
 		//str2 = str2+fmt.Sprintf("0x%02x ", v)
@@ -17,7 +17,11 @@ func Bytes2HexArray(bytes []byte) string {
 		}
 		str = str + "0x" + val + " "
 	}
-	str = str[:len(str)-1] + "]"
+	if len(str) == 0 {
+		return "[]"
+	} else {
+		str = "[" + str[:len(str)-1] + "]"
+	}
 	return str
 }
 

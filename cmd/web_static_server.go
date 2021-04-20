@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/mizuki1412/go-core-kit/init/initkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cobra"
@@ -12,8 +13,9 @@ func WebStaticServerCMD() *cobra.Command {
 		Use:   "web-server",
 		Short: "本地静态web服务器",
 		Run: func(cmd *cobra.Command, args []string) {
+			initkit.BindFlags(cmd)
 			if configkit.GetStringD("port") == "" {
-				logkit.Fatal("port参数确实")
+				logkit.Fatal("port参数缺失")
 			}
 			http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 				http.ServeFile(w, r, r.URL.Path[1:])

@@ -4,6 +4,8 @@ go 1.16
 
 require (
 	github.com/360EntSecGroup-Skylar/excelize/v2 v2.3.2
+	github.com/Allenxuxu/gev v0.2.2
+	github.com/Allenxuxu/ringbuffer v0.0.9
 	github.com/Depado/bfchroma v1.3.0
 	github.com/Masterminds/squirrel v1.5.0
 	github.com/SebastiaanKlippert/go-wkhtmltopdf v1.6.1
@@ -24,6 +26,7 @@ require (
 	github.com/kataras/iris/v12 v12.1.8
 	github.com/kr/text v0.2.0 // indirect
 	github.com/lib/pq v1.10.0
+	github.com/libp2p/go-reuseport v0.0.2 // indirect
 	github.com/mitchellh/mapstructure v1.2.2 // indirect
 	github.com/moul/http2curl v1.0.0 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
@@ -47,6 +50,7 @@ require (
 	go.uber.org/automaxprocs v1.4.0
 	go.uber.org/zap v1.16.0
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
+	golang.org/x/sys v0.0.0-20210419170143-37df388d1f33 // indirect
 	golang.org/x/text v0.3.5
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/ini.v1 v1.62.0

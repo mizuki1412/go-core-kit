@@ -9,6 +9,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/influxkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/mizuki1412/go-core-kit/service/mqttkit"
+	"github.com/mizuki1412/go-core-kit/service/netkit"
 	"github.com/mizuki1412/go-core-kit/service/rediskit"
 	"github.com/mizuki1412/go-core-kit/service/restkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
@@ -92,7 +93,8 @@ func DefFlags(cmd *cobra.Command) {
 	cmd.Flags().String(mqttkit.ConfigKeyMQTTClientID, "", "")
 	cmd.Flags().String(mqttkit.ConfigKeyMQTTUsername, "", "")
 	cmd.Flags().String(mqttkit.ConfigKeyMQTTPwd, "", "")
-
+	// netkit
+	cmd.Flags().String(netkit.ConfigKeyNetPort, "", "")
 }
 
 func BindFlags(cmd *cobra.Command) {
