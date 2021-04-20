@@ -7,7 +7,6 @@ import (
 	"github.com/mizuki1412/go-core-kit/init/initkit"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/mapkit"
-	"github.com/mizuki1412/go-core-kit/library/timekit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cobra"
 	"golang.org/x/text/encoding/simplifiedchinese"
@@ -35,7 +34,7 @@ var rootCmd = &cobra.Command{
 
 func tcpClient() {
 	var buf [2048]byte
-	// 绑定
+	// 绑定 47.96.160.63
 	tcpAddr, _ := net.ResolveTCPAddr("tcp", "47.96.160.63:10170")
 	// 连接
 	conn, _ := net.DialTCP("tcp", nil, tcpAddr)
@@ -43,8 +42,8 @@ func tcpClient() {
 	//for {
 	// 发送
 	n, _ := conn.Write([]byte("Hello server"))
-	timekit.Sleep(100)
-	log.Println(2)
+	//timekit.Sleep(100)
+	//log.Println(2)
 	n, _ = conn.Write([]byte(" Hello server2"))
 	// 接收
 	n, _ = conn.Read(buf[0:])

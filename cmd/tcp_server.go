@@ -2,12 +2,11 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/Allenxuxu/gev/connection"
-	"github.com/Allenxuxu/ringbuffer"
 	"github.com/mizuki1412/go-core-kit/init/initkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/mizuki1412/go-core-kit/service/netkit"
+	"github.com/panjf2000/gnet"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"log"
@@ -24,42 +23,25 @@ func TCPServerCMD() *cobra.Command {
 				logkit.Fatal("port参数缺失")
 			}
 			server := netkit.NetServer{
-				Port:      cast.ToInt32(configkit.GetStringD("port")),
-				OnConnect: OnConnect,
-				OnMessage: OnMessage,
-				OnClose:   OnClose,
-				UnPacket:  UnPacket,
-				Packet:    Packet,
+				Port: cast.ToInt32(configkit.GetStringD("port")),
+				OnConnect: func(c gnet.Conn) (out []byte, action gnet.Action) {
+					log.Println(" OnConnect ： ", c.RemoteAddr())
+					return
+				},
+				OnMessage: func(frame []byte, c gnet.Conn) (out []byte, action gnet.Action) {
+					log.Println("收到：" + string(frame))
+					return
+				},
+				OnClose: func(c gnet.Conn, err error) (action gnet.Action) {
+					log.Println(" close ： ")
+					return
+				},
 			}
 			server.Run()
 		},
 	}
 	cmd.Flags().StringP("port", "", "", "端口")
 	return cmd
-}
-
-func OnConnect(c *connection.Connection) {
-	log.Println(" OnConnect ： ", c.PeerAddr())
-}
-func OnMessage(c *connection.Connection, ctx interface{}, data []byte) (out []byte) {
-	log.Println("收到：" + string(data))
-	return
-}
-
-func OnClose(c *connection.Connection) {
-	log.Println("OnClose")
-}
-
-func UnPacket(c *connection.Connection, buffer *ringbuffer.RingBuffer) (interface{}, []byte) {
-	ret := buffer.Bytes()
-	// 断开时也会收到空数据
-	//log.Println(123, bytekit.Bytes2HexArray(ret))
-	buffer.RetrieveAll()
-	return nil, ret
-}
-
-func Packet(c *connection.Connection, data []byte) []byte {
-	return data
 }
 
 func tcpServer() {
