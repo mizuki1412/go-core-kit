@@ -5,6 +5,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/mapkit"
+	"github.com/spf13/cast"
 )
 
 /**
@@ -155,4 +156,16 @@ func (th *MapString) Get(key string) interface{} {
 		return v
 	}
 	return nil
+}
+func (th *MapString) GetString(key string) string {
+	return cast.ToString(th.Get(key))
+}
+func (th *MapString) GetInt32(key string) int32 {
+	return cast.ToInt32(th.Get(key))
+}
+func (th *MapString) GetFloat64(key string) float64 {
+	return cast.ToFloat64(th.Get(key))
+}
+func (th *MapString) GetMap(key string) map[string]interface{} {
+	return cast.ToStringMap(th.Get(key))
 }
