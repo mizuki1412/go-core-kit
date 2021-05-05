@@ -138,7 +138,6 @@ func (th *MapStringSync) Remove() *MapStringSync {
 func (th *MapStringSync) Delete(key string) *MapStringSync {
 	th.Lock()
 	defer th.Unlock()
-	th.Valid = false
 	delete(th.Map, key)
 	return th
 }
@@ -168,4 +167,14 @@ func (th *MapStringSync) Get(key string) interface{} {
 	defer th.RUnlock()
 	v, _ := th.Map[key]
 	return v
+}
+
+func (th *MapStringSync) Entries() map[string]interface{} {
+	th.RLock()
+	defer th.RUnlock()
+	m := map[string]interface{}{}
+	for k, v := range th.Map {
+		m[k] = v
+	}
+	return m
 }

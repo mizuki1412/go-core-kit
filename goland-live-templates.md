@@ -120,10 +120,10 @@ func (dao *Dao) scan(sql string, args []interface{}) []*$bean$ {
 }
 func (dao *Dao) scanOne(sql string, args []interface{}) *$bean$ {
 	rows := dao.Query(sql, args...)
+	defer rows.Close()
 	for rows.Next() {
 		m := $bean${}
 		err := rows.StructScan(&m)
-		rows.Close()
 		if err != nil {
 			panic(exception.New(err.Error()))
 		}
@@ -162,10 +162,10 @@ func (dao *Dao) scan(sql string, args []interface{}) []*$bean$ {
 }
 func (dao *Dao) scanOne(sql string, args []interface{}) *$bean$ {
 	rows := dao.Query(sql, args...)
+	defer rows.Close()
 	for rows.Next() {
 		m := $bean${}
 		err := rows.StructScan(&m)
-		rows.Close()
 		if err != nil {
 			panic(exception.New(err.Error()))
 		}

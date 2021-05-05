@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/init/initkit"
+	"github.com/mizuki1412/go-core-kit/library/bytekit"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/mapkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
@@ -34,8 +35,8 @@ var rootCmd = &cobra.Command{
 
 func tcpClient() {
 	var buf [2048]byte
-	// 绑定 47.96.160.63
-	tcpAddr, _ := net.ResolveTCPAddr("tcp", "47.96.160.63:10170")
+	// 绑定
+	tcpAddr, _ := net.ResolveTCPAddr("tcp", "127.0.0.1:9000")
 	// 连接
 	conn, _ := net.DialTCP("tcp", nil, tcpAddr)
 	rAddr := conn.RemoteAddr()
@@ -44,10 +45,10 @@ func tcpClient() {
 	n, _ := conn.Write([]byte("Hello server"))
 	//timekit.Sleep(100)
 	//log.Println(2)
-	n, _ = conn.Write([]byte(" Hello server2"))
+	//n, _ = conn.Write([]byte(" Hello server2"))
 	// 接收
 	n, _ = conn.Read(buf[0:])
-	fmt.Println("Reply form server", rAddr.String(), string(buf[0:n]))
+	fmt.Println("Reply form server", rAddr.String(), bytekit.Bytes2HexArray(buf[0:n]))
 	time.Sleep(time.Second * 2)
 }
 
