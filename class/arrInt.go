@@ -73,6 +73,12 @@ func (th *ArrInt) Set(val interface{}) *ArrInt {
 		th.Array = v.Array
 	} else if v, ok := val.(pq.Int64Array); ok {
 		th.Array = v
+	} else if v, ok := val.([]int32); ok {
+		arr := make([]int64, 0, len(v))
+		for _, e := range v {
+			arr = append(arr, cast.ToInt64(e))
+		}
+		th.Array = arr
 	} else {
 		panic(exception.New("class.ArrInt set error"))
 	}
