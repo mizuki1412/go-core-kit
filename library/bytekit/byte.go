@@ -42,23 +42,22 @@ func Bytes2Int32(bs []byte) int32 {
 	case 0:
 		return 0
 	case 1:
-		return cast.ToInt32(bs[0])
+		data := []byte{0x00, 0x00, 0x00}
+		data = append(data, bs...)
+		bs = data
 	case 2:
-		buf := bytes.NewBuffer(bs)
-		var target int16
-		_ = binary.Read(buf, binary.BigEndian, &target)
-		return cast.ToInt32(target)
+		data := []byte{0x00, 0x00}
+		data = append(data, bs...)
+		bs = data
 	case 3:
 		data := []byte{0x00}
 		data = append(data, bs...)
 		bs = data
-		fallthrough
-	default:
-		buf := bytes.NewBuffer(bs)
-		var target int32
-		_ = binary.Read(buf, binary.BigEndian, &target)
-		return target
 	}
+	buf := bytes.NewBuffer(bs)
+	var target int32
+	_ = binary.Read(buf, binary.BigEndian, &target)
+	return target
 }
 
 func Bytes2Int64(bs []byte) int64 {

@@ -33,7 +33,13 @@ func connector() *sqlx.DB {
 	}
 	if db == nil {
 		driver = configkit.GetString(ConfigKeyDBDriver, "")
-		db = sqlx.MustConnect(driver, fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", configkit.GetString(ConfigKeyDBHost, ""), configkit.GetInt(ConfigKeyDBPort, 0), configkit.GetString(ConfigKeyDBUser, ""), configkit.GetString(ConfigKeyDBPwd, ""), configkit.GetString(ConfigKeyDBName, "")))
+		var param string
+		if driver == "postgres" {
+			param = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", configkit.GetString(ConfigKeyDBHost, ""), configkit.GetInt(ConfigKeyDBPort, 0), configkit.GetString(ConfigKeyDBUser, ""), configkit.GetString(ConfigKeyDBPwd, ""), configkit.GetString(ConfigKeyDBName, ""))
+		} else if driver == "mysql" {
+			param = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8", configkit.GetString(ConfigKeyDBUser, ""), configkit.GetString(ConfigKeyDBPwd, ""), configkit.GetString(ConfigKeyDBHost, ""), configkit.GetString(ConfigKeyDBPort, ""), configkit.GetString(ConfigKeyDBName, ""))
+		}
+		db = sqlx.MustConnect(driver, param)
 		db.SetConnMaxLifetime(time.Minute * 60)
 		// todo 需要调优
 		db.SetMaxOpenConns(10)
