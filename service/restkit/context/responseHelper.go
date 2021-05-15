@@ -48,6 +48,12 @@ func (ctx *Context) JsonSuccess(data interface{}) {
 	})
 }
 
+func (ctx *Context) RawSuccess(data []byte) {
+	// todo 更新session的expire 会不会太频繁
+	ctx.UpdateSessionExpire()
+	ctx.Proxy.Binary(data)
+}
+
 // 带分页信息
 func (ctx *Context) JsonSuccessWithPage(data interface{}, currentPage, totalPage, total int32) {
 	ctx.UpdateSessionExpire()

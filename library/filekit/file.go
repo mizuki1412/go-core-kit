@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/afero"
 	"io"
 	"os"
@@ -11,7 +12,10 @@ import (
 )
 
 func WriteFileAppend(fileName string, data []byte) error {
-	checkDir(fileName)
+	err := checkDir(fileName)
+	if err != nil {
+		return err
+	}
 	f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0755)
 	if err == nil {
 		defer f.Close()
@@ -21,7 +25,10 @@ func WriteFileAppend(fileName string, data []byte) error {
 }
 
 func WriteFile(fileName string, data []byte) error {
-	checkDir(fileName)
+	err := checkDir(fileName)
+	if err != nil {
+		return err
+	}
 	f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
 	if err == nil {
 		defer f.Close()
@@ -31,25 +38,31 @@ func WriteFile(fileName string, data []byte) error {
 }
 
 func DelFile(fileName string) error {
-	checkDir(fileName)
+	err := checkDir(fileName)
+	if err != nil {
+		return err
+	}
 	return os.Remove(fileName)
 }
 
-func checkDir(fileName string) {
+func checkDir(fileName string) error {
 	i := strings.LastIndex(fileName, "/")
 	if i > 0 {
-		CheckDir(fileName[:i])
+		return CheckDir(fileName[:i])
 	}
+	return nil
 }
 
-func CheckDir(path string) {
+func CheckDir(path string) error {
 	exist, err := afero.Exists(afero.NewOsFs(), path)
 	if err != nil {
-		panic(exception.New(err.Error()))
+		return err
 	}
 	if !exist {
-		_ = os.MkdirAll(path, 0755)
+		err = os.MkdirAll(path, 0755)
+		return err
 	}
+	return err
 }
 
 func ReadString(fileName string) (string, error) {
@@ -63,7 +76,7 @@ func ReadString(fileName string) (string, error) {
 func ReadBytes(fileName string) []byte {
 	f, err := os.ReadFile(fileName)
 	if err != nil {
-		panic(exception.New("文件读取失败"))
+		logkit.Error("文件读取失败")
 	}
 	return f
 }

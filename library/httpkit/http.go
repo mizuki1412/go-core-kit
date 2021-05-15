@@ -2,6 +2,7 @@ package httpkit
 
 import (
 	"bytes"
+	"crypto/tls"
 	"fmt"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
@@ -19,10 +20,10 @@ var client *http.Client
 
 func init() {
 	// 忽略证书校验 todo
-	//tr := &http.Transport{
-	//	TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	//}
-	client = &http.Client{}
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client = &http.Client{Transport: tr}
 	jar, err := cookiejar.New(nil)
 	if err != nil {
 		panic(err)
