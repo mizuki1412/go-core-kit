@@ -1,7 +1,9 @@
 package cryptokit
 
 import (
+	"crypto/hmac"
 	"crypto/md5"
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
 )
@@ -23,4 +25,13 @@ func BytesEncode(bytes []byte) string {
 func BytesDecode(str string) []byte {
 	bytes, _ := base64.StdEncoding.DecodeString(str)
 	return bytes
+}
+
+func HmacSha256(message []byte, secret string) string {
+	key := []byte(secret)
+	h := hmac.New(sha256.New, key)
+	h.Write(message)
+	//sha := hex.EncodeToString()
+	//	hex.EncodeToString(h.Sum(nil))
+	return base64.StdEncoding.EncodeToString(h.Sum(nil))
 }

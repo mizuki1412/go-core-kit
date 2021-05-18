@@ -59,3 +59,7 @@ func GetStringListD(key string) []string {
 	_ = jsonkit.ParseObj(key, &arr)
 	return arr
 }
+
+func Set(key string, val interface{}) {
+	viper.Set(key, val)
+}
