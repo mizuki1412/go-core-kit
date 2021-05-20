@@ -56,11 +56,25 @@ func (ctx *Context) BindForm(bean interface{}) {
 	//_, _ = r.Read(bytes)
 	//log.Println(string(bytes))
 	switch bean.(type) {
-	case *map[string]interface{}:
+	case map[string]interface{}:
 		// query会和form合并 post时
 		allForm := ctx.Proxy.FormValues()
 		for k, v := range allForm {
-			(*(bean.(*map[string]interface{})))[k] = v[len(v)-1]
+			if len(v) == 1 {
+				(bean.(map[string]interface{}))[k] = v[0]
+			} else if len(v) > 1 {
+				(bean.(map[string]interface{}))[k] = v
+			}
+		}
+		if len(allForm) == 0 {
+			// GET
+			for i := 0; ; i++ {
+				e := ctx.Proxy.Params().GetEntryAt(i)
+				if e.Key == "" {
+					break
+				}
+				(bean.(map[string]interface{}))[e.Key] = e.ValueRaw
+			}
 		}
 	default:
 		//err := ctx.Proxy.ReadForm(bean)
