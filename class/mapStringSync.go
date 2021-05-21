@@ -174,7 +174,11 @@ func (th *MapStringSync) Entries() map[string]interface{} {
 	defer th.RUnlock()
 	m := map[string]interface{}{}
 	for k, v := range th.Map {
-		m[k] = v
+		if vv, ok := v.(*MapStringSync); ok {
+			m[k] = vv.Entries()
+		} else {
+			m[k] = v
+		}
 	}
 	return m
 }
