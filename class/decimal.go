@@ -29,6 +29,9 @@ func (th *Decimal) Set(val interface{}) *Decimal {
 	} else if v, ok := val.(Decimal); ok {
 		th.Valid = v.Valid
 		th.Decimal = v.Decimal
+	} else if v, ok := val.(*Decimal); ok {
+		th.Valid = v.Valid
+		th.Decimal = v.Decimal
 	} else {
 		v, err := decimal.NewFromString(cast.ToString(val))
 		if err == nil {
@@ -47,7 +50,17 @@ func (th *Decimal) Round(place int32) *Decimal {
 }
 
 func (th *Decimal) DivRound(d2 *Decimal, place int32) *Decimal {
-	th.Decimal = th.Decimal.DivRound(d2.Decimal, place)
+	// 对0的处理
+	if d2 == nil || d2.Float64() == 0 {
+		th.Decimal = decimal.NewFromInt32(0)
+	} else {
+		th.Decimal = th.Decimal.DivRound(d2.Decimal, place)
+	}
+	return th
+}
+
+func (th *Decimal) Mul(d2 *Decimal) *Decimal {
+	th.Decimal = th.Decimal.Mul(d2.Decimal)
 	return th
 }
 
