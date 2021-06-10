@@ -64,6 +64,21 @@ func (th *Decimal) Mul(d2 *Decimal) *Decimal {
 	return th
 }
 
+func (th *Decimal) Add(d2 *Decimal) *Decimal {
+	th.Decimal = th.Decimal.Add(d2.Decimal)
+	return th
+}
+
+func (th *Decimal) Sub(d2 *Decimal) *Decimal {
+	th.Decimal = th.Decimal.Sub(d2.Decimal)
+	return th
+}
+
+func (th *Decimal) Div(d2 *Decimal) *Decimal {
+	th.Decimal = th.Decimal.Div(d2.Decimal)
+	return th
+}
+
 func (th Decimal) IsValid() bool {
 	return th.Valid
 }

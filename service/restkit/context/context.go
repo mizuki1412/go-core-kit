@@ -208,16 +208,16 @@ func (ctx *Context) bindStruct(bean interface{}) {
 				temp := class.Time{}
 				if len(val) == 13 && strings.Index(val, "-") < 0 {
 					s, err := cast.ToInt64E(val)
-					if err != nil {
-						panic(exception.New("time cast error"))
+					if err == nil {
+						//panic(exception.New("time cast error"))
+						temp.Set(timekit.UnixMill(s))
 					}
-					temp.Set(timekit.UnixMill(s))
 				} else {
 					s, err := timekit.Parse(val)
-					if err != nil {
-						panic(exception.New("time cast error"))
+					if err == nil {
+						//panic(exception.New("time cast error"))
+						temp.Set(s)
 					}
-					temp.Set(s)
 				}
 				fieldV.Set(reflect.ValueOf(temp))
 			}
