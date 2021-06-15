@@ -166,6 +166,9 @@ func (th *MapString) GetInt32(key string) int32 {
 func (th *MapString) GetFloat64(key string) float64 {
 	return cast.ToFloat64(th.Get(key))
 }
+func (th *MapString) GetBool(key string) bool {
+	return cast.ToBool(th.Get(key))
+}
 func (th *MapString) GetMap(key string) map[string]interface{} {
 	return cast.ToStringMap(th.Get(key))
 }
