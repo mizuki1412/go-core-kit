@@ -20,14 +20,16 @@ type RestRet struct {
 const ResultErr = 0
 const ResultSuccess = 1
 const ResultAuthErr = 2
+const ResultUnauthorized = 403
 
 // http返回json数据
 func (ctx *Context) Json(ret RestRet) {
+	ctx.UpdateSessionExpire()
 	var code int
 	switch ret.Result {
 	case ResultSuccess:
 		code = http.StatusOK
-	case ResultAuthErr:
+	case ResultAuthErr, ResultUnauthorized:
 		code = http.StatusUnauthorized
 	default:
 		code = http.StatusBadRequest
@@ -41,7 +43,6 @@ func (ctx *Context) Json(ret RestRet) {
 
 func (ctx *Context) JsonSuccess(data interface{}) {
 	// todo 更新session的expire 会不会太频繁
-	ctx.UpdateSessionExpire()
 	ctx.Json(RestRet{
 		Result: ResultSuccess,
 		Data:   data,
@@ -56,7 +57,6 @@ func (ctx *Context) RawSuccess(data []byte) {
 
 // 带分页信息
 func (ctx *Context) JsonSuccessWithPage(data interface{}, currentPage, totalPage, total int32) {
-	ctx.UpdateSessionExpire()
 	ret := RestRet{
 		Result: ResultSuccess,
 		Data:   data,

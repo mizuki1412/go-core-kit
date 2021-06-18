@@ -22,7 +22,7 @@ type Context struct {
 	Response context.ResponseWriter
 }
 
-// msg per request
+// Set msg per request
 func (ctx *Context) Set(key string, val interface{}) {
 	ctx.Proxy.Values().Set(key, val)
 }
@@ -47,14 +47,8 @@ func (ctx *Context) DBTxExist() bool {
 
 // data: query, form, json/xml, param
 
-// bean 指针
+// BindForm bean 指针
 func (ctx *Context) BindForm(bean interface{}) {
-	//ctx.Proxy.Params().Get("demo")
-	//log.Println(ctx.Proxy.Request())
-	//r:= ctx.Proxy.Request().Body
-	//bytes:=make([]byte,2048)
-	//_, _ = r.Read(bytes)
-	//log.Println(string(bytes))
 	switch bean.(type) {
 	case map[string]interface{}:
 		// query会和form合并 post时
@@ -95,11 +89,15 @@ func (ctx *Context) BindForm(bean interface{}) {
 	}
 }
 
-/// bean 指针
+/// bean:指针
+// 实现form/query/json中的数据合并获取。
 /// description:"xxx" default:"" trim:"true"
 func (ctx *Context) bindStruct(bean interface{}) {
 	rt := reflect.TypeOf(bean).Elem()
 	rv := reflect.ValueOf(bean).Elem()
+	// 同时匹配json body
+	jsonBody := map[string]interface{}{}
+	_ = ctx.Proxy.ReadJSON(&jsonBody)
 	for i := 0; i < rt.NumField(); i++ {
 		field := rt.Field(i)
 		fieldV := rv.Field(i)
@@ -116,13 +114,16 @@ func (ctx *Context) bindStruct(bean interface{}) {
 			}))
 			continue
 		}
-		// bind
+		// bind struct key: 先从form中，再从params中，再从json中查找
 		key := stringkit.LowerFirst(field.Name)
 		val := ctx.Proxy.FormValue(key)
 		// 判断是否存在key，用于空字符串和无的区分
 		_, ok := ctx.Proxy.FormValues()[key]
 		if val == "" {
 			val = ctx.Proxy.URLParam(stringkit.LowerFirst(field.Name))
+		}
+		if val == "" {
+			val = cast.ToString(jsonBody[key])
 		}
 		// 判断trim
 		if field.Tag.Get("trim") == "true" {
