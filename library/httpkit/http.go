@@ -72,6 +72,8 @@ func Request(reqBean Req) (string, int) {
 		} else {
 			req.Header.Set("Content-Type", ContentTypeForm)
 		}
+	} else {
+		req.Header.Set("Content-Type", reqBean.ContentType)
 	}
 	for key, val := range reqBean.Header {
 		req.Header.Set(key, val)

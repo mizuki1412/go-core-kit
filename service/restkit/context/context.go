@@ -95,16 +95,20 @@ func (ctx *Context) BindForm(bean interface{}) {
 func (ctx *Context) bindStruct(bean interface{}) {
 	rt := reflect.TypeOf(bean).Elem()
 	rv := reflect.ValueOf(bean).Elem()
-	// 同时匹配json body
+	// 取json和取form只能同时进行一次，取完，流被关闭了。
 	jsonBody := map[string]interface{}{}
-	_ = ctx.Proxy.ReadJSON(&jsonBody)
+	isJson := strings.Index(ctx.Request.Header.Get("content-type"), "application/json") >= 0
+	if isJson {
+		_ = ctx.Proxy.ReadJSON(&jsonBody)
+	}
 	for i := 0; i < rt.NumField(); i++ {
 		field := rt.Field(i)
 		fieldV := rv.Field(i)
 		typeString := field.Type.String()
+		key := stringkit.LowerFirst(field.Name)
 		// multipart file
 		if typeString == "class.File" {
-			file, header, err := ctx.Proxy.FormFile(stringkit.LowerFirst(field.Name))
+			file, header, err := ctx.Proxy.FormFile(key)
 			if err != nil {
 				panic(exception.New(err.Error()))
 			}
@@ -114,16 +118,19 @@ func (ctx *Context) bindStruct(bean interface{}) {
 			}))
 			continue
 		}
-		// bind struct key: 先从form中，再从params中，再从json中查找
-		key := stringkit.LowerFirst(field.Name)
-		val := ctx.Proxy.FormValue(key)
-		// 判断是否存在key，用于空字符串和无的区分
-		_, ok := ctx.Proxy.FormValues()[key]
-		if val == "" {
-			val = ctx.Proxy.URLParam(stringkit.LowerFirst(field.Name))
-		}
-		if val == "" {
+		// bind struct key
+		var val string
+		var keyExist bool
+		if isJson {
 			val = cast.ToString(jsonBody[key])
+			_, keyExist = jsonBody[key]
+		} else {
+			val = ctx.Proxy.FormValue(key)
+			// 判断是否存在key，用于空字符串和无的区分
+			_, keyExist = ctx.Proxy.FormValues()[key]
+			if val == "" {
+				val = ctx.Proxy.URLParam(key)
+			}
 		}
 		// 判断trim
 		if field.Tag.Get("trim") == "true" {
@@ -133,7 +140,7 @@ func (ctx *Context) bindStruct(bean interface{}) {
 			if _, tagExist := field.Tag.Lookup("default"); tagExist {
 				// default
 				val = field.Tag.Get("default")
-				ok = true
+				keyExist = true
 			}
 		}
 		switch typeString {
@@ -172,21 +179,21 @@ func (ctx *Context) bindStruct(bean interface{}) {
 				fieldV.Set(reflect.ValueOf(tmp))
 			}
 		case "class.String":
-			if ok {
+			if keyExist {
 				tmp := class.String{String: val, Valid: true}
 				fieldV.Set(reflect.ValueOf(tmp))
 			}
 		case "class.ArrInt":
 			if !stringkit.IsNull(val) {
 				var p []int64
-				jsonkit.ParseObj(val, &p)
+				_ = jsonkit.ParseObj(val, &p)
 				tmp := class.ArrInt{Array: p, Valid: true}
 				fieldV.Set(reflect.ValueOf(tmp))
 			}
 		case "class.ArrString":
 			if !stringkit.IsNull(val) {
 				var p []string
-				jsonkit.ParseObj(val, &p)
+				_ = jsonkit.ParseObj(val, &p)
 				tmp := class.ArrString{Array: p, Valid: true}
 				fieldV.Set(reflect.ValueOf(tmp))
 			}
