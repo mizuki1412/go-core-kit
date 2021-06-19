@@ -195,8 +195,12 @@ func Decorate(val interface{}) string {
 		return val.(class.Decimal).Decimal.String()
 	case *class.Decimal:
 		return val.(*class.Decimal).Decimal.String()
+	case class.Int32:
+		return cast.ToString(val.(class.Int32).Int32)
 	case *class.Int32:
 		return cast.ToString(val.(*class.Int32).Int32)
+	case class.Int64:
+		return cast.ToString(val.(class.Int64).Int64)
 	case *class.Int64:
 		return cast.ToString(val.(*class.Int64).Int64)
 	default:

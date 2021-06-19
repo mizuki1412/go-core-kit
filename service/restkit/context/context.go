@@ -122,7 +122,12 @@ func (ctx *Context) bindStruct(bean interface{}) {
 		var val string
 		var keyExist bool
 		if isJson {
-			val = cast.ToString(jsonBody[key])
+			switch jsonBody[key].(type) {
+			case map[string]interface{}:
+				val = jsonkit.ToString(jsonBody[key])
+			default:
+				val = cast.ToString(jsonBody[key])
+			}
 			_, keyExist = jsonBody[key]
 		} else {
 			val = ctx.Proxy.FormValue(key)
