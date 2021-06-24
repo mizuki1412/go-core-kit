@@ -5,16 +5,17 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/mizuki1412/go-core-kit/service/storagekit"
 	"net/http"
+	"net/url"
 )
 
 type RestRet struct {
 	Result  int          `json:"result"`
-	Message class.String `json:"message"`
-	Data    interface{}  `json:"data"`
+	Message class.String `json:"message,omitempty"`
+	Data    interface{}  `json:"data,omitempty"`
 	// 分页信息
-	CurrentPage class.Int32 `json:"currentPage" description:"分页的当前页"`
-	TotalPage   class.Int32 `json:"totalPage" description:"分页的总页数"`
-	Total       class.Int32 `json:"total" description:"总数，如果data是列表并且分页"`
+	CurrentPage class.Int32 `json:"currentPage,omitempty" description:"分页的当前页"`
+	TotalPage   class.Int32 `json:"totalPage,omitempty" description:"分页的总页数"`
+	Total       class.Int32 `json:"total,omitempty" description:"总数，如果data是列表并且分页"`
 }
 
 const ResultErr = 0
@@ -22,7 +23,7 @@ const ResultSuccess = 1
 const ResultAuthErr = 2
 const ResultUnauthorized = 403
 
-// http返回json数据
+// Json http返回json数据
 func (ctx *Context) Json(ret RestRet) {
 	ctx.UpdateSessionExpire()
 	var code int
@@ -55,7 +56,7 @@ func (ctx *Context) RawSuccess(data []byte) {
 	ctx.Proxy.Binary(data)
 }
 
-// 带分页信息
+// JsonSuccessWithPage 带分页信息
 func (ctx *Context) JsonSuccessWithPage(data interface{}, currentPage, totalPage, total int32) {
 	ret := RestRet{
 		Result: ResultSuccess,
@@ -77,9 +78,12 @@ func (ctx *Context) JsonError(msg string) {
 }
 
 func (ctx *Context) SetFileHeader(filename string) {
-	ctx.Proxy.Header("Content-Disposition", "attachment; filename="+filename)
+	ctx.Proxy.Header("Content-Disposition", "attachment; filename="+url.QueryEscape(filename))
 	ctx.Proxy.Header("Content-Type", "application/octet-stream")
 	ctx.Proxy.Header("Content-Transfer-Encoding", "binary")
+	ctx.Proxy.Header("Pragma", "No-cache")
+	ctx.Proxy.Header("Cache-Control", "No-cache")
+	ctx.Proxy.Header("Expires", "0")
 }
 func (ctx *Context) SetJsonHeader() {
 	ctx.Proxy.Header("Content-Type", "application/json")
@@ -92,7 +96,7 @@ func (ctx *Context) FileRaw(data []byte, name string) {
 	}
 }
 
-// 相对于项目目录路径的
+// File 相对于项目目录路径的
 func (ctx *Context) File(relativePath, name string) {
 	ctx.FileDirect(storagekit.GetFullPath(relativePath), name)
 }

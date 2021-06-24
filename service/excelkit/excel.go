@@ -28,7 +28,7 @@ type KeyDef struct {
 	Width float64
 }
 
-// title/_sheet:x/key:name/key:name:width
+// Export title/_sheet:x/key:name/key:name:width
 // todo 其中的err仍未处理
 func Export(param Param, ctx *context.Context) {
 	if len(param.Keys) == 0 {
@@ -56,11 +56,29 @@ func Export(param Param, ctx *context.Context) {
 		keyMap[ts[0]] = m
 	}
 	// style title
-	titleStyle, err := f.NewStyle(`{"font":{"size":15},"alignment":{"horizontal":"center","vertical":"center"}}`)
+	titleStyle, err := f.NewStyle(&excelize.Style{
+		Alignment: &excelize.Alignment{
+			Horizontal: "center",
+			Vertical:   "center",
+		},
+		Font: &excelize.Font{
+			Size: 15,
+		},
+	})
 	if err != nil {
 		panic(exception.New(err.Error()))
 	}
-	cellStyle, err := f.NewStyle(`{"font":{"size":12},"border":[{"type":"left","color":"000000","style":1},{"type":"top","color":"000000","style":1},{"type":"bottom","color":"000000","style":1},{"type":"right","color":"000000","style":1}]}`)
+	cellStyle, err := f.NewStyle(&excelize.Style{
+		Alignment: &excelize.Alignment{
+			//Horizontal: "right",
+			Vertical: "center",
+			WrapText: true,
+		},
+		Font: &excelize.Font{
+			Size: 12,
+		},
+		Border: BorderStyleDefault(),
+	})
 	if err != nil {
 		panic(exception.New(err.Error()))
 	}
@@ -102,7 +120,7 @@ func Export(param Param, ctx *context.Context) {
 	}
 }
 
-// name(题头):key(map-key):type(number)
+// Load name(题头):key(map-key):type(number)
 func Load(param Param) []map[string]string {
 	if len(param.Keys) == 0 {
 		panic(exception.New("excel names empty"))
@@ -151,4 +169,29 @@ func Load(param Param) []map[string]string {
 		index++
 	}
 	return res
+}
+
+func BorderStyleDefault() []excelize.Border {
+	return []excelize.Border{
+		{
+			Type:  "left",
+			Color: "000000",
+			Style: 1,
+		},
+		{
+			Type:  "right",
+			Color: "000000",
+			Style: 1,
+		},
+		{
+			Type:  "top",
+			Color: "000000",
+			Style: 1,
+		},
+		{
+			Type:  "bottom",
+			Color: "000000",
+			Style: 1,
+		},
+	}
 }

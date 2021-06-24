@@ -25,7 +25,7 @@ func ToString(obj interface{}) string {
 	return s
 }
 
-//  string, &p
+// ParseObj string, &p
 func ParseObj(data string, p interface{}) error {
 	err := JSON().Unmarshal([]byte(data), p)
 	return err
@@ -41,7 +41,7 @@ func ParseMap(data string) map[string]interface{} {
 	return m
 }
 
-// use json.Number，如需要高精度计算用decimal转换
+// ParseMapUseNumber : use json.Number，如需要高精度计算用decimal转换
 // d,_:=decimal.NewFromString(jsonkit.ParseMapUseNumber(str)["key"].(json.Number).String())
 // decimal.MarshalJSONWithoutQuotes=true
 func ParseMapUseNumber(data string) map[string]interface{} {

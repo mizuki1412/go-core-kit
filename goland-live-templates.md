@@ -75,6 +75,13 @@ func (l $name$List) Find(fun func(ele *$name$) bool) *$name$ {
 	}
 	return nil
 }
+func (l $name$List) MapReduce(fun func(ele *$name$) interface{}) []interface{} {
+	var results []interface{}
+	for _, e := range l {
+		results = append(results, fun(e))
+	}
+	return results
+}
 ```
 
 ## dao
