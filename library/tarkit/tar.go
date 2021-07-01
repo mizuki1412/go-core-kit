@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+// CreateTar todo 存在问题：用windows解压时，出现PaxHeader文件、同时中文不显示。
 func CreateTar(resource, target string, deleteIfExist bool) {
 	//create tar file with targetfile name
 	tf, err := os.Create(target)
@@ -47,6 +48,7 @@ func tarFile(directory string, filesource string, sfileInfo os.FileInfo, tarwrit
 		panic(exception.New("file info err:" + err.Error()))
 	}
 	header.Name = directory
+	//header.Format = tar.FormatGNU
 	err = tarwriter.WriteHeader(header)
 	if err != nil {
 		panic(exception.New("file header err:" + err.Error()))
@@ -75,6 +77,7 @@ func tarFolder(directory string, tarwriter *tar.Writer) {
 				return err
 			}
 			header.Name = filepath.Join(baseFolder, strings.TrimPrefix(targetpath, directory))
+			header.Format = tar.FormatGNU
 			if err = tarwriter.WriteHeader(header); err != nil {
 				return err
 			}

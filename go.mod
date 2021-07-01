@@ -18,6 +18,7 @@ require (
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/googollee/go-socket.io v1.4.4
 	github.com/imkira/go-interpol v1.1.0 // indirect
+	github.com/iris-contrib/go.uuid v2.0.0+incompatible
 	github.com/jmespath/go-jmespath v0.3.0 // indirect
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/json-iterator/go v1.1.10
