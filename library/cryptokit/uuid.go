@@ -1,12 +1,12 @@
 package cryptokit
 
 import (
-	uuid "github.com/iris-contrib/go.uuid"
+	uuid "github.com/google/uuid"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 )
 
 func UUID() string {
-	id, _ := uuid.NewV4()
+	id := uuid.New()
 	if id.String() == "" {
 		panic(exception.New("uuid gen error"))
 	}

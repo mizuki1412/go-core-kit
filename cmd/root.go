@@ -6,9 +6,9 @@ import (
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/init/initkit"
 	"github.com/mizuki1412/go-core-kit/library/bytekit"
+	"github.com/mizuki1412/go-core-kit/library/cryptokit"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/mapkit"
-	"github.com/mizuki1412/go-core-kit/library/tarkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cobra"
 	"golang.org/x/text/encoding/simplifiedchinese"
@@ -30,11 +30,7 @@ var rootCmd = &cobra.Command{
 	Use: "go-core-kit",
 	Run: func(cmd *cobra.Command, args []string) {
 		initkit.BindFlags(cmd)
-		//tarkit.CreateTar("/Users/ycj/Downloads/02-lkt-mda", "/Users/ycj/Downloads/export/test.tar", true)
-		err := tarkit.Zip("/Users/ycj/Downloads/export/test.zip", "/Users/ycj/Downloads/02-lkt-mda")
-		if err != nil {
-			return
-		}
+		log.Println(cryptokit.UUID())
 	},
 }
 

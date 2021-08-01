@@ -51,7 +51,7 @@ func startServer(param *WinParam) (chan error, string) {
 	go func() {
 		logkit.Info("pc ui http server start at: " + p)
 		if listener != nil {
-			// todo 和restkit整合, 随机端口
+			// todo 和restkit.Run()整合, 随机端口
 			ch <- http.Serve(listener, nil)
 		} else {
 			ch <- restkit.Run()

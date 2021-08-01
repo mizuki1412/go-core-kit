@@ -10,7 +10,6 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/restkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/router"
 	"github.com/spf13/cast"
-	"log"
 	"net/http"
 )
 
@@ -24,11 +23,7 @@ var ConnectFun = func(s socketio.Conn) {
 var Clients = make([]socketio.Conn, 0, 5)
 
 func init() {
-	var err error
-	Server, err = socketio.NewServer(nil)
-	if err != nil {
-		logkit.Fatal(err)
-	}
+	Server = socketio.NewServer(nil)
 	Server.OnConnect("/", func(s socketio.Conn) error {
 		s.SetContext("")
 		logkit.Info("websocket connected:" + s.ID())
@@ -79,13 +74,12 @@ func SetEventPublicHandle(fun func(req *MsgReq) string) *socketio.Server {
 
 var UiAssets embed.FS
 
-// 开启websocket server并配置http todo
+// Start 开启websocket server并配置http todo
 func Start() {
 	go Server.Serve()
 	// defer Server.Close()
 	// restkit方式：根目录下，而非proxyGroup下； 和其他action共存
 	socketHandle := func(w http.ResponseWriter, r *http.Request) {
-		log.Println(123)
 		origin := r.Header.Get("Origin")
 		w.Header().Set("Access-Control-Allow-Origin", origin)
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
