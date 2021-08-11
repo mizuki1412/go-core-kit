@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func Gen(urlPrefix string) {
+func Gen(urlPrefix string, next bool) {
 	ret, _ := httpkit.Request(httpkit.Req{
 		Method: "GET",
 		Url:    urlPrefix + "/swagger/doc",
@@ -42,7 +42,11 @@ func Gen(urlPrefix string) {
 		param1 := ""
 		param2 := ""
 		if len(all[key].Get("post.parameters").Array()) > 0 {
-			param1 = "params:any"
+			if next {
+				param1 = "params"
+			} else {
+				param1 = "params:any"
+			}
 			param2 = ", params"
 		}
 		// key转function name
@@ -54,16 +58,28 @@ func Gen(urlPrefix string) {
 		for _, k1 := range stringkit.Split(k, "/") {
 			k2 += stringkit.UpperFirst(k1)
 		}
+		funName := "postService"
+		if next {
+			funName = "request"
+		}
 		result += fmt.Sprintf(`
 export async function %s(%s){
-	const {data} = await postService('%s'%s)
+	const {data} = await %s('%s'%s)
 	return data
 }
-`, k2, param1, key, param2)
+`, k2, param1, funName, key, param2)
 		if !arraykit.StringContains(tagTemps, tag) {
 			tagTemps = append(tagTemps, tag)
-			result = "import {postService} from 'web-toolkit/src/case-main/index';\n" + result
+			if next {
+				result = "import {request} from 'webkit/lib/request';\n" + result
+			} else {
+				result = "import {postService} from 'web-toolkit/src/case-main/index';\n" + result
+			}
 		}
-		_ = filekit.WriteFileAppend("./gen-front-dao/"+name+".ts", []byte(result))
+		suffer := ".ts"
+		if next {
+			suffer = ".js"
+		}
+		_ = filekit.WriteFileAppend("./gen-front-dao/"+name+suffer, []byte(result))
 	}
 }
