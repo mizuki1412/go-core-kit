@@ -16,6 +16,11 @@ func JSON() jsoniter.API {
 	return jsonAPI
 }
 
+func Test(obj interface{}) string {
+	s, _ := json.Marshal(obj)
+	return string(s)
+}
+
 func ToString(obj interface{}) string {
 	s, err := JSON().MarshalToString(obj)
 	// todo ?

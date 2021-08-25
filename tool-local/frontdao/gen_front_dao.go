@@ -65,7 +65,7 @@ func Gen(urlPrefix string, next bool) {
 		result += fmt.Sprintf(`
 export async function %s(%s){
 	const {data} = await %s('%s'%s)
-	return data
+	return data.data
 }
 `, k2, param1, funName, key, param2)
 		if !arraykit.StringContains(tagTemps, tag) {

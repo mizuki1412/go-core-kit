@@ -3,10 +3,8 @@ package cmd
 import (
 	"bytes"
 	"fmt"
-	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/init/initkit"
 	"github.com/mizuki1412/go-core-kit/library/bytekit"
-	"github.com/mizuki1412/go-core-kit/library/cryptokit"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/mapkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
@@ -30,7 +28,6 @@ var rootCmd = &cobra.Command{
 	Use: "go-core-kit",
 	Run: func(cmd *cobra.Command, args []string) {
 		initkit.BindFlags(cmd)
-		log.Println(cryptokit.UUID())
 	},
 }
 
@@ -51,20 +48,6 @@ func tcpClient() {
 	n, _ = conn.Read(buf[0:])
 	fmt.Println("Reply form server", rAddr.String(), bytekit.Bytes2HexArray(buf[0:n]))
 	time.Sleep(time.Second * 1)
-}
-
-func TestCatch() (ret int) {
-	defer func() {
-		if err := recover(); err != nil {
-			ret = 11
-		}
-	}()
-	panic(exception.New("123"))
-	return 10
-}
-
-func test(t map[string]interface{}) {
-	fmt.Printf("%p \n", &t)
 }
 
 func testMapMerge() {
