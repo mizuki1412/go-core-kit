@@ -1,7 +1,7 @@
 package cryptokit
 
 import (
-	uuid "github.com/google/uuid"
+	"github.com/google/uuid"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 )
 
