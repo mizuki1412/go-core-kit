@@ -2,10 +2,9 @@ package cronkit
 
 import (
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/library/commonkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
-	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/robfig/cron/v3"
-	"github.com/spf13/cast"
 )
 
 var scheduler *cron.Cron
@@ -37,23 +36,10 @@ func RemovePool(key string) {
 	}
 }
 
-// 给默认的scheduler add func， 封装上recover
+// AddFunc 给默认的scheduler add func， 封装上recover
 func AddFunc(spec string, fun func()) {
 	_, err := Scheduler().AddFunc(spec, func() {
-		defer func() {
-			if err := recover(); err != nil {
-				var msg string
-				if e, ok := err.(exception.Exception); ok {
-					//msg = e.Msg
-					// 带代码位置信息
-					logkit.Error(e.Error())
-				} else {
-					msg = cast.ToString(err)
-					logkit.Error(msg)
-				}
-			}
-		}()
-		fun()
+		commonkit.RecoverFuncWrapper(fun)
 	})
 	if err != nil {
 		panic(exception.New(err.Error()))

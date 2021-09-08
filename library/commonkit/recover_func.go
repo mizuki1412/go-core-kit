@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cast"
 )
 
-// 将函数套在recover内，实现exception catch。eg：用在for-range时
+// RecoverFuncWrapper 将函数套在recover内，实现exception catch。eg：用在for-range时
 func RecoverFuncWrapper(fun func()) {
 	defer func() {
 		if err := recover(); err != nil {
