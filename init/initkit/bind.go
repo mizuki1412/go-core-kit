@@ -67,6 +67,9 @@ func DefFlags(cmd *cobra.Command) {
 	cmd.Flags().String(sqlkit.ConfigKeyDBName, "", "")
 	cmd.Flags().String(sqlkit.ConfigKeyDBUser, "", "")
 	cmd.Flags().String(sqlkit.ConfigKeyDBPwd, "", "")
+	cmd.Flags().String(sqlkit.ConfigKeyDBMaxOpen, "", "最大连接 默认25")
+	cmd.Flags().String(sqlkit.ConfigKeyDBMaxIdle, "", "最大空闲连接 默认5")
+	cmd.Flags().String(sqlkit.ConfigKeyDBMaxLife, "", "单位分钟，默认20")
 
 	cmd.Flags().String(swagger.ConfigKeySwaggerBasePath, "", "/path")
 	cmd.Flags().String(swagger.ConfigKeySwaggerHost, "", "")

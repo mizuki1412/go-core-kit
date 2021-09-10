@@ -7,6 +7,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
+	"github.com/spf13/cast"
 	"reflect"
 	"time"
 )
@@ -40,10 +41,10 @@ func connector() *sqlx.DB {
 			param = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8", configkit.GetString(ConfigKeyDBUser, ""), configkit.GetString(ConfigKeyDBPwd, ""), configkit.GetString(ConfigKeyDBHost, ""), configkit.GetString(ConfigKeyDBPort, ""), configkit.GetString(ConfigKeyDBName, ""))
 		}
 		db = sqlx.MustConnect(driver, param)
-		db.SetConnMaxLifetime(time.Minute * 60)
-		// todo 需要调优
-		db.SetMaxOpenConns(10)
-		db.SetMaxIdleConns(5)
+		lt := cast.ToInt(configkit.GetInt(ConfigKeyDBMaxLife, 20))
+		db.SetConnMaxLifetime(time.Duration(lt) * time.Minute)
+		db.SetMaxOpenConns(configkit.GetInt(ConfigKeyDBMaxOpen, 25))
+		db.SetMaxIdleConns(configkit.GetInt(ConfigKeyDBMaxIdle, 5))
 	}
 	return db
 }
@@ -62,7 +63,7 @@ func New(schema string) *Dao {
 	}
 }
 
-// 在context中调用，如果要单独调用，注意commit和rollback的处理
+// NewTX 在context中调用，如果要单独调用，注意commit和rollback的处理
 func NewTX(schema string) *Dao {
 	return &Dao{
 		Schema: schema,
@@ -71,7 +72,7 @@ func NewTX(schema string) *Dao {
 	}
 }
 
-// 用于处理子类Dao New中的通用逻辑
+// NewHelper 用于处理子类Dao New中的通用逻辑
 func (dao *Dao) NewHelper(schema string, tx ...*Dao) {
 	dao.Schema = schema
 	if tx != nil && len(tx) > 0 {
@@ -92,7 +93,7 @@ func (dao *Dao) SetSchema(schema string) *Dao {
 	return dao
 }
 
-/// 根据类获取tablename，并判断schema
+// GetTable 根据类获取tablename，并判断schema
 func (dao *Dao) GetTable(dest interface{}) string {
 	rt := reflect.TypeOf(dest).Elem()
 	return getTable(rt, dao.Schema)
@@ -123,7 +124,7 @@ func getTable(rt reflect.Type, schema string) string {
 	}
 }
 
-/// 直接获取schema+tableName
+// GetTableD 直接获取schema+tableName
 func (dao *Dao) GetTableD(tName string) string {
 	var schema0 string
 	if dao.Schema != "" {
@@ -140,7 +141,7 @@ func (dao *Dao) GetTableD(tName string) string {
 	}
 }
 
-// transaction
+// Commit transaction
 func (dao *Dao) Commit() {
 	if dao.TX != nil {
 		err := dao.TX.Commit()
