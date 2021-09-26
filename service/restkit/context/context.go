@@ -109,13 +109,16 @@ func (ctx *Context) bindStruct(bean interface{}) {
 		// multipart file
 		if typeString == "class.File" {
 			file, header, err := ctx.Proxy.FormFile(key)
-			if err != nil {
+			// 如果文件流必须存在则检测
+			if err != nil && strings.Index(field.Tag.Get("validate"), "required") > -1 {
 				panic(exception.New(err.Error()))
 			}
-			fieldV.Set(reflect.ValueOf(class.File{
-				File:   file,
-				Header: header,
-			}))
+			if err == nil {
+				fieldV.Set(reflect.ValueOf(class.File{
+					File:   file,
+					Header: header,
+				}))
+			}
 			continue
 		}
 		// bind struct key

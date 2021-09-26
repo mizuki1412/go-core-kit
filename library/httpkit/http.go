@@ -31,7 +31,7 @@ func init() {
 	client.Jar = jar
 }
 
-// 填写FormData、JsonData时可缺省contentType
+// Req 填写FormData、JsonData时可缺省contentType
 type Req struct {
 	Method      string
 	Url         string

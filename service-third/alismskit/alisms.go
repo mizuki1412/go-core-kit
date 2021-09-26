@@ -8,7 +8,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 )
 
-/// phones: xxx,xxxx, data例如：{"code":"123456"}
+// Send phones: xxx,xxxx, data例如：{"code":"123456"}
 func Send(phones, signName, templateCode string, data map[string]interface{}) error {
 	ak := configkit.GetString(ConfigKeyAliSMSAccessKey, "")
 	aks := configkit.GetString(ConfigKeyAliSMSAccessKeySecret, "")

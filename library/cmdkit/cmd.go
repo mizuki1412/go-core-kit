@@ -8,6 +8,7 @@ import (
 	"io"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"time"
 )
 
@@ -17,15 +18,23 @@ type RunParams struct {
 }
 
 func Run(command string, params ...RunParams) (string, error) {
-	// todo 判断系统环境
 	var param RunParams
 	if len(params) == 0 {
 		param = RunParams{}
 	} else {
 		param = params[0]
 	}
-
-	cmd := exec.Command("/bin/sh", "-c", command)
+	var cmdName string
+	var arg1 string
+	switch runtime.GOOS {
+	case "darwin", "linux":
+		cmdName = "/bin/sh"
+		arg1 = "-c"
+	case "windows":
+		cmdName = "cmd"
+		arg1 = "/C"
+	}
+	cmd := exec.Command(cmdName, arg1, command)
 	// 程序退出时Kill子进程
 	//cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	if !param.Async {
