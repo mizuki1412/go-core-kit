@@ -4,6 +4,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"strconv"
+	"strings"
 )
 
 func Bytes2HexArray(bytes []byte) string {
@@ -59,6 +60,12 @@ func HexString2Bytes1(src string) []byte {
 		ret[i/2] = byte(v)
 	}
 	return ret
+}
+
+// HexString2Bytes2 format: 01 02 03 0a 0d
+func HexString2Bytes2(src string) []byte {
+	src = strings.ReplaceAll(src, " ", "")
+	return HexString2Bytes1(src)
 }
 
 // format: 0102030a0d

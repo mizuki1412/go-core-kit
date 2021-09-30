@@ -8,10 +8,11 @@ import (
 )
 
 type NetServer struct {
-	Port      int32
-	OnConnect func(c gnet.Conn) (out []byte, action gnet.Action)
-	OnMessage func(frame []byte, c gnet.Conn) (out []byte, action gnet.Action)
-	OnClose   func(c gnet.Conn, err error) (action gnet.Action)
+	ProtoSchema string `description:"tcp/udp"`
+	Port        int32
+	OnConnect   func(c gnet.Conn) (out []byte, action gnet.Action)
+	OnMessage   func(frame []byte, c gnet.Conn) (out []byte, action gnet.Action)
+	OnClose     func(c gnet.Conn, err error) (action gnet.Action)
 	// 数据message前的组包拆包
 	//UnPacket func(c *connection.Connection, buffer *ringbuffer.RingBuffer) (interface{}, []byte)
 	//Packet   func(c *connection.Connection, data []byte) []byte
@@ -61,9 +62,12 @@ func (th *NetServer) Run() {
 	//	gev.Address(":" + cast.ToString(th.Port)),
 	//	gev.NumLoops(-1),
 	//}
+	if th.ProtoSchema == "" {
+		th.ProtoSchema = "tcp"
+	}
 	err := gnet.Serve(
 		handler0,
-		fmt.Sprintf("tcp://:%d", th.Port),
+		fmt.Sprintf("%s://:%d", th.ProtoSchema, th.Port),
 		gnet.WithMulticore(true),
 		gnet.WithReusePort(true))
 	if err != nil {

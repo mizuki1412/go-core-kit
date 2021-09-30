@@ -6,6 +6,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/library/httpkit"
 	"github.com/mizuki1412/go-core-kit/library/timekit"
 	"github.com/tidwall/gjson"
+	"log"
 	"time"
 )
 
@@ -22,7 +23,12 @@ func FaceAdd(image []byte, groupId, userId string) string {
 			"user_id":    userId,
 		},
 	})
-	if gjson.Get(res, "error_code").Int() != 0 {
+	errCode := gjson.Get(res, "error_code").Int()
+	if errCode == 18 {
+		// QPS超限额
+		timekit.Sleep(500)
+		return FaceAdd(image, groupId, userId)
+	} else if errCode != 0 {
 		panic(exception.New(gjson.Get(res, "error_msg").String()))
 	}
 	return gjson.Get(res, "result").Get("face_token").String()
@@ -40,7 +46,12 @@ func FaceDel(groupId, userId, faceToken string) {
 			"face_token": faceToken,
 		},
 	})
-	if gjson.Get(res, "error_code").Int() != 0 {
+	errCode := gjson.Get(res, "error_code").Int()
+	if errCode == 18 {
+		// QPS超限额
+		timekit.Sleep(500)
+		FaceDel(groupId, userId, faceToken)
+	} else if errCode != 0 {
 		panic(exception.New(gjson.Get(res, "error_msg").String()))
 	}
 }
@@ -59,7 +70,13 @@ func FaceSearch(image []byte, groupId string, count int32) []map[string]interfac
 			"max_user_num":  count,
 		},
 	})
-	if gjson.Get(res, "error_code").Int() != 0 {
+	log.Println(res)
+	errCode := gjson.Get(res, "error_code").Int()
+	if errCode == 18 {
+		// QPS超限额
+		timekit.Sleep(500)
+		return FaceSearch(image, groupId, count)
+	} else if errCode != 0 {
 		panic(exception.New(gjson.Get(res, "error_msg").String()))
 	}
 	users := gjson.Get(res, "result").Get("user_list").Array()
