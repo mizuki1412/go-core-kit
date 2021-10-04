@@ -6,11 +6,11 @@ import (
 	"github.com/mizuki1412/go-core-kit/library/httpkit"
 	"github.com/mizuki1412/go-core-kit/library/timekit"
 	"github.com/tidwall/gjson"
-	"log"
 	"time"
 )
 
 // FaceAdd 人脸注册：https://aip.baidubce.com/rest/2.0/face/v3/faceset/user/add
+// return face_token
 func FaceAdd(image []byte, groupId, userId string) string {
 	checkAccessKey()
 	data := base64.StdEncoding.EncodeToString(image)
@@ -57,7 +57,7 @@ func FaceDel(groupId, userId, faceToken string) {
 }
 
 // FaceSearch 人脸搜索：https://aip.baidubce.com/rest/2.0/face/v3/search
-// count 返回的匹配个数
+// count 返回的匹配个数; return {userId, score}
 func FaceSearch(image []byte, groupId string, count int32) []map[string]interface{} {
 	checkAccessKey()
 	data := base64.StdEncoding.EncodeToString(image)
@@ -70,7 +70,7 @@ func FaceSearch(image []byte, groupId string, count int32) []map[string]interfac
 			"max_user_num":  count,
 		},
 	})
-	log.Println(res)
+	//log.Println(res)
 	errCode := gjson.Get(res, "error_code").Int()
 	if errCode == 18 {
 		// QPS超限额
