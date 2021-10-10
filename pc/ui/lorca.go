@@ -21,7 +21,7 @@ func StartUI(param *WinParam) {
 		panic(exception.New(err.Error()))
 	}
 	if param.Url != "" {
-		_ = Self.Load("http://127.0.0.1:" + port + param.Url)
+		_ = Self.Load("http://localhost:" + port + param.Url)
 	} else if param.CompleteUrl != "" {
 		_ = Self.Load(param.CompleteUrl)
 	} else {

@@ -29,7 +29,7 @@ func FaceAdd(image []byte, groupId, userId string) string {
 		timekit.Sleep(500)
 		return FaceAdd(image, groupId, userId)
 	} else if errCode != 0 {
-		panic(exception.New(gjson.Get(res, "error_msg").String()))
+		panic(exception.New("baidukit: " + gjson.Get(res, "error_msg").String()))
 	}
 	return gjson.Get(res, "result").Get("face_token").String()
 }
@@ -52,7 +52,7 @@ func FaceDel(groupId, userId, faceToken string) {
 		timekit.Sleep(500)
 		FaceDel(groupId, userId, faceToken)
 	} else if errCode != 0 {
-		panic(exception.New(gjson.Get(res, "error_msg").String()))
+		panic(exception.New("baidukit: " + gjson.Get(res, "error_msg").String()))
 	}
 }
 
@@ -77,7 +77,7 @@ func FaceSearch(image []byte, groupId string, count int32) []map[string]interfac
 		timekit.Sleep(500)
 		return FaceSearch(image, groupId, count)
 	} else if errCode != 0 {
-		panic(exception.New(gjson.Get(res, "error_msg").String()))
+		panic(exception.New("baidukit: " + gjson.Get(res, "error_msg").String()))
 	}
 	users := gjson.Get(res, "result").Get("user_list").Array()
 	// 返回：groupId,userId,userInfo,score(用户的匹配得分，推荐阈值80分)
