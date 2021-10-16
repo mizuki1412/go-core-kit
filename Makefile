@@ -1,5 +1,5 @@
 BINARY=go-core-kit
-VERSION=0.4.0
+VERSION=1.0.0
 DATE=`date +%FT%T%z`
 .PHONY: init
 
@@ -14,3 +14,7 @@ init:
 
 upgrade:
 	@go-mod-upgrade
+
+publish:
+	@git tag v${VERSION}
+	@git push origin v${VERSION}
