@@ -34,9 +34,7 @@ func NewPath(path string, method string) *SwaggerPath {
 	return sp
 }
 
-/**
-params struct的tags：description，validate:"required"，default
-*/
+// Param params struct的tags：description，validate:"required"，default
 func (swagger *SwaggerPath) Param(param interface{}) *SwaggerPath {
 	m := Doc.Paths[swagger.Path][swagger.Method]["parameters"]
 	rt := reflect.TypeOf(param)

@@ -20,7 +20,7 @@ import (
 	"log"
 )
 
-// 注意，load比一般的init慢
+// LoadConfig 注意，load比一般的init慢
 func LoadConfig() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")

@@ -1,10 +1,10 @@
-<!-- HTML for static distribution bundle build -->
+<!-- HTML for static distribution bundle build v4.0.0-rc.4 -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8">
     <title>Swagger UI</title>
-    <link rel="stylesheet" type="text/css" href="./swagger/swagger-ui.css" >
+    <link rel="stylesheet" type="text/css" href="./swagger/swagger-ui.css" />
     <link rel="icon" type="image/png" href="./swagger/favicon-32x32.png" sizes="32x32" />
     <link rel="icon" type="image/png" href="./swagger/favicon-16x16.png" sizes="16x16" />
     <style>
@@ -33,13 +33,13 @@
   <body>
     <div id="swagger-ui"></div>
 
-    <script src="./swagger/swagger-ui-bundle.js"> </script>
-    <script src="./swagger/swagger-ui-standalone-preset.js"> </script>
+    <script src="./swagger/swagger-ui-bundle.js" charset="UTF-8"> </script>
+    <script src="./swagger/swagger-ui-standalone-preset.js" charset="UTF-8"> </script>
     <script>
     window.onload = function() {
       // Begin Swagger UI call region
       const ui = SwaggerUIBundle({
-        url: "swagger/doc",
+        url: "./swagger/doc",
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [
@@ -49,15 +49,12 @@
         plugins: [
           SwaggerUIBundle.plugins.DownloadUrl
         ],
-        layout: "StandaloneLayout",
-        docExpansion:"none",
-        filter: true,
-        withCredentials:true
-      })
+        layout: "StandaloneLayout"
+      });
       // End Swagger UI call region
 
-      window.ui = ui
-    }
+      window.ui = ui;
+    };
   </script>
   </body>
 </html>
