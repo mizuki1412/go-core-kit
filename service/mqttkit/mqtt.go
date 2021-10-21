@@ -2,6 +2,7 @@ package mqttkit
 
 import (
 	MQTT "github.com/eclipse/paho.mqtt.golang"
+	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cast"
@@ -13,7 +14,7 @@ var client MQTT.Client
 var subscribeList []func()
 
 // 第一次连接
-var first bool = true
+var first = true
 
 func New() *MQTT.Client {
 	opts := MQTT.NewClientOptions()
@@ -41,7 +42,7 @@ func New() *MQTT.Client {
 	//create and start a client using the above ClientOptions
 	client = MQTT.NewClient(opts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		logkit.Fatal(token.Error().Error())
+		panic(exception.New(token.Error().Error()))
 	}
 	logkit.Info("mqtt connect success")
 	return &client
@@ -54,8 +55,9 @@ func Subscribe(topic string, qos byte, callback MQTT.MessageHandler) {
 	f := func() {
 		if token := client.Subscribe(topic, qos, callback); token.Wait() && token.Error() != nil {
 			logkit.Error(token.Error().Error())
+		} else {
+			logkit.Info("mqtt subscribe success: " + topic)
 		}
-		logkit.Info("mqtt subscribe success: " + topic)
 	}
 	subscribeList = append(subscribeList, f)
 	f()

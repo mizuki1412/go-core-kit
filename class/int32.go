@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cast"
 )
 
-// 同时继承scan和value方法
+// Int32 同时继承scan和value方法
 type Int32 struct {
 	Int32 int32
 	Valid bool

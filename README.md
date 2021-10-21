@@ -3,6 +3,8 @@
 
 toolkit for golang projects
 
+`go get -d github.com/mizuki1412/go-core-kit@v1.0.0`
+
 ## 可替换的函数目录
 - session.SessionGetUserFunc 获取session中user对象的转换处理函数
 
