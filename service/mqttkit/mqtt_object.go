@@ -26,7 +26,7 @@ type ConnectParam struct {
 }
 
 // 用于记录创建过的clients
-var allClients map[MQTT.Client]*Client
+var allClients = map[MQTT.Client]*Client{}
 
 func NewClient(param ConnectParam) *Client {
 	newClient := &Client{First: true, Id: param.Id}
