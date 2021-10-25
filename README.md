@@ -26,6 +26,9 @@ toolkit for golang projects
 # pc
 应用于pc端，web+go的模式，go作为基座的一些封装。
 
+# mod
+公用的业务模块
+
 # tool-local
 本地使用的一些小工具
 
