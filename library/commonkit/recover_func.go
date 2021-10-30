@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/cast"
 )
 
-// RecoverFuncWrapper 将函数套在recover内，实现exception catch。eg：用在for-range时
-func RecoverFuncWrapper(fun func(), throwAgain ...bool) {
+// RecoverFuncWrapper 将函数套在recover内，实现exception catch。如果捕获异常
+func RecoverFuncWrapper(fun func()) (re *exception.Exception) {
 	defer func() {
 		if err := recover(); err != nil {
 			var msg string
@@ -15,21 +15,22 @@ func RecoverFuncWrapper(fun func(), throwAgain ...bool) {
 				msg = e.Msg
 				// 带代码位置信息
 				logkit.Error(e.Error())
+				re = &e
 			} else {
 				msg = cast.ToString(err)
-				logkit.Error(exception.New(msg, 3).Error())
+				exp := exception.New(msg, 3)
+				logkit.Error(exp.Error())
+				re = &exp
 			}
-			// 重新抛出
-			if len(throwAgain) > 0 && throwAgain[0] {
-				panic(err)
-			}
+
 		}
 	}()
 	fun()
+	return nil
 }
 
-func RecoverGoFuncWrapper(fun func(), throwAgain ...bool) {
+func RecoverGoFuncWrapper(fun func()) {
 	go func() {
-		RecoverFuncWrapper(fun, throwAgain...)
+		_ = RecoverFuncWrapper(fun)
 	}()
 }
