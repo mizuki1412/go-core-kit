@@ -8,11 +8,8 @@ import (
 	"github.com/spf13/cast"
 )
 
-/**
-针对PG的jsonb
-*/
+/** 针对PG的jsonb */
 
-// 同时继承scan和value方法
 type MapString struct {
 	Map   map[string]interface{}
 	Valid bool

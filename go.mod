@@ -3,7 +3,6 @@ module github.com/mizuki1412/go-core-kit
 go 1.17
 
 require (
-	github.com/360EntSecGroup-Skylar/excelize/v2 v2.4.0
 	github.com/Depado/bfchroma v1.3.0
 	github.com/Masterminds/squirrel v1.5.1
 	github.com/SebastiaanKlippert/go-wkhtmltopdf v1.7.2
@@ -29,6 +28,7 @@ require (
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.9.0
 	github.com/tidwall/gjson v1.10.2
+	github.com/xuri/excelize/v2 v2.4.1
 	github.com/zserge/lorca v0.1.10
 	go.bug.st/serial v1.3.3
 	go.uber.org/automaxprocs v1.4.0
@@ -106,7 +106,7 @@ require (
 	go.uber.org/atomic v1.8.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect
-	golang.org/x/net v0.0.0-20210614182718-04defd469f4e // indirect
+	golang.org/x/net v0.0.0-20210726213435-c6fcb2dbf985 // indirect
 	golang.org/x/sys v0.0.0-20210823070655-63515b42dcdf // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect

@@ -19,17 +19,17 @@ type (
 	}
 )
 
-// Create a new queue
+// NewQueue Create a new queue
 func NewQueue() *Queue {
 	return &Queue{}
 }
 
-//获取队列长度
+// Len 获取队列长度
 func (th *Queue) Len() int {
 	return th.length
 }
 
-//返回队列顶端元素
+// Peek 返回队列顶端元素
 func (th *Queue) Peek() interface{} {
 	if th.top == nil {
 		return nil
@@ -37,7 +37,7 @@ func (th *Queue) Peek() interface{} {
 	return th.top.value
 }
 
-//入队操作
+// Push 入队操作
 func (th *Queue) Push(v interface{}) {
 	th.lock1.Lock()
 	defer th.lock1.Unlock()
@@ -53,7 +53,7 @@ func (th *Queue) Push(v interface{}) {
 	th.length++
 }
 
-//出队操作
+// Pop 出队操作
 func (th *Queue) Pop() interface{} {
 	th.lock1.Lock()
 	defer th.lock1.Unlock()

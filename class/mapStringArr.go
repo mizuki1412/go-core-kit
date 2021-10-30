@@ -7,11 +7,8 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 )
 
-/**
-针对PG的jsonb，其中是array形式的
-*/
+/** 针对PG的jsonb，其中是array形式的 */
 
-// 同时继承scan和value方法
 type MapStringArr struct {
 	Arr   []map[string]interface{}
 	Valid bool

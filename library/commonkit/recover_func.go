@@ -7,7 +7,7 @@ import (
 )
 
 // RecoverFuncWrapper 将函数套在recover内，实现exception catch。eg：用在for-range时
-func RecoverFuncWrapper(fun func()) {
+func RecoverFuncWrapper(fun func(), throwAgain ...bool) {
 	defer func() {
 		if err := recover(); err != nil {
 			var msg string
@@ -19,13 +19,17 @@ func RecoverFuncWrapper(fun func()) {
 				msg = cast.ToString(err)
 				logkit.Error(exception.New(msg, 3).Error())
 			}
+			// 重新抛出
+			if len(throwAgain) > 0 && throwAgain[0] {
+				panic(err)
+			}
 		}
 	}()
 	fun()
 }
 
-func RecoverGoFuncWrapper(fun func()) {
+func RecoverGoFuncWrapper(fun func(), throwAgain ...bool) {
 	go func() {
-		RecoverFuncWrapper(fun)
+		RecoverFuncWrapper(fun, throwAgain...)
 	}()
 }

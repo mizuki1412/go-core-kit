@@ -3,8 +3,10 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/init/initkit"
 	"github.com/mizuki1412/go-core-kit/library/bytekit"
+	"github.com/mizuki1412/go-core-kit/library/commonkit"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/mapkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
@@ -28,6 +30,12 @@ var rootCmd = &cobra.Command{
 	Use: "go-core-kit",
 	Run: func(cmd *cobra.Command, args []string) {
 		initkit.BindFlags(cmd)
+		commonkit.RecoverFuncWrapper(func() {
+			panic(exception.New("test1"))
+		})
+		commonkit.RecoverFuncWrapper(func() {
+			panic(exception.New("test2"))
+		}, true)
 	},
 }
 
