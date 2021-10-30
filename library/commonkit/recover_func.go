@@ -22,7 +22,6 @@ func RecoverFuncWrapper(fun func()) (re *exception.Exception) {
 				logkit.Error(exp.Error())
 				re = &exp
 			}
-
 		}
 	}()
 	fun()
