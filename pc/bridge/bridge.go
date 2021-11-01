@@ -94,7 +94,9 @@ func Start() {
 	//	Server.ServeHTTP(w, r)
 	//})
 	// local win ui web, 默认在ui
-	restkit.GetRouter().Proxy.Any("/ui/{path:path}", router.EmbedHtmlHandle(UiAssets, "./ui"))
+	restkit.GetRouter().Proxy.Any("/assets/{path:path}", router.EmbedHtmlHandle(UiAssets, "./ui/assets"))
+	restkit.GetRouter().Proxy.Any("/index.html", router.EmbedHtmlHandle(UiAssets, "./ui"))
+	//restkit.GetRouter().Proxy.Any("/ui/{path:path}", router.EmbedHtmlHandle(UiAssets, "./ui"))
 	//http.Handle("/", http.FileServer(http.Dir("./ui")))
 	//_ = mime.AddExtensionType(".js", "text/javascript")
 }
