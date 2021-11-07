@@ -9,15 +9,16 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
+// Param 注意，excel的格式必须是第一行title，后面k-v结构
 type Param struct {
 	Title string
 	Sheet string
-	// export时，key:name:width
+	// export时，key:name:width; load时，key:name
 	Keys []string
 	Data []map[string]interface{}
-	// load时, name:key，选填，自动生成
-	//Names []string
 	File class.File
+	// 本地文件路径
+	FileOriginPath string
 	// 导出文件名
 	FileName string
 }
@@ -120,7 +121,7 @@ func Export(param Param, ctx *context.Context) {
 	}
 }
 
-// Load name(题头):key(map-key):type(number)
+// Load key:name
 func Load(param Param) []map[string]string {
 	if len(param.Keys) == 0 {
 		panic(exception.New("excel names empty"))
@@ -137,6 +138,8 @@ func Load(param Param) []map[string]string {
 	var err error
 	if param.File.File != nil {
 		f, err = excelize.OpenReader(param.File.File)
+	} else if param.FileOriginPath != "" {
+		f, err = excelize.OpenFile(param.FileOriginPath)
 	} else {
 		panic(exception.New("file is nil"))
 	}
@@ -157,11 +160,13 @@ func Load(param Param) []map[string]string {
 			m := map[string]string{}
 			values, _ := rows.Columns()
 			for i, v := range values {
-				if names != nil {
+				if names != nil && len(names) > i && nameMap[names[i]] != "" {
 					m[nameMap[names[i]]] = v
 				}
 			}
-			res = append(res, m)
+			if len(m) > 0 {
+				res = append(res, m)
+			}
 		} else {
 			// 需要取出，否则后续names重叠
 			_, _ = rows.Columns()

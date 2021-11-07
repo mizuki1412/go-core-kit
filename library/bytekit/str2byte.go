@@ -26,7 +26,7 @@ func Bytes2HexArray(bytes []byte) string {
 	return str
 }
 
-// [0x00 0x00]
+// HexString2Bytes [0x00 0x00]
 func HexString2Bytes(src string) []byte {
 	if len(src) < 6 {
 		panic(exception.New("数据长度错误"))
@@ -46,7 +46,7 @@ func HexString2Bytes(src string) []byte {
 	return ret
 }
 
-// format: 0102030a0d
+// HexString2Bytes1 format: 0102030a0d
 func HexString2Bytes1(src string) []byte {
 	if len(src)%2 != 0 || len(src) == 0 {
 		panic(exception.New("数据长度错误"))
@@ -68,7 +68,7 @@ func HexString2Bytes2(src string) []byte {
 	return HexString2Bytes1(src)
 }
 
-// format: 0102030a0d
+// Bytes2HexString1 format: 0102030a0d
 func Bytes2HexString1(data []byte) string {
 	ret := ""
 	for _, e := range data {

@@ -19,6 +19,10 @@ func num2Bytes(i interface{}) []byte {
 	return buf.Bytes()
 }
 
+func Int16ToBytes(i interface{}) []byte {
+	return num2Bytes(cast.ToInt16(i))
+}
+
 func Int32ToBytes(i interface{}) []byte {
 	return num2Bytes(cast.ToInt32(i))
 }
@@ -35,7 +39,6 @@ func Float64ToBytes(i interface{}) []byte {
 	return num2Bytes(cast.ToFloat64(i))
 }
 
-// 必须是4个字节
 func Bytes2Int32(bs []byte) int32 {
 	length := len(bs)
 	switch length {
@@ -91,4 +94,8 @@ func Bytes2Float64(bs []byte) float64 {
 	var i2 float64
 	_ = binary.Read(buf, binary.BigEndian, &i2)
 	return i2
+}
+
+func GetBitFromInt32(o int32, index byte) int32 {
+	return cast.ToInt32(Int32ToBytes(o)[3-index/8] >> index % 8 & 0x01)
 }
