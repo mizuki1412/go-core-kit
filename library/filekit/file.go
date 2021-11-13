@@ -12,7 +12,7 @@ import (
 )
 
 func WriteFileAppend(fileName string, data []byte) error {
-	err := checkDir(fileName)
+	err := CheckFilePath(fileName)
 	if err != nil {
 		return err
 	}
@@ -25,7 +25,7 @@ func WriteFileAppend(fileName string, data []byte) error {
 }
 
 func WriteFile(fileName string, data []byte) error {
-	err := checkDir(fileName)
+	err := CheckFilePath(fileName)
 	if err != nil {
 		return err
 	}
@@ -38,14 +38,14 @@ func WriteFile(fileName string, data []byte) error {
 }
 
 func DelFile(fileName string) error {
-	err := checkDir(fileName)
+	err := CheckFilePath(fileName)
 	if err != nil {
 		return err
 	}
 	return os.Remove(fileName)
 }
 
-func checkDir(fileName string) error {
+func CheckFilePath(fileName string) error {
 	i := strings.LastIndex(fileName, "/")
 	if i > 0 {
 		return CheckDir(fileName[:i])
@@ -85,7 +85,7 @@ func WriteClassFile(filepath string, file *class.File) {
 	if file.File == nil {
 		panic(exception.New("文件为空"))
 	}
-	checkDir(filepath)
+	_ = CheckFilePath(filepath)
 	f, err := os.OpenFile(filepath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		panic(exception.New(err.Error()))

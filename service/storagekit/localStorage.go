@@ -7,6 +7,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 )
 
+// GetFullPath 将path或filename用项目目录包裹
 func GetFullPath(path string) string {
 	if path[0] != '/' {
 		path = "/" + path

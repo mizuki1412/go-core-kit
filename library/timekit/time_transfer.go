@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-// 毫秒时间戳解析为Time
+// UnixMill 毫秒时间戳解析为Time
 func UnixMill(t int64) time.Time {
 	return time.Unix(t/1000, t%1000*1000000)
 }
@@ -16,7 +16,7 @@ func GetUnixMill(t time.Time) int64 {
 	return t.UnixNano() / 1e6
 }
 
-// cast.StringToDate 不能设置时区
+// ParseString cast.StringToDate 不能设置时区
 func ParseString(dtString string, layout string) (time.Time, error) {
 	return time.ParseInLocation(layout, dtString, time.Local)
 }

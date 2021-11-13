@@ -71,7 +71,7 @@ export async function %s(%s){
 		if !arraykit.StringContains(tagTemps, tag) {
 			tagTemps = append(tagTemps, tag)
 			if next {
-				result = "import {request} from 'webkit/lib/request';\n" + result
+				result = "import {request} from 'webkit1412/lib/request';\n" + result
 			} else {
 				result = "import {postService} from 'web-toolkit/src/case-main/index';\n" + result
 			}
