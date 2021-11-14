@@ -97,5 +97,5 @@ func Bytes2Float64(bs []byte) float64 {
 }
 
 func GetBitFromInt32(o int32, index byte) int32 {
-	return cast.ToInt32(Int32ToBytes(o)[3-index/8] >> index % 8 & 0x01)
+	return cast.ToInt32((Int32ToBytes(o)[3-index/8] >> (index % 8)) & 0x01)
 }
