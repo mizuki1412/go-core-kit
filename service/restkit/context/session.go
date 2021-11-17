@@ -35,8 +35,7 @@ func InitSession() {
 			MaxActive: 10,
 			Password:  redisPwd,
 			Database:  redisDB,
-			Prefix:    redisPrefix + "-session-",
-			Delim:     "-",
+			Prefix:    redisPrefix + "-session:",
 			Driver:    redis.Redigo(), // redis.Radix() can be used instead.
 		})
 		// Optionally configure the underline driver:
@@ -59,7 +58,7 @@ func (ctx *Context) Session() *sessions.Session {
 	return sessionManager.Start(ctx.Proxy)
 }
 
-// session每次请求时都会从redis中获取，所以在session中存储的务必是string，如果是对象，会被自动转为json，但如果其中有unicode，可能造成斜杆指数增加
+// SessionSetUser session每次请求时都会从redis中获取，所以在session中存储的务必是string，如果是对象，会被自动转为json，但如果其中有unicode，可能造成斜杆指数增加
 func (ctx *Context) SessionSetUser(user interface{}) {
 	if user == nil {
 		return
@@ -87,7 +86,7 @@ var SessionGetUserFunc = func(ctx *Context) interface{} {
 	}
 }
 
-// eg *model.User
+// SessionGetUser return eg *model.User
 func (ctx *Context) SessionGetUser() interface{} {
 	return SessionGetUserFunc(ctx)
 }

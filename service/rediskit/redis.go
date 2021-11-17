@@ -45,12 +45,13 @@ func Set(ctx context.Context, key string, val interface{}, expire time.Duration)
 	}
 }
 
-func GetKeyPrefix() string {
+// GetDecoratedKey 分层路径按:分隔，会自动加上项目前缀(ConfigKeyRedisPrefix)
+func GetDecoratedKey(subPath string) string {
 	name := configkit.GetStringD(ConfigKeyRedisPrefix)
 	if name != "" {
-		name += "_"
+		name += ":"
 	}
-	return name
+	return name + subPath
 }
 
 func LPush(ctx context.Context, key string, val interface{}) {
