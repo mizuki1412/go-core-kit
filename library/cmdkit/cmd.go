@@ -3,11 +3,9 @@ package cmdkit
 import (
 	"bufio"
 	"errors"
-	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cast"
 	"io"
 	"os/exec"
-	"path/filepath"
 	"runtime"
 	"time"
 )
@@ -99,27 +97,4 @@ func getRet(stdout io.ReadCloser, stderr io.ReadCloser, cmd *exec.Cmd) (string, 
 		return ret, err
 	}
 	return ret, nil
-}
-
-func LinuxCmd(name string, args ...string) error {
-	command := exec.Command(name, args...)
-	return command.Run()
-}
-
-func WinCmd(arg ...string) error {
-	args := make([]string, 0, 3)
-	args = append(args, "/C")
-	args = append(args, arg...)
-	command := &exec.Cmd{
-		Path: "cmd",
-		Args: args,
-	}
-	if filepath.Base("cmd") == "cmd" {
-		if lp, err := exec.LookPath("cmd"); err != nil {
-			logkit.Error("filePathErr")
-		} else {
-			command.Path = lp
-		}
-	}
-	return command.Run()
 }

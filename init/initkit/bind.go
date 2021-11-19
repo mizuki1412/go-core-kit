@@ -17,18 +17,17 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/sqlkit"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"log"
 )
 
-// LoadConfig 注意，load比一般的init慢
-func LoadConfig() {
+// loadConfig 注意，load比一般的init慢
+func loadConfig() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
 	// 这里可以执行多次的 搜索多个地址
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Println("no config load")
+		logkit.Error("miss config.json: " + err.Error())
 	}
 }
 
@@ -72,7 +71,7 @@ func DefFlags(cmd *cobra.Command) {
 	cmd.Flags().String(sqlkit.ConfigKeyDBMaxLife, "", "单位分钟，默认20")
 
 	cmd.Flags().String(swagger.ConfigKeySwaggerBasePath, "", "/path")
-	cmd.Flags().String(swagger.ConfigKeySwaggerHost, "", "")
+	cmd.Flags().String(swagger.ConfigKeySwaggerHost, "", "可选，默认按swagger-ui所在路径")
 	cmd.Flags().String(swagger.ConfigKeySwaggerDescription, "", "")
 	cmd.Flags().String(swagger.ConfigKeySwaggerTitle, "", "")
 	cmd.Flags().String(swagger.ConfigKeySwaggerVersion, "1.0.0", "")
@@ -101,6 +100,9 @@ func DefFlags(cmd *cobra.Command) {
 }
 
 func BindFlags(cmd *cobra.Command) {
+	// 如果存在配置文件
+	loadConfig()
+	// 从命令参数中导入
 	err := viper.BindPFlags(cmd.Flags())
 	if err != nil {
 		logkit.Error(err.Error())

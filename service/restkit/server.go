@@ -71,12 +71,9 @@ func Run() error {
 		// 禁用，阻止如 /xx/ 自动重定向到 /xx，而不经过handle
 		iris.WithoutPathCorrection)
 	return err
-	//if err != nil {
-	//	logkit.Fatal(err.Error())
-	//}
 }
 
-// 导入业务模块，其中的路由和中间件
+// AddActions 导入业务模块，其中的路由和中间件
 func AddActions(actionInits ...func(r *router2.Router)) {
 	if router == nil {
 		defaultEngine()
