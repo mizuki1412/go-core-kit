@@ -2,6 +2,7 @@ package initkit
 
 import (
 	"github.com/mizuki1412/go-core-kit/init"
+	"github.com/mizuki1412/go-core-kit/mod/common/download"
 	"github.com/mizuki1412/go-core-kit/service-third/aliosskit"
 	"github.com/mizuki1412/go-core-kit/service-third/alismskit"
 	"github.com/mizuki1412/go-core-kit/service-third/locationkit"
@@ -34,6 +35,7 @@ func loadConfig() {
 func DefFlags(cmd *cobra.Command) {
 	// todo 默认值不起效？
 	cmd.Flags().String(corekit.ConfigKeyProjectDir, ".", "项目目录")
+	cmd.Flags().String(download.ConfigKeyProjectSubDir4PublicDownload, "", "项目目录中用于公共下载的开放目录（一层），逗号分隔，.表示所有")
 	cmd.Flags().String(corekit.ConfigKeyProfileDev, "", "开发模式 default:false")
 	cmd.Flags().String(configkit.ConfigKeyTimeLocation, "Asia/Shanghai", "项目中用到的时区")
 

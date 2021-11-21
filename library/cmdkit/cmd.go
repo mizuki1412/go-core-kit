@@ -3,10 +3,10 @@ package cmdkit
 import (
 	"bufio"
 	"errors"
+	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/spf13/cast"
 	"io"
 	"os/exec"
-	"runtime"
 	"time"
 )
 
@@ -15,24 +15,32 @@ type RunParams struct {
 	Async   bool `comment:"异步处理返回值"`
 }
 
-func Run(command string, params ...RunParams) (string, error) {
+func Run(command []string, params ...RunParams) (string, error) {
+	if len(command) == 0 {
+		panic(exception.New("cmd need command"))
+	}
 	var param RunParams
 	if len(params) == 0 {
 		param = RunParams{}
 	} else {
 		param = params[0]
 	}
-	var cmdName string
-	var arg1 string
-	switch runtime.GOOS {
-	case "darwin", "linux":
-		cmdName = "/bin/sh"
-		arg1 = "-c"
-	case "windows":
-		cmdName = "cmd"
-		arg1 = "/C"
+	//var cmdName string
+	//var arg1 string
+	//switch runtime.GOOS {
+	//case "darwin", "linux":
+	//	cmdName = "/bin/sh"
+	//	arg1 = "-c"
+	//case "windows":
+	//	cmdName = "cmd"
+	//	arg1 = "/C"
+	//}
+	name := command[0]
+	var args []string
+	if len(command) > 1 {
+		args = command[1:]
 	}
-	cmd := exec.Command(cmdName, arg1, command)
+	cmd := exec.Command(name, args...)
 	// 程序退出时Kill子进程
 	//cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	if !param.Async {
