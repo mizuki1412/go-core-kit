@@ -31,8 +31,7 @@ var mqttCmd = &cobra.Command{
 		}
 		if configkit.GetStringD("topic.pub") != "" {
 			for {
-				send := ""
-				err := mqttkit.Publish(configkit.GetStringD("topic.pub"), 2, false, send)
+				err := mqttkit.Publish(configkit.GetStringD("topic.pub"), 2, false, configkit.GetStringD("send"))
 				if err != nil {
 					log.Println(err.Error())
 				}
