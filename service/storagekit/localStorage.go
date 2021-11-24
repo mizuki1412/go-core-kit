@@ -19,11 +19,13 @@ func GetFullPath(path string) string {
 // SaveInHome 存入项目目录下
 func SaveInHome(file *class.File, path string) {
 	path = GetFullPath(path)
+	_ = filekit.CheckFilePath(path)
 	filekit.WriteClassFile(path, file)
 }
 
 func SaveBytesInHome(data []byte, path string) {
 	path = GetFullPath(path)
+	_ = filekit.CheckFilePath(path)
 	_ = filekit.WriteFile(path, data)
 }
 

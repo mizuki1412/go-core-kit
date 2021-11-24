@@ -21,6 +21,8 @@ type Param struct {
 	FileOriginPath string
 	// 导出文件名
 	FileName string
+	// 导出时存在本地
+	SaveToFile string
 }
 
 type KeyDef struct {
@@ -113,11 +115,18 @@ func Export(param Param, ctx *context.Context) {
 	if param.FileName == "" {
 		param.FileName = "export.xlsx"
 	}
-	//err = f.SaveAs("/Users/ycj/Downloads/test.xlsx")
-	ctx.SetFileHeader(param.FileName)
-	err = f.Write(ctx.Proxy.ResponseWriter())
-	if err != nil {
-		panic(exception.New("excel export error: " + err.Error()))
+
+	if param.SaveToFile != "" {
+		err = f.SaveAs(param.SaveToFile)
+		if err != nil {
+			panic(exception.New("excel export error: " + err.Error()))
+		}
+	} else {
+		ctx.SetFileHeader(param.FileName)
+		err = f.Write(ctx.Proxy.ResponseWriter())
+		if err != nil {
+			panic(exception.New("excel export error: " + err.Error()))
+		}
 	}
 }
 
