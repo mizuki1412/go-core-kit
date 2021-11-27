@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// https://cloud.baidu.com/doc/FACE/s/yk37c1u4t
 // FaceAdd 人脸注册：https://aip.baidubce.com/rest/2.0/face/v3/faceset/user/add
 // return face_token
 func FaceAdd(image []byte, groupId, userId string) string {
@@ -76,6 +77,9 @@ func FaceSearch(image []byte, groupId string, count int32) []map[string]interfac
 		// QPS超限额
 		timekit.Sleep(500)
 		return FaceSearch(image, groupId, count)
+	} else if errCode == 222207 {
+		// 未找到匹配的用户
+		return nil
 	} else if errCode != 0 {
 		panic(exception.New("baidukit: " + gjson.Get(res, "error_msg").String()))
 	}

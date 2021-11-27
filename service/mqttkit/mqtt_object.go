@@ -7,6 +7,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cast"
+	"sync"
 	"time"
 )
 
@@ -27,6 +28,7 @@ type ConnectParam struct {
 
 // 用于记录创建过的clients
 var allClients = map[MQTT.Client]*Client{}
+var allClientsMux sync.RWMutex
 
 func NewClient(param ConnectParam) *Client {
 	newClient := &Client{First: true, Id: param.Id}
@@ -40,6 +42,8 @@ func NewClient(param ConnectParam) *Client {
 	opts.SetUsername(param.Username).SetPassword(param.Pwd)
 	var lostHan MQTT.OnConnectHandler = func(c MQTT.Client) {
 		// todo 测试c是否前后一致
+		allClientsMux.RLock()
+		defer allClientsMux.RUnlock()
 		if cl, ok := allClients[c]; ok {
 			// 第一次连接不处理
 			if cl.First {
@@ -59,6 +63,8 @@ func NewClient(param ConnectParam) *Client {
 		panic(exception.New(token.Error().Error()))
 	}
 	logkit.Info("mqtt connect success")
+	allClientsMux.Lock()
+	defer allClientsMux.Unlock()
 	allClients[newClient.C] = newClient
 	return newClient
 }
