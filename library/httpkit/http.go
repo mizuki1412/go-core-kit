@@ -57,6 +57,7 @@ func Request(reqBean Req) (string, int) {
 	} else if reqBean.JsonData != nil {
 		req, err = http.NewRequest(reqBean.Method, reqBean.Url, bytes.NewBuffer([]byte(jsonkit.ToString(reqBean.JsonData))))
 	} else {
+		// 自带urlencode转码
 		data := make(url.Values)
 		for key, val := range reqBean.FormData {
 			data.Add(key, val)

@@ -21,7 +21,7 @@ import (
 )
 
 // loadConfig 注意，load比一般的init慢
-func loadConfig() {
+func LoadConfig() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
 	// 这里可以执行多次的 搜索多个地址
@@ -103,7 +103,7 @@ func DefFlags(cmd *cobra.Command) {
 
 func BindFlags(cmd *cobra.Command) {
 	// 如果存在配置文件
-	loadConfig()
+	LoadConfig()
 	// 从命令参数中导入
 	err := viper.BindPFlags(cmd.Flags())
 	if err != nil {

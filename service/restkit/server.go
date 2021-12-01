@@ -1,6 +1,7 @@
 package restkit
 
 import (
+	ctx "context"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/middleware/pprof"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
@@ -71,6 +72,15 @@ func Run() error {
 		// 禁用，阻止如 /xx/ 自动重定向到 /xx，而不经过handle
 		iris.WithoutPathCorrection)
 	return err
+}
+
+func Shutdown() {
+	if router != nil && router.Proxy != nil {
+		err := router.Proxy.Shutdown(ctx.Background())
+		if err != nil {
+			logkit.Error(err.Error())
+		}
+	}
 }
 
 // AddActions 导入业务模块，其中的路由和中间件

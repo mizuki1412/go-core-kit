@@ -4,7 +4,6 @@ import (
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/httpkit"
 	"github.com/tidwall/gjson"
-	"log"
 	"time"
 )
 
@@ -31,7 +30,7 @@ func Init(key, secret string) {
 		accessKey = gjson.Get(res, "access_token").String()
 		accessKeyExpire = time.Now().Add(time.Duration(gjson.Get(res, "expires_in").Int()-24*3600) * time.Second)
 	}
-	log.Println(accessKey, accessKeyExpire)
+	//log.Println(accessKey, accessKeyExpire)
 }
 
 func checkAccessKey() {

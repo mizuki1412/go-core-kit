@@ -9,9 +9,9 @@ import (
 	"time"
 )
 
-// https://cloud.baidu.com/doc/FACE/s/yk37c1u4t
 // FaceAdd 人脸注册：https://aip.baidubce.com/rest/2.0/face/v3/faceset/user/add
 // return face_token
+// https://cloud.baidu.com/doc/FACE/s/yk37c1u4t
 func FaceAdd(image []byte, groupId, userId string) string {
 	checkAccessKey()
 	data := base64.StdEncoding.EncodeToString(image)
