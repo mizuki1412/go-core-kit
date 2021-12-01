@@ -17,11 +17,11 @@ type Param struct {
 	Keys []string
 	Data []map[string]interface{}
 	File class.File
-	// 本地文件路径
+	// 文件来源：本地文件路径
 	FileOriginPath string
-	// 导出文件名
+	// 导出的文件名
 	FileName string
-	// 导出时存在本地
+	// 导出存入本地文件地址
 	SaveToFile string
 }
 
@@ -107,6 +107,9 @@ func Export(param Param, ctx *context.Context) {
 			err = f.SetCellStyle(param.Sheet, cell, cell, cellStyle)
 		}
 		for k, v := range data {
+			if _, ok := keyMap[k]; !ok {
+				continue
+			}
 			cell := string(rune('A'+keyMap[k].Index)) + cast.ToString(index)
 			err = f.SetCellValue(param.Sheet, cell, v)
 		}

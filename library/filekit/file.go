@@ -105,7 +105,7 @@ func ReadBytesFromClassFile(file *class.File) []byte {
 	return buf.Bytes()
 }
 
-// 取一个文件路径的路径和文件名 /分隔
+// SplitFilePath 取一个文件路径的路径和文件名 /分隔
 func SplitFilePath(path string) (string, string) {
 	i := strings.LastIndex(path, "/")
 	if i < 0 {
