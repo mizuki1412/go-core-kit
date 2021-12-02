@@ -44,7 +44,7 @@ func (th *MapStringArr) Scan(value interface{}) error {
 	var s []map[string]interface{}
 	err := jsonkit.ParseObj(string(value.([]byte)), &s)
 	if err != nil {
-		logkit.Error(err.Error())
+		logkit.Error(exception.New(err.Error()))
 	}
 	th.Arr = s
 	return nil

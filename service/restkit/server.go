@@ -4,6 +4,7 @@ import (
 	ctx "context"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/middleware/pprof"
+	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
@@ -78,7 +79,7 @@ func Shutdown() {
 	if router != nil && router.Proxy != nil {
 		err := router.Proxy.Shutdown(ctx.Background())
 		if err != nil {
-			logkit.Error(err.Error())
+			logkit.Error(exception.New(err.Error()))
 		}
 	}
 }

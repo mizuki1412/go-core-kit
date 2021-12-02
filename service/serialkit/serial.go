@@ -54,7 +54,7 @@ func Send(data []byte) {
 	}
 }
 
-/// 一次数据返回，receive写在send之前，用channel实现数据异步返回
+// Receive 一次数据返回，receive写在send之前，用channel实现数据异步返回
 // handle是判断数据是否接收完成的函数，参数1表示全部数据，参数2表示收到的一段数据
 // timeoutMill 超时时间，0表示不处理超时
 func Receive(handle func([]byte, []byte) ([]byte, bool), timeoutMill int64) chan []byte {
@@ -68,7 +68,7 @@ func Receive(handle func([]byte, []byte) ([]byte, bool), timeoutMill int64) chan
 			for {
 				n, err := connect.Read(buff)
 				if err != nil {
-					logkit.Error("serial read error: " + err.Error())
+					logkit.Error(exception.New(err.Error()))
 					ch <- nil
 					close(ch)
 				}

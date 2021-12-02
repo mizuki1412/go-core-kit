@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/Depado/bfchroma v1.3.0
-	github.com/Masterminds/squirrel v1.5.1
+	github.com/Masterminds/squirrel v1.5.2
 	github.com/SebastiaanKlippert/go-wkhtmltopdf v1.7.2
 	github.com/alecthomas/chroma v0.9.4
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.1323
@@ -27,14 +27,14 @@ require (
 	github.com/spf13/cast v1.4.1
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.9.0
-	github.com/tidwall/gjson v1.11.0
+	github.com/tidwall/gjson v1.12.1
 	github.com/xuri/excelize/v2 v2.4.1
 	github.com/zserge/lorca v0.1.10
 	go.bug.st/serial v1.3.3
 	go.uber.org/automaxprocs v1.4.0
 	go.uber.org/zap v1.19.1
 	golang.org/x/text v0.3.7
-	gopkg.in/ini.v1 v1.63.2
+	gopkg.in/ini.v1 v1.66.0
 )
 
 require (

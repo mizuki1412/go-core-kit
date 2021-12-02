@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cast"
 )
 
-/** 错误处理，以及db事务处理。 */
+// Recover 错误处理，以及db事务处理。
 func Recover() router.Handler {
 	return func(ctx *context.Context) {
 		defer func() {

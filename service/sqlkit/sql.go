@@ -146,7 +146,7 @@ func (dao *Dao) Commit() {
 	if dao.TX != nil {
 		err := dao.TX.Commit()
 		if err != nil {
-			logkit.Error(err.Error())
+			logkit.Error(exception.New(err.Error()))
 			//panic(exception.New(err.Error(), 2))
 		}
 	}
@@ -155,7 +155,7 @@ func (dao *Dao) Rollback() {
 	if dao.TX != nil {
 		err := dao.TX.Rollback()
 		if err != nil {
-			logkit.Error(err.Error())
+			logkit.Error(exception.New(err.Error()))
 		}
 	}
 }

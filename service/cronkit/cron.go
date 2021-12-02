@@ -39,7 +39,7 @@ func RemovePool(key string) {
 // AddFunc 给默认的scheduler add func， 封装上recover
 func AddFunc(spec string, fun func()) {
 	_, err := Scheduler().AddFunc(spec, func() {
-		commonkit.RecoverFuncWrapper(fun)
+		_ = commonkit.RecoverFuncWrapper(fun)
 	})
 	if err != nil {
 		panic(exception.New(err.Error()))

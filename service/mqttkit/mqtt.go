@@ -54,7 +54,7 @@ func Subscribe(topic string, qos byte, callback MQTT.MessageHandler) {
 	}
 	f := func() {
 		if token := client.Subscribe(topic, qos, callback); token.Wait() && token.Error() != nil {
-			logkit.Error(token.Error().Error())
+			logkit.Error(exception.New(token.Error().Error()))
 		} else {
 			logkit.Info("mqtt subscribe success: " + topic)
 		}
