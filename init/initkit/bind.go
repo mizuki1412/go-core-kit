@@ -18,9 +18,10 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/sqlkit"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"log"
 )
 
-// loadConfig 注意，load比一般的init慢
+// LoadConfig 注意，load比一般的init慢
 func LoadConfig() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
@@ -28,7 +29,8 @@ func LoadConfig() {
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 	if err != nil {
-		logkit.Error("miss config.json: " + err.Error())
+		// 这里不可用logkit，因为环境变量没有设置完
+		log.Println("miss config.json: " + err.Error())
 	}
 }
 
