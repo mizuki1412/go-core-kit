@@ -25,21 +25,20 @@ func ConstDecimal(v int32) decimal.Decimal {
 func (th *Decimal) Set(val interface{}) *Decimal {
 	if v, ok := val.(decimal.Decimal); ok {
 		th.Valid = true
-		th.Decimal = v
+		val = v.String()
 	} else if v, ok := val.(Decimal); ok {
 		th.Valid = v.Valid
-		th.Decimal = v.Decimal
+		val = v.Decimal.String()
 	} else if v, ok := val.(*Decimal); ok {
 		th.Valid = v.Valid
-		th.Decimal = v.Decimal
+		val = v.Decimal.String()
+	}
+	v, err := decimal.NewFromString(cast.ToString(val))
+	if err == nil {
+		th.Valid = true
+		th.Decimal = v
 	} else {
-		v, err := decimal.NewFromString(cast.ToString(val))
-		if err == nil {
-			th.Valid = true
-			th.Decimal = v
-		} else {
-			panic(exception.New("class.Decimal set error: " + err.Error()))
-		}
+		panic(exception.New("class.Decimal set error: " + err.Error()))
 	}
 	return th
 }
@@ -60,23 +59,27 @@ func (th *Decimal) DivRound(d2 *Decimal, place int32) *Decimal {
 }
 
 func (th *Decimal) Mul(d2 *Decimal) *Decimal {
-	th.Decimal = th.Decimal.Mul(d2.Decimal)
-	return th
+	temp := NewDecimal(th.Decimal)
+	temp.Decimal = temp.Decimal.Mul(d2.Decimal)
+	return temp
 }
 
 func (th *Decimal) Add(d2 *Decimal) *Decimal {
-	th.Decimal = th.Decimal.Add(d2.Decimal)
-	return th
+	temp := NewDecimal(th.Decimal)
+	temp.Decimal = temp.Decimal.Add(d2.Decimal)
+	return temp
 }
 
 func (th *Decimal) Sub(d2 *Decimal) *Decimal {
-	th.Decimal = th.Decimal.Sub(d2.Decimal)
-	return th
+	temp := NewDecimal(th.Decimal)
+	temp.Decimal = temp.Decimal.Sub(d2.Decimal)
+	return temp
 }
 
 func (th *Decimal) Div(d2 *Decimal) *Decimal {
-	th.Decimal = th.Decimal.Div(d2.Decimal)
-	return th
+	temp := NewDecimal(th.Decimal)
+	temp.Decimal = temp.Decimal.Div(d2.Decimal)
+	return temp
 }
 
 func (th Decimal) IsValid() bool {
