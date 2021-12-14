@@ -26,7 +26,7 @@ var mqttCmd = &cobra.Command{
 		initkit.BindFlags(cmd)
 		if configkit.GetStringD("topic.sub") != "" {
 			mqttkit.Subscribe(configkit.GetStringD("topic.sub"), 2, func(client MQTT.Client, message MQTT.Message) {
-				log.Println(string(message.Payload()))
+				log.Println(message.Topic(), string(message.Payload()))
 			})
 		}
 		if configkit.GetStringD("topic.pub") != "" {

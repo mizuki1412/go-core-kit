@@ -74,7 +74,7 @@ func (th Time) Value() (driver.Value, error) {
 }
 
 func (th Time) IsValid() bool {
-	return th.Valid
+	return th.Valid && !th.Time.IsZero()
 }
 
 func NewTime(val interface{}) *Time {

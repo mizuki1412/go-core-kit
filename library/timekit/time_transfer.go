@@ -12,8 +12,11 @@ func UnixMill(t int64) time.Time {
 	return time.Unix(t/1000, t%1000*1000000)
 }
 
+// GetUnixMill
+// Deprecated
 func GetUnixMill(t time.Time) int64 {
-	return t.UnixNano() / 1e6
+	//return t.UnixNano() / 1e6
+	return t.UnixMilli()
 }
 
 // ParseString cast.StringToDate 不能设置时区

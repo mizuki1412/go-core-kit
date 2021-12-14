@@ -21,7 +21,7 @@ func init() {
 	initkit.DefFlags(rootCmd)
 	rootCmd.AddCommand(PGSqlToStructCMD("", ""))
 	rootCmd.AddCommand(MarkdownDocCMD("go-core-kit 说明文档"))
-	rootCmd.AddCommand(TCPServerCMD())
+	rootCmd.AddCommand(WebStaticServerCMD())
 }
 
 var rootCmd = &cobra.Command{
