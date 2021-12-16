@@ -19,8 +19,12 @@ func StartUI(param *WinParam) {
 	var err error
 	// 增加user-data-dir后，一些配置将会存入其中，包括安全策略的设置
 	// windows下，每次开启可能提示未正确关闭：需要在设置的user-data-dir中的Default/Preferences的exit_type为Normal，并设置文件为只读
+	pdr := configkit.GetStringD(corekit.ConfigKeyProjectDir)
+	if pdr == "" {
+		pdr = "."
+	}
 	Self, err = lorca.New(
-		"", configkit.GetStringD(corekit.ConfigKeyProjectDir), param.Width, param.Height,
+		"", pdr+"/lorca", param.Width, param.Height,
 		"--disable-web-security", // 不遵守同源策略
 		"--allow-insecure-localhost",
 		"--allow-running-insecure-content",
