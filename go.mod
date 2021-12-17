@@ -6,6 +6,7 @@ require (
 	github.com/Depado/bfchroma v1.3.0
 	github.com/Masterminds/squirrel v1.5.2
 	github.com/SebastiaanKlippert/go-wkhtmltopdf v1.7.2
+	github.com/albenik/go-serial/v2 v2.4.0
 	github.com/alecthomas/chroma v0.9.4
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.1323
 	github.com/arthurkiller/rollingwriter v1.1.2
@@ -30,7 +31,6 @@ require (
 	github.com/tidwall/gjson v1.12.1
 	github.com/xuri/excelize/v2 v2.4.1
 	github.com/zserge/lorca v0.1.10
-	go.bug.st/serial v1.3.3
 	go.uber.org/automaxprocs v1.4.0
 	go.uber.org/zap v1.19.1
 	golang.org/x/text v0.3.7
@@ -47,7 +47,6 @@ require (
 	github.com/aymerick/raymond v2.0.3-0.20180322193309-b565731e1464+incompatible // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/creack/goselect v0.1.2 // indirect
-	github.com/danwakefield/fnmatch v0.0.0-20160403171240-cbb64ac3d964 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/eknkc/amber v0.0.0-20171010120322-cdade1c07385 // indirect
@@ -103,11 +102,11 @@ require (
 	github.com/yalp/jsonpath v0.0.0-20180802001716-5cc68e5049a0 // indirect
 	github.com/yudai/gojsondiff v1.0.0 // indirect
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
-	go.uber.org/atomic v1.8.0 // indirect
+	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect
 	golang.org/x/net v0.0.0-20210726213435-c6fcb2dbf985 // indirect
-	golang.org/x/sys v0.0.0-20210823070655-63515b42dcdf // indirect
+	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

@@ -9,6 +9,29 @@ import (
 	"time"
 )
 
+// FaceDetect 人脸检测
+// https://cloud.baidu.com/doc/FACE/s/yk37c1u4t
+func FaceDetect(image []byte) map[string]gjson.Result {
+	checkAccessKey()
+	data := base64.StdEncoding.EncodeToString(image)
+	res, _ := httpkit.Request(httpkit.Req{
+		Url: "https://aip.baidubce.com/rest/2.0/face/v3/detect?access_token=" + accessKey,
+		JsonData: map[string]interface{}{
+			"image":      data,
+			"image_type": "BASE64",
+		},
+	})
+	errCode := gjson.Get(res, "error_code").Int()
+	if errCode == 18 {
+		// QPS超限额
+		timekit.Sleep(500)
+		return FaceDetect(image)
+	} else if errCode != 0 {
+		panic(exception.New("baidukit: " + gjson.Get(res, "error_msg").String()))
+	}
+	return gjson.Get(res, "result").Map()
+}
+
 // FaceAdd 人脸注册：https://aip.baidubce.com/rest/2.0/face/v3/faceset/user/add
 // return face_token
 // https://cloud.baidu.com/doc/FACE/s/yk37c1u4t
@@ -41,7 +64,7 @@ func FaceDel(groupId, userId, faceToken string) {
 	res, _ := httpkit.Request(httpkit.Req{
 		Url: "https://aip.baidubce.com/rest/2.0/face/v3/faceset/user/delete?access_token=" + accessKey,
 		JsonData: map[string]interface{}{
-			"log_id":     timekit.GetUnixMill(time.Now()),
+			"log_id":     time.Now().UnixMilli(),
 			"group_id":   groupId,
 			"user_id":    userId,
 			"face_token": faceToken,

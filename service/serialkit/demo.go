@@ -1,9 +1,9 @@
 package serialkit
 
 import (
+	"github.com/albenik/go-serial/v2"
 	"github.com/mizuki1412/go-core-kit/library/bytekit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
-	"go.bug.st/serial"
 )
 
 func Demo() {

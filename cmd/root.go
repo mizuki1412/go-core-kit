@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"github.com/mizuki1412/go-core-kit/init/initkit"
@@ -14,6 +15,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"os"
 	"time"
 )
 
@@ -28,7 +30,53 @@ var rootCmd = &cobra.Command{
 	Use: "go-core-kit",
 	Run: func(cmd *cobra.Command, args []string) {
 		initkit.BindFlags(cmd)
+		//go func() {
+		//	ch := make(chan int)
+		//	go func(c chan int) {
+		//		defer func() {
+		//			println("close")
+		//		}()
+		//		timekit.Sleep(10000)
+		//		println("here")
+		//		c <- 1
+		//	}(ch)
+		//	println("start")
+		//	select {
+		//	case <-ch:
+		//		println("ok")
+		//	case <-time.After(time.Duration(5) * time.Second):
+		//		println("timeout")
+		//	}
+		//}()
+		//select {}
+		ch := make(chan string, 10)
+		defer close(ch)
+
+		go print_input(ch)
+
+		scanner := bufio.NewScanner(os.Stdin)
+		for scanner.Scan() {
+			in := scanner.Text()
+			ch <- in
+			if in == "EOF" {
+				fmt.Printf("exit\n")
+				return
+			}
+		}
 	},
+}
+
+func print_input(ch chan string) {
+	fmt.Printf("Begin to print input.\n")
+	for {
+		select {
+		case input_ := <-ch:
+			fmt.Printf("get %v from standard input.\n", input_)
+		case <-time.After(3 * time.Second): // 超时3秒没有获得数据，则退出程序，如果只是退出循环，可以return改为continue
+			fmt.Printf("More than 3 second no input, return\n")
+			return
+		}
+	}
 }
 
 func tcpClient() {
