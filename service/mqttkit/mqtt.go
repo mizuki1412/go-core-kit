@@ -3,6 +3,7 @@ package mqttkit
 import (
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/init/configkey"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cast"
@@ -18,13 +19,13 @@ var first = true
 
 func New() *MQTT.Client {
 	opts := MQTT.NewClientOptions()
-	opts.AddBroker(configkit.GetStringD(ConfigKeyMQTTBroker))
+	opts.AddBroker(configkit.GetStringD(configkey.MQTTBroker))
 	opts.SetKeepAlive(time.Duration(1) * time.Minute)
 	opts.SetAutoReconnect(true)
 	opts.SetConnectRetry(true)
 	opts.SetConnectRetryInterval(time.Duration(5) * time.Second)
-	opts.SetClientID(configkit.GetStringD(ConfigKeyMQTTClientID))
-	opts.SetUsername(configkit.GetStringD(ConfigKeyMQTTUsername)).SetPassword(configkit.GetStringD(ConfigKeyMQTTPwd))
+	opts.SetClientID(configkit.GetStringD(configkey.MQTTClientID))
+	opts.SetUsername(configkit.GetStringD(configkey.MQTTUsername)).SetPassword(configkit.GetStringD(ConfigKeyMQTTPwd))
 	var lostHan MQTT.OnConnectHandler = func(c MQTT.Client) {
 		if first {
 			first = false

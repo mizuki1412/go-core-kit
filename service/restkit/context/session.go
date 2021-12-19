@@ -4,10 +4,10 @@ import (
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/sessions"
 	"github.com/kataras/iris/v12/sessions/sessiondb/redis"
+	"github.com/mizuki1412/go-core-kit/init/configkey"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
-	"github.com/mizuki1412/go-core-kit/service/rediskit"
 	"github.com/spf13/cast"
 	"time"
 )
@@ -18,15 +18,15 @@ func InitSession() {
 	sessionManager = sessions.New(sessions.Config{
 		Cookie:                      "session",
 		AllowReclaim:                true,
-		Expires:                     time.Duration(configkit.GetInt(ConfigKeySessionExpire, 12)) * time.Hour,
+		Expires:                     time.Duration(configkit.GetInt(configkey.SessionExpire, 12)) * time.Hour,
 		DisableSubdomainPersistence: true, // 开发环境跨域时对火狐有效
 	})
 	// redis
-	redisHost := configkit.GetStringD(rediskit.ConfigKeyRedisHost)
-	redisPort := configkit.GetString(rediskit.ConfigKeyRedisPort, "6379")
-	redisPwd := configkit.GetStringD(rediskit.ConfigKeyRedisPwd)
-	redisDB := configkit.GetStringD(rediskit.ConfigKeyRedisDB)
-	redisPrefix := configkit.GetString(rediskit.ConfigKeyRedisPrefix, "")
+	redisHost := configkit.GetStringD(configkey.RedisHost)
+	redisPort := configkit.GetString(configkey.RedisPort, "6379")
+	redisPwd := configkit.GetStringD(configkey.RedisPwd)
+	redisDB := configkit.GetStringD(configkey.RedisDB)
+	redisPrefix := configkit.GetString(configkey.RedisPrefix, "")
 	if redisHost != "" {
 		db := redis.New(redis.Config{
 			Network:   "tcp",
@@ -109,5 +109,5 @@ func (ctx *Context) RenewSession() *sessions.Session {
 	return sess
 }
 func (ctx *Context) UpdateSessionExpire() {
-	_ = sessionManager.UpdateExpiration(ctx.Proxy, time.Duration(cast.ToInt(configkit.GetString(ConfigKeySessionExpire, "12")))*time.Hour)
+	_ = sessionManager.UpdateExpiration(ctx.Proxy, time.Duration(cast.ToInt(configkit.GetString(configkey.SessionExpire, "12")))*time.Hour)
 }

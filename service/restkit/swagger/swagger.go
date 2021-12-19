@@ -1,6 +1,7 @@
 package swagger
 
 import (
+	"github.com/mizuki1412/go-core-kit/init/configkey"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
@@ -130,10 +131,10 @@ func init() {
 func (s *SwaggerDoc) ReadDoc() string {
 	// match openapi 3.0
 	s.Swagger = "2.0"
-	s.Info["description"] = configkit.GetStringD(ConfigKeySwaggerDescription)
-	s.Info["title"] = configkit.GetStringD(ConfigKeySwaggerTitle)
-	s.Info["version"] = configkit.GetString(ConfigKeySwaggerVersion, "1.0.0")
-	s.Host = configkit.GetStringD(ConfigKeySwaggerHost)
-	s.BasePath = configkit.GetStringD(ConfigKeySwaggerBasePath)
+	s.Info["description"] = configkit.GetStringD(configkey.SwaggerDescription)
+	s.Info["title"] = configkit.GetStringD(configkey.SwaggerTitle)
+	s.Info["version"] = configkit.GetString(configkey.SwaggerVersion, "1.0.0")
+	s.Host = configkit.GetStringD(configkey.SwaggerHost)
+	s.BasePath = configkit.GetStringD(configkey.SwaggerBasePath)
 	return jsonkit.ToString(*s)
 }

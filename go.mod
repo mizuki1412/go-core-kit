@@ -9,7 +9,6 @@ require (
 	github.com/albenik/go-serial/v2 v2.4.0
 	github.com/alecthomas/chroma v0.9.4
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.1323
-	github.com/arthurkiller/rollingwriter v1.1.3-0.20210825082109-f61c29bf8751
 	github.com/eclipse/paho.mqtt.golang v1.3.5
 	github.com/go-playground/validator/v10 v10.9.0
 	github.com/go-redis/redis/v8 v8.11.4
@@ -35,6 +34,7 @@ require (
 	go.uber.org/zap v1.19.1
 	golang.org/x/text v0.3.7
 	gopkg.in/ini.v1 v1.66.2
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 
 )
 
@@ -87,7 +87,6 @@ require (
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/richardlehane/mscfb v1.0.3 // indirect
 	github.com/richardlehane/msoleps v1.0.1 // indirect
-	github.com/robfig/cron v1.1.0 // indirect
 	github.com/ryanuber/columnize v2.1.0+incompatible // indirect
 	github.com/schollz/closestmatch v2.1.0+incompatible // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
@@ -109,7 +108,6 @@ require (
 	golang.org/x/net v0.0.0-20210813160813-60bc85c4be6d // indirect
 	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
-	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )

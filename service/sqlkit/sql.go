@@ -5,6 +5,7 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/init/configkey"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cast"
@@ -29,22 +30,22 @@ func driverName() string {
 	return driver
 }
 func connector() *sqlx.DB {
-	if !configkit.Exist(ConfigKeyDBDriver) || !configkit.Exist(ConfigKeyDBHost) || !configkit.Exist(ConfigKeyDBPort) || !configkit.Exist(ConfigKeyDBPwd) || !configkit.Exist(ConfigKeyDBUser) || !configkit.Exist(ConfigKeyDBName) {
+	if !configkit.Exist(configkey.DBDriver) || !configkit.Exist(configkey.DBHost) || !configkit.Exist(configkey.DBPort) || !configkit.Exist(configkey.DBPwd) || !configkit.Exist(configkey.DBUser) || !configkit.Exist(configkey.DBName) {
 		panic("sqlkit: database config error")
 	}
 	if db == nil {
-		driver = configkit.GetString(ConfigKeyDBDriver, "")
+		driver = configkit.GetString(configkey.DBDriver, "")
 		var param string
 		if driver == "postgres" {
-			param = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", configkit.GetString(ConfigKeyDBHost, ""), configkit.GetInt(ConfigKeyDBPort, 0), configkit.GetString(ConfigKeyDBUser, ""), configkit.GetString(ConfigKeyDBPwd, ""), configkit.GetString(ConfigKeyDBName, ""))
+			param = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", configkit.GetString(configkey.DBHost, ""), configkit.GetInt(configkey.DBPort, 0), configkit.GetString(configkey.DBUser, ""), configkit.GetString(configkey.DBPwd, ""), configkit.GetString(configkey.DBName, ""))
 		} else if driver == "mysql" {
-			param = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8", configkit.GetString(ConfigKeyDBUser, ""), configkit.GetString(ConfigKeyDBPwd, ""), configkit.GetString(ConfigKeyDBHost, ""), configkit.GetString(ConfigKeyDBPort, ""), configkit.GetString(ConfigKeyDBName, ""))
+			param = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8", configkit.GetString(configkey.DBUser, ""), configkit.GetString(configkey.DBPwd, ""), configkit.GetString(configkey.DBHost, ""), configkit.GetString(configkey.DBPort, ""), configkit.GetString(configkey.DBName, ""))
 		}
 		db = sqlx.MustConnect(driver, param)
-		lt := cast.ToInt(configkit.GetInt(ConfigKeyDBMaxLife, 20))
+		lt := cast.ToInt(configkit.GetInt(configkey.DBMaxLife, 20))
 		db.SetConnMaxLifetime(time.Duration(lt) * time.Minute)
-		db.SetMaxOpenConns(configkit.GetInt(ConfigKeyDBMaxOpen, 25))
-		db.SetMaxIdleConns(configkit.GetInt(ConfigKeyDBMaxIdle, 5))
+		db.SetMaxOpenConns(configkit.GetInt(configkey.DBMaxOpen, 25))
+		db.SetMaxIdleConns(configkit.GetInt(configkey.DBMaxIdle, 5))
 	}
 	return db
 }

@@ -1,21 +1,8 @@
 package initkit
 
 import (
-	"github.com/mizuki1412/go-core-kit/init"
-	"github.com/mizuki1412/go-core-kit/mod/common/download"
-	"github.com/mizuki1412/go-core-kit/service-third/aliosskit"
-	"github.com/mizuki1412/go-core-kit/service-third/alismskit"
-	"github.com/mizuki1412/go-core-kit/service-third/locationkit"
-	"github.com/mizuki1412/go-core-kit/service/configkit"
-	"github.com/mizuki1412/go-core-kit/service/influxkit"
+	"github.com/mizuki1412/go-core-kit/init/configkey"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
-	"github.com/mizuki1412/go-core-kit/service/mqttkit"
-	"github.com/mizuki1412/go-core-kit/service/netkit"
-	"github.com/mizuki1412/go-core-kit/service/rediskit"
-	"github.com/mizuki1412/go-core-kit/service/restkit"
-	"github.com/mizuki1412/go-core-kit/service/restkit/context"
-	"github.com/mizuki1412/go-core-kit/service/restkit/swagger"
-	"github.com/mizuki1412/go-core-kit/service/sqlkit"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"log"
@@ -36,73 +23,73 @@ func LoadConfig() {
 
 func DefFlags(cmd *cobra.Command) {
 	// todo 默认值不起效？
-	cmd.Flags().String(corekit.ConfigKeyProjectDir, ".", "项目目录")
-	cmd.Flags().String(download.ConfigKeyProjectSubDir4PublicDownload, "", "项目目录中用于公共下载的开放目录（一层），逗号分隔，.表示所有")
-	cmd.Flags().String(corekit.ConfigKeyProfileDev, "", "开发模式 default:false")
-	cmd.Flags().String(configkit.ConfigKeyTimeLocation, "Asia/Shanghai", "项目中用到的时区")
+	cmd.Flags().String(configkey.ProjectDir, ".", "项目目录")
+	cmd.Flags().String(configkey.ProjectSubDir4PublicDownload, "", "项目目录中用于公共下载的开放目录（一层），逗号分隔，.表示所有")
+	cmd.Flags().String(configkey.ProfileDev, "", "开发模式 default:false")
+	cmd.Flags().String(configkey.TimeLocation, "Asia/Shanghai", "项目中用到的时区")
 
-	cmd.Flags().String(rediskit.ConfigKeyRedisPrefix, "", "redis key的前缀")
-	cmd.Flags().String(rediskit.ConfigKeyRedisHost, "", "redis host")
-	cmd.Flags().String(rediskit.ConfigKeyRedisPort, "", "")
-	cmd.Flags().String(rediskit.ConfigKeyRedisDB, "", "redis db 数据库号")
-	cmd.Flags().String(rediskit.ConfigKeyRedisPwd, "", "")
+	cmd.Flags().String(configkey.RedisPrefix, "", "redis key的前缀")
+	cmd.Flags().String(configkey.RedisHost, "", "redis host")
+	cmd.Flags().String(configkey.RedisPort, "", "")
+	cmd.Flags().String(configkey.RedisDB, "", "redis db 数据库号")
+	cmd.Flags().String(configkey.RedisPwd, "", "")
 
-	cmd.Flags().String(influxkit.ConfigKeyInfluxURL, "", "")
-	cmd.Flags().String(influxkit.ConfigKeyInfluxUser, "", "")
-	cmd.Flags().String(influxkit.ConfigKeyInfluxPwd, "", "")
-	cmd.Flags().String(influxkit.ConfigKeyInfluxDBName, "", "默认的数据库")
+	cmd.Flags().String(configkey.InfluxURL, "", "")
+	cmd.Flags().String(configkey.InfluxUser, "", "")
+	cmd.Flags().String(configkey.InfluxPwd, "", "")
+	cmd.Flags().String(configkey.InfluxDBName, "", "默认的数据库")
 
-	cmd.Flags().String(logkit.ConfigKeyLogPath, "", "日志目录；默认在project.dir下")
-	cmd.Flags().String(logkit.ConfigKeyLogName, "main", "日志文件名，无后缀")
-	cmd.Flags().String(logkit.ConfigKeyLogMaxRemain, "", "最大保留天数")
-	cmd.Flags().String(logkit.ConfigKeyLogMaxBackups, "", "最大保留个数")
-	cmd.Flags().String(logkit.ConfigKeyLogMaxSize, "", "单文件最大尺寸")
-	cmd.Flags().String(logkit.ConfigKeyLogFileOff, "", "关闭文件日志")
-	cmd.Flags().String(logkit.ConfigKeyLogLevel, "", "日志等级 debug/info/warn/error")
+	cmd.Flags().String(configkey.LogPath, "", "日志目录；默认在project.dir下")
+	cmd.Flags().String(configkey.LogName, "main", "日志文件名，无后缀")
+	cmd.Flags().String(configkey.LogMaxRemain, "", "最大保留天数")
+	cmd.Flags().String(configkey.LogMaxBackups, "", "最大保留个数")
+	cmd.Flags().String(configkey.LogMaxSize, "", "单文件最大尺寸")
+	cmd.Flags().String(configkey.LogFileOff, "", "关闭文件日志")
+	cmd.Flags().String(configkey.LogLevel, "", "日志等级 debug/info/warn/error")
 
-	cmd.Flags().String(restkit.ConfigKeyRestServerBase, "", "rest base url")
-	cmd.Flags().String(restkit.ConfigKeyRestServerPort, "", "")
-	cmd.Flags().String(restkit.ConfigKeyRestRequestBodySize, "", "限制request最大，单位MB")
-	cmd.Flags().String(restkit.ConfigKeyRestPPROF, "", "开启pprof, /debug/pprof")
-	cmd.Flags().String(context.ConfigKeySessionExpire, "", "session expire 单位小时")
+	cmd.Flags().String(configkey.RestServerBase, "", "rest base url")
+	cmd.Flags().String(configkey.RestServerPort, "", "")
+	cmd.Flags().String(configkey.RestRequestBodySize, "", "限制request最大，单位MB")
+	cmd.Flags().String(configkey.RestPPROF, "", "开启pprof, /debug/pprof")
+	cmd.Flags().String(configkey.SessionExpire, "", "session expire 单位小时")
 
-	cmd.Flags().String(sqlkit.ConfigKeyDBDriver, "", "")
-	cmd.Flags().String(sqlkit.ConfigKeyDBHost, "", "")
-	cmd.Flags().String(sqlkit.ConfigKeyDBPort, "", "")
-	cmd.Flags().String(sqlkit.ConfigKeyDBName, "", "")
-	cmd.Flags().String(sqlkit.ConfigKeyDBUser, "", "")
-	cmd.Flags().String(sqlkit.ConfigKeyDBPwd, "", "")
-	cmd.Flags().String(sqlkit.ConfigKeyDBMaxOpen, "", "最大连接 默认25")
-	cmd.Flags().String(sqlkit.ConfigKeyDBMaxIdle, "", "最大空闲连接 默认5")
-	cmd.Flags().String(sqlkit.ConfigKeyDBMaxLife, "", "单位分钟，默认20")
+	cmd.Flags().String(configkey.DBDriver, "", "")
+	cmd.Flags().String(configkey.DBHost, "", "")
+	cmd.Flags().String(configkey.DBPort, "", "")
+	cmd.Flags().String(configkey.DBName, "", "")
+	cmd.Flags().String(configkey.DBUser, "", "")
+	cmd.Flags().String(configkey.DBPwd, "", "")
+	cmd.Flags().String(configkey.DBMaxOpen, "", "最大连接 默认25")
+	cmd.Flags().String(configkey.DBMaxIdle, "", "最大空闲连接 默认5")
+	cmd.Flags().String(configkey.DBMaxLife, "", "单位分钟，默认20")
 
-	cmd.Flags().String(swagger.ConfigKeySwaggerBasePath, "", "/path")
-	cmd.Flags().String(swagger.ConfigKeySwaggerHost, "", "可选，默认按swagger-ui所在路径")
-	cmd.Flags().String(swagger.ConfigKeySwaggerDescription, "", "")
-	cmd.Flags().String(swagger.ConfigKeySwaggerTitle, "", "")
-	cmd.Flags().String(swagger.ConfigKeySwaggerVersion, "1.0.0", "")
+	cmd.Flags().String(configkey.SwaggerBasePath, "", "/path")
+	cmd.Flags().String(configkey.SwaggerHost, "", "可选，默认按swagger-ui所在路径")
+	cmd.Flags().String(configkey.SwaggerDescription, "", "")
+	cmd.Flags().String(configkey.SwaggerTitle, "", "")
+	cmd.Flags().String(configkey.SwaggerVersion, "1.0.0", "")
 
-	cmd.Flags().String(locationkit.ConfigKeyAmapKey, "", "高德key")
+	cmd.Flags().String(configkey.AmapKey, "", "高德key")
 
-	cmd.Flags().String(alismskit.ConfigKeyAliSMSRegionId, "cn-hangzhou", "ali sms")
-	cmd.Flags().String(alismskit.ConfigKeyAliSMSAccessKey, "", "ali sms")
-	cmd.Flags().String(alismskit.ConfigKeyAliSMSAccessKeySecret, "", "ali sms")
-	cmd.Flags().String(alismskit.ConfigKeyAliSMSTemplate1, "", "ali sms 模板1")
-	cmd.Flags().String(alismskit.ConfigKeyAliSMSSign1, "", "ali sms 签名1")
+	cmd.Flags().String(configkey.AliSMSRegionId, "cn-hangzhou", "ali sms")
+	cmd.Flags().String(configkey.AliSMSAccessKey, "", "ali sms")
+	cmd.Flags().String(configkey.AliSMSAccessKeySecret, "", "ali sms")
+	cmd.Flags().String(configkey.AliSMSTemplate1, "", "ali sms 模板1")
+	cmd.Flags().String(configkey.AliSMSSign1, "", "ali sms 签名1")
 
-	cmd.Flags().String(aliosskit.ConfigKeyAliSTSRegionId, "cn-hangzhou", "ali sts")
-	cmd.Flags().String(aliosskit.ConfigKeyAliSTSAccessKey, "", "ali sts")
-	cmd.Flags().String(aliosskit.ConfigKeyAliSTSAccessKeySecret, "", "ali sts")
-	cmd.Flags().String(aliosskit.ConfigKeyAliSTSRoleArn, "", "ali sts")
-	cmd.Flags().String(aliosskit.ConfigKeyAliOSSBucketName, "", "ali oss default bucket")
+	cmd.Flags().String(configkey.AliSTSRegionId, "cn-hangzhou", "ali sts")
+	cmd.Flags().String(configkey.AliSTSAccessKey, "", "ali sts")
+	cmd.Flags().String(configkey.AliSTSAccessKeySecret, "", "ali sts")
+	cmd.Flags().String(configkey.AliSTSRoleArn, "", "ali sts")
+	cmd.Flags().String(configkey.AliOSSBucketName, "", "ali oss default bucket")
 
 	// mqtt
-	cmd.Flags().String(mqttkit.ConfigKeyMQTTBroker, "", "eg: tcp://xx.xx.xx")
-	cmd.Flags().String(mqttkit.ConfigKeyMQTTClientID, "", "")
-	cmd.Flags().String(mqttkit.ConfigKeyMQTTUsername, "", "")
-	cmd.Flags().String(mqttkit.ConfigKeyMQTTPwd, "", "")
+	cmd.Flags().String(configkey.MQTTBroker, "", "eg: tcp://xx.xx.xx")
+	cmd.Flags().String(configkey.MQTTClientID, "", "")
+	cmd.Flags().String(configkey.MQTTUsername, "", "")
+	cmd.Flags().String(configkey.MQTTPwd, "", "")
 	// netkit
-	cmd.Flags().String(netkit.ConfigKeyNetPort, "", "")
+	cmd.Flags().String(configkey.NetPort, "", "")
 }
 
 func BindFlags(cmd *cobra.Command) {

@@ -2,6 +2,7 @@ package ui
 
 import (
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/init/configkey"
 	"github.com/mizuki1412/go-core-kit/pc/bridge"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit"
@@ -46,7 +47,7 @@ func startServer(param *WinParam) (chan error, string) {
 	}
 	p := cast.ToString(param.Port)
 	// 设置restkit的port
-	viper.Set(restkit.ConfigKeyRestServerPort, p)
+	viper.Set(configkey.RestServerPort, p)
 	// 启动ui的http server
 	go func() {
 		logkit.Info("pc ui http server start at: " + p)

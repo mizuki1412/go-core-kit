@@ -3,6 +3,7 @@ package influxkit
 import (
 	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/init/configkey"
 	"github.com/mizuki1412/go-core-kit/library/httpkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/spf13/cast"
@@ -11,11 +12,11 @@ import (
 )
 
 func QueryDefaultDB(sql string) []map[string]interface{} {
-	return queryResult(configkit.GetStringD(ConfigKeyInfluxDBName), sql)
+	return queryResult(configkit.GetStringD(configkey.InfluxDBName), sql)
 }
 
 func QueryWithPrefix(prefix, sql string) []map[string]interface{} {
-	queryResult(prefix+configkit.GetStringD(ConfigKeyInfluxDBName), sql)
+	queryResult(prefix+configkit.GetStringD(configkey.InfluxDBName), sql)
 	return nil
 }
 
@@ -24,7 +25,7 @@ func QueryWithDBName(dbName, sql string) []map[string]interface{} {
 }
 
 func QueryMultiDefaultDB(sql []string) [][]map[string]interface{} {
-	return queryMultiResult(configkit.GetStringD(ConfigKeyInfluxDBName), sql)
+	return queryMultiResult(configkit.GetStringD(configkey.InfluxDBName), sql)
 }
 
 func QueryMultiWithDBName(dbName string, sql []string) [][]map[string]interface{} {
@@ -32,7 +33,7 @@ func QueryMultiWithDBName(dbName string, sql []string) [][]map[string]interface{
 }
 
 func url(action, dbName string) string {
-	url := configkit.GetStringD(ConfigKeyInfluxURL)
+	url := configkit.GetStringD(configkey.InfluxURL)
 	if url == "" {
 		panic(exception.New("influx url is null"))
 	}
@@ -40,16 +41,16 @@ func url(action, dbName string) string {
 	if dbName != "" {
 		params += "db=" + dbName
 	}
-	if configkit.GetStringD(ConfigKeyInfluxUser) != "" {
+	if configkit.GetStringD(configkey.InfluxUser) != "" {
 		if params != "" {
 			params += "&"
 		}
-		params += "u=" + configkit.GetStringD(ConfigKeyInfluxUser) + "&p=" + configkit.GetStringD(ConfigKeyInfluxPwd)
+		params += "u=" + configkit.GetStringD(configkey.InfluxUser) + "&p=" + configkit.GetStringD(ConfigKeyInfluxPwd)
 	}
 	if params == "" {
-		return configkit.GetStringD(ConfigKeyInfluxURL) + "/" + action
+		return configkit.GetStringD(configkey.InfluxURL) + "/" + action
 	} else {
-		return configkit.GetStringD(ConfigKeyInfluxURL) + "/" + action + "?" + params
+		return configkit.GetStringD(configkey.InfluxURL) + "/" + action + "?" + params
 	}
 }
 
@@ -152,7 +153,7 @@ func CreateDB(name string) {
 
 // sql: dv_x key1=1,key2="val2" timestamp
 func WriteDefaultDB(sql string) {
-	writeData(configkit.GetStringD(ConfigKeyInfluxDBName), sql)
+	writeData(configkit.GetStringD(configkey.InfluxDBName), sql)
 }
 
 func WriteWithDBName(dbName, sql string) {

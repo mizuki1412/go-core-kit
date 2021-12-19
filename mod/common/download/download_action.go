@@ -2,6 +2,7 @@ package download
 
 import (
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/init/configkey"
 	"github.com/mizuki1412/go-core-kit/library/cryptokit"
 	"github.com/mizuki1412/go-core-kit/mod/middleware"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
@@ -45,7 +46,7 @@ func download(ctx *context.Context) {
 func downloadPublic(ctx *context.Context) {
 	params := downloadParams{}
 	ctx.BindForm(&params)
-	subDir := configkit.GetStringD(ConfigKeyProjectSubDir4PublicDownload)
+	subDir := configkit.GetStringD(configkey.ProjectSubDir4PublicDownload)
 	if params.Name[0] == '/' {
 		params.Name = params.Name[1:]
 	}

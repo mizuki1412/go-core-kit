@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"github.com/mizuki1412/go-core-kit/init/initkit"
 	"github.com/mizuki1412/go-core-kit/library/bytekit"
 	"github.com/spf13/cobra"
 	"net"
@@ -9,7 +10,7 @@ import (
 )
 
 func init() {
-	//initkit.DefFlags(rootCmd)
+	initkit.DefFlags(rootCmd)
 	//rootCmd.AddCommand(cmd.PGSqlToStructCMD("", ""))
 	//rootCmd.AddCommand(cmd.MarkdownDocCMD("go-core-kit 说明文档"))
 	//rootCmd.AddCommand(cmd.WebStaticServerCMD())
@@ -18,7 +19,7 @@ func init() {
 var rootCmd = &cobra.Command{
 	Use: "go-core-kit",
 	Run: func(cmd *cobra.Command, args []string) {
-		//initkit.BindFlags(cmd)
+		initkit.BindFlags(cmd)
 	},
 }
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/go-redis/redis/v8"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/init/configkey"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/spf13/cast"
@@ -15,9 +16,9 @@ var client *redis.Client
 func Instance() *redis.Client {
 	if client == nil {
 		client = redis.NewClient(&redis.Options{
-			Addr:     configkit.GetStringD(ConfigKeyRedisHost) + ":" + configkit.GetString(ConfigKeyRedisPort, "6379"),
-			Password: configkit.GetStringD(ConfigKeyRedisPwd), // no password set
-			DB:       cast.ToInt(configkit.GetString(ConfigKeyRedisDB, "0")),
+			Addr:     configkit.GetStringD(configkey.RedisHost) + ":" + configkit.GetString(ConfigKeyRedisPort, "6379"),
+			Password: configkit.GetStringD(configkey.RedisPwd), // no password set
+			DB:       cast.ToInt(configkit.GetString(configkey.RedisDB, "0")),
 		})
 	}
 	return client
@@ -47,7 +48,7 @@ func Set(ctx context.Context, key string, val interface{}, expire time.Duration)
 
 // GetDecoratedKey 分层路径按:分隔，会自动加上项目前缀(ConfigKeyRedisPrefix)
 func GetDecoratedKey(subPath string) string {
-	name := configkit.GetStringD(ConfigKeyRedisPrefix)
+	name := configkit.GetStringD(configkey.RedisPrefix)
 	if name != "" {
 		name += ":"
 	}

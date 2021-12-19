@@ -3,6 +3,7 @@ package aliosskit
 import (
 	"github.com/aliyun/alibaba-cloud-sdk-go/services/sts"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/init/configkey"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 )
@@ -16,15 +17,15 @@ type STSData struct {
 	Bucket          string `json:"bucket"`
 }
 
-// path是在bucket下的相对路径(eg:*), paths将用于resource
+// GetSTS path是在bucket下的相对路径(eg:*), paths将用于resource
 func GetSTS(roleSession, bucket string, paths ...string) STSData {
-	ak := configkit.GetString(ConfigKeyAliSTSAccessKey, "")
-	aks := configkit.GetString(ConfigKeyAliSTSAccessKeySecret, "")
-	role := configkit.GetString(ConfigKeyAliSTSRoleArn, "")
+	ak := configkit.GetString(configkey.AliSTSAccessKey, "")
+	aks := configkit.GetString(configkey.AliSTSAccessKeySecret, "")
+	role := configkit.GetString(configkey.AliSTSRoleArn, "")
 	if ak == "" || aks == "" || role == "" {
 		panic(exception.New("sts 必要参数未设置"))
 	}
-	region := configkit.GetString(ConfigKeyAliSTSRegionId, "cn-hangzhou")
+	region := configkit.GetString(configkey.AliSTSRegionId, "cn-hangzhou")
 	client, err := sts.NewClientWithAccessKey(region, ak, aks)
 	if err != nil {
 		panic(exception.New("sts初始化错误: " + err.Error()))

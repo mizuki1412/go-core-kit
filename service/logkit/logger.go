@@ -3,7 +3,7 @@ package logkit
 // logger的抽象
 
 import (
-	"github.com/mizuki1412/go-core-kit/init"
+	"github.com/mizuki1412/go-core-kit/init/configkey"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/library/timekit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
@@ -36,7 +36,7 @@ func Init() *zap.Logger {
 	}
 	var core zapcore.Core
 	level := zap.InfoLevel
-	switch configkit.GetStringD(ConfigKeyLogLevel) {
+	switch configkit.GetStringD(configkey.LogLevel) {
 	case "debug":
 		level = zap.DebugLevel
 	case "warn":
@@ -44,7 +44,7 @@ func Init() *zap.Logger {
 	case "error":
 		level = zap.ErrorLevel
 	}
-	if configkit.GetBoolD(ConfigKeyLogFileOff) {
+	if configkit.GetBoolD(configkey.LogFileOff) {
 		core = zapcore.NewTee(
 			// console中基本展示
 			zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout)), level),
@@ -102,10 +102,10 @@ func Init() *zap.Logger {
 //}
 
 func getWriter2() io.Writer {
-	filename := configkit.GetString(ConfigKeyLogName, "main")
-	filepath := configkit.GetStringD(ConfigKeyLogPath)
+	filename := configkit.GetString(configkey.LogName, "main")
+	filepath := configkit.GetStringD(configkey.LogPath)
 	if stringkit.IsNull(filepath) {
-		filepath = configkit.GetStringD(corekit.ConfigKeyProjectDir)
+		filepath = configkit.GetStringD(configkey.ProjectDir)
 	}
 	if stringkit.IsNull(filepath) {
 		filepath = "./log"
@@ -114,9 +114,9 @@ func getWriter2() io.Writer {
 	}
 	config := &lumberjack.Logger{
 		Filename:   filepath + "/" + filename + ".log",
-		MaxSize:    configkit.GetInt(ConfigKeyLogMaxSize, 100),
-		MaxBackups: configkit.GetInt(ConfigKeyLogMaxBackups, 0),
-		MaxAge:     configkit.GetInt(ConfigKeyLogMaxRemain, 0),
+		MaxSize:    configkit.GetInt(configkey.LogMaxSize, 100),
+		MaxBackups: configkit.GetInt(configkey.LogMaxBackups, 0),
+		MaxAge:     configkit.GetInt(configkey.LogMaxRemain, 0),
 		LocalTime:  true,
 		Compress:   true,
 	}

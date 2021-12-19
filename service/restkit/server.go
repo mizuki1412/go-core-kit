@@ -5,6 +5,7 @@ import (
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/middleware/pprof"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/init/configkey"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
@@ -32,11 +33,11 @@ func defaultEngine() {
 	router.Use(middleware.Log())
 	router.Use(middleware.Cors())
 	// max request size
-	router.Proxy.Use(iris.LimitRequestBodySize(int64(configkit.GetInt(ConfigKeyRestRequestBodySize, 100)) << 20))
+	router.Proxy.Use(iris.LimitRequestBodySize(int64(configkit.GetInt(configkey.RestRequestBodySize, 100)) << 20))
 	// 其他错误如404，
 	router.OnError(middleware.Cors())
 	// add base path
-	base := configkit.GetStringD(ConfigKeyRestServerBase)
+	base := configkit.GetStringD(configkey.RestServerBase)
 	if base != "" {
 		if base[0] != '/' {
 			base = "/" + base
@@ -54,10 +55,10 @@ func Run() error {
 	if router == nil {
 		defaultEngine()
 	}
-	port := configkit.GetString(ConfigKeyRestServerPort, "8080")
+	port := configkit.GetString(configkey.RestServerPort, "8080")
 	logkit.Info("Listening and serving HTTP on " + port)
 	//err := http.ListenAndServe(":" + port, middleware.Session.LoadAndSave(router))
-	if configkit.GetBool(ConfigKeyRestPPROF, false) {
+	if configkit.GetBool(configkey.RestPPROF, false) {
 		p := pprof.New()
 		if router.IsGroup {
 			router.ProxyGroup.Any("/debug/pprof", p)
