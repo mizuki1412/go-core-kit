@@ -17,3 +17,4 @@ vendor/
 log/
 .idea
 .DS_Store
+build

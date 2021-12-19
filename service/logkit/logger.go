@@ -3,7 +3,6 @@ package logkit
 // logger的抽象
 
 import (
-	"github.com/arthurkiller/rollingwriter"
 	"github.com/mizuki1412/go-core-kit/init"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/library/timekit"
@@ -11,6 +10,7 @@ import (
 	"github.com/spf13/cast"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
 	"os"
 	"strings"
@@ -52,7 +52,7 @@ func Init() *zap.Logger {
 	} else {
 		core = zapcore.NewTee(
 			// 日志中json方式输出
-			zapcore.NewCore(zapcore.NewJSONEncoder(config), zapcore.AddSync(getWriter()), level),
+			zapcore.NewCore(zapcore.NewJSONEncoder(config), zapcore.AddSync(getWriter2()), level),
 			// console中基本展示
 			zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout)), level),
 		)
@@ -60,7 +60,48 @@ func Init() *zap.Logger {
 	Logger = zap.New(core)
 	return Logger
 }
-func getWriter() io.Writer {
+
+// bug: in windows rename error https://github.com/arthurkiller/rollingwriter/issues/11
+//func getWriter() io.Writer {
+//	filename := configkit.GetString(ConfigKeyLogName, "main")
+//	filepath := configkit.GetStringD(ConfigKeyLogPath)
+//	if stringkit.IsNull(filepath) {
+//		filepath = configkit.GetStringD(corekit.ConfigKeyProjectDir)
+//	}
+//	if stringkit.IsNull(filepath) {
+//		filepath = "./log"
+//	} else {
+//		filepath += "/log"
+//	}
+//	config := rollingwriter.Config{
+//		LogPath:       filepath,                                   //日志路径
+//		TimeTagFormat: "20060102",                                 //时间格式串
+//		FileName:      filename,                                   //日志文件名
+//		MaxRemain:     configkit.GetInt(ConfigKeyLogMaxRemain, 0), //配置日志最大存留数 0 取消自动清理
+//		// - 时间滚动: 配置策略如同 crontable, 例如,每天0:0切分, 则配置 0 0 0 * * *
+//		// - 大小滚动: 配置单个日志文件(未压缩)的滚动大小门限, 如1G, 500M
+//		RollingPolicy: rollingwriter.VolumeRolling, //配置滚动策略 norolling timerolling volumerolling
+//		//RollingTimePattern: "0 0 0 * * *",             //配置时间滚动策略
+//		RollingVolumeSize: "1M", //配置截断文件下限大小
+//		// writer 支持4种不同的 mode: 1. none 2. lock  3. async 4. buffer
+//		// - 无保护的 writer: 不提供并发安全保障
+//		// - lock 保护的 writer: 提供由 mutex 保护的并发安全保障
+//		// - 异步 writer: 异步 write, 并发安全. 异步开启后忽略 Lock 选项
+//		WriterMode: "lock",
+//		// BufferWriterThershould in B
+//		BufferWriterThershould: 8 * 1024 * 1024,
+//		// Compress will compress log file with gzip
+//		Compress: true,
+//	}
+//	// 创建一个 writer
+//	writer, err := rollingwriter.NewWriterFromConfig(&config)
+//	if err != nil {
+//		panic("rollingwriter.NewWriterFromConfig: " + err.Error())
+//	}
+//	return writer
+//}
+
+func getWriter2() io.Writer {
 	filename := configkit.GetString(ConfigKeyLogName, "main")
 	filepath := configkit.GetStringD(ConfigKeyLogPath)
 	if stringkit.IsNull(filepath) {
@@ -71,32 +112,15 @@ func getWriter() io.Writer {
 	} else {
 		filepath += "/log"
 	}
-	config := rollingwriter.Config{
-		LogPath:       filepath,                                   //日志路径
-		TimeTagFormat: "20060102",                                 //时间格式串
-		FileName:      filename,                                   //日志文件名
-		MaxRemain:     configkit.GetInt(ConfigKeyLogMaxRemain, 0), //配置日志最大存留数 0 取消自动清理
-		// - 时间滚动: 配置策略如同 crontable, 例如,每天0:0切分, 则配置 0 0 0 * * *
-		// - 大小滚动: 配置单个日志文件(未压缩)的滚动大小门限, 如1G, 500M
-		RollingPolicy:      rollingwriter.TimeRolling, //配置滚动策略 norolling timerolling volumerolling
-		RollingTimePattern: "0 0 0 * * *",             //配置时间滚动策略
-		RollingVolumeSize:  "10M",                     //配置截断文件下限大小
-		// writer 支持4种不同的 mode: 1. none 2. lock  3. async 4. buffer
-		// - 无保护的 writer: 不提供并发安全保障
-		// - lock 保护的 writer: 提供由 mutex 保护的并发安全保障
-		// - 异步 writer: 异步 write, 并发安全. 异步开启后忽略 Lock 选项
-		WriterMode: "lock",
-		// BufferWriterThershould in B
-		BufferWriterThershould: 8 * 1024 * 1024,
-		// Compress will compress log file with gzip
-		Compress: true,
+	config := &lumberjack.Logger{
+		Filename:   filepath + "/" + filename + ".log",
+		MaxSize:    configkit.GetInt(ConfigKeyLogMaxSize, 100),
+		MaxBackups: configkit.GetInt(ConfigKeyLogMaxBackups, 0),
+		MaxAge:     configkit.GetInt(ConfigKeyLogMaxRemain, 0),
+		LocalTime:  true,
+		Compress:   true,
 	}
-	// 创建一个 writer
-	writer, err := rollingwriter.NewWriterFromConfig(&config)
-	if err != nil {
-		panic("rollingwriter.NewWriterFromConfig: " + err.Error())
-	}
-	return writer
+	return config
 }
 
 type Param struct {

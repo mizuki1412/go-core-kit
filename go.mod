@@ -9,7 +9,7 @@ require (
 	github.com/albenik/go-serial/v2 v2.4.0
 	github.com/alecthomas/chroma v0.9.4
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.1323
-	github.com/arthurkiller/rollingwriter v1.1.2
+	github.com/arthurkiller/rollingwriter v1.1.3-0.20210825082109-f61c29bf8751
 	github.com/eclipse/paho.mqtt.golang v1.3.5
 	github.com/go-playground/validator/v10 v10.9.0
 	github.com/go-redis/redis/v8 v8.11.4
@@ -20,21 +20,22 @@ require (
 	github.com/kataras/iris/v12 v12.1.8
 	github.com/lib/pq v1.10.4
 	github.com/matoous/go-nanoid/v2 v2.0.0
-	github.com/panjf2000/gnet v1.5.3
+	github.com/panjf2000/gnet v1.6.3
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/shopspring/decimal v1.3.1
 	github.com/spf13/afero v1.6.0
 	github.com/spf13/cast v1.4.1
-	github.com/spf13/cobra v1.2.1
-	github.com/spf13/viper v1.9.0
+	github.com/spf13/cobra v1.3.0
+	github.com/spf13/viper v1.10.1
 	github.com/tidwall/gjson v1.12.1
 	github.com/xuri/excelize/v2 v2.4.1
 	github.com/zserge/lorca v0.1.10
 	go.uber.org/automaxprocs v1.4.0
 	go.uber.org/zap v1.19.1
 	golang.org/x/text v0.3.7
-	gopkg.in/ini.v1 v1.66.0
+	gopkg.in/ini.v1 v1.66.2
+
 )
 
 require (
@@ -78,7 +79,7 @@ require (
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mediocregopher/radix/v3 v3.4.2 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.16 // indirect
-	github.com/mitchellh/mapstructure v1.4.2 // indirect
+	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
@@ -105,7 +106,7 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect
-	golang.org/x/net v0.0.0-20210726213435-c6fcb2dbf985 // indirect
+	golang.org/x/net v0.0.0-20210813160813-60bc85c4be6d // indirect
 	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect

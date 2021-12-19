@@ -1,7 +1,7 @@
 BINARY=go-core-kit
 VERSION=1.1.0
 DATE=`date +%FT%T%z`
-.PHONY: init
+.PHONY: init build
 
 default:
 	@echo ${BINARY}
@@ -18,3 +18,6 @@ upgrade:
 publish:
 	@git tag v${VERSION}
 	@git push origin v${VERSION}
+
+build:
+	@GOOS=windows GOARCH=amd64 go build -o build/corekit.exe

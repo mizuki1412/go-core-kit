@@ -9,19 +9,18 @@ import (
 	"strings"
 )
 
-func init() {
-	rootCmd.AddCommand(json2CliCmd)
-}
-
-var json2CliCmd = &cobra.Command{
-	Use:   "json2cli",
-	Short: `json config file转命令行的参数形式`,
-	Run: func(cmd *cobra.Command, args []string) {
-		json, _ := filekit.ReadString("config.deploy.json")
-		config := jsonkit.ParseMap(json)
-		ret := handleMap("", config)
-		fmt.Println(strings.Join(ret, "\n"))
-	},
+func Json2CliCMD(title string) *cobra.Command {
+	var json2CliCmd = &cobra.Command{
+		Use:   "json2cli",
+		Short: `json config file转命令行的参数形式`,
+		Run: func(cmd *cobra.Command, args []string) {
+			json, _ := filekit.ReadString("config.deploy.json")
+			config := jsonkit.ParseMap(json)
+			ret := handleMap("", config)
+			fmt.Println(strings.Join(ret, "\n"))
+		},
+	}
+	return json2CliCmd
 }
 
 func handleMap(parentKey string, data map[string]interface{}) []string {
