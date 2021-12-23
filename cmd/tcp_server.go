@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/mizuki1412/go-core-kit/init/initkit"
+	"github.com/mizuki1412/go-core-kit/library/bytekit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/mizuki1412/go-core-kit/service/netkit"
@@ -25,15 +26,15 @@ func TCPServerCMD() *cobra.Command {
 			server := netkit.NetServer{
 				Port: cast.ToInt32(configkit.GetStringD("port")),
 				OnConnect: func(c gnet.Conn) (out []byte, action gnet.Action) {
-					log.Println(" OnConnect ： ", c.RemoteAddr())
+					log.Println("OnConnect： ", c.RemoteAddr())
 					return
 				},
 				OnMessage: func(frame []byte, c gnet.Conn) (out []byte, action gnet.Action) {
-					log.Println("收到：" + string(frame))
+					log.Println("recv：" + bytekit.Bytes2HexArray(frame))
 					return
 				},
 				OnClose: func(c gnet.Conn, err error) (action gnet.Action) {
-					log.Println(" close ： ")
+					log.Println("OnClose： ", c.RemoteAddr())
 					return
 				},
 			}
@@ -44,8 +45,8 @@ func TCPServerCMD() *cobra.Command {
 	return cmd
 }
 
-func tcpServer() {
-	service := ":5000"
+func tcpServer(port string) {
+	service := ":" + port
 	// 绑定
 	tcpAddr, _ := net.ResolveTCPAddr("tcp", service)
 	// 监听

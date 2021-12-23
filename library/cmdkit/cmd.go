@@ -63,7 +63,7 @@ func Run(command []string, params ...RunParams) (string, error) {
 			}()
 			select {
 			case <-time.After(time.Duration(param.Timeout) * time.Second):
-				return "", errors.New("timeout")
+				return "", errors.New("cmd timeout:" + name)
 			case m := <-to:
 				ret := m["ret"].(string)
 				var err error
