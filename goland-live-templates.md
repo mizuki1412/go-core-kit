@@ -22,6 +22,65 @@ func $name$(ctx *context.Context){
 }
 ```
 
+## action_init_full
+
+```
+func Init(router *router.Router) {
+	tag := "$tname$"
+	r := router.Group("/rest/$tag$")
+	r.Use(middleware.AuthUsernameAndPwd())
+	{
+		r.Post("/update", update).Swagger.Tag(tag).Summary("增加和修改").Param(updateParams{})
+		r.Post("/del", del).Swagger.Tag(tag).Summary("删除").Param(delParams{})
+		r.Post("/list", list).Swagger.Tag(tag).Summary("列表").Param(listParams{})
+		r.Post("/detail", detail).Swagger.Tag(tag).Summary("详情").Param(detailParams{})
+	}
+}
+
+type updateParams struct {
+	//Phone    string `description:"手机号" default:"" trim:"true"`
+	//Pwd      string `validate:"required"`
+}
+
+func update(ctx *context.Context) {
+	params := updateParams{}
+	ctx.BindForm(&params)
+
+	ctx.JsonSuccess(nil)
+}
+
+type delParams struct {
+	Id int32 `validate:"required"`
+}
+
+func del(ctx *context.Context) {
+	params := delParams{}
+	ctx.BindForm(&params)
+
+	ctx.JsonSuccess(nil)
+}
+
+type listParams struct{}
+
+func list(ctx *context.Context) {
+	params := listParams{}
+	ctx.BindForm(&params)
+
+	ctx.JsonSuccess(nil)
+}
+
+type detailParams struct {
+	Id int32 `validate:"required"`
+}
+
+func detail(ctx *context.Context) {
+	params := detailParams{}
+	ctx.BindForm(&params)
+
+	ctx.JsonSuccess(nil)
+}
+```
+
 ## action
 ```
 type $name$Params struct{

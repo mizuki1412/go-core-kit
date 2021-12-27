@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"reflect"
 	"strings"
+	"time"
 )
 
 type Context struct {
@@ -226,7 +227,7 @@ func (ctx *Context) bindStruct(bean interface{}) {
 					s, err := cast.ToInt64E(val)
 					if err == nil {
 						//panic(exception.New("time cast error"))
-						temp.Set(timekit.UnixMill(s))
+						temp.Set(time.UnixMilli(s))
 					}
 				} else {
 					s, err := timekit.Parse(val)

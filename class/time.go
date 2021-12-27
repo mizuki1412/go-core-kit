@@ -97,7 +97,7 @@ func (th *Time) Set(val interface{}) *Time {
 		th.Time = t
 		th.Valid = true
 	} else if v, ok := val.(int64); ok {
-		th.Time = timekit.UnixMill(v)
+		th.Time = time.UnixMilli(v)
 		th.Valid = true
 	} else {
 		t, err := cast.ToTimeE(val)

@@ -8,8 +8,10 @@ import (
 )
 
 // UnixMill 毫秒时间戳解析为Time
+// Deprecated
 func UnixMill(t int64) time.Time {
-	return time.Unix(t/1000, t%1000*1000000)
+	return time.UnixMilli(t)
+	//return time.Unix(t/1000, t%1000*1000000)
 }
 
 // GetUnixMill
@@ -32,7 +34,7 @@ func Parse(dt string) (time.Time, error) {
 		if err != nil {
 			return s, err
 		}
-		s = UnixMill(s0)
+		s = time.UnixMilli(s0)
 		return s, nil
 	} else {
 		for _, dateType := range []string{
