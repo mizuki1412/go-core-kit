@@ -18,6 +18,9 @@ type Config struct {
 
 var connect *serial.Port
 
+// 外部控制receive逻辑中断
+var interrupt bool
+
 func ListPorts() []string {
 	ports, err := serial.GetPortsList()
 	if err != nil {
@@ -32,16 +35,18 @@ func ListPorts() []string {
 
 func Open(config0 Config) {
 	//config = config0
-	var err error
-	connect, err = serial.Open(
-		config0.COMName,
-		serial.WithBaudrate(config0.BaudRate),
-		serial.WithStopBits(config0.StopBits),
-		serial.WithDataBits(config0.DataBits),
-		serial.WithParity(config0.Parity),
-		serial.WithReadTimeout(0))
-	if err != nil {
-		panic(exception.New("open serial error"))
+	if connect == nil {
+		var err error
+		connect, err = serial.Open(
+			config0.COMName,
+			serial.WithBaudrate(config0.BaudRate),
+			serial.WithStopBits(config0.StopBits),
+			serial.WithDataBits(config0.DataBits),
+			serial.WithParity(config0.Parity),
+			serial.WithReadTimeout(0))
+		if err != nil {
+			panic(exception.New("open serial error"))
+		}
 	}
 }
 
@@ -62,6 +67,7 @@ func Receive(handle func([]byte, []byte) ([]byte, bool), timeoutMill int) chan [
 	if connect == nil {
 		panic(exception.New("please open serial first"))
 	}
+	interrupt = false
 	chRun := make(chan []byte)
 	now := time.Now()
 	go func(ch chan []byte) {
@@ -69,6 +75,12 @@ func Receive(handle func([]byte, []byte) ([]byte, bool), timeoutMill int) chan [
 		buff := make([]byte, 100)
 		// non-block
 		for {
+			if interrupt {
+				logkit.Error("serial interrupt")
+				ch <- nil
+				close(ch)
+				break
+			}
 			n, err := connect.Read(buff)
 			if err != nil {
 				logkit.Error(exception.New(err.Error()))
@@ -102,4 +114,8 @@ func Receive(handle func([]byte, []byte) ([]byte, bool), timeoutMill int) chan [
 func Close() {
 	_ = connect.Close()
 	connect = nil
+}
+
+func Interrupt() {
+	interrupt = true
 }
