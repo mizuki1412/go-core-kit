@@ -1,8 +1,8 @@
 package context
 
 import (
+	"github.com/gin-gonic/gin/render"
 	"github.com/mizuki1412/go-core-kit/class"
-	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/mizuki1412/go-core-kit/service/storagekit"
 	"net/http"
 	"net/url"
@@ -25,7 +25,7 @@ const ResultUnauthorized = 403
 
 // Json http返回json数据
 func (ctx *Context) Json(ret RestRet) {
-	ctx.UpdateSessionExpire()
+	//ctx.UpdateSessionExpire()
 	var code int
 	switch ret.Result {
 	case ResultSuccess:
@@ -35,11 +35,7 @@ func (ctx *Context) Json(ret RestRet) {
 	default:
 		code = http.StatusBadRequest
 	}
-	ctx.Proxy.StatusCode(code)
-	_, err := ctx.Proxy.JSON(ret)
-	if err != nil {
-		logkit.Error("rest_ret_json_error: " + err.Error())
-	}
+	ctx.Proxy.JSON(code, ret)
 }
 
 func (ctx *Context) JsonSuccess(data interface{}) {
@@ -52,8 +48,8 @@ func (ctx *Context) JsonSuccess(data interface{}) {
 
 func (ctx *Context) RawSuccess(data []byte) {
 	// todo 更新session的expire 会不会太频繁
-	ctx.UpdateSessionExpire()
-	ctx.Proxy.Binary(data)
+	//ctx.UpdateSessionExpire()
+	ctx.Proxy.Render(http.StatusOK, render.Data{Data: data})
 }
 
 // JsonSuccessWithPage 带分页信息
@@ -90,10 +86,7 @@ func (ctx *Context) SetJsonHeader() {
 }
 func (ctx *Context) FileRaw(data []byte, name string) {
 	ctx.SetFileHeader(name)
-	_, err := ctx.Proxy.Binary(data)
-	if err != nil {
-		logkit.Error("rest_ret_file_raw_error: " + err.Error())
-	}
+	ctx.RawSuccess(data)
 }
 
 // File 相对于项目目录路径的
@@ -103,10 +96,5 @@ func (ctx *Context) File(relativePath, name string) {
 
 func (ctx *Context) FileDirect(obsolutePath, name string) {
 	// todo 直接返回的了
-	err := ctx.Proxy.SendFile(obsolutePath, name)
-	if err != nil {
-		logkit.Error("rest_ret_file_error: " + err.Error())
-		//ctx.SetJsonHeader()
-		//panic(exception.New(err.Error()))
-	}
+	ctx.Proxy.File(obsolutePath + name)
 }

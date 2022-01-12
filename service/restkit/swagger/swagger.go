@@ -135,6 +135,7 @@ func (s *SwaggerDoc) ReadDoc() string {
 	s.Info["title"] = configkit.GetStringD(configkey.SwaggerTitle)
 	s.Info["version"] = configkit.GetString(configkey.SwaggerVersion, "1.0.0")
 	s.Host = configkit.GetStringD(configkey.SwaggerHost)
-	s.BasePath = configkit.GetStringD(configkey.SwaggerBasePath)
+	// basePath已经在router中直接加上了
+	//s.BasePath = configkit.GetStringD(configkey.SwaggerBasePath)
 	return jsonkit.ToString(*s)
 }

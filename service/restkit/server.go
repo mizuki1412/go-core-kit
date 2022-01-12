@@ -2,8 +2,7 @@ package restkit
 
 import (
 	ctx "context"
-	"github.com/kataras/iris/v12"
-	"github.com/kataras/iris/v12/middleware/pprof"
+	"github.com/gin-gonic/gin"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/init/configkey"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
@@ -11,44 +10,47 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
 	"github.com/mizuki1412/go-core-kit/service/restkit/middleware"
 	router2 "github.com/mizuki1412/go-core-kit/service/restkit/router"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
 var router *router2.Router
-
-func Engine() *router2.Router {
-	if router == nil {
-		defaultEngine()
-	}
-	return router
-}
+var server *http.Server
 
 func defaultEngine() {
-	router = &router2.Router{
-		IsGroup: false,
-		Proxy:   iris.New(),
-		Path:    "",
+	if !configkit.GetBoolD(configkey.ProfileDev) {
+		gin.SetMode(gin.ReleaseMode)
 	}
-	//router.Proxy.Use(recover2.New())
-	router.Use(middleware.Recover())
+	router = &router2.Router{
+		Proxy: gin.New(),
+	}
+	router.Proxy.Use(context.InitSession())
 	router.Use(middleware.Log())
 	router.Use(middleware.Cors())
-	// max request size
-	router.Proxy.Use(iris.LimitRequestBodySize(int64(configkit.GetInt(configkey.RestRequestBodySize, 100)) << 20))
+	router.Use(middleware.Recover())
+	//router.Use(cors.Default())
+
+	if configkit.GetBool(configkey.RestPPROF, false) {
+		// todo  p := pprof.New()
+	}
+	// max request size todo
+	//router.Proxy.Use(iris.LimitRequestBodySize(int64(configkit.GetInt(configkey.RestRequestBodySize, 100)) << 20))
 	// 其他错误如404，
-	router.OnError(middleware.Cors())
+	//router.OnError(middleware.Cors())
 	// add base path
 	base := configkit.GetStringD(configkey.RestServerBase)
 	if base != "" {
 		if base[0] != '/' {
 			base = "/" + base
 		}
-		router.ProxyGroup = router.Proxy.Party(base)
-		router.IsGroup = true
-		//router.Path = base
+		if base[len(base)-1] == '/' {
+			base = base[:len(base)-1]
+		}
+		router.Base = base
 	}
-
-	/// init session
-	context.InitSession()
 }
 
 func Run() error {
@@ -56,29 +58,41 @@ func Run() error {
 		defaultEngine()
 	}
 	port := configkit.GetString(configkey.RestServerPort, "8080")
-	logkit.Info("Listening and serving HTTP on " + port)
-	//err := http.ListenAndServe(":" + port, middleware.Session.LoadAndSave(router))
-	if configkit.GetBool(configkey.RestPPROF, false) {
-		p := pprof.New()
-		if router.IsGroup {
-			router.ProxyGroup.Any("/debug/pprof", p)
-			router.ProxyGroup.Any("/debug/pprof/{action:path}", p)
-		} else {
-			router.Proxy.Any("/debug/pprof", p)
-			router.Proxy.Any("/debug/pprof/{action:path}", p)
-		}
-	}
 	router.RegisterSwagger()
-	err := router.Proxy.Run(
-		iris.Addr(":"+port),
-		// 禁用，阻止如 /xx/ 自动重定向到 /xx，而不经过handle
-		iris.WithoutPathCorrection)
-	return err
+	server = &http.Server{
+		Addr:    ":" + port,
+		Handler: router,
+	}
+	go func() {
+		logkit.Info("Listening and serving HTTP on " + port)
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logkit.Fatal(exception.New(err.Error()))
+		}
+	}()
+	// https://github.com/gin-gonic/examples/blob/master/graceful-shutdown/graceful-shutdown/notify-without-context/server.go
+	// Wait for interrupt signal to gracefully shutdown the server with
+	// a timeout of 5 seconds.
+	quit := make(chan os.Signal, 1)
+	// kill (no param) default send syscall.SIGTERM
+	// kill -2 is syscall.SIGINT
+	// kill -9 is syscall.SIGKILL but can't be catch, so don't need add it
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	logkit.Info("Shutting down server...")
+
+	// The context is used to inform the server it has 5 seconds to finish
+	// the request it is currently handling
+	ctxt, cancel := ctx.WithTimeout(ctx.Background(), 5*time.Second)
+	defer cancel()
+	if err := server.Shutdown(ctxt); err != nil {
+		logkit.Fatal(exception.New(err.Error()))
+	}
+	return nil
 }
 
 func Shutdown() {
-	if router != nil && router.Proxy != nil {
-		err := router.Proxy.Shutdown(ctx.Background())
+	if server != nil {
+		err := server.Shutdown(ctx.Background())
 		if err != nil {
 			logkit.Error(exception.New(err.Error()))
 		}

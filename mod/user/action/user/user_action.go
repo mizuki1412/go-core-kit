@@ -19,7 +19,7 @@ type loginByUsernameParam struct {
 }
 
 func loginByUsername(ctx *context.Context) {
-	session := ctx.RenewSession()
+	//session := ctx.RenewSession()
 	params := loginByUsernameParam{}
 	ctx.BindForm(&params)
 	if !pghelper.CheckSchemaExist(params.Schema) {
@@ -36,10 +36,11 @@ func loginByUsername(ctx *context.Context) {
 	}
 	ctx.SessionSetUser(user)
 	ctx.SessionSetSchema(params.Schema)
-	ctx.SessionSetToken(session.ID())
+	ctx.SessionSetToken(ctx.SessionID())
+	ctx.SessionSave()
 	ret := map[string]interface{}{
 		"user":  user,
-		"token": session.ID(),
+		"token": ctx.SessionID(),
 	}
 	if AdditionLoginFunc != nil {
 		AdditionLoginFunc(ctx, ret)
@@ -57,7 +58,7 @@ type loginParam struct {
 
 /// 通用登录
 func login(ctx *context.Context) {
-	session := ctx.RenewSession()
+	//session := ctx.RenewSession()
 	params := loginParam{}
 	ctx.BindForm(&params)
 	if stringkit.IsNull(params.Username) && stringkit.IsNull(params.Phone) {
@@ -78,10 +79,11 @@ func login(ctx *context.Context) {
 	}
 	ctx.SessionSetUser(user)
 	ctx.SessionSetSchema(params.Schema)
-	ctx.SessionSetToken(session.ID())
+	ctx.SessionSetToken(ctx.SessionID())
+	ctx.SessionSave()
 	ret := map[string]interface{}{
 		"user":  user,
-		"token": session.ID(),
+		"token": ctx.SessionID(),
 	}
 	if AdditionLoginFunc != nil {
 		AdditionLoginFunc(ctx, ret)
@@ -109,7 +111,7 @@ func info(ctx *context.Context) {
 	if !params.Id.Valid {
 		// 获取自己的
 		// todo 先走数据库
-		user := ctx.SessionGetUser().(*model.User)
+		user := ctx.SessionGetUser()
 		user = userdao.New(ctx.SessionGetSchema()).FindById(user.Id)
 		// todo user不存在时
 		if AdditionUserExFunc != nil {
@@ -131,8 +133,7 @@ func info(ctx *context.Context) {
 }
 
 func logout(ctx *context.Context) {
-	// todo usercenter
-	ctx.SessionRemoveUser()
+	ctx.SessionClear()
 	ctx.JsonSuccess(nil)
 }
 
@@ -144,7 +145,7 @@ type updatePwdParam struct {
 func updatePwd(ctx *context.Context) {
 	params := updatePwdParam{}
 	ctx.BindForm(&params)
-	u := ctx.SessionGetUser().(*model.User)
+	u := ctx.SessionGetUser()
 	usermapper := userdao.New(ctx.SessionGetSchema())
 	user := usermapper.FindById(u.Id)
 	if user == nil {
@@ -156,7 +157,7 @@ func updatePwd(ctx *context.Context) {
 	user.Pwd.String = cryptokit.MD5(params.NewPwd)
 	usermapper.Update(user)
 	ctx.SessionSetUser(user)
-	// todo usercenter
+	ctx.SessionSave()
 	ctx.JsonSuccess(nil)
 }
 
@@ -169,7 +170,7 @@ type updateUserInfoParam struct {
 }
 
 func updateUserInfo(ctx *context.Context) {
-	u := ctx.SessionGetUser().(*model.User)
+	u := ctx.SessionGetUser()
 	params := updateUserInfoParam{}
 	ctx.BindForm(&params)
 	dao := userdao.New(ctx.SessionGetSchema())

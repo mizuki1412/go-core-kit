@@ -202,8 +202,8 @@ type DelParams struct {
 func DelUser(ctx *context.Context) {
 	params := DelParams{}
 	ctx.BindForm(&params)
-	mine, ok := ctx.SessionGetUser().(*model.User)
-	if !ok {
+	mine := ctx.SessionGetUser()
+	if mine == nil {
 		panic(exception.New("登录的用户错误"))
 	}
 	if mine.Id == params.Id {

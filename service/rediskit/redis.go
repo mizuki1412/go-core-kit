@@ -16,7 +16,7 @@ var client *redis.Client
 func Instance() *redis.Client {
 	if client == nil {
 		client = redis.NewClient(&redis.Options{
-			Addr:     configkit.GetStringD(configkey.RedisHost) + ":" + configkit.GetString(ConfigKeyRedisPort, "6379"),
+			Addr:     configkit.GetStringD(configkey.RedisHost) + ":" + configkit.GetString(configkey.RedisPort, "6379"),
 			Password: configkit.GetStringD(configkey.RedisPwd), // no password set
 			DB:       cast.ToInt(configkit.GetString(configkey.RedisDB, "0")),
 		})

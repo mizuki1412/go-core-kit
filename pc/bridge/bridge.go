@@ -1,14 +1,12 @@
 package bridge
 
 import (
-	"embed"
 	socketio "github.com/googollee/go-socket.io"
-	"github.com/kataras/iris/v12"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit"
-	"github.com/mizuki1412/go-core-kit/service/restkit/router"
+	"github.com/mizuki1412/go-core-kit/service/restkit/context"
 	"github.com/spf13/cast"
 	"net/http"
 )
@@ -72,8 +70,6 @@ func SetEventPublicHandle(fun func(req *MsgReq) string) *socketio.Server {
 	return Server
 }
 
-var UiAssets embed.FS
-
 // Start 开启websocket server并配置http todo
 func Start() {
 	go Server.Serve()
@@ -86,17 +82,7 @@ func Start() {
 		Server.ServeHTTP(w, r)
 	}
 	// 和rest base地址区分开; POST和GET都可能
-	restkit.GetRouter().Proxy.Any("/socket.io/**", iris.FromStd(socketHandle))
-	//http.HandleFunc("/socket.io/", func(w http.ResponseWriter, r *http.Request) {
-	//	origin := r.Header.Get("Origin")
-	//	w.Header().Set("Access-Control-Allow-Origin", origin)
-	//	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	//	Server.ServeHTTP(w, r)
-	//})
-	// local win ui web, 默认在ui
-	restkit.GetRouter().Proxy.Any("/assets/{path:path}", router.EmbedHtmlHandle(UiAssets, "./ui/assets"))
-	restkit.GetRouter().Proxy.Any("/index.html", router.EmbedHtmlHandle(UiAssets, "./ui"))
-	//restkit.GetRouter().Proxy.Any("/ui/{path:path}", router.EmbedHtmlHandle(UiAssets, "./ui"))
-	//http.Handle("/", http.FileServer(http.Dir("./ui")))
-	//_ = mime.AddExtensionType(".js", "text/javascript")
+	restkit.GetRouter().Any("/socket.io/**", func(ctx *context.Context) {
+		socketHandle(ctx.Proxy.Writer, ctx.Proxy.Request)
+	})
 }

@@ -13,14 +13,17 @@ func init() {
 	Validator = validator.New()
 	Validator.RegisterCustomTypeFunc(validateValuer,
 		class.ArrInt{},
+		class.ArrString{},
+		class.Bool{},
+		class.Decimal{},
 		class.Int32{},
 		class.String{},
 		class.Float64{},
-		class.ArrString{},
-		class.Bool{},
 		class.Int64{},
 		class.MapString{},
-		class.Time{})
+		class.MapStringArr{},
+		class.Time{},
+	)
 }
 
 func validateValuer(field reflect.Value) interface{} {

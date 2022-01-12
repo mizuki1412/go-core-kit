@@ -26,20 +26,11 @@ func Recover() router.Handler {
 				if ctx.DBTxExist() {
 					ctx.DBTx().Rollback()
 				}
-				if ctx.Proxy.IsStopped() {
+				if ctx.Proxy.IsAborted() {
 					return
 				}
 				ctx.JsonError(msg)
-				// 打印错误信息
-				logkit.Info("response-error",
-					logkit.Param{
-						Key: "url",
-						Val: ctx.Request.URL.String(),
-					}, logkit.Param{
-						Key: "msg",
-						Val: msg,
-					})
-				ctx.Proxy.StopExecution()
+				//ctx.Proxy.Abort()
 			}
 		}()
 		ctx.Proxy.Next()

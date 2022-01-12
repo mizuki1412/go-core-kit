@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/init/httpconst"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/tidwall/gjson"
 	"io"
@@ -43,7 +44,10 @@ type Req struct {
 	Timeout     int // seconds
 }
 
+// Deprecated
 const ContentTypeForm = "application/x-www-form-urlencoded; charset=utf-8"
+
+// Deprecated
 const ContentTypeJSON = "application/json; charset=utf-8"
 
 func Request(reqBean Req) (string, int) {
@@ -69,9 +73,9 @@ func Request(reqBean Req) (string, int) {
 	}
 	if reqBean.ContentType == "" {
 		if reqBean.JsonData != nil {
-			req.Header.Set("Content-Type", ContentTypeJSON)
+			req.Header.Set("Content-Type", httpconst.ContentTypeJSON)
 		} else {
-			req.Header.Set("Content-Type", ContentTypeForm)
+			req.Header.Set("Content-Type", httpconst.ContentTypeForm)
 		}
 	} else {
 		req.Header.Set("Content-Type", reqBean.ContentType)

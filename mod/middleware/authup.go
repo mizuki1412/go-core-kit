@@ -9,8 +9,7 @@ import (
 // AuthUsernameAndPwd 用户名密码校验
 func AuthUsernameAndPwd() router.Handler {
 	return func(ctx *context.Context) {
-		user := ctx.Session().Get("user")
-		// todo 通过token获取session
+		user := ctx.SessionGetUser()
 		if user == nil {
 			ctx.Json(context.RestRet{
 				Result: context.ResultAuthErr,
@@ -19,8 +18,9 @@ func AuthUsernameAndPwd() router.Handler {
 					Valid:  true,
 				},
 			})
-			ctx.Proxy.StopExecution()
+			ctx.Proxy.Abort()
+		} else {
+			ctx.Proxy.Next()
 		}
-		ctx.Proxy.Next()
 	}
 }

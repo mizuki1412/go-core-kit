@@ -7,6 +7,7 @@ import (
 )
 
 // SessionGetUserFunc session定制配置, 转换user对象
+// Deprecated
 func SessionGetUserFunc() {
 	context.SessionGetUserFunc = func(ctx *context.Context) interface{} {
 		json := ctx.Session().Get("user")

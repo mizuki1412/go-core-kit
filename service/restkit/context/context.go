@@ -1,14 +1,14 @@
 package context
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/kataras/iris/v12"
-	"github.com/kataras/iris/v12/context"
 	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/library/timekit"
+	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/mizuki1412/go-core-kit/service/sqlkit"
 	"github.com/spf13/cast"
 	"net/http"
@@ -18,18 +18,19 @@ import (
 )
 
 type Context struct {
-	Proxy    iris.Context
+	Proxy    *gin.Context
 	Request  *http.Request
-	Response context.ResponseWriter
+	Response gin.ResponseWriter
 }
 
 // Set msg per request
 func (ctx *Context) Set(key string, val interface{}) {
-	ctx.Proxy.Values().Set(key, val)
+	ctx.Proxy.Set(key, val)
 }
 
 func (ctx *Context) Get(key string) interface{} {
-	return ctx.Proxy.Values().Get(key)
+	r, _ := ctx.Proxy.Get(key)
+	return r
 }
 
 func (ctx *Context) DBTx() *sqlkit.Dao {
@@ -52,25 +53,25 @@ func (ctx *Context) DBTxExist() bool {
 func (ctx *Context) BindForm(bean interface{}) {
 	switch bean.(type) {
 	case map[string]interface{}:
-		// query会和form合并 post时
-		allForm := ctx.Proxy.FormValues()
-		for k, v := range allForm {
-			if len(v) == 1 {
-				(bean.(map[string]interface{}))[k] = v[0]
-			} else if len(v) > 1 {
-				(bean.(map[string]interface{}))[k] = v
-			}
-		}
-		if len(allForm) == 0 {
-			// GET
-			for i := 0; ; i++ {
-				e := ctx.Proxy.Params().GetEntryAt(i)
-				if e.Key == "" {
-					break
-				}
-				(bean.(map[string]interface{}))[e.Key] = e.ValueRaw
-			}
-		}
+		// query会和form合并 post时 todo
+		//allForm := ctx.Proxy.FormValues()
+		//for k, v := range allForm {
+		//	if len(v) == 1 {
+		//		(bean.(map[string]interface{}))[k] = v[0]
+		//	} else if len(v) > 1 {
+		//		(bean.(map[string]interface{}))[k] = v
+		//	}
+		//}
+		//if len(allForm) == 0 {
+		//	// GET
+		//	for i := 0; ; i++ {
+		//		e := ctx.Proxy.Params().GetEntryAt(i)
+		//		if e.Key == "" {
+		//			break
+		//		}
+		//		(bean.(map[string]interface{}))[e.Key] = e.ValueRaw
+		//	}
+		//}
 	default:
 		//err := ctx.Proxy.ReadForm(bean)
 		//if err != nil {
@@ -100,7 +101,7 @@ func (ctx *Context) bindStruct(bean interface{}) {
 	jsonBody := map[string]interface{}{}
 	isJson := strings.Index(ctx.Request.Header.Get("content-type"), "application/json") >= 0
 	if isJson {
-		_ = ctx.Proxy.ReadJSON(&jsonBody)
+		_ = ctx.Proxy.ShouldBindJSON(&jsonBody)
 	}
 	for i := 0; i < rt.NumField(); i++ {
 		field := rt.Field(i)
@@ -109,16 +110,21 @@ func (ctx *Context) bindStruct(bean interface{}) {
 		key := stringkit.LowerFirst(field.Name)
 		// multipart file
 		if typeString == "class.File" {
-			file, header, err := ctx.Proxy.FormFile(key)
+			file, err := ctx.Proxy.FormFile(key)
 			// 如果文件流必须存在则检测
 			if err != nil && strings.Index(field.Tag.Get("validate"), "required") > -1 {
 				panic(exception.New(err.Error()))
 			}
 			if err == nil {
-				fieldV.Set(reflect.ValueOf(class.File{
-					File:   file,
-					Header: header,
-				}))
+				f, e := file.Open()
+				if e == nil {
+					fieldV.Set(reflect.ValueOf(class.File{
+						File:   f,
+						Header: file,
+					}))
+				} else {
+					logkit.Error(exception.New(e.Error()))
+				}
 			}
 			continue
 		}
@@ -134,11 +140,11 @@ func (ctx *Context) bindStruct(bean interface{}) {
 			}
 			_, keyExist = jsonBody[key]
 		} else {
-			val = ctx.Proxy.FormValue(key)
 			// 判断是否存在key，用于空字符串和无的区分
-			_, keyExist = ctx.Proxy.FormValues()[key]
+			val, keyExist = ctx.Proxy.GetPostForm(key)
 			if val == "" {
-				val = ctx.Proxy.URLParam(key)
+				// todo
+				val = ctx.Proxy.Param(key)
 			}
 		}
 		// 判断trim

@@ -11,7 +11,7 @@ func Log() router.Handler {
 	return func(ctx *context.Context) {
 		t := time.Now()
 		// 当前上传的cookies中的session，不一定等于response中的
-		sessionId := ctx.Session().ID()
+		sessionId := ctx.SessionID()
 		// todo params
 		//params := make(map[interface{}]interface{})
 		//_ = c.Copy().ShouldBind(&params)
@@ -27,7 +27,7 @@ func Log() router.Handler {
 		ctx.Proxy.Next()
 
 		latency := time.Since(t).Milliseconds()
-		status := ctx.Response.StatusCode()
+		status := ctx.Proxy.Writer.Status()
 		logkit.Info("response",
 			logkit.Param{
 				Key: "url",

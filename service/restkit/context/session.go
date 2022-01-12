@@ -1,113 +1,118 @@
 package context
 
 import (
-	"github.com/kataras/iris/v12"
-	"github.com/kataras/iris/v12/sessions"
-	"github.com/kataras/iris/v12/sessions/sessiondb/redis"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-contrib/sessions/redis"
+	"github.com/gin-gonic/gin"
+	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/init/configkey"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
+	"github.com/mizuki1412/go-core-kit/mod/user/model"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cast"
-	"time"
+	"net/http"
 )
 
-var sessionManager *sessions.Sessions
-
-func InitSession() {
-	sessionManager = sessions.New(sessions.Config{
-		Cookie:                      "session",
-		AllowReclaim:                true,
-		Expires:                     time.Duration(configkit.GetInt(configkey.SessionExpire, 12)) * time.Hour,
-		DisableSubdomainPersistence: true, // 开发环境跨域时对火狐有效
-	})
+func InitSession() gin.HandlerFunc {
 	// redis
 	redisHost := configkit.GetStringD(configkey.RedisHost)
 	redisPort := configkit.GetString(configkey.RedisPort, "6379")
 	redisPwd := configkit.GetStringD(configkey.RedisPwd)
 	redisDB := configkit.GetStringD(configkey.RedisDB)
-	redisPrefix := configkit.GetString(configkey.RedisPrefix, "")
+	//redisPrefix := configkit.GetString(configkey.RedisPrefix, "")
 	if redisHost != "" {
-		db := redis.New(redis.Config{
-			Network:   "tcp",
-			Addr:      redisHost + ":" + redisPort,
-			Timeout:   time.Duration(30) * time.Second,
-			MaxActive: 10,
-			Password:  redisPwd,
-			Database:  redisDB,
-			Prefix:    redisPrefix + "-session:",
-			Driver:    redis.Redigo(), // redis.Radix() can be used instead.
-		})
-		// Optionally configure the underline driver:
-		// driver := redis.Redigo()
-		// driver.MaxIdle = ...
-		// driver.IdleTimeout = ...
-		// driver.Wait = ...
-		// redis.Config {Driver: driver}
-		// Close connection when control+C/cmd+C
-		iris.RegisterOnInterrupt(func() {
-			_ = db.Close()
-			logkit.Error("session in redis: error")
-		})
-		sessionManager.UseDatabase(db)
 		logkit.Info("session use redis")
+		// todo secret?
+		store, _ := redis.NewStoreWithDB(10, "tcp", redisHost+":"+redisPort, redisPwd, redisDB, []byte("default"))
+		return sessions.Sessions("sessionID", store)
+	} else {
+		store := cookie.NewStore([]byte("default"))
+		logkit.Info("session use cache")
+		return sessions.Sessions("sessionID", store)
 	}
 }
 
-func (ctx *Context) Session() *sessions.Session {
-	return sessionManager.Start(ctx.Proxy)
-}
-
-// SessionSetUser session每次请求时都会从redis中获取，所以在session中存储的务必是string，如果是对象，会被自动转为json，但如果其中有unicode，可能造成斜杆指数增加
+// SessionSetUser session每次请求时都会从redis中获取，所以在session中存储的务必是string，如果是对象，会被自动转为json，但如果其中有unicode，可能造成指数增加
 func (ctx *Context) SessionSetUser(user interface{}) {
+	session := sessions.Default(ctx.Proxy)
 	if user == nil {
 		return
 	}
 	if _, ok := user.(string); !ok {
-		ctx.Session().Set("user", jsonkit.ToString(user))
+		session.Set("user", jsonkit.ToString(user))
 	} else {
-		ctx.Session().Set("user", user)
+		session.Set("user", user)
 	}
+
 }
 func (ctx *Context) SessionSetSchema(schema string) {
-	ctx.Session().Set("schema", schema)
+	session := sessions.Default(ctx.Proxy)
+	session.Set("schema", schema)
 }
 func (ctx *Context) SessionSetToken(token string) {
-	ctx.Session().Set("token", token)
+	session := sessions.Default(ctx.Proxy)
+	session.Set("token", token)
+}
+func (ctx *Context) SessionSet(key string, val interface{}) {
+	session := sessions.Default(ctx.Proxy)
+	session.Set(key, val)
 }
 
-var SessionGetUserFunc = func(ctx *Context) interface{} {
-	// 默认处理，在自定义请覆盖
-	json := ctx.Session().GetString("user")
-	if json != "" {
-		return json
-	} else {
-		return nil
+// SessionSave 刷新session 到cookie
+func (ctx *Context) SessionSave() {
+	session := sessions.Default(ctx.Proxy)
+	session.Options(sessions.Options{
+		MaxAge:   6 * 3600,
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
+	})
+	err := session.Save()
+	if err != nil {
+		logkit.Error(exception.New(err.Error()))
 	}
 }
 
 // SessionGetUser return eg *model.User
-func (ctx *Context) SessionGetUser() interface{} {
-	return SessionGetUserFunc(ctx)
+func (ctx *Context) SessionGetUser() *model.User {
+	session := sessions.Default(ctx.Proxy)
+	json := session.Get("user")
+	if j, ok := json.(string); ok {
+		user := &model.User{}
+		// todo 每次都要转换，可能存在性能问题
+		err := jsonkit.ParseObj(j, user)
+		if err != nil {
+			return nil
+		}
+		return user
+	} else {
+		return nil
+	}
 }
 func (ctx *Context) SessionGetSchema() string {
-	return ctx.Session().GetStringDefault("schema", "public")
+	session := sessions.Default(ctx.Proxy)
+	r := cast.ToString(session.Get("schema"))
+	if r == "" {
+		r = "public"
+	}
+	return r
 }
 func (ctx *Context) SessionGetToken() string {
-	return ctx.Session().GetString("token")
+	session := sessions.Default(ctx.Proxy)
+	return cast.ToString(session.Get("token"))
 }
-func (ctx *Context) SessionRemoveUser() {
-	ctx.Session().Delete("user")
+func (ctx *Context) SessionClear() {
+	session := sessions.Default(ctx.Proxy)
+	session.Clear()
+	err := session.Save()
+	if err != nil {
+		logkit.Error(exception.New(err.Error()))
+	}
 }
 
-func (ctx *Context) RenewSession() *sessions.Session {
-	sess := ctx.Session()
-	if !sess.IsNew() {
-		sessionManager.Destroy(ctx.Proxy)
-		return ctx.Session()
-	}
-	return sess
-}
-func (ctx *Context) UpdateSessionExpire() {
-	_ = sessionManager.UpdateExpiration(ctx.Proxy, time.Duration(cast.ToInt(configkit.GetString(configkey.SessionExpire, "12")))*time.Hour)
+func (ctx *Context) SessionID() string {
+	session := sessions.Default(ctx.Proxy)
+	return session.ID()
 }
