@@ -64,7 +64,8 @@ func (ctx *Context) SessionSet(key string, val interface{}) {
 func (ctx *Context) SessionSave() {
 	session := sessions.Default(ctx.Proxy)
 	session.Options(sessions.Options{
-		MaxAge:   6 * 3600,
+		Path:     "/",
+		MaxAge:   configkit.GetInt(configkey.SessionExpire, 6) * 3600,
 		HttpOnly: true,
 		Secure:   true,
 		SameSite: http.SameSiteNoneMode,
