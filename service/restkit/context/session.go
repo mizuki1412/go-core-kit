@@ -107,10 +107,7 @@ func (ctx *Context) SessionGetToken() string {
 func (ctx *Context) SessionClear() {
 	session := sessions.Default(ctx.Proxy)
 	session.Clear()
-	err := session.Save()
-	if err != nil {
-		logkit.Error(exception.New(err.Error()))
-	}
+	ctx.SessionSave()
 }
 
 func (ctx *Context) SessionID() string {

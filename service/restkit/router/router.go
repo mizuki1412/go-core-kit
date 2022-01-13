@@ -26,7 +26,7 @@ func handlerTrans(handlers ...Handler) []gin.HandlerFunc {
 	list := make([]gin.HandlerFunc, len(handlers), len(handlers))
 	for i, v := range handlers {
 		list[i] = func(ctx *gin.Context) {
-			// 实际ctx进入，转为抽象层的context todo 注意field更新
+			// 实际ctx进入，转为抽象层的context
 			v(&context.Context{
 				Proxy:    ctx,
 				Request:  ctx.Request,
@@ -38,7 +38,7 @@ func handlerTrans(handlers ...Handler) []gin.HandlerFunc {
 }
 func handlerTransOne(handler Handler) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		// 实际ctx进入，转为抽象层的context todo 注意field更新
+		// 实际ctx进入，转为抽象层的context
 		handler(&context.Context{
 			Proxy:    ctx,
 			Request:  ctx.Request,
@@ -60,7 +60,6 @@ func (router *Router) Group(path string, handlers ...Handler) *Router {
 }
 
 func (router *Router) Use(handlers ...Handler) *Router {
-	// todo ？多参数handlers会多次执行最后一个handle？
 	if router.ProxyGroup != nil {
 		for _, v := range handlers {
 			router.ProxyGroup.Use(handlerTransOne(v))

@@ -25,7 +25,6 @@ const ResultUnauthorized = 403
 
 // Json http返回json数据
 func (ctx *Context) Json(ret RestRet) {
-	//ctx.UpdateSessionExpire()
 	var code int
 	switch ret.Result {
 	case ResultSuccess:
@@ -39,7 +38,6 @@ func (ctx *Context) Json(ret RestRet) {
 }
 
 func (ctx *Context) JsonSuccess(data interface{}) {
-	// todo 更新session的expire 会不会太频繁
 	ctx.Json(RestRet{
 		Result: ResultSuccess,
 		Data:   data,
@@ -47,8 +45,6 @@ func (ctx *Context) JsonSuccess(data interface{}) {
 }
 
 func (ctx *Context) RawSuccess(data []byte) {
-	// todo 更新session的expire 会不会太频繁
-	//ctx.UpdateSessionExpire()
 	ctx.Proxy.Render(http.StatusOK, render.Data{Data: data})
 }
 
@@ -95,6 +91,5 @@ func (ctx *Context) File(relativePath, name string) {
 }
 
 func (ctx *Context) FileDirect(obsolutePath, name string) {
-	// todo 直接返回的了
 	ctx.Proxy.File(obsolutePath + name)
 }

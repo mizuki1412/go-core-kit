@@ -85,7 +85,8 @@ func Run() error {
 	ctxt, cancel := ctx.WithTimeout(ctx.Background(), 5*time.Second)
 	defer cancel()
 	if err := server.Shutdown(ctxt); err != nil {
-		logkit.Fatal(exception.New(err.Error()))
+		logkit.Error(exception.New(err.Error()))
+		return err
 	}
 	return nil
 }

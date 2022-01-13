@@ -126,7 +126,7 @@ func Export(param Param, ctx *context.Context) {
 		}
 	} else {
 		ctx.SetFileHeader(param.FileName)
-		err = f.Write(ctx.Proxy.ResponseWriter())
+		err = f.Write(ctx.Proxy.Writer)
 		if err != nil {
 			panic(exception.New("excel export error: " + err.Error()))
 		}
