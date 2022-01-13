@@ -25,7 +25,12 @@ func Gen(urlPrefix string, next bool) {
 	tagTemps := make([]string, 0)
 	for _, key := range keys {
 		var result string
-		tag := all[key].Get("post.tags").Array()[0].String()
+		// todo get 暂无
+		arr := all[key].Get("post.tags").Array()
+		if len(arr) == 0 {
+			continue
+		}
+		tag := arr[0].String()
 		name := stringkit.Split(tag, ":")[0]
 		if all[key].Get("post.summary").String() != "" {
 			result += fmt.Sprintf("\n/// %s", all[key].Get("post.summary").String())

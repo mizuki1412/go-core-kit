@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/init/configkey"
 	"github.com/mizuki1412/go-core-kit/library/httpkit"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
@@ -35,7 +36,7 @@ func Geo(cityCode, address string) (loc *Location) {
 	if len(cityCode) == 4 {
 		cityCode += "00"
 	}
-	url := fmt.Sprintf("https://restapi.amap.com/v3/geocode/geo?key=%s&address=%s&city=%s", configkit.GetStringD(ConfigKeyAmapKey), address, cityCode)
+	url := fmt.Sprintf("https://restapi.amap.com/v3/geocode/geo?key=%s&address=%s&city=%s", configkit.GetStringD(configkey.AmapKey), address, cityCode)
 	ret, _ := httpkit.Request(httpkit.Req{
 		Method: http.MethodGet,
 		Url:    url,
@@ -66,7 +67,7 @@ func ReGeo(lon, lat class.Decimal) (loc *Location) {
 			loc = nil
 		}
 	}()
-	url := fmt.Sprintf("https://restapi.amap.com/v3/geocode/regeo?key=%s&location=%s,%s", configkit.GetStringD(ConfigKeyAmapKey), lon.Decimal.String(), lat.Decimal.String())
+	url := fmt.Sprintf("https://restapi.amap.com/v3/geocode/regeo?key=%s&location=%s,%s", configkit.GetStringD(configkey.AmapKey), lon.Decimal.String(), lat.Decimal.String())
 	ret, _ := httpkit.Request(httpkit.Req{
 		Method: http.MethodGet,
 		Url:    url,
@@ -97,7 +98,7 @@ func ReGeo(lon, lat class.Decimal) (loc *Location) {
 func Weather(city string) []map[string]interface{} {
 	ret, _ := httpkit.Request(httpkit.Req{
 		Method: http.MethodGet,
-		Url:    "https://restapi.amap.com/v3/weather/weatherInfo?key=" + configkit.GetStringD(ConfigKeyAmapKey) + "&city=" + city + "&extensions=all",
+		Url:    "https://restapi.amap.com/v3/weather/weatherInfo?key=" + configkit.GetStringD(configkey.AmapKey) + "&city=" + city + "&extensions=all",
 	})
 	rs := gjson.Parse(ret).Get("forecasts").Array()
 	cast := rs[0].Get("casts").Array()
