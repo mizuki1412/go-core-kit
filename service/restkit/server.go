@@ -10,6 +10,8 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
 	"github.com/mizuki1412/go-core-kit/service/restkit/middleware"
 	router2 "github.com/mizuki1412/go-core-kit/service/restkit/router"
+	"github.com/spf13/cast"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -53,20 +55,33 @@ func defaultEngine() {
 	}
 }
 
-func Run() error {
+func Run(listeners ...net.Listener) error {
 	if router == nil {
 		defaultEngine()
 	}
 	port := configkit.GetString(configkey.RestServerPort, "8080")
 	router.RegisterSwagger()
-	server = &http.Server{
-		Addr:    ":" + port,
-		Handler: router,
+	if len(listeners) == 0 {
+		server = &http.Server{
+			Addr:    ":" + port,
+			Handler: router,
+		}
+	} else {
+		server = &http.Server{
+			Handler: router,
+		}
+		port = cast.ToString(listeners[0].Addr().(*net.TCPAddr).Port)
 	}
 	go func() {
 		logkit.Info("Listening and serving HTTP on " + port)
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logkit.Fatal(exception.New(err.Error()))
+		if len(listeners) == 0 {
+			if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+				logkit.Fatal(exception.New(err.Error()))
+			}
+		} else {
+			if err := server.Serve(listeners[0]); err != nil && err != http.ErrServerClosed {
+				logkit.Fatal(exception.New(err.Error()))
+			}
 		}
 	}()
 	// https://github.com/gin-gonic/examples/blob/master/graceful-shutdown/graceful-shutdown/notify-without-context/server.go
@@ -93,6 +108,7 @@ func Run() error {
 
 func Shutdown() {
 	if server != nil {
+		logkit.Info("Shutting down server...")
 		err := server.Shutdown(ctx.Background())
 		if err != nil {
 			logkit.Error(exception.New(err.Error()))

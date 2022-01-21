@@ -70,7 +70,7 @@ func SetEventPublicHandle(fun func(req *MsgReq) string) *socketio.Server {
 	return Server
 }
 
-// Start 开启websocket server并配置http todo
+// Start 开启websocket server并配置http
 func Start() {
 	go Server.Serve()
 	// defer Server.Close()

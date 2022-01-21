@@ -1,38 +1,38 @@
 package ui
 
 import (
+	"embed"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/init/configkey"
-	"github.com/mizuki1412/go-core-kit/pc/bridge"
-	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit"
+	"github.com/mizuki1412/go-core-kit/service/restkit/router"
 	"github.com/spf13/cast"
 	"github.com/spf13/viper"
 	"net"
-	"net/http"
 )
 
-/// ui window params
+// WinParam ui window params
 type WinParam struct {
-	// 默认0则开启随机端口; 这里的port将替代config中的默认port
+	// 默认0则开启随机端口; 这里的port将替代config中的rest port
 	Port       int
 	Width      int
 	Height     int
+	Title      string
 	FullScreen bool
-	// url中的项目路径 eg：/base/xxx。如果前端是hash模式：/#/xxx
-	Url string
-	// 完整的url
-	CompleteUrl string
+	Debug      bool
+	Assets     embed.FS
 	// true：只开启服务，不开启ui
 	NoUI bool
+	// todo 不开启rest server
+	NoRest bool
 	// 关闭ui时不关闭主线程
 	KeepMain bool
 }
 
 // 开启websocket server
-func startServer(param *WinParam) (chan error, string) {
-	// 开启bridge
-	bridge.Start()
+func startServer(param *WinParam) chan error {
+	// todo 开启bridge
+	//bridge.Start()
 	ch := make(chan error)
 	var listener net.Listener
 	var err error
@@ -43,21 +43,27 @@ func startServer(param *WinParam) (chan error, string) {
 			panic(exception.New("随机端口开启失败"))
 		}
 		param.Port = listener.Addr().(*net.TCPAddr).Port
-		//listener.Close()
 	}
-	p := cast.ToString(param.Port)
+	// 设置 ui assets
+	restkit.GetRouter().GetOrigin("/ui/:path", router.EmbedHtmlHandle(param.Assets, "./ui"))
+	restkit.GetRouter().GetOrigin("/ui", router.EmbedHtmlHandle(param.Assets, "./ui"))
 	// 设置restkit的port
-	viper.Set(configkey.RestServerPort, p)
+	viper.Set(configkey.RestServerPort, cast.ToString(param.Port))
 	// 启动ui的http server
 	go func() {
-		logkit.Info("pc ui http server start at: " + p)
-		if listener != nil {
-			// todo 和restkit.Run()整合, 随机端口
-			ch <- http.Serve(listener, nil)
-		} else {
+		if listener == nil {
 			ch <- restkit.Run()
-			//ch <- http.ListenAndServe(":"+p, nil)
+		} else {
+			ch <- restkit.Run(listener)
 		}
 	}()
-	return ch, p
+	return ch
+}
+
+func Run(param *WinParam) {
+	serverCh := startServer(param)
+	if !param.NoUI {
+		startUI(param)
+	}
+	waitClose(param, serverCh)
 }

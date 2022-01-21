@@ -101,6 +101,12 @@ func (router *Router) Get(path string, handlers ...Handler) *Router {
 	router.setPath4Swagger(path, "get")
 	return router
 }
+
+// GetOrigin 不附带router.base
+func (router *Router) GetOrigin(path string, handlers ...Handler) *Router {
+	router.Proxy.GET(path, handlerTrans(handlers...)...)
+	return router
+}
 func (router *Router) Any(path string, handlers ...Handler) *Router {
 	if router.ProxyGroup != nil {
 		router.ProxyGroup.Any(path, handlerTrans(handlers...)...)
