@@ -1,4 +1,4 @@
-//go:build windows
+//go:build windows && webview2
 
 package ui
 
