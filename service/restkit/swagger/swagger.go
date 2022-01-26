@@ -15,6 +15,11 @@ type SwaggerPath struct {
 }
 
 func NewPath(path string, method string) *SwaggerPath {
+	// 由于gin的关系，手动处理 basePath
+	basePath := configkit.GetStringD(configkey.SwaggerBasePath)
+	if strings.Index(path, basePath) == 0 {
+		path = path[len(basePath):]
+	}
 	sp := &SwaggerPath{Path: path, Method: method}
 	if _, ok := Doc.Paths[path]; !ok {
 		Doc.Paths[path] = map[string]map[string]interface{}{}
@@ -135,7 +140,7 @@ func (s *SwaggerDoc) ReadDoc() string {
 	s.Info["title"] = configkit.GetStringD(configkey.SwaggerTitle)
 	s.Info["version"] = configkit.GetString(configkey.SwaggerVersion, "1.0.0")
 	s.Host = configkit.GetStringD(configkey.SwaggerHost)
-	// basePath已经在router中直接加上了
-	//s.BasePath = configkit.GetStringD(configkey.SwaggerBasePath)
+	// basePath已经在router中直接加上了，在NewPath中需要额外处理
+	s.BasePath = configkit.GetStringD(configkey.SwaggerBasePath)
 	return jsonkit.ToString(*s)
 }

@@ -2,7 +2,7 @@
 ## action_init
 ```
 func Init(router *router.Router) {
-	tag := "$tname$"
+	tag := "$tag$:$tname$"
 	r := router.Group("/rest/$tag$")
 	r.Use(middleware.AuthUsernameAndPwd())
 	{
@@ -26,7 +26,7 @@ func $name$(ctx *context.Context){
 
 ```
 func Init(router *router.Router) {
-	tag := "$tname$"
+	tag := "$tag$:$tname$"
 	r := router.Group("/rest/$tag$")
 	r.Use(middleware.AuthUsernameAndPwd())
 	{
