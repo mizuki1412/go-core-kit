@@ -143,6 +143,9 @@ func (ctx *Context) bindStruct(bean interface{}) {
 			// 判断是否存在key，用于空字符串和无的区分
 			val, keyExist = ctx.Proxy.GetPostForm(key)
 			if val == "" {
+				val = ctx.Proxy.Query(key)
+			}
+			if val == "" {
 				// todo
 				val = ctx.Proxy.Param(key)
 			}

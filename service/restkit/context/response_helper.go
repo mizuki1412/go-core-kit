@@ -48,6 +48,10 @@ func (ctx *Context) RawSuccess(data []byte) {
 	ctx.Proxy.Render(http.StatusOK, render.Data{Data: data})
 }
 
+func (ctx *Context) Html(data []byte) {
+	ctx.Proxy.Render(http.StatusOK, render.Data{Data: data, ContentType: "text/html"})
+}
+
 // JsonSuccessWithPage 带分页信息
 func (ctx *Context) JsonSuccessWithPage(data interface{}, currentPage, totalPage, total int32) {
 	ret := RestRet{
