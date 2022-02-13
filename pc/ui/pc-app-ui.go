@@ -45,7 +45,7 @@ func startServer(param *WinParam) chan error {
 		param.Port = listener.Addr().(*net.TCPAddr).Port
 	}
 	// 设置 ui assets
-	restkit.GetRouter().GetOrigin("/ui/:path", router.EmbedHtmlHandle(param.Assets, "./ui"))
+	restkit.GetRouter().GetOrigin("/ui/*action", router.EmbedHtmlHandle(param.Assets, "./ui"))
 	restkit.GetRouter().GetOrigin("/ui", router.EmbedHtmlHandle(param.Assets, "./ui"))
 	// 设置restkit的port
 	viper.Set(configkey.RestServerPort, cast.ToString(param.Port))

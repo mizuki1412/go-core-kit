@@ -8,8 +8,6 @@ import (
 	"sync"
 )
 
-/** 针对PG的jsonb */
-
 // MapStringSync 同时继承scan和value方法
 type MapStringSync struct {
 	sync.RWMutex

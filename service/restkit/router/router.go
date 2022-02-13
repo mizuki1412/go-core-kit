@@ -123,14 +123,16 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 // EmbedHtmlHandle 注意path pattern中加入{path:path}
+// url中path的路径前缀需要和root一致
 func EmbedHtmlHandle(fs embed.FS, root string) func(c *context.Context) {
 	return func(c *context.Context) {
 		// 解析访问路径
-		pathName := c.Proxy.Param("path")
-		if pathName == "" {
+		var assetPath string
+		pathName := c.Proxy.Param("action")
+		if pathName == "" || pathName == "/" {
 			pathName = "index.html"
 		}
-		assetPath := path.Join(root, pathName)
+		assetPath = path.Join(root, pathName)
 		assets, err := fs.Open(assetPath)
 		if err != nil {
 			c.Proxy.Status(http.StatusBadRequest)
