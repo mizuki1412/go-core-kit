@@ -14,7 +14,7 @@ import (
 func Gen(urlPrefix string, next bool) {
 	ret, _ := httpkit.Request(httpkit.Req{
 		Method: "GET",
-		Url:    urlPrefix + "/swagger/doc",
+		Url:    urlPrefix + "/swagger-doc",
 	})
 	var keys []string
 	all := gjson.Get(ret, "paths").Map()

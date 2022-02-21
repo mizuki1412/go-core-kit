@@ -132,6 +132,7 @@ func EmbedHtmlHandle(fs embed.FS, root string) func(c *context.Context) {
 		if pathName == "" || pathName == "/" {
 			pathName = "index.html"
 		}
+		println(pathName)
 		assetPath = path.Join(root, pathName)
 		assets, err := fs.Open(assetPath)
 		if err != nil {
@@ -166,12 +167,12 @@ func EmbedHtmlHandle(fs embed.FS, root string) func(c *context.Context) {
 }
 
 func (router *Router) RegisterSwagger() {
-	router.Get("/swagger/doc", func(c *context.Context) {
+	router.Get("/swagger-doc", func(c *context.Context) {
 		c.Proxy.Render(http.StatusOK, render.Data{Data: []byte(swg.Doc.ReadDoc()), ContentType: httpconst.ContentTypeJSON})
 		//c.Proxy.Status(http.StatusOK)
 		//_, _ = c.Proxy.Writer.Write([]byte(swg.Doc.ReadDoc()))
 	})
 	// 第二个path表示匹配路径
-	router.Get("/swagger/:path", EmbedHtmlHandle(swg.UiAssets, "./swagger-ui"))
+	router.Get("/swagger/*action", EmbedHtmlHandle(swg.UiAssets, "./swagger-ui"))
 	router.Get("/swagger", EmbedHtmlHandle(swg.UiAssets, "./swagger-ui"))
 }
