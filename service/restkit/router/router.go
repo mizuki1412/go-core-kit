@@ -140,11 +140,6 @@ func EmbedHtmlHandle(fs embed.FS, root string) func(c *context.Context) {
 			_, _ = c.Proxy.Writer.Write([]byte(err.Error()))
 			return
 		}
-		//f, err := pkger.Open(pkPath + pathName)
-		//if err != nil {
-		//	_, _ = c.Write([]byte(err.Error()))
-		//	return
-		//}
 		data := make([]byte, 0, 1024*5)
 		for true {
 			temp := make([]byte, 1024)
@@ -155,7 +150,6 @@ func EmbedHtmlHandle(fs embed.FS, root string) func(c *context.Context) {
 				data = append(data, temp[:n]...)
 			}
 		}
-		//_ = mime.AddExtensionType(".js", "text/javascript")
 		// mine
 		i := strings.LastIndex(pathName, ".")
 		if i > 0 {

@@ -54,12 +54,12 @@ func downloadPublic(ctx *context.Context) {
 	if subDir == "" || (subDir != "." && (len(subs) == 1 || strings.Index(subDir, subs[0]) < 0)) {
 		panic(exception.New("未授权开放目录"))
 	}
-	dotIndex := strings.LastIndex(params.Name, ".")
-	var filename string
-	if dotIndex >= 0 {
-		filename = cryptokit.URLEncode(params.Name[0:dotIndex]) + params.Name[dotIndex:]
-	} else {
-		filename = cryptokit.URLEncode(params.Name)
-	}
-	ctx.File(params.Name, filename)
+	//dotIndex := strings.LastIndex(params.Name, ".")
+	//var filename string
+	//if dotIndex >= 0 {
+	//	filename = cryptokit.URLEncode(params.Name[0:dotIndex]) + params.Name[dotIndex:]
+	//} else {
+	//	filename = cryptokit.URLEncode(params.Name)
+	//}
+	ctx.File2(params.Name)
 }

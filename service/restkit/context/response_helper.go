@@ -93,6 +93,9 @@ func (ctx *Context) FileRaw(data []byte, name string) {
 func (ctx *Context) File(relativePath, name string) {
 	ctx.FileDirect(storagekit.GetFullPath(relativePath), name)
 }
+func (ctx *Context) File2(relativePathName string) {
+	ctx.Proxy.File(storagekit.GetFullPath(relativePathName))
+}
 
 func (ctx *Context) FileDirect(obsolutePath, name string) {
 	ctx.Proxy.File(obsolutePath + name)
