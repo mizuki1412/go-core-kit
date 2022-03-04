@@ -152,9 +152,9 @@ func updatePwd(ctx *context.Context) {
 		panic(exception.New("用户不存在"))
 	}
 	if user.Pwd.String != cryptokit.MD5(params.OldPwd) {
-		panic(exception.New("密码错误"))
+		panic(exception.New("原密码错误"))
 	}
-	user.Pwd.String = cryptokit.MD5(params.NewPwd)
+	user.Pwd.Set(cryptokit.MD5(params.NewPwd))
 	usermapper.Update(user)
 	ctx.SessionSetUser(user)
 	ctx.SessionSave()
@@ -168,7 +168,8 @@ type updateUserInfoParam struct {
 	Gender     int8
 	Image      class.String
 	Address    class.String
-	Pwd        class.String
+	OldPwd     class.String
+	NewPwd     class.String
 	ExtendJson class.MapString
 }
 
@@ -206,8 +207,12 @@ func updateUserInfo(ctx *context.Context) {
 	if params.ExtendJson.Valid {
 		u.Extend.PutAll(params.ExtendJson.Map)
 	}
-	if params.Pwd.Valid && params.Pwd.String != "" {
-		u.Pwd.Set(cryptokit.MD5(params.Pwd.String))
+	if params.OldPwd.Valid && params.NewPwd.Valid && params.OldPwd.String != "" && params.NewPwd.String != "" {
+		user := dao.FindById(u.Id)
+		if user.Pwd.String != cryptokit.MD5(params.OldPwd.String) {
+			panic(exception.New("原密码错误"))
+		}
+		user.Pwd.Set(cryptokit.MD5(params.NewPwd.String))
 	}
 	// todo usercenter
 	dao.Update(u)

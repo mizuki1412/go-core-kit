@@ -34,4 +34,4 @@ toolkit for golang projects
 ## 可替换的函数目录
 
 # TODO
-- [ ] https://github.com/gin-contrib/sessions/pull/148
+- [ ] https://github.com/gin-contrib/sessions/pull/148 等官方更新
