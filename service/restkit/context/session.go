@@ -1,16 +1,18 @@
 package context
 
 import (
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
-	"github.com/gin-contrib/sessions/redis"
+	"context"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/init/configkey"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/mod/user/model"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
+	"github.com/mizuki1412/sessions"
+	"github.com/mizuki1412/sessions/cookie"
+	redistore "github.com/mizuki1412/sessions/redis"
 	"github.com/spf13/cast"
 	"net/http"
 )
@@ -24,8 +26,13 @@ func InitSession() gin.HandlerFunc {
 	//redisPrefix := configkit.GetString(configkey.RedisPrefix, "")
 	if redisHost != "" {
 		logkit.Info("session use redis")
-		// todo secret?
-		store, _ := redis.NewStoreWithDB(10, "tcp", redisHost+":"+redisPort, redisPwd, redisDB, []byte("default"))
+		redisClient := redis.NewClient(&redis.Options{
+			Addr:     redisHost + ":" + redisPort,
+			Password: redisPwd,
+			DB:       cast.ToInt(redisDB),
+		})
+		store, _ := redistore.NewStore(context.Background(), redisClient)
+		//store, _ := redis.NewStoreWithDB(10, "tcp", redisHost+":"+redisPort, redisPwd, redisDB, []byte("default"))
 		return sessions.Sessions("sessionID", store)
 	} else {
 		store := cookie.NewStore([]byte("default"))

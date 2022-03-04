@@ -162,10 +162,13 @@ func updatePwd(ctx *context.Context) {
 }
 
 type updateUserInfoParam struct {
+	Username   class.String
 	Name       class.String
 	Phone      class.String
 	Gender     int8
+	Image      class.String
 	Address    class.String
+	Pwd        class.String
 	ExtendJson class.MapString
 }
 
@@ -177,6 +180,16 @@ func updateUserInfo(ctx *context.Context) {
 	dao.SetResultType(userdao.ResultNone)
 	if params.Phone.Valid && params.Phone.String != "" && params.Phone.String != u.Phone.String && dao.FindByPhone(params.Phone.String) != nil {
 		panic(exception.New("手机号已存在"))
+	}
+	if params.Username.Valid && params.Username.String != u.Username.String {
+		if dao.FindByUsername(params.Username.String) != nil {
+			panic(exception.New("该用户名已被使用"))
+		} else {
+			u.Username.Set(params.Username.String)
+		}
+	}
+	if params.Image.Valid {
+		u.Image.Set(params.Image)
 	}
 	if params.Name.Valid {
 		u.Name.Set(params.Name.String)
@@ -192,6 +205,9 @@ func updateUserInfo(ctx *context.Context) {
 	}
 	if params.ExtendJson.Valid {
 		u.Extend.PutAll(params.ExtendJson.Map)
+	}
+	if params.Pwd.Valid && params.Pwd.String != "" {
+		u.Pwd.Set(cryptokit.MD5(params.Pwd.String))
 	}
 	// todo usercenter
 	dao.Update(u)
