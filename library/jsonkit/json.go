@@ -16,12 +16,12 @@ func JSON() jsoniter.API {
 	return jsonAPI
 }
 
-func Test(obj interface{}) string {
+func Test(obj any) string {
 	s, _ := json.Marshal(obj)
 	return string(s)
 }
 
-func ToString(obj interface{}) string {
+func ToString(obj any) string {
 	s, err := JSON().MarshalToString(obj)
 	// todo ?
 	if err != nil {
@@ -31,17 +31,17 @@ func ToString(obj interface{}) string {
 }
 
 // ParseObj string, &p
-func ParseObj(data string, p interface{}) error {
+func ParseObj(data string, p any) error {
 	err := JSON().Unmarshal([]byte(data), p)
 	return err
 }
 
-func ParseMap(data string) map[string]interface{} {
-	//m := map[string]interface{}{}
+func ParseMap(data string) map[string]any {
+	//m := map[string]any{}
 	//ParseObj(data,&m)
-	m, ok := gjson.Parse(data).Value().(map[string]interface{})
+	m, ok := gjson.Parse(data).Value().(map[string]any)
 	if !ok {
-		return map[string]interface{}{}
+		return map[string]any{}
 	}
 	return m
 }
@@ -49,14 +49,14 @@ func ParseMap(data string) map[string]interface{} {
 // ParseMapUseNumber : use json.Number，如需要高精度计算用decimal转换
 // d,_:=decimal.NewFromString(jsonkit.ParseMapUseNumber(str)["key"].(json.Number).String())
 // decimal.MarshalJSONWithoutQuotes=true
-func ParseMapUseNumber(data string) map[string]interface{} {
-	para := make(map[string]interface{})
+func ParseMapUseNumber(data string) map[string]any {
+	para := make(map[string]any)
 	// gjson存在精度问题，jsoniter出现nil错误
 	decoder := json.NewDecoder(strings.NewReader(data))
 	decoder.UseNumber()
 	err := decoder.Decode(&para)
 	if err != nil {
-		return map[string]interface{}{}
+		return map[string]any{}
 	}
 	return para
 }

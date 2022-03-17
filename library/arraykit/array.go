@@ -16,7 +16,7 @@ func StringContains(arr []string, ele string) bool {
 	return false
 }
 
-func AnyContains(arr []interface{}, ele interface{}) bool {
+func AnyContains(arr []any, ele any) bool {
 	for _, v := range arr {
 		if cast.ToString(v) == cast.ToString(ele) {
 			return true
@@ -48,7 +48,7 @@ func StringDeleteAt(arr []string, index int) []string {
 
 // 此种方法会修改arr原始值，使用场景必须是arr一次性覆盖的时候
 // 同时要注意比较值的类型，json转过的一般是int
-func Delete(arr []interface{}, ele interface{}) []interface{} {
+func Delete(arr []any, ele any) []any {
 	j := 0
 	for _, val := range arr {
 		if cast.ToString(val) != cast.ToString(ele) {
@@ -58,7 +58,7 @@ func Delete(arr []interface{}, ele interface{}) []interface{} {
 	}
 	return arr[:j]
 }
-func DeleteAt(arr []interface{}, index int) []interface{} {
+func DeleteAt(arr []any, index int) []any {
 	j := 0
 	for i, val := range arr {
 		if i != index {
@@ -70,6 +70,6 @@ func DeleteAt(arr []interface{}, index int) []interface{} {
 }
 
 // obj need pointer
-func Array2ArrayStruct(input interface{}, obj interface{}) error {
+func Array2ArrayStruct(input any, obj any) error {
 	return jsonkit.ParseObj(jsonkit.ToString(input), obj)
 }

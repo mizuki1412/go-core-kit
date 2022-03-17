@@ -34,7 +34,7 @@ func (dao *Dao) cascade(obj *model.Role) {
 		obj.Department = nil
 	}
 }
-func (dao *Dao) scanPrivilege(sql string, args []interface{}) []*model.PrivilegeConstant {
+func (dao *Dao) scanPrivilege(sql string, args []any) []*model.PrivilegeConstant {
 	rows := dao.Query(sql, args...)
 	list := make([]*model.PrivilegeConstant, 0, 5)
 	defer rows.Close()
@@ -48,7 +48,7 @@ func (dao *Dao) scanPrivilege(sql string, args []interface{}) []*model.Privilege
 	}
 	return list
 }
-func (dao *Dao) scan(sql string, args []interface{}) []*model.Role {
+func (dao *Dao) scan(sql string, args []any) []*model.Role {
 	rows := dao.Query(sql, args...)
 	list := make([]*model.Role, 0, 5)
 	defer rows.Close()
@@ -65,7 +65,7 @@ func (dao *Dao) scan(sql string, args []interface{}) []*model.Role {
 	}
 	return list
 }
-func (dao *Dao) scanOne(sql string, args []interface{}) *model.Role {
+func (dao *Dao) scanOne(sql string, args []any) *model.Role {
 	rows := dao.Query(sql, args...)
 	defer rows.Close()
 	for rows.Next() {

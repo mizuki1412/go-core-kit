@@ -42,7 +42,7 @@ func InitSession() gin.HandlerFunc {
 }
 
 // SessionSetUser session每次请求时都会从redis中获取，所以在session中存储的务必是string，如果是对象，会被自动转为json，但如果其中有unicode，可能造成指数增加
-func (ctx *Context) SessionSetUser(user interface{}) {
+func (ctx *Context) SessionSetUser(user any) {
 	session := sessions.Default(ctx.Proxy)
 	if user == nil {
 		return
@@ -62,7 +62,7 @@ func (ctx *Context) SessionSetToken(token string) {
 	session := sessions.Default(ctx.Proxy)
 	session.Set("token", token)
 }
-func (ctx *Context) SessionSet(key string, val interface{}) {
+func (ctx *Context) SessionSet(key string, val any) {
 	session := sessions.Default(ctx.Proxy)
 	session.Set(key, val)
 }

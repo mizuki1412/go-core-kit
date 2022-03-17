@@ -95,7 +95,7 @@ func (dao *Dao) SetSchema(schema string) *Dao {
 }
 
 // GetTable 根据类获取tablename，并判断schema
-func (dao *Dao) GetTable(dest interface{}) string {
+func (dao *Dao) GetTable(dest any) string {
 	rt := reflect.TypeOf(dest).Elem()
 	return getTable(rt, dao.Schema)
 }
@@ -161,7 +161,7 @@ func (dao *Dao) Rollback() {
 	}
 }
 
-func (dao *Dao) Query(sql string, args ...interface{}) *sqlx.Rows {
+func (dao *Dao) Query(sql string, args ...any) *sqlx.Rows {
 	var rows *sqlx.Rows
 	var err error
 	if dao.TX != nil {
@@ -174,7 +174,7 @@ func (dao *Dao) Query(sql string, args ...interface{}) *sqlx.Rows {
 	}
 	return rows
 }
-func (dao *Dao) Exec(sql string, args ...interface{}) {
+func (dao *Dao) Exec(sql string, args ...any) {
 	if dao.TX != nil {
 		dao.TX.MustExec(sql, args...)
 	} else {
@@ -183,14 +183,14 @@ func (dao *Dao) Exec(sql string, args ...interface{}) {
 }
 
 // dest a struct
-// todo select会引起no-struct错误（Scan()导致）；structScan 对interface{}报错
-func (dao *Dao) QueryStruct(destType func(rs *sqlx.Rows) (interface{}, error), sql string, args []interface{}, err error) []interface{} {
+// todo select会引起no-struct错误（Scan()导致）；structScan 对any报错
+func (dao *Dao) QueryStruct(destType func(rs *sqlx.Rows) (any, error), sql string, args []any, err error) []any {
 	if err != nil {
 		panic(exception.New(err.Error(), 2))
 	}
 	//log.Println("sqlkit:", sql, args)
 	//err = DB().Select(dest, sql, args...)
-	var list []interface{}
+	var list []any
 	rows := dao.Query(sql, args...)
 	defer rows.Close()
 	for rows.Next() {
@@ -203,15 +203,15 @@ func (dao *Dao) QueryStruct(destType func(rs *sqlx.Rows) (interface{}, error), s
 	return list
 }
 
-func (dao *Dao) QueryMap(sql string, args []interface{}, err error) []map[string]interface{} {
+func (dao *Dao) QueryMap(sql string, args []any, err error) []map[string]any {
 	if err != nil {
 		panic(exception.New(err.Error(), 2))
 	}
-	var list []map[string]interface{}
+	var list []map[string]any
 	rows := dao.Query(sql, args...)
 	defer rows.Close()
 	for rows.Next() {
-		m := map[string]interface{}{}
+		m := map[string]any{}
 		err := rows.MapScan(m)
 		if err != nil {
 			panic(exception.New(err.Error(), 2))
@@ -223,7 +223,7 @@ func (dao *Dao) QueryMap(sql string, args []interface{}, err error) []map[string
 
 // dest a pointer
 // todo 此方法不能表示nil
-//func (dao *Dao) QueryById(dest interface{}, selects ...string) {
+//func (dao *Dao) QueryById(dest any, selects ...string) {
 //	rt := reflect.TypeOf(dest).Elem()
 //	rv := reflect.ValueOf(dest).Elem()
 //	pks := getPKs(rt, rv)
@@ -254,13 +254,13 @@ func (dao *Dao) QueryMap(sql string, args []interface{}, err error) []map[string
 //}
 
 /// dest should be elem
-func (dao *Dao) Insert(dest interface{}) {
+func (dao *Dao) Insert(dest any) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
 	builder := Builder().Insert(getTable(rt, dao.Schema))
 	var pks []string
 	var columns []string
-	var vals []interface{}
+	var vals []any
 	for i := 0; i < rt.NumField(); i++ {
 		// 自增的排除
 		if t, ok := rt.Field(i).Tag.Lookup("autoincrement"); ok && t == "true" {
@@ -272,7 +272,7 @@ func (dao *Dao) Insert(dest interface{}) {
 			continue
 		}
 		db, ok := rt.Field(i).Tag.Lookup("db")
-		var val interface{}
+		var val any
 		// 判断field是否指针
 		if rt.Field(i).Type.Kind() == reflect.Ptr && rv.Field(i).Elem().IsValid() {
 			val = rv.Field(i).Elem().Interface()
@@ -312,7 +312,7 @@ func (dao *Dao) Insert(dest interface{}) {
 }
 
 /// dest should be elem
-func (dao *Dao) Update(dest interface{}) {
+func (dao *Dao) Update(dest any) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
 	builder := Builder().Update(getTable(rt, dao.Schema))
@@ -320,7 +320,7 @@ func (dao *Dao) Update(dest interface{}) {
 		// db字段
 		dbKey, ok := rt.Field(i).Tag.Lookup("db")
 		pk := rt.Field(i).Tag.Get("pk")
-		var val interface{}
+		var val any
 		// 判断field是否指针
 		if rt.Field(i).Type.Kind() == reflect.Ptr && rv.Field(i).Elem().IsValid() {
 			val = rv.Field(i).Elem().Interface()
@@ -351,7 +351,7 @@ func (dao *Dao) Update(dest interface{}) {
 }
 
 /// dest should be elem
-func (dao *Dao) Delete(dest interface{}) {
+func (dao *Dao) Delete(dest any) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
 	builder := Builder().Delete(getTable(rt, dao.Schema))
@@ -367,7 +367,7 @@ func (dao *Dao) Delete(dest interface{}) {
 	dao.Exec(sql, args...)
 }
 
-func (dao *Dao) DeleteOff(dest interface{}) {
+func (dao *Dao) DeleteOff(dest any) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
 	builder := Builder().Update(getTable(rt, dao.Schema)).Set("off", true)
@@ -384,8 +384,8 @@ func (dao *Dao) DeleteOff(dest interface{}) {
 }
 
 // 多或单主键
-func getPKs(rt reflect.Type, rv reflect.Value) map[string]interface{} {
-	pks := map[string]interface{}{}
+func getPKs(rt reflect.Type, rv reflect.Value) map[string]any {
+	pks := map[string]any{}
 	for i := 0; i < rt.NumField(); i++ {
 		if t, ok := rt.Field(i).Tag.Lookup("pk"); ok {
 			if t == "true" {

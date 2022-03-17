@@ -22,18 +22,18 @@ func NewPath(path string, method string) *SwaggerPath {
 	}
 	sp := &SwaggerPath{Path: path, Method: method}
 	if _, ok := Doc.Paths[path]; !ok {
-		Doc.Paths[path] = map[string]map[string]interface{}{}
+		Doc.Paths[path] = map[string]map[string]any{}
 	}
-	Doc.Paths[path][method] = map[string]interface{}{}
+	Doc.Paths[path][method] = map[string]any{}
 	Doc.Paths[path][method]["consumes"] = []string{"application/x-www-form-urlencoded", "multipart/form-data"}
 	Doc.Paths[path][method]["produces"] = []string{"*/*", "application/json"}
 	Doc.Paths[path][method]["operationId"] = path + "-" + method
-	Doc.Paths[path][method]["parameters"] = []map[string]interface{}{}
-	Doc.Paths[path][method]["responses"] = map[string]interface{}{
-		"200": map[string]interface{}{
+	Doc.Paths[path][method]["parameters"] = []map[string]any{}
+	Doc.Paths[path][method]["responses"] = map[string]any{
+		"200": map[string]any{
 			"description": "OK",
 		},
-		"400": map[string]interface{}{
+		"400": map[string]any{
 			"description": "参数校验/业务逻辑错误",
 		},
 	}
@@ -41,11 +41,11 @@ func NewPath(path string, method string) *SwaggerPath {
 }
 
 // Param params struct的tags：description，validate:"required"，default
-func (swagger *SwaggerPath) Param(param interface{}) *SwaggerPath {
+func (swagger *SwaggerPath) Param(param any) *SwaggerPath {
 	m := Doc.Paths[swagger.Path][swagger.Method]["parameters"]
 	rt := reflect.TypeOf(param)
 	for i := 0; i < rt.NumField(); i++ {
-		e := map[string]interface{}{}
+		e := map[string]any{}
 		tname := stringkit.LowerFirst(rt.Field(i).Type.Name())
 		//println(tname)
 		switch {
@@ -81,7 +81,7 @@ func (swagger *SwaggerPath) Param(param interface{}) *SwaggerPath {
 		if v, ok := rt.Field(i).Tag.Lookup("default"); ok {
 			e["default"] = v
 		}
-		m = append(m.([]map[string]interface{}), e)
+		m = append(m.([]map[string]any), e)
 	}
 	Doc.Paths[swagger.Path][swagger.Method]["parameters"] = m
 	return swagger
@@ -108,7 +108,7 @@ func (swagger *SwaggerPath) Tag(title string, description ...string) *SwaggerPat
 		}
 	}
 	// 新建tags
-	t := map[string]interface{}{"title": title}
+	t := map[string]any{"title": title}
 	if len(description) > 0 {
 		t["description"] = description[0]
 	}
@@ -119,18 +119,18 @@ func (swagger *SwaggerPath) Tag(title string, description ...string) *SwaggerPat
 var Doc SwaggerDoc
 
 type SwaggerDoc struct {
-	Swagger  string                 `json:"swagger"`
-	Info     map[string]interface{} `json:"info"`
-	Host     string                 `json:"host"`
-	BasePath string                 `json:"basePath"`
-	tags     []map[string]interface{}
-	Paths    map[string]map[string]map[string]interface{} `json:"paths"`
+	Swagger  string         `json:"swagger"`
+	Info     map[string]any `json:"info"`
+	Host     string         `json:"host"`
+	BasePath string         `json:"basePath"`
+	tags     []map[string]any
+	Paths    map[string]map[string]map[string]any `json:"paths"`
 }
 
 func init() {
-	Doc.Info = map[string]interface{}{}
-	Doc.tags = []map[string]interface{}{}
-	Doc.Paths = map[string]map[string]map[string]interface{}{}
+	Doc.Info = map[string]any{}
+	Doc.tags = []map[string]any{}
+	Doc.Paths = map[string]map[string]map[string]any{}
 }
 
 func (s *SwaggerDoc) ReadDoc() string {

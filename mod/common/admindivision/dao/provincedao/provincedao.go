@@ -29,7 +29,7 @@ func (dao *Dao) cascade(obj *model.Province) {
 		obj.Cities = citydao.New(dao.Schema).ListByProvince(obj.Code)
 	}
 }
-func (dao *Dao) scan(sql string, args []interface{}) []*model.Province {
+func (dao *Dao) scan(sql string, args []any) []*model.Province {
 	rows := dao.Query(sql, args...)
 	list := make([]*model.Province, 0, 5)
 	defer rows.Close()
@@ -46,7 +46,7 @@ func (dao *Dao) scan(sql string, args []interface{}) []*model.Province {
 	}
 	return list
 }
-func (dao *Dao) scanOne(sql string, args []interface{}) *model.Province {
+func (dao *Dao) scanOne(sql string, args []any) *model.Province {
 	rows := dao.Query(sql, args...)
 	defer rows.Close()
 	for rows.Next() {

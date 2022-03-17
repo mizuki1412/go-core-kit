@@ -10,14 +10,14 @@ import (
 <- result:boolean, data:map, message:string
 */
 type MsgReq struct {
-	Code string      `json:"code"`
-	Data interface{} `json:"data"`
+	Code string `json:"code"`
+	Data any    `json:"data"`
 }
 
 type MsgRes struct {
-	Result  bool        `json:"result"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
+	Result  bool   `json:"result"`
+	Message string `json:"message"`
+	Data    any    `json:"data"`
 }
 
 // handle public event return
@@ -29,7 +29,7 @@ func RetErr(msg string) string {
 }
 
 // handle public event return
-func RetSuccess(data interface{}) string {
+func RetSuccess(data any) string {
 	return jsonkit.ToString(MsgRes{
 		Result: true,
 		Data:   data,

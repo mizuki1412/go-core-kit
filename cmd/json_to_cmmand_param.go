@@ -23,14 +23,14 @@ func Json2CliCMD(title string) *cobra.Command {
 	return json2CliCmd
 }
 
-func handleMap(parentKey string, data map[string]interface{}) []string {
+func handleMap(parentKey string, data map[string]any) []string {
 	var ret []string
 	for key, val := range data {
 		k := key
 		if parentKey != "" {
 			k = parentKey + "." + key
 		}
-		if v, ok := val.(map[string]interface{}); ok {
+		if v, ok := val.(map[string]any); ok {
 			ret = append(ret, handleMap(k, v)...)
 		} else {
 			ret = append(ret, "--"+k+"="+cast.ToString(val))

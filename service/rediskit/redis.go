@@ -35,7 +35,7 @@ func Get(ctx context.Context, key string, defaultVal string) string {
 }
 
 // val将会以json形式存储，如果不是string的话
-func Set(ctx context.Context, key string, val interface{}, expire time.Duration) {
+func Set(ctx context.Context, key string, val any, expire time.Duration) {
 	client = Instance()
 	if _, ok := val.(string); !ok {
 		val = jsonkit.ToString(val)
@@ -55,7 +55,7 @@ func GetDecoratedKey(subPath string) string {
 	return name + subPath
 }
 
-func LPush(ctx context.Context, key string, val interface{}) {
+func LPush(ctx context.Context, key string, val any) {
 	client = Instance()
 	if _, ok := val.(string); !ok {
 		val = jsonkit.ToString(val)
@@ -75,7 +75,7 @@ func LPop(ctx context.Context, key string, defaultVal string) string {
 	return val
 }
 
-func RPush(ctx context.Context, key string, val interface{}) {
+func RPush(ctx context.Context, key string, val any) {
 	client = Instance()
 	if _, ok := val.(string); !ok {
 		val = jsonkit.ToString(val)

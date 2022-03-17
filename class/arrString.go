@@ -43,7 +43,7 @@ func (th ArrString) IsValid() bool {
 }
 
 // Scan implements the Scanner interface.
-func (th *ArrString) Scan(value interface{}) error {
+func (th *ArrString) Scan(value any) error {
 	if value == nil {
 		th.Array, th.Valid = nil, false
 		return nil
@@ -60,7 +60,7 @@ func (th ArrString) Value() (driver.Value, error) {
 	return th.Array.Value()
 }
 
-func NewArrString(val interface{}) *ArrString {
+func NewArrString(val any) *ArrString {
 	th := &ArrString{}
 	if val != nil {
 		th.Set(val)
@@ -68,7 +68,7 @@ func NewArrString(val interface{}) *ArrString {
 	return th
 }
 
-func (th *ArrString) Set(val interface{}) *ArrString {
+func (th *ArrString) Set(val any) *ArrString {
 	if v, ok := val.([]string); ok {
 		th.Array = v
 	} else if v, ok := val.(ArrString); ok {

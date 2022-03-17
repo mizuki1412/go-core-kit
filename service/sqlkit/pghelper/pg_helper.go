@@ -5,12 +5,12 @@ import (
 	"strings"
 )
 
-// 生成sql中: sth in (select unnest(Array[?,?,?])) []interface{}
+// 生成sql中: sth in (select unnest(Array[?,?,?])) []any
 // arr必须不能空
 // 注意使用时 args...
-func GenUnnestString(arr []string) (string, []interface{}) {
+func GenUnnestString(arr []string) (string, []any) {
 	flags := make([]string, len(arr))
-	args := make([]interface{}, len(arr))
+	args := make([]any, len(arr))
 	for i := 0; i < len(arr); i++ {
 		flags[i] = "?"
 		args[i] = arr[i]
@@ -18,9 +18,9 @@ func GenUnnestString(arr []string) (string, []interface{}) {
 	return " (select unnest(Array[" + strings.Join(flags, ", ") + "]))", args
 }
 
-func GenUnnestInt(arr []int32) (string, []interface{}) {
+func GenUnnestInt(arr []int32) (string, []any) {
 	flags := make([]string, len(arr))
-	args := make([]interface{}, len(arr))
+	args := make([]any, len(arr))
 	for i := 0; i < len(arr); i++ {
 		flags[i] = "?"
 		args[i] = arr[i]
@@ -28,9 +28,9 @@ func GenUnnestInt(arr []int32) (string, []interface{}) {
 	return " (select unnest(Array[" + strings.Join(flags, ", ") + "]::int[]))", args
 }
 
-func GenUnnestInt64(arr []int64) (string, []interface{}) {
+func GenUnnestInt64(arr []int64) (string, []any) {
 	flags := make([]string, len(arr))
-	args := make([]interface{}, len(arr))
+	args := make([]any, len(arr))
 	for i := 0; i < len(arr); i++ {
 		flags[i] = "?"
 		args[i] = arr[i]
@@ -39,9 +39,9 @@ func GenUnnestInt64(arr []int64) (string, []interface{}) {
 }
 
 // 返回 Array[?,?,?]
-func GenArrayFlagString(arr []string) (string, []interface{}) {
+func GenArrayFlagString(arr []string) (string, []any) {
 	flags := make([]string, len(arr))
-	args := make([]interface{}, len(arr))
+	args := make([]any, len(arr))
 	for i := 0; i < len(arr); i++ {
 		flags[i] = "?"
 		args[i] = arr[i]
@@ -49,9 +49,9 @@ func GenArrayFlagString(arr []string) (string, []interface{}) {
 	return " Array[" + strings.Join(flags, ", ") + "]::varchar[]", args
 }
 
-func GenArrayFlagInt(arr []int32) (string, []interface{}) {
+func GenArrayFlagInt(arr []int32) (string, []any) {
 	flags := make([]string, len(arr))
-	args := make([]interface{}, len(arr))
+	args := make([]any, len(arr))
 	for i := 0; i < len(arr); i++ {
 		flags[i] = "?"
 		args[i] = arr[i]
@@ -60,9 +60,9 @@ func GenArrayFlagInt(arr []int32) (string, []interface{}) {
 }
 
 // extend->'key' @> '[3]'::jsonb
-func GenJsonArrayFlagInt(arr []int32) (string, []interface{}) {
+func GenJsonArrayFlagInt(arr []int32) (string, []any) {
 	flags := make([]string, len(arr))
-	args := make([]interface{}, len(arr))
+	args := make([]any, len(arr))
 	for i := 0; i < len(arr); i++ {
 		flags[i] = "?"
 		args[i] = arr[i]

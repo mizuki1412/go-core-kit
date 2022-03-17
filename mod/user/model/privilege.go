@@ -13,7 +13,7 @@ type PrivilegeConstant struct {
 	Sort int32        `json:"sort" db:"sort"`
 }
 
-func (th *PrivilegeConstant) Scan(value interface{}) error {
+func (th *PrivilegeConstant) Scan(value any) error {
 	if value == nil {
 		return nil
 	}

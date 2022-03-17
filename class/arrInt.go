@@ -37,7 +37,7 @@ func (th *ArrInt) UnmarshalJSON(data []byte) error {
 }
 
 // Scan implements the Scanner interface.
-func (th *ArrInt) Scan(value interface{}) error {
+func (th *ArrInt) Scan(value any) error {
 	if value == nil {
 		th.Array, th.Valid = nil, false
 		return nil
@@ -54,7 +54,7 @@ func (th ArrInt) Value() (driver.Value, error) {
 	return th.Array.Value()
 }
 
-func NewArrInt(val interface{}) *ArrInt {
+func NewArrInt(val any) *ArrInt {
 	th := &ArrInt{}
 	if val != nil {
 		th.Set(val)
@@ -66,7 +66,7 @@ func (th ArrInt) IsValid() bool {
 	return th.Valid
 }
 
-func (th *ArrInt) Set(val interface{}) *ArrInt {
+func (th *ArrInt) Set(val any) *ArrInt {
 	if v, ok := val.([]int64); ok {
 		th.Array = v
 	} else if v, ok := val.(ArrInt); ok {
@@ -104,7 +104,7 @@ func (th *ArrInt) ToInt32Slice() []int32 {
 	return list
 }
 
-func (th *ArrInt) Add(vals ...interface{}) *ArrInt {
+func (th *ArrInt) Add(vals ...any) *ArrInt {
 	for _, e := range vals {
 		th.Array = append(th.Array, cast.ToInt64(e))
 	}
@@ -112,7 +112,7 @@ func (th *ArrInt) Add(vals ...interface{}) *ArrInt {
 	return th
 }
 
-func (th *ArrInt) Contains(val interface{}) bool {
+func (th *ArrInt) Contains(val any) bool {
 	for _, e := range th.Array {
 		if e == cast.ToInt64(val) {
 			return true

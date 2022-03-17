@@ -16,7 +16,7 @@ func FaceDetect(image []byte) map[string]gjson.Result {
 	data := base64.StdEncoding.EncodeToString(image)
 	res, _ := httpkit.Request(httpkit.Req{
 		Url: "https://aip.baidubce.com/rest/2.0/face/v3/detect?access_token=" + accessKey,
-		JsonData: map[string]interface{}{
+		JsonData: map[string]any{
 			"image":      data,
 			"image_type": "BASE64",
 		},
@@ -40,7 +40,7 @@ func FaceAdd(image []byte, groupId, userId string) string {
 	data := base64.StdEncoding.EncodeToString(image)
 	res, _ := httpkit.Request(httpkit.Req{
 		Url: "https://aip.baidubce.com/rest/2.0/face/v3/faceset/user/add?access_token=" + accessKey,
-		JsonData: map[string]interface{}{
+		JsonData: map[string]any{
 			"image":      data,
 			"image_type": "BASE64",
 			"group_id":   groupId,
@@ -63,7 +63,7 @@ func FaceDel(groupId, userId, faceToken string) {
 	checkAccessKey()
 	res, _ := httpkit.Request(httpkit.Req{
 		Url: "https://aip.baidubce.com/rest/2.0/face/v3/faceset/user/delete?access_token=" + accessKey,
-		JsonData: map[string]interface{}{
+		JsonData: map[string]any{
 			"log_id":     time.Now().UnixMilli(),
 			"group_id":   groupId,
 			"user_id":    userId,
@@ -82,12 +82,12 @@ func FaceDel(groupId, userId, faceToken string) {
 
 // FaceSearch 人脸搜索：https://aip.baidubce.com/rest/2.0/face/v3/search
 // count 返回的匹配个数; return {userId, score}
-func FaceSearch(image []byte, groupId string, count int32) []map[string]interface{} {
+func FaceSearch(image []byte, groupId string, count int32) []map[string]any {
 	checkAccessKey()
 	data := base64.StdEncoding.EncodeToString(image)
 	res, _ := httpkit.Request(httpkit.Req{
 		Url: "https://aip.baidubce.com/rest/2.0/face/v3/search?access_token=" + accessKey,
-		JsonData: map[string]interface{}{
+		JsonData: map[string]any{
 			"image":         data,
 			"image_type":    "BASE64",
 			"group_id_list": groupId,
@@ -108,9 +108,9 @@ func FaceSearch(image []byte, groupId string, count int32) []map[string]interfac
 	}
 	users := gjson.Get(res, "result").Get("user_list").Array()
 	// 返回：groupId,userId,userInfo,score(用户的匹配得分，推荐阈值80分)
-	ret := make([]map[string]interface{}, 0, len(users))
+	ret := make([]map[string]any, 0, len(users))
 	for _, e := range users {
-		ee := map[string]interface{}{
+		ee := map[string]any{
 			"groupId":  e.Get("group_id").String(),
 			"userId":   e.Get("user_id").String(),
 			"userInfo": e.Get("user_info"),

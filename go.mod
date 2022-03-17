@@ -1,6 +1,6 @@
 module github.com/mizuki1412/go-core-kit
 
-go 1.17
+go 1.18
 
 require (
 	github.com/Depado/bfchroma v1.3.0
@@ -8,10 +8,10 @@ require (
 	github.com/SebastiaanKlippert/go-wkhtmltopdf v1.7.2
 	github.com/albenik/go-serial/v2 v2.5.0
 	github.com/alecthomas/chroma v0.10.0
-	github.com/aliyun/alibaba-cloud-sdk-go v1.61.1323
+	github.com/aliyun/alibaba-cloud-sdk-go v1.61.1524
 	github.com/eclipse/paho.mqtt.golang v1.3.5
 	github.com/gin-gonic/gin v1.7.7
-	github.com/go-playground/validator/v10 v10.10.0
+	github.com/go-playground/validator/v10 v10.10.1
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/google/uuid v1.3.0
 	github.com/googollee/go-socket.io v1.6.1
@@ -25,9 +25,9 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/shopspring/decimal v1.3.1
-	github.com/spf13/afero v1.8.1
+	github.com/spf13/afero v1.8.2
 	github.com/spf13/cast v1.4.1
-	github.com/spf13/cobra v1.3.0
+	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.10.1
 	github.com/tidwall/gjson v1.14.0
 	github.com/xuri/excelize/v2 v2.5.0
@@ -35,7 +35,7 @@ require (
 	go.uber.org/automaxprocs v1.4.0
 	go.uber.org/zap v1.21.0
 	golang.org/x/text v0.3.7
-	gopkg.in/ini.v1 v1.66.2
+	gopkg.in/ini.v1 v1.66.4
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
 

@@ -1,11 +1,11 @@
 package arraykit
 
 // 比较两个数组，得出新增的和删除的，src基于base
-func CompareAddAndDel(src, base []map[string]interface{}, key string) ([]map[string]interface{}, []map[string]interface{}) {
-	var news []map[string]interface{}
-	var dels []map[string]interface{}
-	cache := map[interface{}]map[string]interface{}{}
-	cacheFlag := map[interface{}]bool{}
+func CompareAddAndDel(src, base []map[string]any, key string) ([]map[string]any, []map[string]any) {
+	var news []map[string]any
+	var dels []map[string]any
+	cache := map[any]map[string]any{}
+	cacheFlag := map[any]bool{}
 	for _, v := range base {
 		cacheFlag[v[key]] = false
 		cache[v[key]] = v

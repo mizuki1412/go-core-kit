@@ -25,7 +25,7 @@ const UserOffOK = 0
 const UserOffFreeze = 1
 const UserOffDelete = -1
 
-func (th *User) Scan(value interface{}) error {
+func (th *User) Scan(value any) error {
 	if value == nil {
 		return nil
 	}
@@ -70,8 +70,8 @@ func (l UserList) Find(fun func(ele *User) bool) *User {
 	}
 	return nil
 }
-func (l UserList) MapReduce(fun func(ele *User) interface{}) []interface{} {
-	var results []interface{}
+func (l UserList) MapReduce(fun func(ele *User) any) []any {
+	var results []any
 	for _, e := range l {
 		results = append(results, fun(e))
 	}

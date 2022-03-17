@@ -40,7 +40,7 @@ func (th *Time) UnmarshalJSON(data []byte) error {
 }
 
 // Scan implements the Scanner interface.
-func (th *Time) Scan(value interface{}) error {
+func (th *Time) Scan(value any) error {
 	if value == nil {
 		th.Time, th.Valid = time.Time{}, false
 		return nil
@@ -77,7 +77,7 @@ func (th Time) IsValid() bool {
 	return th.Valid && !th.Time.IsZero()
 }
 
-func NewTime(val interface{}) *Time {
+func NewTime(val any) *Time {
 	th := &Time{}
 	if val != nil {
 		th.Set(val)
@@ -85,7 +85,7 @@ func NewTime(val interface{}) *Time {
 	return th
 }
 
-func (th *Time) Set(val interface{}) *Time {
+func (th *Time) Set(val any) *Time {
 	if v, ok := val.(Time); ok {
 		th.Time = v.Time
 		th.Valid = v.Valid

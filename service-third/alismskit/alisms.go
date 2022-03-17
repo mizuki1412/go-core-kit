@@ -10,7 +10,7 @@ import (
 )
 
 // Send phones: xxx,xxxx, data例如：{"code":"123456"}
-func Send(phones, signName, templateCode string, data map[string]interface{}) error {
+func Send(phones, signName, templateCode string, data map[string]any) error {
 	ak := configkit.GetString(configkey.AliSMSAccessKey, "")
 	aks := configkit.GetString(configkey.AliSMSAccessKeySecret, "")
 	if ak == "" || aks == "" {

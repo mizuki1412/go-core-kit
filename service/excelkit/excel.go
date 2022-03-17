@@ -15,7 +15,7 @@ type Param struct {
 	Sheet string
 	// export时，key:name:width; load时，key:name
 	Keys []string
-	Data []map[string]interface{}
+	Data []map[string]any
 	File class.File
 	// 文件来源：本地文件路径
 	FileOriginPath string

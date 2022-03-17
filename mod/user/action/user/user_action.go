@@ -38,7 +38,7 @@ func loginByUsername(ctx *context.Context) {
 	ctx.SessionSetSchema(params.Schema)
 	ctx.SessionSetToken(ctx.SessionID())
 	ctx.SessionSave()
-	ret := map[string]interface{}{
+	ret := map[string]any{
 		"user":  user,
 		"token": ctx.SessionID(),
 	}
@@ -81,7 +81,7 @@ func login(ctx *context.Context) {
 	ctx.SessionSetSchema(params.Schema)
 	ctx.SessionSetToken(ctx.SessionID())
 	ctx.SessionSave()
-	ret := map[string]interface{}{
+	ret := map[string]any{
 		"user":  user,
 		"token": ctx.SessionID(),
 	}
@@ -92,7 +92,7 @@ func login(ctx *context.Context) {
 	ctx.JsonSuccess(ret)
 }
 
-var AdditionLoginFunc func(ctx *context.Context, ret map[string]interface{})
+var AdditionLoginFunc func(ctx *context.Context, ret map[string]any)
 
 var AdditionUserExFunc func(ctx *context.Context, u *model.User)
 
@@ -117,7 +117,7 @@ func info(ctx *context.Context) {
 		if AdditionUserExFunc != nil {
 			AdditionUserExFunc(ctx, user)
 		}
-		ctx.JsonSuccess(map[string]interface{}{
+		ctx.JsonSuccess(map[string]any{
 			"user":  user,
 			"token": ctx.SessionGetToken(),
 		})

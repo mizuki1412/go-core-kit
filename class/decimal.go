@@ -10,7 +10,7 @@ type Decimal struct {
 	decimal.NullDecimal
 }
 
-func NewDecimal(val interface{}) *Decimal {
+func NewDecimal(val any) *Decimal {
 	th := &Decimal{}
 	if val != nil {
 		th.Set(val)
@@ -22,7 +22,7 @@ func ConstDecimal(v int32) decimal.Decimal {
 	return decimal.NewFromInt32(v)
 }
 
-func (th *Decimal) Set(val interface{}) *Decimal {
+func (th *Decimal) Set(val any) *Decimal {
 	if v, ok := val.(decimal.Decimal); ok {
 		th.Valid = true
 		val = v.String()

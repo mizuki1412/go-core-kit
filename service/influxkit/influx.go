@@ -11,24 +11,24 @@ import (
 	"strings"
 )
 
-func QueryDefaultDB(sql string) []map[string]interface{} {
+func QueryDefaultDB(sql string) []map[string]any {
 	return queryResult(configkit.GetStringD(configkey.InfluxDBName), sql)
 }
 
-func QueryWithPrefix(prefix, sql string) []map[string]interface{} {
+func QueryWithPrefix(prefix, sql string) []map[string]any {
 	queryResult(prefix+configkit.GetStringD(configkey.InfluxDBName), sql)
 	return nil
 }
 
-func QueryWithDBName(dbName, sql string) []map[string]interface{} {
+func QueryWithDBName(dbName, sql string) []map[string]any {
 	return queryResult(dbName, sql)
 }
 
-func QueryMultiDefaultDB(sql []string) [][]map[string]interface{} {
+func QueryMultiDefaultDB(sql []string) [][]map[string]any {
 	return queryMultiResult(configkit.GetStringD(configkey.InfluxDBName), sql)
 }
 
-func QueryMultiWithDBName(dbName string, sql []string) [][]map[string]interface{} {
+func QueryMultiWithDBName(dbName string, sql []string) [][]map[string]any {
 	return queryMultiResult(dbName, sql)
 }
 
@@ -54,7 +54,7 @@ func url(action, dbName string) string {
 	}
 }
 
-func queryResult(dbName, sql string) []map[string]interface{} {
+func queryResult(dbName, sql string) []map[string]any {
 	ret, code := httpkit.Request(httpkit.Req{
 		Url: url("query", dbName),
 		FormData: map[string]string{
@@ -77,9 +77,9 @@ func queryResult(dbName, sql string) []map[string]interface{} {
 			columns := serie.Map()["columns"].Array()
 			values := serie.Map()["values"].Array()
 			if len(columns) > 0 && len(values) > 0 {
-				list := make([]map[string]interface{}, len(values))
+				list := make([]map[string]any, len(values))
 				for i, v := range values {
-					e := map[string]interface{}{}
+					e := map[string]any{}
 					for ii, vv := range columns {
 						e[vv.String()] = v.Array()[ii].Value()
 					}
@@ -90,11 +90,11 @@ func queryResult(dbName, sql string) []map[string]interface{} {
 			}
 		}
 	}
-	return []map[string]interface{}{}
+	return []map[string]any{}
 }
 
 // 数组中可能出现nil
-func queryMultiResult(dbName string, sql []string) [][]map[string]interface{} {
+func queryMultiResult(dbName string, sql []string) [][]map[string]any {
 	sqls := strings.Join(sql, ";")
 	ret, code := httpkit.Request(httpkit.Req{
 		Url: url("query", dbName),
@@ -111,7 +111,7 @@ func queryMultiResult(dbName string, sql []string) [][]map[string]interface{} {
 		panic(exception.New("influx query error: " + cast.ToString(code)))
 	}
 	results := gjson.Get(ret, "results").Array()
-	data := make([][]map[string]interface{}, 0, len(results))
+	data := make([][]map[string]any, 0, len(results))
 	for _, result := range results {
 		series := result.Map()["series"].Array()
 		if len(series) > 0 {
@@ -119,9 +119,9 @@ func queryMultiResult(dbName string, sql []string) [][]map[string]interface{} {
 			columns := serie.Map()["columns"].Array()
 			values := serie.Map()["values"].Array()
 			if len(columns) > 0 && len(values) > 0 {
-				list := make([]map[string]interface{}, len(values))
+				list := make([]map[string]any, len(values))
 				for i, v := range values {
-					e := map[string]interface{}{}
+					e := map[string]any{}
 					for ii, vv := range columns {
 						e[vv.String()] = v.Array()[ii].Value()
 					}
@@ -175,7 +175,7 @@ func writeData(dbName, sql string) {
 }
 
 // 用于insert时或query时，val的装饰转换
-func Decorate(val interface{}) string {
+func Decorate(val any) string {
 	if val == nil {
 		return ""
 	}

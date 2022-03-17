@@ -41,9 +41,9 @@ func GetSTS(roleSession, bucket string, paths ...string) STSData {
 		}
 		resource[i] = "acs:oss:*:*:" + bucket + p
 	}
-	request.Policy = jsonkit.ToString(map[string]interface{}{
+	request.Policy = jsonkit.ToString(map[string]any{
 		"Version": "1",
-		"Statement": []map[string]interface{}{
+		"Statement": []map[string]any{
 			{
 				"Action":   []string{"oss:GetObject", "oss:PutObject", "oss:DeleteObject", "oss:PutObjectAcl", "oss:GetObjectAcl"},
 				"Resource": resource,

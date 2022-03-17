@@ -17,7 +17,7 @@ func New(schema string, tx ...*sqlkit.Dao) *Dao {
 	dao.NewHelper(schema, tx...)
 	return dao
 }
-func (dao *Dao) scan(sql string, args []interface{}) []*model.City {
+func (dao *Dao) scan(sql string, args []any) []*model.City {
 	rows := dao.Query(sql, args...)
 	list := make([]*model.City, 0, 5)
 	defer rows.Close()
@@ -31,7 +31,7 @@ func (dao *Dao) scan(sql string, args []interface{}) []*model.City {
 	}
 	return list
 }
-func (dao *Dao) scanOne(sql string, args []interface{}) *model.City {
+func (dao *Dao) scanOne(sql string, args []any) *model.City {
 	rows := dao.Query(sql, args...)
 	defer rows.Close()
 	for rows.Next() {

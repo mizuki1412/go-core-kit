@@ -64,7 +64,7 @@ func (th *String) UnmarshalJSON(data []byte) error {
 	th.Valid = true
 	return nil
 }
-func (th *String) Scan(value interface{}) error {
+func (th *String) Scan(value any) error {
 	if value == nil {
 		th.String, th.Valid = "", false
 		return nil
@@ -86,7 +86,7 @@ func (th String) IsValid() bool {
 	return th.Valid
 }
 
-func NewString(val interface{}) *String {
+func NewString(val any) *String {
 	th := &String{}
 	if val != nil {
 		th.Set(val)
@@ -94,7 +94,7 @@ func NewString(val interface{}) *String {
 	return th
 }
 
-func (th *String) Set(val interface{}) *String {
+func (th *String) Set(val any) *String {
 	if v, ok := val.(String); ok {
 		th.String = v.String
 		th.Valid = v.Valid

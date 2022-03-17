@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func IsNull(obj interface{}) bool {
+func IsNull(obj any) bool {
 	if obj == nil {
 		return true
 	}

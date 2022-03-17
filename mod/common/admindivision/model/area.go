@@ -10,7 +10,7 @@ type Area struct {
 	Name class.String `json:"name,omitempty" db:"name"`
 }
 
-func (th *Area) Scan(value interface{}) error {
+func (th *Area) Scan(value any) error {
 	if value == nil {
 		return nil
 	}

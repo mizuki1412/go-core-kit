@@ -18,7 +18,7 @@ func Exist(key string) bool {
 	}
 	return true
 }
-func Get(key string, defaultVal interface{}) interface{} {
+func Get(key string, defaultVal any) any {
 	if !Exist(key) {
 		return defaultVal
 	}
@@ -60,6 +60,6 @@ func GetStringListD(key string) []string {
 	return arr
 }
 
-func Set(key string, val interface{}) {
+func Set(key string, val any) {
 	viper.Set(key, val)
 }

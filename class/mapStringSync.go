@@ -11,7 +11,7 @@ import (
 // MapStringSync 同时继承scan和value方法
 type MapStringSync struct {
 	sync.RWMutex
-	Map   map[string]interface{}
+	Map   map[string]any
 	Valid bool
 }
 
@@ -29,7 +29,7 @@ func (th *MapStringSync) UnmarshalJSON(data []byte) error {
 		th.Valid = false
 		return nil
 	}
-	var s map[string]interface{}
+	var s map[string]any
 	if err := jsonkit.JSON().Unmarshal(data, &s); err != nil {
 		return err
 	}
@@ -39,7 +39,7 @@ func (th *MapStringSync) UnmarshalJSON(data []byte) error {
 }
 
 // Scan implements the Scanner interface.
-func (th *MapStringSync) Scan(value interface{}) error {
+func (th *MapStringSync) Scan(value any) error {
 	if value == nil {
 		th.Map, th.Valid = nil, false
 		return nil
@@ -61,27 +61,27 @@ func (th *MapStringSync) IsValid() bool {
 	return th.Valid
 }
 
-func NewMapStringSync(val interface{}) *MapStringSync {
+func NewMapStringSync(val any) *MapStringSync {
 	th := &MapStringSync{}
 	if val != nil {
 		th.Set(val)
 	} else {
-		th.Set(map[string]interface{}{})
+		th.Set(map[string]any{})
 	}
 	return th
 }
 
-func (th *MapStringSync) Set(val interface{}) *MapStringSync {
+func (th *MapStringSync) Set(val any) *MapStringSync {
 	th.Lock()
 	defer th.Unlock()
 	if v, ok := val.(MapStringSync); ok {
 		if v.Map == nil {
-			th.Map = map[string]interface{}{}
+			th.Map = map[string]any{}
 		} else {
 			th.Map = v.Map
 		}
 		th.Valid = v.Valid
-	} else if v, ok := val.(map[string]interface{}); ok {
+	} else if v, ok := val.(map[string]any); ok {
 		th.Map = v
 		th.Valid = true
 	} else {
@@ -90,22 +90,22 @@ func (th *MapStringSync) Set(val interface{}) *MapStringSync {
 	return th
 }
 
-func (th *MapStringSync) PutAll(val map[string]interface{}) *MapStringSync {
+func (th *MapStringSync) PutAll(val map[string]any) *MapStringSync {
 	th.Lock()
 	defer th.Unlock()
 	if th.Map == nil {
-		th.Map = map[string]interface{}{}
+		th.Map = map[string]any{}
 	}
 	mapkit.PutAll(th.Map, val)
 	th.Valid = true
 	return th
 }
 
-func (th *MapStringSync) PutIfAbsent(key string, val interface{}) *MapStringSync {
+func (th *MapStringSync) PutIfAbsent(key string, val any) *MapStringSync {
 	th.Lock()
 	defer th.Unlock()
 	if th.Map == nil {
-		th.Map = map[string]interface{}{}
+		th.Map = map[string]any{}
 	}
 	if _, ok := th.Map[key]; !ok {
 		th.Map[key] = val
@@ -114,11 +114,11 @@ func (th *MapStringSync) PutIfAbsent(key string, val interface{}) *MapStringSync
 	return th
 }
 
-func (th *MapStringSync) Put(key string, val interface{}) *MapStringSync {
+func (th *MapStringSync) Put(key string, val any) *MapStringSync {
 	th.Lock()
 	defer th.Unlock()
 	if th.Map == nil {
-		th.Map = map[string]interface{}{}
+		th.Map = map[string]any{}
 	}
 	th.Map[key] = val
 	th.Valid = true
@@ -129,7 +129,7 @@ func (th *MapStringSync) Remove() *MapStringSync {
 	th.Lock()
 	defer th.Unlock()
 	th.Valid = false
-	th.Map = map[string]interface{}{}
+	th.Map = map[string]any{}
 	return th
 }
 
@@ -160,17 +160,17 @@ func (th *MapStringSync) Contains(key string) bool {
 	return ok
 }
 
-func (th *MapStringSync) Get(key string) interface{} {
+func (th *MapStringSync) Get(key string) any {
 	th.RLock()
 	defer th.RUnlock()
 	v, _ := th.Map[key]
 	return v
 }
 
-func (th *MapStringSync) Entries() map[string]interface{} {
+func (th *MapStringSync) Entries() map[string]any {
 	th.RLock()
 	defer th.RUnlock()
-	m := map[string]interface{}{}
+	m := map[string]any{}
 	for k, v := range th.Map {
 		if vv, ok := v.(*MapStringSync); ok {
 			m[k] = vv.Entries()

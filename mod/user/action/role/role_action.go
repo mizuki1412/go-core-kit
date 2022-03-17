@@ -128,7 +128,7 @@ func listRolesWithUser(ctx *context.Context) {
 	ctx.BindForm(&params)
 	list := roledao.New(ctx.SessionGetSchema()).List(roledao.ListParam{})
 	for _, r := range list {
-		r.Extend.PutAll(map[string]interface{}{
+		r.Extend.PutAll(map[string]any{
 			"users": userdao.New(ctx.SessionGetSchema()).List(userdao.ListParam{RoleId: r.Id}),
 		})
 	}

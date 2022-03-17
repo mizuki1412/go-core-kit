@@ -7,7 +7,7 @@ import (
 
 type HashSet struct {
 	//数据载体
-	data map[interface{}]interface{}
+	data map[any]any
 	//数据类型
 	dataType string
 	//数据数量
@@ -17,9 +17,9 @@ type HashSet struct {
 /**
 初始化并指定存储对象的类型
 */
-func NewHashSet(data interface{}) *HashSet {
+func NewHashSet(data any) *HashSet {
 	hashSet := new(HashSet)
-	hashSet.data = make(map[interface{}]interface{})
+	hashSet.data = make(map[any]any)
 	hashSet.dataType = reflect.TypeOf(data).String()
 	return hashSet
 }
@@ -34,14 +34,14 @@ func (hashSet *HashSet) Size() int {
 /**
 返回数据类型
 */
-func (hashSet *HashSet) GetDataType() interface{} {
+func (hashSet *HashSet) GetDataType() any {
 	return hashSet.dataType
 }
 
 /**
 添加元素
 */
-func (hashSet *HashSet) Add(key interface{}) error {
+func (hashSet *HashSet) Add(key any) error {
 	err := hashSet.checkData(key)
 	if err != nil {
 		return err
@@ -59,7 +59,7 @@ func (hashSet *HashSet) Add(key interface{}) error {
 /**
 删除指定Key元素
 */
-func (hashSet *HashSet) Remove(key interface{}) error {
+func (hashSet *HashSet) Remove(key any) error {
 	err := hashSet.checkData(key)
 	if err != nil {
 		return err
@@ -77,7 +77,7 @@ func (hashSet *HashSet) Remove(key interface{}) error {
 /**
 判断key是否存在
 */
-func (hashSet *HashSet) Contains(key interface{}) (bool, error) {
+func (hashSet *HashSet) Contains(key any) (bool, error) {
 	err := hashSet.checkData(key)
 	if err != nil {
 		return false, err
@@ -95,13 +95,13 @@ func (hashSet *HashSet) Contains(key interface{}) (bool, error) {
 */
 func (hashSet *HashSet) Clear() {
 	hashSet.count = 0
-	hashSet.data = make(map[interface{}]interface{})
+	hashSet.data = make(map[any]any)
 }
 
 /**
 判断添加元素是否为指定类型
 */
-func (hashSet *HashSet) checkData(data interface{}) error {
+func (hashSet *HashSet) checkData(data any) error {
 	if data == nil {
 		return errors.New("dataIsNil")
 	}

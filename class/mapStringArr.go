@@ -10,7 +10,7 @@ import (
 /** 针对PG的jsonb，其中是array形式的 */
 
 type MapStringArr struct {
-	Arr   []map[string]interface{}
+	Arr   []map[string]any
 	Valid bool
 }
 
@@ -25,7 +25,7 @@ func (th *MapStringArr) UnmarshalJSON(data []byte) error {
 		th.Valid = false
 		return nil
 	}
-	var s []map[string]interface{}
+	var s []map[string]any
 	if err := jsonkit.JSON().Unmarshal(data, &s); err != nil {
 		return err
 	}
@@ -35,13 +35,13 @@ func (th *MapStringArr) UnmarshalJSON(data []byte) error {
 }
 
 // Scan implements the Scanner interface.
-func (th *MapStringArr) Scan(value interface{}) error {
+func (th *MapStringArr) Scan(value any) error {
 	if value == nil {
 		th.Arr, th.Valid = nil, false
 		return nil
 	}
 	th.Valid = true
-	var s []map[string]interface{}
+	var s []map[string]any
 	err := jsonkit.ParseObj(string(value.([]byte)), &s)
 	if err != nil {
 		logkit.Error(exception.New(err.Error()))
@@ -62,7 +62,7 @@ func (th MapStringArr) IsValid() bool {
 	return th.Valid
 }
 
-func NewMapStringArr(val interface{}) *MapStringArr {
+func NewMapStringArr(val any) *MapStringArr {
 	th := &MapStringArr{}
 	if val != nil {
 		th.Set(val)
@@ -70,11 +70,11 @@ func NewMapStringArr(val interface{}) *MapStringArr {
 	return th
 }
 
-func (th *MapStringArr) Set(val interface{}) *MapStringArr {
+func (th *MapStringArr) Set(val any) *MapStringArr {
 	if v, ok := val.(MapStringArr); ok {
 		th.Arr = v.Arr
 		th.Valid = v.Valid
-	} else if v, ok := val.([]map[string]interface{}); ok {
+	} else if v, ok := val.([]map[string]any); ok {
 		th.Arr = v
 		th.Valid = true
 	} else {
@@ -88,7 +88,7 @@ func (th *MapStringArr) Length() int {
 }
 func (th *MapStringArr) Remove() *MapStringArr {
 	th.Valid = false
-	th.Arr = []map[string]interface{}{}
+	th.Arr = []map[string]any{}
 	return th
 }
 

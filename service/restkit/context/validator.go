@@ -26,7 +26,7 @@ func init() {
 	)
 }
 
-func validateValuer(field reflect.Value) interface{} {
+func validateValuer(field reflect.Value) any {
 	if valuer, ok := field.Interface().(driver.Valuer); ok {
 		val, _ := valuer.Value()
 		if val != nil && reflect.ValueOf(val).IsZero() {

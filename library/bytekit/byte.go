@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cast"
 )
 
-func num2Bytes(i interface{}) []byte {
+func num2Bytes(i any) []byte {
 	arr := make([]byte, 0)
 	buf := bytes.NewBuffer(arr)
 	// 数字转 []byte, 网络字节序为大端字节序
@@ -20,23 +20,23 @@ func num2Bytes(i interface{}) []byte {
 	return buf.Bytes()
 }
 
-func Int16ToBytes(i interface{}) []byte {
+func Int16ToBytes(i any) []byte {
 	return num2Bytes(cast.ToInt16(i))
 }
 
-func Int32ToBytes(i interface{}) []byte {
+func Int32ToBytes(i any) []byte {
 	return num2Bytes(cast.ToInt32(i))
 }
 
-func Int64ToBytes(i interface{}) []byte {
+func Int64ToBytes(i any) []byte {
 	return num2Bytes(cast.ToInt64(i))
 }
 
-func Float32ToBytes(i interface{}) []byte {
+func Float32ToBytes(i any) []byte {
 	return num2Bytes(cast.ToFloat32(i))
 }
 
-func Float64ToBytes(i interface{}) []byte {
+func Float64ToBytes(i any) []byte {
 	return num2Bytes(cast.ToFloat64(i))
 }
 

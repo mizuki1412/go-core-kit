@@ -39,7 +39,7 @@ type Req struct {
 	Header      map[string]string
 	ContentType string
 	FormData    map[string]string
-	JsonData    interface{}
+	JsonData    any
 	BinaryData  []byte
 	Timeout     int // seconds
 }
@@ -130,7 +130,7 @@ func Demo() {
 		},
 	})
 	fmt.Println(gjson.Get(ret, "data.user"))
-	fmt.Println(gjson.Parse(ret).Value().(map[string]interface{}))
+	fmt.Println(gjson.Parse(ret).Value().(map[string]any))
 	fmt.Println("----")
 	ret, _ = Request(Req{
 		Url: "https://www.machplat.com/roms-rest-cnc/rest/user/info",

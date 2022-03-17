@@ -9,10 +9,10 @@ import (
 
 // Struct2Map 用标签中的json来指定map的key值, 保持原有对象中的数据类型
 // bean 需要是指针形式
-func Struct2Map(bean interface{}) map[string]interface{} {
+func Struct2Map(bean any) map[string]any {
 	rt := reflect.TypeOf(bean).Elem()
 	rv := reflect.ValueOf(bean).Elem()
-	ret := map[string]interface{}{}
+	ret := map[string]any{}
 	for i := 0; i < rt.NumField(); i++ {
 		field := rt.Field(i)
 		fieldV := rv.Field(i)
@@ -31,7 +31,7 @@ func Struct2Map(bean interface{}) map[string]interface{} {
 }
 
 // Map2Struct 用于将map转换成结构体 注意可用的数据类型
-func Map2Struct(m map[string]interface{}, bean interface{}) {
+func Map2Struct(m map[string]any, bean any) {
 	rt := reflect.TypeOf(bean).Elem()
 	rv := reflect.ValueOf(bean).Elem()
 	for i := 0; i < rt.NumField(); i++ {

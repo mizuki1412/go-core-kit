@@ -31,7 +31,7 @@ func (th *Int64) UnmarshalJSON(data []byte) error {
 	th.Int64 = s
 	return nil
 }
-func (th *Int64) Scan(value interface{}) error {
+func (th *Int64) Scan(value any) error {
 	if value == nil {
 		th.Int64, th.Valid = 0, false
 		return nil
@@ -53,7 +53,7 @@ func (th Int64) IsValid() bool {
 	return th.Valid
 }
 
-func NewInt64(val interface{}) *Int64 {
+func NewInt64(val any) *Int64 {
 	th := &Int64{}
 	if val != nil {
 		th.Set(val)
@@ -61,7 +61,7 @@ func NewInt64(val interface{}) *Int64 {
 	return th
 }
 
-func (th *Int64) Set(val interface{}) *Int64 {
+func (th *Int64) Set(val any) *Int64 {
 	if v, ok := val.(Int64); ok {
 		th.Int64 = v.Int64
 		th.Valid = v.Valid

@@ -5,7 +5,7 @@ import (
 	"text/template"
 )
 
-func process(t *template.Template, vars interface{}) string {
+func process(t *template.Template, vars any) string {
 	var tmplBytes bytes.Buffer
 	err := t.Execute(&tmplBytes, vars)
 	if err != nil {
@@ -15,7 +15,7 @@ func process(t *template.Template, vars interface{}) string {
 }
 
 // ProcessString vars一般是map
-func ProcessString(str string, vars interface{}) string {
+func ProcessString(str string, vars any) string {
 	tmpl, err := template.New("tmpl").Parse(str)
 
 	if err != nil {

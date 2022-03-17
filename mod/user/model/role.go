@@ -15,7 +15,7 @@ type Role struct {
 	Extend      class.MapString `json:"extend,omitempty" db:"extend"`
 }
 
-func (th *Role) Scan(value interface{}) error {
+func (th *Role) Scan(value any) error {
 	if value == nil {
 		return nil
 	}

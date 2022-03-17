@@ -114,7 +114,7 @@ func getWriter2() io.Writer {
 	}
 	config := &lumberjack.Logger{
 		Filename:   filepath + "/" + filename + ".log",
-		MaxSize:    configkit.GetInt(configkey.LogMaxSize, 100),
+		MaxSize:    configkit.GetInt(configkey.LogMaxSize, 20),
 		MaxBackups: configkit.GetInt(configkey.LogMaxBackups, 0),
 		MaxAge:     configkit.GetInt(configkey.LogMaxRemain, 0),
 		LocalTime:  true,
@@ -125,10 +125,10 @@ func getWriter2() io.Writer {
 
 type Param struct {
 	Key string
-	Val interface{}
+	Val any
 }
 
-func Debug(msg interface{}, params ...Param) {
+func Debug(msg any, params ...Param) {
 	if Logger == nil {
 		Logger = Init()
 	}
@@ -142,7 +142,7 @@ func Debug(msg interface{}, params ...Param) {
 func DebugConcat(msg ...string) {
 	Debug(strings.Join(msg, " "))
 }
-func Info(msg interface{}, params ...Param) {
+func Info(msg any, params ...Param) {
 	if Logger == nil {
 		Logger = Init()
 	}
@@ -156,7 +156,7 @@ func Info(msg interface{}, params ...Param) {
 func InfoConcat(msg ...string) {
 	Info(strings.Join(msg, " "))
 }
-func Error(msg interface{}, params ...Param) {
+func Error(msg any, params ...Param) {
 	if Logger == nil {
 		Logger = Init()
 	}
@@ -170,7 +170,7 @@ func Error(msg interface{}, params ...Param) {
 func ErrorConcat(msg ...string) {
 	Error(strings.Join(msg, " "))
 }
-func Fatal(msg interface{}, params ...Param) {
+func Fatal(msg any, params ...Param) {
 	if Logger == nil {
 		Logger = Init()
 	}

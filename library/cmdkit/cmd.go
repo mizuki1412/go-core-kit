@@ -56,10 +56,10 @@ func Run(command []string, params ...RunParams) (string, error) {
 			return "", err
 		}
 		if param.Timeout > 0 {
-			to := make(chan map[string]interface{})
+			to := make(chan map[string]any)
 			go func() {
 				ret0, err2 := getRet(stdout, stderr, cmd)
-				to <- map[string]interface{}{"ret": ret0, "err": err2}
+				to <- map[string]any{"ret": ret0, "err": err2}
 			}()
 			select {
 			case <-time.After(time.Duration(param.Timeout) * time.Second):

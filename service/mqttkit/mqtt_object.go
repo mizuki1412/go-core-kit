@@ -85,7 +85,7 @@ func (th *Client) Subscribe(topic string, qos byte, callback MQTT.MessageHandler
 	f()
 }
 
-func (th *Client) Publish(topic string, qos byte, retained bool, payload interface{}) error {
+func (th *Client) Publish(topic string, qos byte, retained bool, payload any) error {
 	if th.C == nil {
 		err := errors.New("please newClient first")
 		logkit.Error(err.Error())

@@ -97,7 +97,7 @@ func $name$(ctx *context.Context){
 
 ## bean_extend
 ```
-func (th *$struct$) Scan(value interface{}) error {
+func (th *$struct$) Scan(value any) error {
 	if value == nil {
 		return nil
 	}
@@ -134,8 +134,8 @@ func (l $name$List) Find(fun func(ele *$name$) bool) *$name$ {
 	}
 	return nil
 }
-func (l $name$List) MapReduce(fun func(ele *$name$) interface{}) []interface{} {
-	var results []interface{}
+func (l $name$List) MapReduce(fun func(ele *$name$) any) []any {
+	var results []any
 	for _, e := range l {
 		results = append(results, fun(e))
 	}
@@ -167,7 +167,7 @@ func (dao *Dao) cascade(obj *$bean$) {
 		// todo 将外联的置为nil
 	}
 }
-func (dao *Dao) scan(sql string, args []interface{}) []*$bean$ {
+func (dao *Dao) scan(sql string, args []any) []*$bean$ {
 	rows := dao.Query(sql, args...)
 	list := make([]*$bean$,0,5)
 	defer rows.Close()
@@ -184,7 +184,7 @@ func (dao *Dao) scan(sql string, args []interface{}) []*$bean$ {
 	}
 	return list
 }
-func (dao *Dao) scanOne(sql string, args []interface{}) *$bean$ {
+func (dao *Dao) scanOne(sql string, args []any) *$bean$ {
 	rows := dao.Query(sql, args...)
 	defer rows.Close()
 	for rows.Next() {
@@ -212,7 +212,7 @@ func New(schema string, tx ...*sqlkit.Dao) *Dao{
 	dao.NewHelper(schema,tx...)
 	return dao
 }
-func (dao *Dao) scan(sql string, args []interface{}) []*$bean$ {
+func (dao *Dao) scan(sql string, args []any) []*$bean$ {
 	rows := dao.Query(sql, args...)
 	list := make([]*$bean$,0,5)
 	defer rows.Close()
@@ -226,7 +226,7 @@ func (dao *Dao) scan(sql string, args []interface{}) []*$bean$ {
 	}
 	return list
 }
-func (dao *Dao) scanOne(sql string, args []interface{}) *$bean$ {
+func (dao *Dao) scanOne(sql string, args []any) *$bean$ {
 	rows := dao.Query(sql, args...)
 	defer rows.Close()
 	for rows.Next() {

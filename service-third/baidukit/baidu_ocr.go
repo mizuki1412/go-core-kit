@@ -27,7 +27,7 @@ func _getOCRData(param OCRParam) map[string]string {
 
 // OCRVatInvoice 增值税发票识别
 // https://cloud.baidu.com/doc/OCR/s/nk3h7xy2t
-func OCRVatInvoice(param OCRParam) map[string]interface{} {
+func OCRVatInvoice(param OCRParam) map[string]any {
 	checkAccessKey()
 	data := _getOCRData(param)
 	res, _ := httpkit.Request(httpkit.Req{
@@ -50,7 +50,7 @@ func OCRVatInvoice(param OCRParam) map[string]interface{} {
 }
 
 // OCRTrainTicket 火车票
-func OCRTrainTicket(param OCRParam) map[string]interface{} {
+func OCRTrainTicket(param OCRParam) map[string]any {
 	checkAccessKey()
 	data := _getOCRData(param)
 	res, _ := httpkit.Request(httpkit.Req{
@@ -73,7 +73,7 @@ func OCRTrainTicket(param OCRParam) map[string]interface{} {
 }
 
 // OCRTollTicket 过路费
-func OCRTollTicket(param OCRParam) map[string]interface{} {
+func OCRTollTicket(param OCRParam) map[string]any {
 	checkAccessKey()
 	data := _getOCRData(param)
 	res, _ := httpkit.Request(httpkit.Req{

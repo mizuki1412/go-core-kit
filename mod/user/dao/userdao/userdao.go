@@ -37,7 +37,7 @@ func (dao *Dao) cascade(obj *model.User) {
 		obj.Role = nil
 	}
 }
-func (dao *Dao) scan(sql string, args []interface{}) []*model.User {
+func (dao *Dao) scan(sql string, args []any) []*model.User {
 	rows := dao.Query(sql, args...)
 	list := make([]*model.User, 0, 5)
 	defer rows.Close()
@@ -54,7 +54,7 @@ func (dao *Dao) scan(sql string, args []interface{}) []*model.User {
 	}
 	return list
 }
-func (dao *Dao) scanOne(sql string, args []interface{}) *model.User {
+func (dao *Dao) scanOne(sql string, args []any) *model.User {
 	rows := dao.Query(sql, args...)
 	defer rows.Close()
 	for rows.Next() {
@@ -97,7 +97,7 @@ func (dao *Dao) FindByUsername(username string) *model.User {
 
 // FindParam 可以通过extend的值来find
 type FindParam struct {
-	Extend map[string]interface{}
+	Extend map[string]any
 }
 
 func (dao *Dao) Find(param FindParam) *model.User {

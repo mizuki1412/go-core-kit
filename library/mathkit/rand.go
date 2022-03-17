@@ -5,7 +5,7 @@ import (
 	"math/rand"
 )
 
-func RandFloat64(min, max interface{}) float64 {
+func RandFloat64(min, max any) float64 {
 	v1 := cast.ToFloat64(min)
 	v2 := cast.ToFloat64(max)
 	if v1 > v2 {
@@ -16,7 +16,7 @@ func RandFloat64(min, max interface{}) float64 {
 	return rand.Float64()*(v2-v1) + v1
 }
 
-func RandInt32(min, max interface{}) int32 {
+func RandInt32(min, max any) int32 {
 	v1 := cast.ToInt32(min)
 	v2 := cast.ToInt32(max)
 	if v1 > v2 {

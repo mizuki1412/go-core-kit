@@ -25,7 +25,7 @@ func New() *MQTT.Client {
 	opts.SetConnectRetry(true)
 	opts.SetConnectRetryInterval(time.Duration(5) * time.Second)
 	opts.SetClientID(configkit.GetStringD(configkey.MQTTClientID))
-	opts.SetUsername(configkit.GetStringD(configkey.MQTTUsername)).SetPassword(configkit.GetStringD(ConfigKeyMQTTPwd))
+	opts.SetUsername(configkit.GetStringD(configkey.MQTTUsername)).SetPassword(configkit.GetStringD(configkey.MQTTPwd))
 	var lostHan MQTT.OnConnectHandler = func(c MQTT.Client) {
 		if first {
 			first = false
@@ -64,7 +64,7 @@ func Subscribe(topic string, qos byte, callback MQTT.MessageHandler) {
 	f()
 }
 
-func Publish(topic string, qos byte, retained bool, payload interface{}) error {
+func Publish(topic string, qos byte, retained bool, payload any) error {
 	if client == nil {
 		New()
 	}

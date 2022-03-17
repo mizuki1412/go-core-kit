@@ -11,7 +11,7 @@ type Province struct {
 	Cities []*City      `json:"cities"`
 }
 
-func (th *Province) Scan(value interface{}) error {
+func (th *Province) Scan(value any) error {
 	if value == nil {
 		return nil
 	}

@@ -31,7 +31,7 @@ func (th *Bool) UnmarshalJSON(data []byte) error {
 	th.Bool = s
 	return nil
 }
-func (th *Bool) Scan(value interface{}) error {
+func (th *Bool) Scan(value any) error {
 	if value == nil {
 		th.Bool, th.Valid = false, false
 		return nil
@@ -53,7 +53,7 @@ func (th Bool) IsValid() bool {
 	return th.Valid
 }
 
-func NewBool(val interface{}) *Bool {
+func NewBool(val any) *Bool {
 	th := &Bool{}
 	if val != nil {
 		th.Set(val)
@@ -61,7 +61,7 @@ func NewBool(val interface{}) *Bool {
 	return th
 }
 
-func (th *Bool) Set(val interface{}) *Bool {
+func (th *Bool) Set(val any) *Bool {
 	if v, ok := val.(Bool); ok {
 		th.Bool = v.Bool
 		th.Valid = v.Valid

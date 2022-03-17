@@ -95,17 +95,17 @@ func ReGeo(lon, lat class.Decimal) (loc *Location) {
 }
 
 // params：city code
-func Weather(city string) []map[string]interface{} {
+func Weather(city string) []map[string]any {
 	ret, _ := httpkit.Request(httpkit.Req{
 		Method: http.MethodGet,
 		Url:    "https://restapi.amap.com/v3/weather/weatherInfo?key=" + configkit.GetStringD(configkey.AmapKey) + "&city=" + city + "&extensions=all",
 	})
 	rs := gjson.Parse(ret).Get("forecasts").Array()
 	cast := rs[0].Get("casts").Array()
-	data := make([]map[string]interface{}, 0, len(cast))
+	data := make([]map[string]any, 0, len(cast))
 	for _, v := range cast {
 		tmp := v.Map()
-		m := map[string]interface{}{}
+		m := map[string]any{}
 		for k, v := range tmp {
 			m[k] = v.Value()
 		}

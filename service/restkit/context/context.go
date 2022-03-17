@@ -24,11 +24,11 @@ type Context struct {
 }
 
 // Set msg per request
-func (ctx *Context) Set(key string, val interface{}) {
+func (ctx *Context) Set(key string, val any) {
 	ctx.Proxy.Set(key, val)
 }
 
-func (ctx *Context) Get(key string) interface{} {
+func (ctx *Context) Get(key string) any {
 	r, _ := ctx.Proxy.Get(key)
 	return r
 }
@@ -50,16 +50,16 @@ func (ctx *Context) DBTxExist() bool {
 // data: query, form, json/xml, param
 
 // BindForm bean 指针
-func (ctx *Context) BindForm(bean interface{}) {
+func (ctx *Context) BindForm(bean any) {
 	switch bean.(type) {
-	case map[string]interface{}:
+	case map[string]any:
 		// query会和form合并 post时 todo
 		//allForm := ctx.Proxy.FormValues()
 		//for k, v := range allForm {
 		//	if len(v) == 1 {
-		//		(bean.(map[string]interface{}))[k] = v[0]
+		//		(bean.(map[string]any))[k] = v[0]
 		//	} else if len(v) > 1 {
-		//		(bean.(map[string]interface{}))[k] = v
+		//		(bean.(map[string]any))[k] = v
 		//	}
 		//}
 		//if len(allForm) == 0 {
@@ -69,7 +69,7 @@ func (ctx *Context) BindForm(bean interface{}) {
 		//		if e.Key == "" {
 		//			break
 		//		}
-		//		(bean.(map[string]interface{}))[e.Key] = e.ValueRaw
+		//		(bean.(map[string]any))[e.Key] = e.ValueRaw
 		//	}
 		//}
 	default:
@@ -94,11 +94,11 @@ func (ctx *Context) BindForm(bean interface{}) {
 /// bean:指针
 // 实现form/query/json中的数据合并获取。
 /// description:"xxx" default:"" trim:"true"
-func (ctx *Context) bindStruct(bean interface{}) {
+func (ctx *Context) bindStruct(bean any) {
 	rt := reflect.TypeOf(bean).Elem()
 	rv := reflect.ValueOf(bean).Elem()
 	// 取json和取form只能同时进行一次，取完，流被关闭了。
-	jsonBody := map[string]interface{}{}
+	jsonBody := map[string]any{}
 	isJson := strings.Index(ctx.Request.Header.Get("content-type"), "application/json") >= 0
 	if isJson {
 		_ = ctx.Proxy.ShouldBindJSON(&jsonBody)
@@ -133,7 +133,7 @@ func (ctx *Context) bindStruct(bean interface{}) {
 		var keyExist bool
 		if isJson {
 			switch jsonBody[key].(type) {
-			case map[string]interface{}:
+			case map[string]any:
 				val = jsonkit.ToString(jsonBody[key])
 			default:
 				val = cast.ToString(jsonBody[key])
@@ -217,14 +217,14 @@ func (ctx *Context) bindStruct(bean interface{}) {
 			}
 		case "class.MapString":
 			if !stringkit.IsNull(val) {
-				var p map[string]interface{}
+				var p map[string]any
 				_ = jsonkit.ParseObj(val, &p)
 				tmp := class.MapString{Map: p, Valid: true}
 				fieldV.Set(reflect.ValueOf(tmp))
 			}
 		case "class.MapStringArr":
 			if !stringkit.IsNull(val) {
-				var p []map[string]interface{}
+				var p []map[string]any
 				_ = jsonkit.ParseObj(val, &p)
 				tmp := class.MapStringArr{Arr: p, Valid: true}
 				fieldV.Set(reflect.ValueOf(tmp))

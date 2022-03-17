@@ -14,7 +14,7 @@ type NetServer struct {
 	OnMessage   func(frame []byte, c gnet.Conn) (out []byte, action gnet.Action)
 	OnClose     func(c gnet.Conn, err error) (action gnet.Action)
 	// 数据message前的组包拆包
-	//UnPacket func(c *connection.Connection, buffer *ringbuffer.RingBuffer) (interface{}, []byte)
+	//UnPacket func(c *connection.Connection, buffer *ringbuffer.RingBuffer) (any, []byte)
 	//Packet   func(c *connection.Connection, data []byte) []byte
 }
 
@@ -76,11 +76,11 @@ func (th *NetServer) Run() {
 }
 
 //type DefaultProtocol struct {
-//	UnPacketFunc func(c *connection.Connection, buffer *ringbuffer.RingBuffer) (interface{}, []byte)
+//	UnPacketFunc func(c *connection.Connection, buffer *ringbuffer.RingBuffer) (any, []byte)
 //	PacketFunc   func(c *connection.Connection, data []byte) []byte
 //}
 //
-//func (d *DefaultProtocol) UnPacket(c *connection.Connection, buffer *ringbuffer.RingBuffer) (interface{}, []byte) {
+//func (d *DefaultProtocol) UnPacket(c *connection.Connection, buffer *ringbuffer.RingBuffer) (any, []byte) {
 //	if d.UnPacketFunc == nil {
 //		defer buffer.RetrieveAll()
 //		return nil, buffer.Bytes()

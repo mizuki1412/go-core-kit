@@ -13,7 +13,7 @@ var once sync.Once
 
 type simpleCacheBean struct {
 	Expire time.Time
-	Data   interface{}
+	Data   any
 }
 
 type SimpleCacheHandler struct {
@@ -40,14 +40,14 @@ func SimpleCache() *SimpleCacheHandler {
 	return simpleCacheHandler
 }
 
-func (th *SimpleCacheHandler) Put(key string, val interface{}, expireSeconds int32) {
+func (th *SimpleCacheHandler) Put(key string, val any, expireSeconds int32) {
 	th.Cache.Put(key, &simpleCacheBean{
 		Expire: time.Now().Add(time.Duration(expireSeconds) * time.Second),
 		Data:   val,
 	})
 }
 
-func (th *SimpleCacheHandler) Get(key string) interface{} {
+func (th *SimpleCacheHandler) Get(key string) any {
 	val := th.Cache.Get(key)
 	if val != nil {
 		if val.(*simpleCacheBean).Expire.Before(time.Now()) {

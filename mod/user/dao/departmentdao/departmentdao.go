@@ -41,7 +41,7 @@ func (dao *Dao) cascade(obj *model.Department) {
 		obj.Parent = nil
 	}
 }
-func (dao *Dao) scan(sql string, args []interface{}) []*model.Department {
+func (dao *Dao) scan(sql string, args []any) []*model.Department {
 	rows := dao.Query(sql, args...)
 	list := make([]*model.Department, 0, 5)
 	defer rows.Close()
@@ -58,7 +58,7 @@ func (dao *Dao) scan(sql string, args []interface{}) []*model.Department {
 	}
 	return list
 }
-func (dao *Dao) scanOne(sql string, args []interface{}) *model.Department {
+func (dao *Dao) scanOne(sql string, args []any) *model.Department {
 	rows := dao.Query(sql, args...)
 	defer rows.Close()
 	for rows.Next() {

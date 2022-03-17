@@ -17,7 +17,7 @@ type Department struct {
 	Children []*Department   `json:"children"`
 }
 
-func (th *Department) Scan(value interface{}) error {
+func (th *Department) Scan(value any) error {
 	if value == nil {
 		return nil
 	}

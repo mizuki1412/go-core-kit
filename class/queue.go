@@ -15,7 +15,7 @@ type (
 	node struct {
 		pre   *node
 		next  *node
-		value interface{}
+		value any
 	}
 )
 
@@ -30,7 +30,7 @@ func (th *Queue) Len() int {
 }
 
 // Peek 返回队列顶端元素
-func (th *Queue) Peek() interface{} {
+func (th *Queue) Peek() any {
 	if th.top == nil {
 		return nil
 	}
@@ -38,7 +38,7 @@ func (th *Queue) Peek() interface{} {
 }
 
 // Push 入队操作
-func (th *Queue) Push(v interface{}) {
+func (th *Queue) Push(v any) {
 	th.lock1.Lock()
 	defer th.lock1.Unlock()
 	n := &node{nil, nil, v}
@@ -54,7 +54,7 @@ func (th *Queue) Push(v interface{}) {
 }
 
 // Pop 出队操作
-func (th *Queue) Pop() interface{} {
+func (th *Queue) Pop() any {
 	th.lock1.Lock()
 	defer th.lock1.Unlock()
 	if th.length == 0 {
