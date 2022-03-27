@@ -2,7 +2,7 @@ package timekit
 
 import "fmt"
 
-// 毫秒格式化
+// FormatMillSecondHMS 毫秒格式化 hh:mm:ss
 func FormatMillSecondHMS(mill int64) string {
 	mill = mill / 1000
 	hh := mill / 60 / 60

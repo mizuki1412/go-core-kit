@@ -2,7 +2,7 @@ package timekit
 
 import "time"
 
-// 是否存在交集，不含点
+// IsOverlap 是否存在交集，不含点
 func IsOverlap(base []time.Time, layout []time.Time) bool {
 	if len(base) != 2 || len(layout) != 2 {
 		return false
@@ -10,7 +10,7 @@ func IsOverlap(base []time.Time, layout []time.Time) bool {
 	return base[1].Unix() > layout[0].Unix() && base[0].Unix() < layout[1].Unix()
 }
 
-// 取base中不含layout的部分
+// GetNotOverlapArray 取base中不含layout的部分
 func GetNotOverlapArray(base []time.Time, layout []time.Time) ([]time.Time, []time.Time) {
 	base1 := base[0].Unix()
 	base2 := base[1].Unix()
@@ -30,7 +30,7 @@ func GetNotOverlapArray(base []time.Time, layout []time.Time) ([]time.Time, []ti
 	}
 }
 
-// 合并两组时间，返回nil则未合并
+// MergeArray 合并两组时间，返回nil则未合并
 func MergeArray(base []time.Time, layout []time.Time) []time.Time {
 	base1 := base[0].Unix()
 	base2 := base[1].Unix()

@@ -111,5 +111,5 @@ func (th *Time) Set(val any) *Time {
 }
 
 func (th *Time) UnixMill() int64 {
-	return timekit.GetUnixMill(th.Time)
+	return th.Time.UnixMilli()
 }
