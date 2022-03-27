@@ -11,12 +11,12 @@ import (
 
 // Send phones: xxx,xxxx, data例如：{"code":"123456"}
 func Send(phones, signName, templateCode string, data map[string]any) error {
-	ak := configkit.GetString(configkey.AliSMSAccessKey, "")
-	aks := configkit.GetString(configkey.AliSMSAccessKeySecret, "")
+	ak := configkit.GetString(configkey.AliAccessKey, "")
+	aks := configkit.GetString(configkey.AliAccessKeySecret, "")
 	if ak == "" || aks == "" {
 		panic(exception.New("sms accessKey 未设置"))
 	}
-	client, err := dysmsapi.NewClientWithAccessKey(configkit.GetString(configkey.AliSMSRegionId, "cn-hangzhou"), ak, aks)
+	client, err := dysmsapi.NewClientWithAccessKey(configkit.GetString(configkey.AliRegionId, "cn-hangzhou"), ak, aks)
 	if err != nil {
 		panic(exception.New("sms初始化错误: " + err.Error()))
 	}

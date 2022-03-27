@@ -71,15 +71,11 @@ func DefFlags(cmd *cobra.Command) {
 
 	cmd.Flags().String(configkey.AmapKey, "", "高德key")
 
-	cmd.Flags().String(configkey.AliSMSRegionId, "cn-hangzhou", "ali sms")
-	cmd.Flags().String(configkey.AliSMSAccessKey, "", "ali sms")
-	cmd.Flags().String(configkey.AliSMSAccessKeySecret, "", "ali sms")
+	cmd.Flags().String(configkey.AliRegionId, "cn-hangzhou", "ali")
+	cmd.Flags().String(configkey.AliAccessKey, "", "ali")
+	cmd.Flags().String(configkey.AliAccessKeySecret, "", "ali")
 	cmd.Flags().String(configkey.AliSMSTemplate1, "", "ali sms 模板1")
 	cmd.Flags().String(configkey.AliSMSSign1, "", "ali sms 签名1")
-
-	cmd.Flags().String(configkey.AliSTSRegionId, "cn-hangzhou", "ali sts")
-	cmd.Flags().String(configkey.AliSTSAccessKey, "", "ali sts")
-	cmd.Flags().String(configkey.AliSTSAccessKeySecret, "", "ali sts")
 	cmd.Flags().String(configkey.AliSTSRoleArn, "", "ali sts")
 	cmd.Flags().String(configkey.AliOSSBucketName, "", "ali oss default bucket")
 

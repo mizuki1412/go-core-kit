@@ -63,8 +63,9 @@ func Parse(dt string) (time.Time, error) {
 			time.StampMicro,
 			time.StampNano,
 		} {
-			if t, e := time.ParseInLocation(dateType, dt, time.Local); e == nil {
-				return t, e
+			// ParseInLocation 在已有时区偏移时不会使用given location
+			if t, e := time.Parse(dateType, dt); e == nil {
+				return t.Local(), e
 			}
 		}
 		return s, fmt.Errorf("unable to parse date: %s", dt)

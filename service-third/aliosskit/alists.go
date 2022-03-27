@@ -19,13 +19,13 @@ type STSData struct {
 
 // GetSTS path是在bucket下的相对路径(eg:*), paths将用于resource
 func GetSTS(roleSession, bucket string, paths ...string) STSData {
-	ak := configkit.GetString(configkey.AliSTSAccessKey, "")
-	aks := configkit.GetString(configkey.AliSTSAccessKeySecret, "")
+	ak := configkit.GetString(configkey.AliAccessKey, "")
+	aks := configkit.GetString(configkey.AliAccessKeySecret, "")
 	role := configkit.GetString(configkey.AliSTSRoleArn, "")
 	if ak == "" || aks == "" || role == "" {
 		panic(exception.New("sts 必要参数未设置"))
 	}
-	region := configkit.GetString(configkey.AliSTSRegionId, "cn-hangzhou")
+	region := configkit.GetString(configkey.AliRegionId, "cn-hangzhou")
 	client, err := sts.NewClientWithAccessKey(region, ak, aks)
 	if err != nil {
 		panic(exception.New("sts初始化错误: " + err.Error()))

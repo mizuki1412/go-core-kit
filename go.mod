@@ -8,11 +8,11 @@ require (
 	github.com/SebastiaanKlippert/go-wkhtmltopdf v1.7.2
 	github.com/albenik/go-serial/v2 v2.5.0
 	github.com/alecthomas/chroma v0.10.0
-	github.com/aliyun/alibaba-cloud-sdk-go v1.61.1524
+	github.com/aliyun/alibaba-cloud-sdk-go v1.61.1536
 	github.com/eclipse/paho.mqtt.golang v1.3.5
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/validator/v10 v10.10.1
-	github.com/go-redis/redis/v8 v8.11.4
+	github.com/go-redis/redis/v8 v8.11.5
 	github.com/google/uuid v1.3.0
 	github.com/googollee/go-socket.io v1.6.1
 	github.com/jmoiron/sqlx v1.3.4
