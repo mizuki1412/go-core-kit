@@ -13,6 +13,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/spf13/cast"
 	"sync"
+	"time"
 )
 
 var client *vod.Client
@@ -123,8 +124,7 @@ func getDefinitionName(val string) string {
 
 // GenUrlAuthKey url鉴权中的 auth_key=timestamp-rand-uid-md5hash
 func GenUrlAuthKey(uri string, key string) string {
-	//timestamp := time.Now().Unix()
-	timestamp := 1648456742
+	timestamp := time.Now().Unix()
 	rand := 0
 	uid := 0
 	// URI-timestamp-rand-uid-PrivateKey
