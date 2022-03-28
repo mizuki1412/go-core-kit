@@ -8,6 +8,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/init/configkey"
+	"github.com/mizuki1412/go-core-kit/library/cryptokit"
 	"github.com/mizuki1412/go-core-kit/library/timekit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/spf13/cast"
@@ -118,4 +119,15 @@ func getDefinitionName(val string) string {
 		return "高音质"
 	}
 	return val
+}
+
+// GenUrlAuthKey url鉴权中的 auth_key=timestamp-rand-uid-md5hash
+func GenUrlAuthKey(uri string, key string) string {
+	//timestamp := time.Now().Unix()
+	timestamp := 1648456742
+	rand := 0
+	uid := 0
+	// URI-timestamp-rand-uid-PrivateKey
+	md5hash := cryptokit.MD5(fmt.Sprintf("%s-%d-%d-%d-%s", uri, timestamp, rand, uid, key))
+	return fmt.Sprintf("%d-%d-%d-%s", timestamp, rand, uid, md5hash)
 }
