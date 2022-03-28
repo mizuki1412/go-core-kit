@@ -20,6 +20,7 @@ var once sync.Once
 // InitVodClient accessKeyId string, accessKeySecret string
 func InitVodClient(keys ...string) {
 	once.Do(func() {
+		println(12)
 		var accessKeyId string
 		var accessKeySecret string
 		if len(keys) == 2 {
@@ -81,6 +82,7 @@ func SearchMediaInfoList(p SearchMediaInfoListParam) []map[string]any {
 
 // GetPlayInfo https://help.aliyun.com/document_detail/56124.html
 func GetPlayInfo(videoId string) []map[string]any {
+	InitVodClient()
 	request := vod.CreateGetPlayInfoRequest()
 	request.VideoId = videoId
 	// Definition Url
