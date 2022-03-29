@@ -1,12 +1,14 @@
 package user
 
 import (
+	context2 "context"
 	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/cryptokit"
 	"github.com/mizuki1412/go-core-kit/mod/user/dao/roledao"
 	"github.com/mizuki1412/go-core-kit/mod/user/dao/userdao"
 	"github.com/mizuki1412/go-core-kit/mod/user/model"
+	"github.com/mizuki1412/go-core-kit/service/rediskit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
 	"time"
 )
@@ -51,6 +53,7 @@ type AddUserParams struct {
 	Role       int32        `validate:"required"`
 	Name       class.String
 	Phone      class.String
+	Sms        class.String
 	Gender     int8
 	Image      class.String
 	Address    class.String
@@ -60,11 +63,11 @@ type AddUserParams struct {
 func AddUser(ctx *context.Context) {
 	params := AddUserParams{}
 	ctx.BindForm(&params)
-	u := AddUserHandle(ctx, params)
+	u := AddUserHandle(ctx, params, false)
 	ctx.JsonSuccess(u)
 }
 
-func AddUserHandle(ctx *context.Context, params AddUserParams) model.User {
+func AddUserHandle(ctx *context.Context, params AddUserParams, checkSms bool) model.User {
 	dao := userdao.New(ctx.SessionGetSchema())
 	dao.SetResultType(userdao.ResultNone)
 	if dao.FindByUsername(params.Username.String) != nil {
@@ -72,6 +75,9 @@ func AddUserHandle(ctx *context.Context, params AddUserParams) model.User {
 	}
 	if params.Phone.Valid && dao.FindByPhone(params.Phone.String) != nil {
 		panic(exception.New("手机号已经存在"))
+	}
+	if params.Phone.Valid && checkSms && (!params.Sms.Valid || rediskit.Get(context2.Background(), rediskit.GetKeyWithPrefix("sms:"+params.Phone.String), "") != params.Sms.String) {
+		panic(exception.New("验证码错误"))
 	}
 	roleDao := roledao.New(ctx.SessionGetSchema())
 	roleDao.SetResultType(roledao.ResultNone)

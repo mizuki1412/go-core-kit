@@ -34,7 +34,7 @@ func Get(ctx context.Context, key string, defaultVal string) string {
 	}
 }
 
-// val将会以json形式存储，如果不是string的话
+// Set val将会以json形式存储，如果不是string的话
 func Set(ctx context.Context, key string, val any, expire time.Duration) {
 	client = Instance()
 	if _, ok := val.(string); !ok {
@@ -43,6 +43,15 @@ func Set(ctx context.Context, key string, val any, expire time.Duration) {
 	_, err := client.Set(ctx, key, val, expire).Result()
 	if err != nil {
 		panic(exception.New("redis 存入失败：" + err.Error()))
+	}
+}
+
+func GetKeyWithPrefix(key string) string {
+	p := configkit.GetStringD(configkey.RedisPrefix)
+	if p == "" {
+		return key
+	} else {
+		return p + ":" + key
 	}
 }
 

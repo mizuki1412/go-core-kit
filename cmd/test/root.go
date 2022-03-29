@@ -22,6 +22,7 @@ var rootCmd = &cobra.Command{
 	Use: "go-core-kit",
 	Run: func(cmd *cobra.Command, args []string) {
 		initkit.BindFlags(cmd)
+
 	},
 }
 

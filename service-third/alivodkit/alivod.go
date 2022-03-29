@@ -22,7 +22,6 @@ var once sync.Once
 // InitVodClient accessKeyId string, accessKeySecret string
 func InitVodClient(keys ...string) {
 	once.Do(func() {
-		println(12)
 		var accessKeyId string
 		var accessKeySecret string
 		if len(keys) == 2 {

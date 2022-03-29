@@ -1,12 +1,14 @@
 package user
 
 import (
+	context2 "context"
 	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/cryptokit"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/mod/user/dao/userdao"
 	"github.com/mizuki1412/go-core-kit/mod/user/model"
+	"github.com/mizuki1412/go-core-kit/service/rediskit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
 	"github.com/mizuki1412/go-core-kit/service/sqlkit/pghelper"
 	"strings"
@@ -165,6 +167,7 @@ type updateUserInfoParam struct {
 	Username   class.String
 	Name       class.String
 	Phone      class.String
+	Sms        class.String
 	Gender     int8
 	Image      class.String
 	Address    class.String
@@ -179,8 +182,13 @@ func updateUserInfo(ctx *context.Context) {
 	ctx.BindForm(&params)
 	dao := userdao.New(ctx.SessionGetSchema())
 	dao.SetResultType(userdao.ResultNone)
-	if params.Phone.Valid && params.Phone.String != "" && params.Phone.String != u.Phone.String && dao.FindByPhone(params.Phone.String) != nil {
-		panic(exception.New("手机号已存在"))
+	if params.Phone.Valid && params.Phone.String != "" && params.Phone.String != u.Phone.String {
+		if dao.FindByPhone(params.Phone.String) != nil {
+			panic(exception.New("手机号已被注册"))
+		}
+		if !params.Sms.Valid || rediskit.Get(context2.Background(), rediskit.GetKeyWithPrefix("sms:"+params.Phone.String), "") != params.Sms.String {
+			panic(exception.New("验证码错误"))
+		}
 	}
 	if params.Username.Valid && params.Username.String != u.Username.String {
 		if dao.FindByUsername(params.Username.String) != nil {

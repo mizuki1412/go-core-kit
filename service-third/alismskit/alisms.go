@@ -1,38 +1,73 @@
 package alismskit
 
 import (
-	"errors"
 	"github.com/aliyun/alibaba-cloud-sdk-go/services/dysmsapi"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/init/configkey"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
+	"strings"
+	"sync"
 )
 
-// Send phones: xxx,xxxx, data例如：{"code":"123456"}
-func Send(phones, signName, templateCode string, data map[string]any) error {
-	ak := configkit.GetString(configkey.AliAccessKey, "")
-	aks := configkit.GetString(configkey.AliAccessKeySecret, "")
-	if ak == "" || aks == "" {
-		panic(exception.New("sms accessKey 未设置"))
+var client *dysmsapi.Client
+var once sync.Once
+
+func InitSMSClient(keys ...string) {
+	once.Do(func() {
+		var err error
+		var accessKeyId string
+		var accessKeySecret string
+		if len(keys) == 2 {
+			accessKeyId = keys[0]
+			accessKeySecret = keys[1]
+		} else {
+			accessKeyId = configkit.GetStringD(configkey.AliAccessKey)
+			accessKeySecret = configkit.GetStringD(configkey.AliAccessKeySecret)
+		}
+		client, err = dysmsapi.NewClientWithAccessKey(configkit.GetString(configkey.AliRegionId, "cn-hangzhou"), accessKeyId, accessKeySecret)
+		if err != nil {
+			panic(exception.New("sms初始化错误: " + err.Error()))
+		}
+	})
+}
+
+type SendParams struct {
+	Phone        string
+	Phones       []string
+	SignName     string
+	TemplateCode string
+	Data         map[string]any
+}
+
+// Send data例如：{"code":"123456"}
+func Send(param SendParams) {
+	InitSMSClient()
+	phones := ""
+	if param.Phone != "" {
+		phones = param.Phone
+	} else if len(param.Phones) > 0 {
+		phones = strings.Join(param.Phones, ",")
+	} else {
+		panic(exception.New("手机号参数未填"))
 	}
-	client, err := dysmsapi.NewClientWithAccessKey(configkit.GetString(configkey.AliRegionId, "cn-hangzhou"), ak, aks)
-	if err != nil {
-		panic(exception.New("sms初始化错误: " + err.Error()))
+	if param.SignName == "" {
+		param.SignName = configkit.GetStringD(configkey.AliSMSSign1)
+	}
+	if param.TemplateCode == "" {
+		param.TemplateCode = configkit.GetStringD(configkey.AliSMSTemplate1)
 	}
 	request := dysmsapi.CreateSendSmsRequest()
 	request.Scheme = "https"
 	request.PhoneNumbers = phones
-	request.SignName = signName
-	request.TemplateCode = templateCode
-	request.TemplateParam = jsonkit.ToString(data)
+	request.SignName = param.SignName
+	request.TemplateCode = param.TemplateCode
+	request.TemplateParam = jsonkit.ToString(param.Data)
 	response, err := client.SendSms(request)
 	if err != nil {
-		return err
+		panic(exception.New(err.Error()))
 	}
 	if response.Code != "OK" {
-		return errors.New(response.Message)
-	} else {
-		return nil
+		panic(exception.New(response.Message))
 	}
 }
