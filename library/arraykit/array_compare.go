@@ -1,6 +1,6 @@
 package arraykit
 
-// 比较两个数组，得出新增的和删除的，src基于base
+// CompareAddAndDel 比较两个数组，得出新增的和删除的，src基于base
 func CompareAddAndDel(src, base []map[string]any, key string) ([]map[string]any, []map[string]any) {
 	var news []map[string]any
 	var dels []map[string]any

@@ -12,7 +12,7 @@ import (
 
 func init() {
 	initkit.DefFlags(rootCmd)
-	rootCmd.AddCommand(cmd.TCPServerCMD())
+	//rootCmd.AddCommand(cmd.TCPServerCMD())
 	rootCmd.AddCommand(cmd.PGSqlToStructCMD("", ""))
 	//rootCmd.AddCommand(cmd.MarkdownDocCMD("go-core-kit 说明文档"))
 	//rootCmd.AddCommand(cmd.WebStaticServerCMD())
