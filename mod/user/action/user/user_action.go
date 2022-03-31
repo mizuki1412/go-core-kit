@@ -222,7 +222,7 @@ func updateUserInfo(ctx *context.Context) {
 		}
 		user.Pwd.Set(cryptokit.MD5(params.NewPwd.String))
 	}
-	// todo usercenter
+	//todo usercenter
 	dao.Update(u)
 	ctx.JsonSuccess(nil)
 }

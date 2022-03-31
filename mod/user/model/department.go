@@ -7,13 +7,14 @@ import (
 )
 
 type Department struct {
-	Id       int32           `json:"id" db:"id" pk:"true" tablename:"department" autoincrement:"true"`
-	No       class.String    `json:"no,omitempty" db:"no"`
+	Id       int32           `autoincrement:"true" json:"id" db:"id" pk:"true" tablename:"department"`
+	No       class.String    `json:"no,omitempty" db:"no" description:"编号"`
 	Name     class.String    `json:"name,omitempty" db:"name"`
-	Descr    class.String    `json:"descr,omitempty" db:"descr"`
+	Descr    class.String    `json:"descr,omitempty" db:"descr" description:"描述"`
 	Parent   *Department     `json:"parent,omitempty" db:"parent"`
 	Extend   class.MapString `json:"extend,omitempty" db:"extend"`
 	CreateDt class.Time      `json:"createDt,omitempty" db:"createdt"`
+	Off      class.Bool      `json:"off,omitempty" db:"off"`
 	Children []*Department   `json:"children"`
 }
 

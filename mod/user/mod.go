@@ -7,8 +7,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/restkit/router"
 )
 
-/*** 用户、部门、角色模块 */
-
+// All 用户、部门、角色模块
 func All() []func(r *router.Router) {
 	return []func(r *router.Router){user.Init, role.Init, smscode.Init}
 }

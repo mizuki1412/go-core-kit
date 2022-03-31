@@ -5,6 +5,7 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
+	"github.com/mizuki1412/go-core-kit/mod/user/dao/departmentdao"
 	"github.com/mizuki1412/go-core-kit/mod/user/dao/roledao"
 	"github.com/mizuki1412/go-core-kit/mod/user/model"
 	"github.com/mizuki1412/go-core-kit/service/sqlkit"
@@ -33,8 +34,12 @@ func (dao *Dao) cascade(obj *model.User) {
 		if obj.Role != nil {
 			obj.Role = roledao.New(dao.Schema).FindById(obj.Role.Id)
 		}
+		if obj.Department != nil {
+			obj.Department = departmentdao.New(dao.Schema).FindById(obj.Department.Id)
+		}
 	case ResultNone:
 		obj.Role = nil
+		obj.Department = nil
 	}
 }
 func (dao *Dao) scan(sql string, args []any) []*model.User {

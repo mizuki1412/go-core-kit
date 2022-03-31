@@ -12,7 +12,9 @@ type Role struct {
 	Name        class.String    `json:"name,omitempty" db:"name"`
 	Description class.String    `json:"description,omitempty" db:"description"`
 	Privileges  class.ArrString `json:"privileges,omitempty" db:"privileges"`
-	Extend      class.MapString `json:"extend,omitempty" db:"extend"`
+	CreateDt    class.Time      `json:"createDt,omitempty" db:"createdt"`
+	Off         class.Bool      `json:"off,omitempty" db:"off"`
+	Extend      class.MapString `json:"extend,omitempty" db:"extend" description:"immutable:不可删除"`
 }
 
 func (th *Role) Scan(value any) error {

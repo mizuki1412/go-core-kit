@@ -93,7 +93,7 @@ func del(ctx *context.Context) {
 	if us != nil && len(us) > 0 {
 		panic(exception.New("角色下还有用户,不能删除"))
 	}
-	dao.Delete(role)
+	dao.DeleteOff(role)
 	ctx.JsonSuccess(nil)
 }
 

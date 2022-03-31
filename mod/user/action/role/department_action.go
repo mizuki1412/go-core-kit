@@ -97,7 +97,7 @@ func departmentDel(ctx *context.Context) {
 	if val, ok := department.Extend.Map["immutable"]; ok && val.(bool) {
 		panic(exception.New("该部门不可删除"))
 	}
-	dao.Delete(department)
+	dao.DeleteOff(department)
 	ctx.JsonSuccess(nil)
 }
 
