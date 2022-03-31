@@ -1,16 +1,12 @@
 BINARY=go-core-kit
-VERSION=1.3.5
+VERSION=1.3.6
 DATE=`date +%FT%T%z`
-.PHONY: init build
+.PHONY: build publish upgrade
 
 default:
 	@echo ${BINARY}
 	@echo ${VERSION}
 	@echo ${DATE}
-
-init:
-	@go generate
-	@echo "[ok] generate"
 
 upgrade:
 	@go-mod-upgrade
