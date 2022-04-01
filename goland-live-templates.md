@@ -242,6 +242,57 @@ func (dao *Dao) scanOne(sql string, args []any) *$bean$ {
 ////
 ```
 
+## dao_new
+```
+type Dao struct {
+	sqlkit.Dao[$name$]
+}
+
+const (
+	ResultDefault byte = iota
+	ResultNone
+)
+
+func New(tx ...*sqlx.Tx) *Dao {
+	dao := &Dao{}
+	if len(tx) > 0 {
+		dao.TX = tx[0]
+	}
+	dao.Cascade = func(obj *$name$) {
+		switch dao.ResultType {
+		case ResultDefault:
+		case ResultNone:
+		}
+	}
+	return dao
+}
+func NewWithSchema(schema string,tx ...*sqlx.Tx) *Dao {
+	dao := New(tx...)
+	dao.SetSchema(schema)
+	return dao
+}
+```
+
+## dao_new_no_cascade
+```
+type Dao struct {
+	sqlkit.Dao[$name$]
+}
+
+func New(tx ...*sqlx.Tx) *Dao {
+	dao := &Dao{}
+	if len(tx) > 0 {
+		dao.TX = tx[0]
+	}
+	return dao
+}
+func NewWithSchema(schema string,tx ...*sqlx.Tx) *Dao {
+	dao := New(tx...)
+	dao.SetSchema(schema)
+	return dao
+}
+```
+
 ## dao_demo
 ```
 func (dao *Dao) FindById(id int32) *$bean$ {

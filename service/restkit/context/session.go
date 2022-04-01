@@ -10,6 +10,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/mod/user/model"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
+	"github.com/mizuki1412/go-core-kit/service/sqlkit"
 	"github.com/mizuki1412/sessions"
 	"github.com/mizuki1412/sessions/cookie"
 	redistore "github.com/mizuki1412/sessions/redis"
@@ -103,7 +104,7 @@ func (ctx *Context) SessionGetSchema() string {
 	session := sessions.Default(ctx.Proxy)
 	r := cast.ToString(session.Get("schema"))
 	if r == "" {
-		r = "public"
+		r = sqlkit.SchemaDefault
 	}
 	return r
 }

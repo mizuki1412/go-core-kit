@@ -29,7 +29,7 @@ func loginByUsername(ctx *context.Context) {
 	}
 	params.Username = strings.TrimSpace(params.Username)
 	params.Pwd = cryptokit.MD5(params.Pwd)
-	user := userdao.New(params.Schema).Login(params.Pwd, params.Username, "")
+	user := userdao.NewWithSchema(params.Schema).Login(params.Pwd, params.Username, "")
 	if user == nil {
 		panic(exception.New("用户名或密码错误"))
 	}
@@ -72,7 +72,7 @@ func login(ctx *context.Context) {
 	params.Username = strings.TrimSpace(params.Username)
 	params.Phone = strings.TrimSpace(params.Phone)
 	params.Pwd = cryptokit.MD5(params.Pwd)
-	user := userdao.New(params.Schema).Login(params.Pwd, params.Username, params.Phone)
+	user := userdao.NewWithSchema(params.Schema).Login(params.Pwd, params.Username, params.Phone)
 	if user == nil {
 		panic(exception.New("账号和密码不匹配"))
 	}
@@ -114,7 +114,7 @@ func info(ctx *context.Context) {
 		// 获取自己的
 		// todo 先走数据库
 		user := ctx.SessionGetUser()
-		user = userdao.New(ctx.SessionGetSchema()).FindById(user.Id)
+		user = userdao.NewWithSchema(ctx.SessionGetSchema()).FindById(user.Id)
 		// todo user不存在时
 		if AdditionUserExFunc != nil {
 			AdditionUserExFunc(ctx, user)
@@ -124,7 +124,7 @@ func info(ctx *context.Context) {
 			"token": ctx.SessionGetToken(),
 		})
 	} else {
-		user := userdao.New(ctx.SessionGetSchema()).FindById(params.Id.Int32)
+		user := userdao.NewWithSchema(ctx.SessionGetSchema()).FindById(params.Id.Int32)
 		// todo user不存在时
 		if AdditionUserExFunc != nil {
 			AdditionUserExFunc(ctx, user)
@@ -148,7 +148,7 @@ func updatePwd(ctx *context.Context) {
 	params := updatePwdParam{}
 	ctx.BindForm(&params)
 	u := ctx.SessionGetUser()
-	usermapper := userdao.New(ctx.SessionGetSchema())
+	usermapper := userdao.NewWithSchema(ctx.SessionGetSchema())
 	user := usermapper.FindById(u.Id)
 	if user == nil {
 		panic(exception.New("用户不存在"))
@@ -180,7 +180,7 @@ func updateUserInfo(ctx *context.Context) {
 	u := ctx.SessionGetUser()
 	params := updateUserInfoParam{}
 	ctx.BindForm(&params)
-	dao := userdao.New(ctx.SessionGetSchema())
+	dao := userdao.NewWithSchema(ctx.SessionGetSchema())
 	dao.SetResultType(userdao.ResultNone)
 	if params.Phone.Valid && params.Phone.String != "" && params.Phone.String != u.Phone.String {
 		if dao.FindByPhone(params.Phone.String) != nil {

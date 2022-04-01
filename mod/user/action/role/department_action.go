@@ -22,7 +22,7 @@ func departmentCreate(ctx *context.Context) {
 	params := departmentCreateParams{}
 	ctx.BindForm(&params)
 	department := &model.Department{}
-	dao := departmentdao.New(ctx.SessionGetSchema())
+	dao := departmentdao.NewWithSchema(ctx.SessionGetSchema())
 	dao.SetResultType(departmentdao.ResultNone)
 	if params.ParentId.Valid {
 		parent := dao.FindById(params.ParentId.Int32)
@@ -54,7 +54,7 @@ type departmentUpdateParams struct {
 func departmentUpdate(ctx *context.Context) {
 	params := departmentUpdateParams{}
 	ctx.BindForm(&params)
-	dao := departmentdao.New(ctx.SessionGetSchema())
+	dao := departmentdao.NewWithSchema(ctx.SessionGetSchema())
 	department := dao.FindById(params.Id)
 	dao.SetResultType(departmentdao.ResultNone)
 	if department == nil {
@@ -82,13 +82,13 @@ func departmentUpdate(ctx *context.Context) {
 func departmentDel(ctx *context.Context) {
 	params := delParams{}
 	ctx.BindForm(&params)
-	dao := departmentdao.New(ctx.SessionGetSchema())
+	dao := departmentdao.NewWithSchema(ctx.SessionGetSchema())
 	dao.SetResultType(departmentdao.ResultNone)
 	department := dao.FindById(params.Id)
 	if department == nil {
 		panic(exception.New("部门不存在"))
 	}
-	roleDao := roledao.New(ctx.SessionGetSchema())
+	roleDao := roledao.NewWithSchema(ctx.SessionGetSchema())
 	roleDao.SetResultType(userdao.ResultNone)
 	rs := roleDao.ListByDepartment(params.Id)
 	if rs != nil && len(rs) > 0 {
@@ -102,7 +102,7 @@ func departmentDel(ctx *context.Context) {
 }
 
 func listDepartment(ctx *context.Context) {
-	dao := departmentdao.New(ctx.SessionGetSchema())
+	dao := departmentdao.NewWithSchema(ctx.SessionGetSchema())
 	dao.SetResultType(departmentdao.ResultAll)
 	ctx.JsonSuccess(dao.ListAll())
 }

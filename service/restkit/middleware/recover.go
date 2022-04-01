@@ -24,7 +24,7 @@ func Recover() router.Handler {
 				}
 				// transaction
 				if ctx.DBTxExist() {
-					ctx.DBTx().Rollback()
+					_ = ctx.DBTx().Rollback()
 				}
 				if ctx.Proxy.IsAborted() {
 					return
@@ -36,7 +36,7 @@ func Recover() router.Handler {
 		ctx.Proxy.Next()
 		// transaction
 		if ctx.DBTxExist() {
-			ctx.DBTx().Commit()
+			_ = ctx.DBTx().Commit()
 		}
 	}
 }

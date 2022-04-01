@@ -16,7 +16,7 @@ func GroupNum(sum int, group int) int {
 	}
 }
 
-// 保留小数
+// FloatRound 保留小数
 func FloatRound(val float64, num int32) float64 {
 	if math.IsNaN(val) {
 		return 0

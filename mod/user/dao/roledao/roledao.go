@@ -2,6 +2,7 @@ package roledao
 
 import (
 	"fmt"
+	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/mod/user/dao/departmentdao"
 	"github.com/mizuki1412/go-core-kit/mod/user/model"
@@ -9,9 +10,8 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/sqlkit/pghelper"
 )
 
-/// auto template
 type Dao struct {
-	sqlkit.Dao
+	sqlkit.Dao[model.Role]
 }
 
 const (
@@ -19,20 +19,27 @@ const (
 	ResultNone
 )
 
-func New(schema string, tx ...*sqlkit.Dao) *Dao {
+func New(tx ...*sqlx.Tx) *Dao {
 	dao := &Dao{}
-	dao.NewHelper(schema, tx...)
+	if len(tx) > 0 {
+		dao.TX = tx[0]
+	}
+	dao.Cascade = func(obj *model.Role) {
+		switch dao.ResultType {
+		case ResultDefault:
+			if obj.Department != nil {
+				obj.Department = departmentdao.NewWithSchema(dao.Schema).FindById(obj.Department.Id)
+			}
+		case ResultNone:
+			obj.Department = nil
+		}
+	}
 	return dao
 }
-func (dao *Dao) cascade(obj *model.Role) {
-	switch dao.ResultType {
-	case ResultDefault:
-		if obj.Department != nil {
-			obj.Department = departmentdao.New(dao.Schema).FindById(obj.Department.Id)
-		}
-	case ResultNone:
-		obj.Department = nil
-	}
+func NewWithSchema(schema string, tx ...*sqlx.Tx) *Dao {
+	dao := New(tx...)
+	dao.SetSchema(schema)
+	return dao
 }
 func (dao *Dao) scanPrivilege(sql string, args []any) []*model.PrivilegeConstant {
 	rows := dao.Query(sql, args...)
@@ -48,52 +55,19 @@ func (dao *Dao) scanPrivilege(sql string, args []any) []*model.PrivilegeConstant
 	}
 	return list
 }
-func (dao *Dao) scan(sql string, args []any) []*model.Role {
-	rows := dao.Query(sql, args...)
-	list := make([]*model.Role, 0, 5)
-	defer rows.Close()
-	for rows.Next() {
-		m := &model.Role{}
-		err := rows.StructScan(m)
-		if err != nil {
-			panic(exception.New(err.Error()))
-		}
-		list = append(list, m)
-	}
-	for i := range list {
-		dao.cascade(list[i])
-	}
-	return list
-}
-func (dao *Dao) scanOne(sql string, args []any) *model.Role {
-	rows := dao.Query(sql, args...)
-	defer rows.Close()
-	for rows.Next() {
-		m := model.Role{}
-		err := rows.StructScan(&m)
-		if err != nil {
-			panic(exception.New(err.Error()))
-		}
-		dao.cascade(&m)
-		return &m
-	}
-	return nil
-}
-
-////
 
 func (dao *Dao) FindById(id int32) *model.Role {
 	sql, args := sqlkit.Builder().Select("*").From(dao.GetTableD("role")).Where("id=?", id).MustSql()
-	return dao.scanOne(sql, args)
+	return dao.ScanOne(sql, args)
 }
 func (dao *Dao) FindByName(name string) *model.Role {
 	sql, args := sqlkit.Builder().Select("*").From(dao.GetTableD("role")).Where("name=?", name).Limit(1).MustSql()
-	return dao.scanOne(sql, args)
+	return dao.ScanOne(sql, args)
 }
 func (dao *Dao) ListFromRootDepart(id int32) []*model.Role {
 	where := fmt.Sprintf(`id>0 and department in ( with recursive t(id) as( values(%d) union all select d.id from %s d, t where t.id=d.parent) select id from t )`, id, dao.GetTable(&model.Department{}))
 	sql, args := sqlkit.Builder().Select("*").From(dao.GetTableD("role")).Where(where).OrderBy("id").MustSql()
-	return dao.scan(sql, args)
+	return dao.ScanList(sql, args)
 }
 
 type ListParam struct {
@@ -106,14 +80,14 @@ func (dao *Dao) List(param ListParam) []*model.Role {
 		builder = pghelper.WhereUnnestInt(builder, "department in ", param.Departments)
 	}
 	sql, args := builder.MustSql()
-	return dao.scan(sql, args)
+	return dao.ScanList(sql, args)
 }
 func (dao *Dao) ListByDepartment(did int32) []*model.Role {
 	sql, args := sqlkit.Builder().Select("*").From(dao.GetTableD("role")).Where("id>0 and department=?", did).OrderBy("id").MustSql()
-	return dao.scan(sql, args)
+	return dao.ScanList(sql, args)
 }
 
-// privilege
+// ListPrivileges privilege
 func (dao *Dao) ListPrivileges() []*model.PrivilegeConstant {
 	sql, args := sqlkit.Builder().Select("*").From(dao.GetTableD("privilege_constant")).Where("type<>'dev'").OrderBy("sort").MustSql()
 	return dao.scanPrivilege(sql, args)

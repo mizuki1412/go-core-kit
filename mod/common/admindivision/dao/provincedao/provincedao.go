@@ -1,6 +1,7 @@
 package provincedao
 
 import (
+	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/mod/common/admindivision/dao/citydao"
@@ -8,9 +9,8 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/sqlkit"
 )
 
-/// auto template
 type Dao struct {
-	sqlkit.Dao
+	sqlkit.Dao[model.Province]
 }
 
 const (
@@ -18,54 +18,28 @@ const (
 	ResultNone
 )
 
-func New(schema string, tx ...*sqlkit.Dao) *Dao {
+func New(tx ...*sqlx.Tx) *Dao {
 	dao := &Dao{}
-	dao.NewHelper(schema, tx...)
+	if len(tx) > 0 {
+		dao.TX = tx[0]
+	}
+	dao.Cascade = func(obj *model.Province) {
+		switch dao.ResultType {
+		case ResultDefault:
+			obj.Cities = citydao.NewWithSchema(dao.Schema).ListByProvince(obj.Code)
+		}
+	}
 	return dao
 }
-func (dao *Dao) cascade(obj *model.Province) {
-	switch dao.ResultType {
-	case ResultDefault:
-		obj.Cities = citydao.New(dao.Schema).ListByProvince(obj.Code)
-	}
+func NewWithSchema(schema string, tx ...*sqlx.Tx) *Dao {
+	dao := New(tx...)
+	dao.SetSchema(schema)
+	return dao
 }
-func (dao *Dao) scan(sql string, args []any) []*model.Province {
-	rows := dao.Query(sql, args...)
-	list := make([]*model.Province, 0, 5)
-	defer rows.Close()
-	for rows.Next() {
-		m := &model.Province{}
-		err := rows.StructScan(m)
-		if err != nil {
-			panic(exception.New(err.Error()))
-		}
-		list = append(list, m)
-	}
-	for i := range list {
-		dao.cascade(list[i])
-	}
-	return list
-}
-func (dao *Dao) scanOne(sql string, args []any) *model.Province {
-	rows := dao.Query(sql, args...)
-	defer rows.Close()
-	for rows.Next() {
-		m := model.Province{}
-		err := rows.StructScan(&m)
-		if err != nil {
-			panic(exception.New(err.Error()))
-		}
-		dao.cascade(&m)
-		return &m
-	}
-	return nil
-}
-
-////
 
 func (dao *Dao) FindById(id class.String) *model.Province {
 	sql, args := sqlkit.Builder().Select("*").From(dao.GetTableD("province")).Where("code=?", id).MustSql()
-	return dao.scanOne(sql, args)
+	return dao.ScanOne(sql, args)
 }
 
 func (dao *Dao) FindCodeByName(name string) string {
@@ -84,5 +58,5 @@ func (dao *Dao) FindCodeByName(name string) string {
 
 func (dao *Dao) ListAll() []*model.Province {
 	sql, args := sqlkit.Builder().Select("*").From(dao.GetTableD("province")).OrderBy("code").MustSql()
-	return dao.scan(sql, args)
+	return dao.ScanList(sql, args)
 }

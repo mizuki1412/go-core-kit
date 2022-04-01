@@ -6,7 +6,6 @@ import (
 	"github.com/mizuki1412/go-core-kit/mod/common/admindivision/dao/provincedao"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
 	"github.com/mizuki1412/go-core-kit/service/restkit/router"
-	"github.com/mizuki1412/go-core-kit/service/sqlkit"
 )
 
 func Init(router *router.Router) {
@@ -21,7 +20,7 @@ func Init(router *router.Router) {
 }
 
 func ListAllProvinceCity(ctx *context.Context) {
-	ctx.JsonSuccess(provincedao.New(sqlkit.SchemaDefault).ListAll())
+	ctx.JsonSuccess(provincedao.New().ListAll())
 }
 
 type listAreaParam struct {
@@ -31,5 +30,5 @@ type listAreaParam struct {
 func listArea(ctx *context.Context) {
 	params := listAreaParam{}
 	ctx.BindForm(&params)
-	ctx.JsonSuccess(areadao.New(sqlkit.SchemaDefault).ListByCity(class.String{String: params.CityCode, Valid: true}))
+	ctx.JsonSuccess(areadao.New().ListByCity(class.String{String: params.CityCode, Valid: true}))
 }

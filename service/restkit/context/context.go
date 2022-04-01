@@ -3,6 +3,7 @@ package context
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
@@ -33,13 +34,12 @@ func (ctx *Context) Get(key string) any {
 	return r
 }
 
-func (ctx *Context) DBTx() *sqlkit.Dao {
-	var dao *sqlkit.Dao
+func (ctx *Context) DBTx() *sqlx.Tx {
+	var dao *sqlx.Tx
 	if ctx.Get("dbtx") == nil {
-		dao = sqlkit.NewTX(ctx.SessionGetSchema())
-		ctx.Set("dbtx", dao)
+		ctx.Set("dbtx", sqlkit.StartTx())
 	} else {
-		dao = ctx.Get("dbtx").(*sqlkit.Dao)
+		dao = ctx.Get("dbtx").(*sqlx.Tx)
 	}
 	return dao
 }
