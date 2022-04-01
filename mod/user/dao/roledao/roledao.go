@@ -20,7 +20,11 @@ const (
 )
 
 func New(tx ...*sqlx.Tx) *Dao {
+	return NewWithSchema("", tx...)
+}
+func NewWithSchema(schema string, tx ...*sqlx.Tx) *Dao {
 	dao := &Dao{}
+	dao.SetSchema(schema)
 	if len(tx) > 0 {
 		dao.TX = tx[0]
 	}
@@ -34,11 +38,6 @@ func New(tx ...*sqlx.Tx) *Dao {
 			obj.Department = nil
 		}
 	}
-	return dao
-}
-func NewWithSchema(schema string, tx ...*sqlx.Tx) *Dao {
-	dao := New(tx...)
-	dao.SetSchema(schema)
 	return dao
 }
 func (dao *Dao) scanPrivilege(sql string, args []any) []*model.PrivilegeConstant {
