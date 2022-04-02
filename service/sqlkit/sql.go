@@ -398,8 +398,10 @@ func (dao *Dao[T]) ScanList(sql string, args []any) []*T {
 		}
 		list = append(list, m)
 	}
-	for i := range list {
-		dao.Cascade(list[i])
+	if dao.Cascade != nil {
+		for i := range list {
+			dao.Cascade(list[i])
+		}
 	}
 	return list
 }
@@ -413,7 +415,9 @@ func (dao *Dao[T]) ScanOne(sql string, args []any) *T {
 		if err != nil {
 			panic(exception.New(err.Error()))
 		}
-		dao.Cascade(m)
+		if dao.Cascade != nil {
+			dao.Cascade(m)
+		}
 		return m
 	}
 	return nil
