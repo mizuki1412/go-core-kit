@@ -15,7 +15,7 @@ func ParseString(dtString string, layout string) (time.Time, error) {
 func Parse(dt string) (time.Time, error) {
 	var s time.Time
 	// 日期时间格式 + 毫秒形式
-	if ok, _ := regexp.Match("^[\\d]{13}$", []byte(dt)); ok {
+	if ok, _ := regexp.Match("^[\\d]+$", []byte(dt)); ok {
 		s0, err := cast.ToInt64E(dt)
 		if err != nil {
 			return s, err

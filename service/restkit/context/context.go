@@ -15,7 +15,6 @@ import (
 	"net/http"
 	"reflect"
 	"strings"
-	"time"
 )
 
 type Context struct {
@@ -232,18 +231,10 @@ func (ctx *Context) bindStruct(bean any) {
 		case "class.Time":
 			if !stringkit.IsNull(val) {
 				temp := class.Time{}
-				if len(val) == 13 && strings.Index(val, "-") < 0 {
-					s, err := cast.ToInt64E(val)
-					if err == nil {
-						//panic(exception.New("time cast error"))
-						temp.Set(time.UnixMilli(s))
-					}
-				} else {
-					s, err := timekit.Parse(val)
-					if err == nil {
-						//panic(exception.New("time cast error"))
-						temp.Set(s)
-					}
+				s, err := timekit.Parse(val)
+				if err == nil {
+					//panic(exception.New("time cast error"))
+					temp.Set(s)
 				}
 				fieldV.Set(reflect.ValueOf(temp))
 			}
