@@ -37,7 +37,14 @@ func (th *Float64) Scan(value any) error {
 		return nil
 	}
 	th.Valid = true
-	th.Float64 = cast.ToFloat64(value)
+	switch value.(type) {
+	case []uint8:
+		// 数据库中decimal的值是字符数组返回
+		a := value.([]uint8)
+		th.Float64 = cast.ToFloat64(string(a))
+	default:
+		th.Float64 = cast.ToFloat64(value)
+	}
 	return nil
 }
 
