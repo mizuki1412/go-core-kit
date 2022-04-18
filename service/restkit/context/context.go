@@ -53,29 +53,7 @@ func (ctx *Context) BindForm(bean any) {
 	switch bean.(type) {
 	case map[string]any:
 		// query会和form合并 post时 todo
-		//allForm := ctx.Proxy.FormValues()
-		//for k, v := range allForm {
-		//	if len(v) == 1 {
-		//		(bean.(map[string]any))[k] = v[0]
-		//	} else if len(v) > 1 {
-		//		(bean.(map[string]any))[k] = v
-		//	}
-		//}
-		//if len(allForm) == 0 {
-		//	// GET
-		//	for i := 0; ; i++ {
-		//		e := ctx.Proxy.Params().GetEntryAt(i)
-		//		if e.Key == "" {
-		//			break
-		//		}
-		//		(bean.(map[string]any))[e.Key] = e.ValueRaw
-		//	}
-		//}
 	default:
-		//err := ctx.Proxy.ReadForm(bean)
-		//if err != nil {
-		//	panic(exception.New("form解析错误"))
-		//}
 		ctx.bindStruct(bean)
 		// validator
 		err := Validator.Struct(bean)
@@ -87,6 +65,10 @@ func (ctx *Context) BindForm(bean any) {
 				panic(exception.New("validation failed: " + stringkit.LowerFirst(err0.Field()) + ", need " + err0.Tag()))
 			}
 		}
+		logkit.Info("request-body", logkit.Param{
+			Key: "session",
+			Val: ctx.SessionID(),
+		}, logkit.Param{Key: "body", Val: jsonkit.ToString(bean)})
 	}
 }
 

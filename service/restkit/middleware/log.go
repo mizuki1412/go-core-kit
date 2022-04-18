@@ -12,9 +12,6 @@ func Log() router.Handler {
 		t := time.Now()
 		// 当前上传的cookies中的session，不一定等于response中的
 		sessionId := ctx.SessionID()
-		// todo params
-		//params := make(map[any]any)
-		//_ = c.Copy().ShouldBind(&params)
 		logkit.Info("request",
 			logkit.Param{
 				Key: "session",

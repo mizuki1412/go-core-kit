@@ -132,7 +132,6 @@ func EmbedHtmlHandle(fs embed.FS, root string) func(c *context.Context) {
 		if pathName == "" || pathName == "/" {
 			pathName = "index.html"
 		}
-		println(pathName)
 		assetPath = path.Join(root, pathName)
 		assets, err := fs.Open(assetPath)
 		if err != nil {
