@@ -5,7 +5,8 @@ import (
 	"github.com/mizuki1412/go-core-kit/cmd"
 	"github.com/mizuki1412/go-core-kit/init/initkit"
 	"github.com/mizuki1412/go-core-kit/library/bytekit"
-	"github.com/mizuki1412/go-core-kit/library/timekit"
+	"github.com/mizuki1412/go-core-kit/mod/user/model"
+	"github.com/mizuki1412/go-core-kit/service/sqlkit"
 	"github.com/spf13/cobra"
 	"log"
 	"net"
@@ -24,7 +25,7 @@ var rootCmd = &cobra.Command{
 	Use: "go-core-kit",
 	Run: func(cmd *cobra.Command, args []string) {
 		initkit.BindFlags(cmd)
-		log.Println(timekit.ParseD("2022-01-01"))
+		log.Println(sqlkit.InitModelMeta(&model.User{}).GetColumns("id", "role"))
 	},
 }
 

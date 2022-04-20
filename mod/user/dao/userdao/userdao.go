@@ -18,6 +18,8 @@ type Dao struct {
 	sqlkit.Dao[model.User]
 }
 
+var meta = sqlkit.InitModelMeta(&model.User{})
+
 const (
 	ResultDefault byte = iota
 	ResultNone
@@ -50,7 +52,7 @@ func NewWithSchema(schema string, tx ...*sqlx.Tx) *Dao {
 }
 
 func (dao *Dao) Login(pwd, username, phone string) *model.User {
-	builder := sqlkit.Builder().Select("*").From(dao.GetTableD("admin_user"))
+	builder := sqlkit.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema))
 	if !stringkit.IsNull(username) {
 		builder = builder.Where("username=?", username)
 	} else {
@@ -60,16 +62,16 @@ func (dao *Dao) Login(pwd, username, phone string) *model.User {
 	return dao.ScanOne(sql, args)
 }
 func (dao *Dao) FindById(id int32) *model.User {
-	sql, args := sqlkit.Builder().Select("*").From(dao.GetTableD("admin_user")).Where("id=?", id).MustSql()
+	sql, args := sqlkit.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("id=?", id).MustSql()
 	return dao.ScanOne(sql, args)
 }
 func (dao *Dao) FindByPhone(phone string) *model.User {
-	sql, args := sqlkit.Builder().Select("*").From(dao.GetTableD("admin_user")).Where("phone=?", phone).Where("off>=0").MustSql()
+	sql, args := sqlkit.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("phone=?", phone).Where("off>=0").MustSql()
 	return dao.ScanOne(sql, args)
 }
 
 func (dao *Dao) FindByUsername(username string) *model.User {
-	sql, args := sqlkit.Builder().Select("*").From(dao.GetTableD("admin_user")).Where("username=?", username).Where("off>=0").MustSql()
+	sql, args := sqlkit.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("username=?", username).Where("off>=0").MustSql()
 	return dao.ScanOne(sql, args)
 }
 
@@ -79,7 +81,7 @@ type FindParam struct {
 }
 
 func (dao *Dao) Find(param FindParam) *model.User {
-	builder := sqlkit.Builder().Select("*").From(dao.GetTableD("admin_user")).Where("off>=0").Limit(1)
+	builder := sqlkit.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("off>=0").Limit(1)
 	for k, v := range param.Extend {
 		builder = builder.Where(fmt.Sprintf("extend->>'%s'=?", k), cast.ToString(v))
 	}
@@ -93,7 +95,7 @@ off>-1 and role>0 and role in
   ( select id from %s where department in 
      (with recursive t(id) as( values(%d) union all select d.id from %s d, t where t.id=d.parent) select id from t )
   )`, dao.GetTable(&model.Role{}), departId, dao.GetTable(&model.Department{}))
-	sql, args := sqlkit.Builder().Select("*").From(dao.GetTableD("admin_user")).Where(where).OrderBy("name, id").MustSql()
+	sql, args := sqlkit.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where(where).OrderBy("name, id").MustSql()
 	return dao.ScanList(sql, args)
 }
 
@@ -105,7 +107,7 @@ type ListParam struct {
 }
 
 func (dao *Dao) List(param ListParam) []*model.User {
-	builder := sqlkit.Builder().Select("*").From(dao.GetTableD("admin_user")).Where("off>-1").OrderBy("name, id")
+	builder := sqlkit.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("off>-1").OrderBy("name, id")
 	if param.RoleId != 0 {
 		builder = builder.Where("role=?", param.RoleId)
 	}
@@ -125,14 +127,14 @@ func (dao *Dao) List(param ListParam) []*model.User {
 }
 
 func (dao *Dao) OffUser(uid int32, off int32) {
-	sql, args, err := sqlkit.Builder().Update(dao.GetTableD("admin_user")).Set("off", off).Where("id=?", uid).ToSql()
+	sql, args, err := sqlkit.Builder().Update(meta.GetTableName(dao.Schema)).Set("off", off).Where("id=?", uid).ToSql()
 	if err != nil {
 		panic(exception.New(err.Error()))
 	}
 	dao.Exec(sql, args...)
 }
 func (dao *Dao) SetNull(id int32) {
-	sql, args, err := sqlkit.Builder().Update(dao.GetTableD("admin_user")).Set("phone", squirrel.Expr("null")).Where("id=?", id).ToSql()
+	sql, args, err := sqlkit.Builder().Update(meta.GetTableName(dao.Schema)).Set("phone", squirrel.Expr("null")).Where("id=?", id).ToSql()
 	if err != nil {
 		panic(exception.New(err.Error()))
 	}

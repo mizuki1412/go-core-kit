@@ -143,110 +143,12 @@ func (l $name$List) MapReduce(fun func(ele *$name$) any) []any {
 }
 ```
 
-## dao
-```
-/// auto template
-type Dao struct {
-	sqlkit.Dao
-}
-const (
-	ResultDefault byte = iota
-	ResultNone
-)
-func New(schema string, tx ...*sqlkit.Dao) *Dao{
-	dao:=&Dao{}
-	dao.NewHelper(schema,tx...)
-	return dao
-}
-func (dao *Dao) cascade(obj *$bean$) {
-	switch dao.ResultType {
-	case ResultDefault:
-		// todo 注意校验nil
-		// todo 如果没有级联，此函数删除
-    case ResultNone:
-		// todo 将外联的置为nil
-	}
-}
-func (dao *Dao) scan(sql string, args []any) []*$bean$ {
-	rows := dao.Query(sql, args...)
-	list := make([]*$bean$,0,5)
-	defer rows.Close()
-	for rows.Next() {
-		m := &$bean${}
-		err := rows.StructScan(m)
-		if err != nil {
-			panic(exception.New(err.Error()))
-		}
-		list = append(list, m)
-	}
-	for i := range list{
-		dao.cascade(list[i])
-	}
-	return list
-}
-func (dao *Dao) scanOne(sql string, args []any) *$bean$ {
-	rows := dao.Query(sql, args...)
-	defer rows.Close()
-	for rows.Next() {
-		m := $bean${}
-		err := rows.StructScan(&m)
-		if err != nil {
-			panic(exception.New(err.Error()))
-		}
-		dao.cascade(&m)
-		return &m
-	}
-	return nil
-}
-////
-```
-
-## dao_no_cascade
-```
-/// auto template
-type Dao struct {
-	sqlkit.Dao
-}
-func New(schema string, tx ...*sqlkit.Dao) *Dao{
-	dao:=&Dao{}
-	dao.NewHelper(schema,tx...)
-	return dao
-}
-func (dao *Dao) scan(sql string, args []any) []*$bean$ {
-	rows := dao.Query(sql, args...)
-	list := make([]*$bean$,0,5)
-	defer rows.Close()
-	for rows.Next() {
-		m := &$bean${}
-		err := rows.StructScan(m)
-		if err != nil {
-			panic(exception.New(err.Error()))
-		}
-		list = append(list, m)
-	}
-	return list
-}
-func (dao *Dao) scanOne(sql string, args []any) *$bean$ {
-	rows := dao.Query(sql, args...)
-	defer rows.Close()
-	for rows.Next() {
-		m := $bean${}
-		err := rows.StructScan(&m)
-		if err != nil {
-			panic(exception.New(err.Error()))
-		}
-		return &m
-	}
-	return nil
-}
-////
-```
-
 ## dao_new
 ```
 type Dao struct {
 	sqlkit.Dao[$name$]
 }
+var meta = sqlkit.InitModelMeta(&$name${})
 
 const (
 	ResultDefault byte = iota
@@ -278,6 +180,8 @@ type Dao struct {
 	sqlkit.Dao[$name$]
 }
 
+var meta = sqlkit.InitModelMeta(&$name${})
+
 func New(tx ...*sqlx.Tx) *Dao {
 	return NewWithSchema("", tx...)
 }
@@ -294,7 +198,7 @@ func NewWithSchema(schema string,tx ...*sqlx.Tx) *Dao {
 ## dao_demo
 ```
 func (dao *Dao) FindById(id int32) *$bean$ {
-	sql, args := sqlkit.Builder().Select("*").From(dao.GetTableD("$name$")).Where("id=?",id).MustSql()
+	sql, args := sqlkit.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("id=?",id).MustSql()
 	return dao.ScanOne(sql, args)
 }
 
@@ -303,7 +207,7 @@ type ListParam struct {
 }
 
 func (dao *Dao) List(param ListParam) []*$bean$ {
-	builder := sqlkit.Builder().Select("*").From(dao.GetTableD("$name$")).Where("off=false").OrderBy("id")
+	builder := sqlkit.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("off=false").OrderBy("id")
 	sql, args := builder.MustSql()
 	return dao.ScanList(sql, args)
 }

@@ -45,7 +45,7 @@ func url(action, dbName string) string {
 		if params != "" {
 			params += "&"
 		}
-		params += "u=" + configkit.GetStringD(configkey.InfluxUser) + "&p=" + configkit.GetStringD(ConfigKeyInfluxPwd)
+		params += "u=" + configkit.GetStringD(configkey.InfluxUser) + "&p=" + configkit.GetStringD(configkey.InfluxPwd)
 	}
 	if params == "" {
 		return configkit.GetStringD(configkey.InfluxURL) + "/" + action

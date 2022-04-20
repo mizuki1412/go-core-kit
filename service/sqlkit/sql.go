@@ -92,36 +92,7 @@ func getTable(rt reflect.Type, schema string) string {
 	if tname == "" {
 		panic(exception.New("tablename未设置", 2))
 	}
-	var schema0 string
-	if schema != "" {
-		schema0 = schema
-	} else if driver == "postgres" {
-		schema0 = SchemaDefault
-	} else {
-		schema0 = ""
-	}
-	if schema0 == "" {
-		return tname
-	} else {
-		return schema0 + "." + tname
-	}
-}
-
-// GetTableD 直接获取schema+tableName
-func (dao *Dao[T]) GetTableD(tName string) string {
-	var schema0 string
-	if dao.Schema != "" {
-		schema0 = dao.Schema
-	} else if driver == "postgres" {
-		schema0 = SchemaDefault
-	} else {
-		schema0 = ""
-	}
-	if schema0 == "" {
-		return tName
-	} else {
-		return schema0 + "." + tName
-	}
+	return GetSchemaTable(schema, tname)
 }
 
 // Commit transaction
@@ -235,7 +206,7 @@ func (dao *Dao[T]) QueryMap(sql string, args []any, err error) []map[string]any 
 //	}
 //}
 
-/// dest should be elem
+// Insert dest should be elem
 func (dao *Dao[T]) Insert(dest any) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
@@ -293,7 +264,7 @@ func (dao *Dao[T]) Insert(dest any) {
 	}
 }
 
-/// dest should be elem
+// Update dest should be elem
 func (dao *Dao[T]) Update(dest any) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
@@ -332,7 +303,7 @@ func (dao *Dao[T]) Update(dest any) {
 	dao.Exec(sql, args...)
 }
 
-/// dest should be elem
+// Delete dest should be elem
 func (dao *Dao[T]) Delete(dest any) {
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
