@@ -41,6 +41,13 @@ func InitModelMeta(obj any) *ModelMeta {
 }
 
 func (th ModelMeta) GetColumns(excludes ...string) string {
+	return th.GetColumnsWithPrefix("", excludes...)
+}
+
+func (th ModelMeta) GetColumnsWithPrefix(prefix string, excludes ...string) string {
+	if prefix != "" {
+		prefix += "."
+	}
 	var arr = th.Fields
 	if len(excludes) > 0 {
 		arr = make([]string, 0, len(th.Fields))
@@ -48,8 +55,13 @@ func (th ModelMeta) GetColumns(excludes ...string) string {
 		ex += ";"
 		for _, e := range th.Fields {
 			if !strings.Contains(ex, e+";") {
-				arr = append(arr, e)
+				arr = append(arr, prefix+e)
 			}
+		}
+	} else if prefix != "" {
+		arr = make([]string, 0, len(th.Fields))
+		for _, e := range th.Fields {
+			arr = append(arr, prefix+e)
 		}
 	}
 	if len(arr) == 0 {
@@ -58,10 +70,16 @@ func (th ModelMeta) GetColumns(excludes ...string) string {
 	return strings.Join(arr, ",")
 }
 
-func (th ModelMeta) GetTableName(schema string) string {
-	return GetSchemaTable(schema, th.TableName)
+// GetTableName alias 可以包括table别名
+func (th ModelMeta) GetTableName(schema string, alias ...string) string {
+	if len(alias) > 0 {
+		return GetSchemaTable(schema, th.TableName) + " " + alias[0]
+	} else {
+		return GetSchemaTable(schema, th.TableName)
+	}
 }
 
+// GetSchemaTable name可能是表名，带join信息
 func GetSchemaTable(schema string, name string) string {
 	var schema0 string
 	if schema != "" {
