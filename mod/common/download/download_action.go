@@ -16,13 +16,13 @@ func Init(router *router.Router) {
 	r := router.Group("/rest")
 	r.Use(middleware.AuthUsernameAndPwd())
 	{
-		r.Post("/download", download).Swagger.Tag(tag).Summary("私有下载").Param(downloadParams{})
-		r.Get("/download", download).Swagger.Tag(tag).Summary("私有下载").Param(downloadParams{})
+		r.Post("/download", download).Swagger.Tag(tag).Summary("私有下载").Param(downloadParams{}).ProduceStream()
+		r.Get("/download", download).Swagger.Tag(tag).Summary("私有下载").Param(downloadParams{}).ProduceStream()
 	}
 	r2 := router.Group("/rest/common")
 	{
-		r2.Post("/download", downloadPublic).Swagger.Tag(tag).Summary("公共下载").Param(downloadParams{})
-		r2.Get("/download", downloadPublic).Swagger.Tag(tag).Summary("公共下载").Param(downloadParams{})
+		r2.Post("/download", downloadPublic).Swagger.Tag(tag).Summary("公共下载").Param(downloadParams{}).ProduceStream()
+		r2.Get("/download", downloadPublic).Swagger.Tag(tag).Summary("公共下载").Param(downloadParams{}).ProduceStream()
 	}
 }
 
