@@ -44,12 +44,6 @@ type Req struct {
 	Timeout     int // seconds
 }
 
-// Deprecated
-const ContentTypeForm = "application/x-www-form-urlencoded; charset=utf-8"
-
-// Deprecated
-const ContentTypeJSON = "application/json; charset=utf-8"
-
 func Request(reqBean Req) (string, int) {
 	if reqBean.Method == "" {
 		reqBean.Method = http.MethodPost

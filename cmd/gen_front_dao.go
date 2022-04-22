@@ -5,22 +5,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func FrontDaoCMD(url string) *cobra.Command {
-	return &cobra.Command{
-		Use:   "genDao",
-		Short: "generate front dao",
-		Run: func(cmd *cobra.Command, args []string) {
-			frontdao.Gen(url, false)
-		},
-	}
-}
-
 func FrontDaoCMDNext(url string) *cobra.Command {
 	return &cobra.Command{
 		Use:   "genDao",
 		Short: "generate front dao",
 		Run: func(cmd *cobra.Command, args []string) {
-			frontdao.Gen(url, true)
+			frontdao.Gen(url)
 		},
 	}
 }

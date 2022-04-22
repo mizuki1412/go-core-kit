@@ -17,6 +17,7 @@ func init() {
 	initkit.DefFlags(rootCmd)
 	//rootCmd.AddCommand(cmd.TCPServerCMD())
 	rootCmd.AddCommand(cmd.PGSqlToStructCMD("", ""))
+	rootCmd.AddCommand(cmd.FrontDaoCMDNext("https://www.linkortech.com/mes-demo"))
 	//rootCmd.AddCommand(cmd.MarkdownDocCMD("go-core-kit 说明文档"))
 	//rootCmd.AddCommand(cmd.WebStaticServerCMD())
 }

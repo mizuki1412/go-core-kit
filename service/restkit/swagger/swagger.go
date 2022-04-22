@@ -2,6 +2,7 @@ package swagger
 
 import (
 	"github.com/mizuki1412/go-core-kit/init/configkey"
+	"github.com/mizuki1412/go-core-kit/init/httpconst"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
@@ -25,8 +26,8 @@ func NewPath(path string, method string) *SwaggerPath {
 		Doc.Paths[path] = map[string]map[string]any{}
 	}
 	Doc.Paths[path][method] = map[string]any{}
-	Doc.Paths[path][method]["consumes"] = []string{"application/x-www-form-urlencoded", "multipart/form-data"}
-	Doc.Paths[path][method]["produces"] = []string{"*/*", "application/json"}
+	Doc.Paths[path][method]["consumes"] = []string{httpconst.MimePOSTForm}
+	Doc.Paths[path][method]["produces"] = []string{httpconst.MimeJSON}
 	Doc.Paths[path][method]["operationId"] = path + "-" + method
 	Doc.Paths[path][method]["parameters"] = []map[string]any{}
 	Doc.Paths[path][method]["responses"] = map[string]any{
@@ -114,6 +115,20 @@ func (swagger *SwaggerPath) Tag(title string, description ...string) *SwaggerPat
 	}
 	Doc.tags = append(Doc.tags, t)
 	return swagger
+}
+func (swagger *SwaggerPath) Consume(mime string) *SwaggerPath {
+	Doc.Paths[swagger.Path][swagger.Method]["consumes"] = []string{mime}
+	return swagger
+}
+func (swagger *SwaggerPath) ConsumeMultipart() *SwaggerPath {
+	return swagger.Consume(httpconst.MimeMultipartPOSTForm)
+}
+func (swagger *SwaggerPath) Produce(mime string) *SwaggerPath {
+	Doc.Paths[swagger.Path][swagger.Method]["produces"] = []string{mime}
+	return swagger
+}
+func (swagger *SwaggerPath) ProduceStream() *SwaggerPath {
+	return swagger.Produce(httpconst.MimeStream)
 }
 
 var Doc SwaggerDoc

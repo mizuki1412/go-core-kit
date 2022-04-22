@@ -2,6 +2,7 @@ package frontdao
 
 import (
 	"fmt"
+	"github.com/mizuki1412/go-core-kit/init/httpconst"
 	"github.com/mizuki1412/go-core-kit/library/arraykit"
 	"github.com/mizuki1412/go-core-kit/library/filekit"
 	"github.com/mizuki1412/go-core-kit/library/httpkit"
@@ -11,7 +12,13 @@ import (
 	"strings"
 )
 
-func Gen(urlPrefix string, next bool) {
+type bean struct {
+	Name     string
+	Imports  []string
+	Contents []string
+}
+
+func Gen(urlPrefix string) {
 	ret, _ := httpkit.Request(httpkit.Req{
 		Method: "GET",
 		Url:    urlPrefix + "/swagger-doc",
@@ -22,9 +29,8 @@ func Gen(urlPrefix string, next bool) {
 		keys = append(keys, key)
 	}
 	sort.Strings(keys)
-	tagTemps := make([]string, 0)
+	beanMap := map[string]*bean{}
 	for _, key := range keys {
-		var result string
 		// todo get 暂无
 		arr := all[key].Get("post.tags").Array()
 		if len(arr) == 0 {
@@ -32,26 +38,30 @@ func Gen(urlPrefix string, next bool) {
 		}
 		tag := arr[0].String()
 		name := stringkit.Split(tag, ":")[0]
-		if all[key].Get("post.summary").String() != "" {
-			result += fmt.Sprintf("\n/// %s", all[key].Get("post.summary").String())
+		if beanMap[name] == nil {
+			beanMap[name] = &bean{Name: name}
 		}
+		b := beanMap[name]
+		content := ""
+		// 函数描述
+		if all[key].Get("post.summary").String() != "" {
+			content += fmt.Sprintf("/// %s", all[key].Get("post.summary").String())
+		}
+		// 参数
 		for _, e := range all[key].Get("post.parameters").Array() {
 			require := ""
 			if e.Get("required").Bool() {
 				require = "*"
 			}
-			result += fmt.Sprintf("\n// %s %s : %s : %s", require, e.Get("name").String(), e.Get("type").String(), e.Get("description"))
+			content += fmt.Sprintf("\n// %s %s : %s : %s", require, e.Get("name").String(), e.Get("type").String(), e.Get("description"))
 		}
+		// 函数内容
 		var k string
 		var k2 string
 		param1 := ""
 		param2 := ""
 		if len(all[key].Get("post.parameters").Array()) > 0 {
-			if next {
-				param1 = "params"
-			} else {
-				param1 = "params:any"
-			}
+			param1 = "params"
 			param2 = ", params"
 		}
 		// key转function name
@@ -63,32 +73,51 @@ func Gen(urlPrefix string, next bool) {
 		for _, k1 := range stringkit.Split(k, "/") {
 			k2 += stringkit.UpperFirst(k1)
 		}
-		funName := "postService"
-		if next {
-			funName = "request"
-		}
-		tempFlag := ""
-		if next {
-			tempFlag = ".data"
-		}
-		result += fmt.Sprintf(`
-export async function %s(%s){
-	const {data} = await %s('%s'%s)
-	return data%s
-}
-`, k2, param1, funName, key, param2, tempFlag)
-		if !arraykit.StringContains(tagTemps, tag) {
-			tagTemps = append(tagTemps, tag)
-			if next {
-				result = "import {request} from '/lib/request';\n" + result
-			} else {
-				result = "import {postService} from 'web-toolkit/src/case-main/index';\n" + result
+		// 区分函数
+		funcName := "request"
+		for _, ee := range all[key].Get("post.consumes").Array() {
+			if ee.String() == httpconst.MimeMultipartPOSTForm {
+				funcName = "upload"
+				break
 			}
 		}
-		suffer := ".ts"
-		if next {
-			suffer = ".js"
+		for _, ee := range all[key].Get("post.produces").Array() {
+			if ee.String() == httpconst.MimeStream {
+				funcName = "download"
+				break
+			}
 		}
-		_ = filekit.WriteFileAppend("./gen-front-dao/"+name+suffer, []byte(result))
+		switch funcName {
+		case "request":
+			content += fmt.Sprintf(`
+export async function %s(%s){
+	const {data} = await request('%s'%s)
+	return data.data
+}
+`, k2, param1, key, param2)
+		case "upload":
+			content += fmt.Sprintf(`
+export async function %s(%s){
+	await upload('%s'%s)
+}
+`, k2, param1, key, param2)
+		case "download":
+			content += fmt.Sprintf(`
+export async function %s(%s){
+	await download('%s'%s)
+}
+`, k2, param1, key, param2)
+		}
+		if !arraykit.StringContains(b.Imports, funcName) {
+			b.Imports = append(b.Imports, funcName)
+		}
+		b.Contents = append(b.Contents, content)
 	}
+	// 生成
+	for _, e := range beanMap {
+		final := fmt.Sprintf("import {%s} from '/lib/request'\n\n", strings.Join(e.Imports, ","))
+		final += strings.Join(e.Contents, "\n")
+		_ = filekit.WriteFileAppend("./gen-front-dao/"+e.Name+".js", []byte(final))
+	}
+
 }
