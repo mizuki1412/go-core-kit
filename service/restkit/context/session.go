@@ -93,6 +93,7 @@ func (ctx *Context) SessionGetUser() *model.User {
 		// todo 每次都要转换，可能存在性能问题
 		err := jsonkit.ParseObj(j, user)
 		if err != nil {
+			logkit.Error(err.Error())
 			return nil
 		}
 		return user

@@ -43,6 +43,7 @@ func Parse(dt string) (time.Time, error) {
 			"2006-01-02 15:04:05Z07:00", // RFC3339 without T
 			"2006-01-02 15:04:05Z0700",  // RFC3339 without T or timezone hh:mm colon
 			"2006-01-02 15:04:05",
+			"2006/01/02 15:04:05",
 			time.Kitchen,
 			time.Stamp,
 			time.StampMilli,
