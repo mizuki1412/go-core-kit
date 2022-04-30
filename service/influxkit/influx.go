@@ -12,20 +12,20 @@ import (
 )
 
 func QueryDefaultDB(sql string) []map[string]any {
-	return queryResult(configkit.GetStringD(configkey.InfluxDBName), sql)
+	return QueryWithDBName(configkit.GetStringD(configkey.InfluxDBName), sql)
 }
 
-func QueryWithPrefix(prefix, sql string) []map[string]any {
-	queryResult(prefix+configkit.GetStringD(configkey.InfluxDBName), sql)
-	return nil
-}
+//func QueryWithPrefix(prefix, sql string) []map[string]any {
+//	queryResult(prefix+configkit.GetStringD(configkey.InfluxDBName), sql)
+//	return nil
+//}
 
 func QueryWithDBName(dbName, sql string) []map[string]any {
 	return queryResult(dbName, sql)
 }
 
 func QueryMultiDefaultDB(sql []string) [][]map[string]any {
-	return queryMultiResult(configkit.GetStringD(configkey.InfluxDBName), sql)
+	return QueryMultiWithDBName(configkit.GetStringD(configkey.InfluxDBName), sql)
 }
 
 func QueryMultiWithDBName(dbName string, sql []string) [][]map[string]any {
