@@ -104,13 +104,24 @@ var AdditionUserInfoWithIdFunc = func(ctx *context.Context, u *model.User) {
 }
 
 type infoParam struct {
-	Id class.Int32 `description:"不填获取自己，并且返回的是user和token；否则只返回user"`
+	Id     class.Int32  `description:"不填获取自己，并且返回的是user和token；否则只返回user"`
+	Schema class.String `description:"用于校验当前登录的和需要的是不是一个schema"`
 }
 
 func info(ctx *context.Context) {
 	params := infoParam{}
 	ctx.BindForm(&params)
 	if !params.Id.Valid {
+		if params.Schema.String != "" && params.Schema.String != ctx.SessionGetSchema() {
+			ctx.Json(context.RestRet{
+				Result: context.ResultAuthErr,
+				Message: class.String{
+					String: "schema不匹配",
+					Valid:  true,
+				},
+			})
+			return
+		}
 		// 获取自己的
 		// todo 先走数据库
 		user := ctx.SessionGetUser()
@@ -120,8 +131,9 @@ func info(ctx *context.Context) {
 			AdditionUserExFunc(ctx, user)
 		}
 		ctx.JsonSuccess(map[string]any{
-			"user":  user,
-			"token": ctx.SessionGetToken(),
+			"user":   user,
+			"token":  ctx.SessionGetToken(),
+			"schema": ctx.SessionGetSchema(),
 		})
 	} else {
 		user := userdao.NewWithSchema(ctx.SessionGetSchema()).FindById(params.Id.Int32)
