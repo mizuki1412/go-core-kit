@@ -35,3 +35,10 @@ toolkit for golang projects
 
 # TODO
 - [ ] https://github.com/gin-contrib/sessions/pull/148 等官方更新
+
+## 旧项目升级注意
+
+- ctx.SessionGetUser().(*model2.User); 
+- interface{}->any
+- 配置文件：aliyun
+- dao

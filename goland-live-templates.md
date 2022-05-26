@@ -198,7 +198,7 @@ func NewWithSchema(schema string,tx ...*sqlx.Tx) *Dao {
 ## dao_demo
 ```
 func (dao *Dao) FindById(id int32) *$bean$ {
-	sql, args := sqlkit.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("id=?",id).MustSql()
+	sql, args := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("id=?",id).MustSql()
 	return dao.ScanOne(sql, args)
 }
 
@@ -207,7 +207,7 @@ type ListParam struct {
 }
 
 func (dao *Dao) List(param ListParam) []*$bean$ {
-	builder := sqlkit.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("off=false").OrderBy("id")
+	builder := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("off=false").OrderBy("id")
 	sql, args := builder.MustSql()
 	return dao.ScanList(sql, args)
 }

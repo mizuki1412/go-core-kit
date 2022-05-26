@@ -8,7 +8,8 @@ import (
 )
 
 func Builder() squirrel.StatementBuilderType {
-	if driverName() == "postgres" {
+	connector()
+	if driver == "postgres" {
 		return squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 	} else {
 		// todo 未处理oracle

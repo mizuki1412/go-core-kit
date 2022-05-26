@@ -25,11 +25,6 @@ var once sync.Once
 
 const SchemaDefault = "public"
 
-func driverName() string {
-	connector()
-	return driver
-}
-
 // 前提数据库驱动需要默认导入
 func connector() *sqlx.DB {
 	once.Do(func() {
@@ -60,10 +55,32 @@ type Dao[T any] struct {
 	Schema  string
 	// 事务时使用
 	TX *sqlx.Tx
+	// 指定连接
+	Conn *sqlx.DB
+	// 指定连接时的driver
+	Driver string
 }
 
+// StartTx todo 未处理指定连接时的场景
 func StartTx() *sqlx.Tx {
 	return connector().MustBegin()
+}
+
+func (dao *Dao[T]) Builder() squirrel.StatementBuilderType {
+	if dao.Driver == "postgres" {
+		return squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+	} else {
+		// todo 未处理oracle
+		return squirrel.StatementBuilder.PlaceholderFormat(squirrel.Question)
+	}
+}
+
+func (dao *Dao[T]) Connector() *sqlx.DB {
+	if dao.Conn == nil {
+		dao.Conn = connector()
+		dao.Driver = driver
+	}
+	return dao.Conn
 }
 
 func (dao *Dao[T]) SetResultType(rt byte) *Dao[T] {
@@ -120,7 +137,7 @@ func (dao *Dao[T]) Query(sql string, args ...any) *sqlx.Rows {
 	if dao.TX != nil {
 		rows, err = dao.TX.Queryx(sql, args...)
 	} else {
-		rows, err = connector().Queryx(sql, args...)
+		rows, err = dao.Connector().Queryx(sql, args...)
 	}
 	if err != nil {
 		panic(exception.New(err.Error(), 2))
@@ -131,7 +148,7 @@ func (dao *Dao[T]) Exec(sql string, args ...any) {
 	if dao.TX != nil {
 		dao.TX.MustExec(sql, args...)
 	} else {
-		connector().MustExec(sql, args...)
+		dao.Connector().MustExec(sql, args...)
 	}
 }
 

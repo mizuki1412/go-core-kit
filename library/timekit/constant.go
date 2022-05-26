@@ -1,8 +1,8 @@
 package timekit
 
-// 固定
 const TimeLayout = "2006-01-02 15:04:05"
 const TimeLayout2 = "2006/01/02 15:04:05"
+const TimeLayoutWithMill = "2006-01-02 15:04:05.999"
 
 // safari需要这种格式 兼容safari
 const TimeLayoutAll = "2006-01-02T15:04:05.999-0700"
