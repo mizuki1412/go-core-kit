@@ -78,6 +78,7 @@ func (ctx *Context) SessionSave() {
 		Secure:   true,
 		SameSite: http.SameSiteNoneMode,
 	})
+	// todo save时是否也会存入redis，还是其他情况也会
 	err := session.Save()
 	if err != nil {
 		logkit.Error(exception.New(err.Error()))
@@ -90,7 +91,6 @@ func (ctx *Context) SessionGetUser() *model.User {
 	json := session.Get("user")
 	if j, ok := json.(string); ok {
 		user := &model.User{}
-		// todo 每次都要转换，可能存在性能问题
 		err := jsonkit.ParseObj(j, user)
 		if err != nil {
 			logkit.Error(err.Error())
@@ -100,6 +100,10 @@ func (ctx *Context) SessionGetUser() *model.User {
 	} else {
 		return nil
 	}
+}
+func (ctx *Context) SessionGetUserOrigin() any {
+	session := sessions.Default(ctx.Proxy)
+	return session.Get("user")
 }
 func (ctx *Context) SessionGetSchema() string {
 	session := sessions.Default(ctx.Proxy)

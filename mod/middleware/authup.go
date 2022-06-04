@@ -9,7 +9,7 @@ import (
 // AuthUsernameAndPwd 用户名密码校验
 func AuthUsernameAndPwd() router.Handler {
 	return func(ctx *context.Context) {
-		user := ctx.SessionGetUser()
+		user := ctx.SessionGetUserOrigin()
 		if user == nil {
 			ctx.Json(context.RestRet{
 				Result: context.ResultAuthErr,
