@@ -2,11 +2,11 @@ package class
 
 import (
 	"database/sql/driver"
+	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/class/utils"
 	"github.com/spf13/cast"
 )
 
-// 同时继承scan和value方法
 type Bool struct {
 	Bool  bool
 	Valid bool
@@ -37,8 +37,9 @@ func (th *Bool) Scan(value any) error {
 		return nil
 	}
 	th.Valid = true
-	th.Bool = cast.ToBool(value)
-	return nil
+	var err error
+	th.Bool, err = cast.ToBoolE(value)
+	return err
 }
 
 // Value implements the driver Valuer interface.
@@ -70,6 +71,8 @@ func (th *Bool) Set(val any) *Bool {
 		if err == nil {
 			th.Bool = i
 			th.Valid = true
+		} else {
+			panic(exception.New(err.Error()))
 		}
 	}
 	return th

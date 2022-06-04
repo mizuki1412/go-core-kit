@@ -14,9 +14,7 @@ type HashSet struct {
 	count int
 }
 
-/**
-初始化并指定存储对象的类型
-*/
+// NewHashSet 初始化并指定存储对象的类型
 func NewHashSet(data any) *HashSet {
 	hashSet := new(HashSet)
 	hashSet.data = make(map[any]any)
@@ -24,29 +22,22 @@ func NewHashSet(data any) *HashSet {
 	return hashSet
 }
 
-/**
-返回数据数量
-*/
+// Size 返回数据数量
 func (hashSet *HashSet) Size() int {
 	return hashSet.count
 }
 
-/**
-返回数据类型
-*/
+// GetDataType 返回数据类型
 func (hashSet *HashSet) GetDataType() any {
 	return hashSet.dataType
 }
 
-/**
-添加元素
-*/
+// Add 添加元素
 func (hashSet *HashSet) Add(key any) error {
 	err := hashSet.checkData(key)
 	if err != nil {
 		return err
 	}
-
 	_, ok := hashSet.data[key]
 	if ok {
 		return errors.New("DataIsExist")
@@ -56,9 +47,7 @@ func (hashSet *HashSet) Add(key any) error {
 	return nil
 }
 
-/**
-删除指定Key元素
-*/
+// Remove 删除指定Key元素
 func (hashSet *HashSet) Remove(key any) error {
 	err := hashSet.checkData(key)
 	if err != nil {
@@ -74,9 +63,7 @@ func (hashSet *HashSet) Remove(key any) error {
 	return errors.New("NotFoundKey")
 }
 
-/**
-判断key是否存在
-*/
+// Contains 判断key是否存在
 func (hashSet *HashSet) Contains(key any) (bool, error) {
 	err := hashSet.checkData(key)
 	if err != nil {
@@ -90,17 +77,13 @@ func (hashSet *HashSet) Contains(key any) (bool, error) {
 	}
 }
 
-/**
-重置
-*/
+// Clear 重置
 func (hashSet *HashSet) Clear() {
 	hashSet.count = 0
 	hashSet.data = make(map[any]any)
 }
 
-/**
-判断添加元素是否为指定类型
-*/
+//判断添加元素是否为指定类型
 func (hashSet *HashSet) checkData(data any) error {
 	if data == nil {
 		return errors.New("dataIsNil")

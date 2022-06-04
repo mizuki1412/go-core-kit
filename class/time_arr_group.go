@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// 两个时间一组的数组
+// TimeArrGroup 两个时间一组的数组
 type TimeArrGroup [][]time.Time
 
 type TimePoint struct {
@@ -20,7 +20,7 @@ func (l TimePointList) Len() int           { return len(l) }
 func (l TimePointList) Swap(i, j int)      { l[i], l[j] = l[j], l[i] }
 func (l TimePointList) Less(i, j int) bool { return l[i].Time.Unix() < l[j].Time.Unix() }
 
-// 累计时间长，s
+// Sum 累计时间长，s
 func (th TimeArrGroup) Sum() int64 {
 	var all int64 = 0
 	for _, t := range th {
@@ -73,7 +73,7 @@ func _group2TimeArr(a, b TimeArrGroup, typeFlag int32) TimePointList {
 	return list
 }
 
-// 合并，当前的时间数组和参数的时间数组合并。
+// Merge 合并，当前的时间数组和参数的时间数组合并。
 func (th TimeArrGroup) Merge(obj TimeArrGroup) TimeArrGroup {
 	list := _group2TimeArr(th, obj, 0)
 	ret := TimeArrGroup{}
@@ -113,7 +113,7 @@ func (th TimeArrGroup) Merge(obj TimeArrGroup) TimeArrGroup {
 	return ret
 }
 
-// 剔除，当前的时间数组剔除参数的时间数组范围
+// Eliminate 剔除，当前的时间数组剔除参数的时间数组范围
 func (th TimeArrGroup) Eliminate(obj TimeArrGroup) TimeArrGroup {
 	list := _group2TimeArr(th, obj, 10)
 	ret := TimeArrGroup{}
@@ -163,7 +163,7 @@ func (th TimeArrGroup) Eliminate(obj TimeArrGroup) TimeArrGroup {
 	return ret
 }
 
-// 交集
+// Mixed 交集
 // 两个缓存区a和b，当一个点进来时，必须遇见结束点，才能从缓存区中踢出。
 func (th TimeArrGroup) Mixed(obj TimeArrGroup) TimeArrGroup {
 	list := _group2TimeArr(th, obj, 10)

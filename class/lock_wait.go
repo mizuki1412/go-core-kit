@@ -2,8 +2,7 @@ package class
 
 import "sync"
 
-// 用于异步等待
-
+// LockWait 用于异步等待
 type LockWait struct {
 	sync.RWMutex
 	Data map[string]chan map[string]any

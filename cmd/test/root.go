@@ -28,22 +28,7 @@ var rootCmd = &cobra.Command{
 	Use: "go-core-kit",
 	Run: func(cmd *cobra.Command, args []string) {
 		initkit.BindFlags(cmd)
-		//test2()
-		arr := []float64{0.021, 0.021, 0.016, 0.007, 0.008, 0.019, 0.01, 0.013, 0.012, 0.021, 0.01, 0.02, 0.012, 0.023, 0.027, 0.017, 0.009, 0.027, 0.019, 0.022, 0.01, 0.018, 0.016, 0.011, 0.024, 0.026, 0.026, 0.027, 0.011, 0.011, 0.029, 0.026, 0.01, 0.028, 0.031, 0.008, 0.03, 0.014, 0.023, 0.021, 0.023, 0.009, 0.026, 0.023, 0.008, 0.02, 0.011, 0.01, 0.02, 0.012}
-		var max, min, all float64
-		for _, e := range arr {
-			if max == 0 || max < e {
-				max = e
-			}
-			if min == 0 || min > e {
-				min = e
-			}
-			all += e
-		}
-		println(
-			class.NewDecimal(max).Round(3).Decimal.String(),
-			class.NewDecimal(min).Round(3).Decimal.String(),
-			class.NewDecimal(all/cast.ToFloat64(len(arr))).Round(3).Decimal.String())
+		class.NewBool(0).Set("ww")
 	},
 }
 

@@ -2,11 +2,11 @@ package class
 
 import (
 	"database/sql/driver"
+	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/class/utils"
 	"github.com/spf13/cast"
 )
 
-// 同时继承scan和value方法
 type Float64 struct {
 	Float64 float64
 	Valid   bool
@@ -37,15 +37,16 @@ func (th *Float64) Scan(value any) error {
 		return nil
 	}
 	th.Valid = true
+	var err error
 	switch value.(type) {
 	case []uint8:
 		// 数据库中decimal的值是字符数组返回
 		a := value.([]uint8)
-		th.Float64 = cast.ToFloat64(string(a))
+		th.Float64, err = cast.ToFloat64E(string(a))
 	default:
-		th.Float64 = cast.ToFloat64(value)
+		th.Float64, err = cast.ToFloat64E(value)
 	}
-	return nil
+	return err
 }
 
 // Value implements the driver Valuer interface.
@@ -77,6 +78,8 @@ func (th *Float64) Set(val any) *Float64 {
 		if err == nil {
 			th.Float64 = i
 			th.Valid = true
+		} else {
+			panic(exception.New(err.Error()))
 		}
 	}
 	return th

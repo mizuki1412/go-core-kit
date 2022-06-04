@@ -4,7 +4,6 @@ import (
 	"database/sql/driver"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
-	"github.com/mizuki1412/go-core-kit/service/logkit"
 )
 
 /** 针对PG的jsonb，其中是array形式的 */
@@ -43,11 +42,8 @@ func (th *MapStringArr) Scan(value any) error {
 	th.Valid = true
 	var s []map[string]any
 	err := jsonkit.ParseObj(string(value.([]byte)), &s)
-	if err != nil {
-		logkit.Error(exception.New(err.Error()))
-	}
 	th.Arr = s
-	return nil
+	return err
 }
 
 // Value implements the driver Valuer interface.

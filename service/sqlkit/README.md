@@ -11,6 +11,11 @@
 - update set时：`Set("extend",squirrel.Expr("'{}'::jsonb"))` or `Set("extend","{}")`
 - class.mapString在插入数据库时将用jsonb格式，并且不是完全替换，而是merge的方式(```coalesce(extend, '{}'::jsonb) || '$param'::jsonb```)。如果要删除其中的key，需要设置key为null。 merge时只会merge顶层的keys。
 
+###
+数据库驱动：
+- postgres: _ "github.com/lib/pq"
+- mysql: _ "github.com/go-sql-driver/mysql"
+
 ### demo
 ```go
 func (dao *Dao) UpdateConfirm(id int64){

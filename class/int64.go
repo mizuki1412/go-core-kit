@@ -2,11 +2,11 @@ package class
 
 import (
 	"database/sql/driver"
+	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/class/utils"
 	"github.com/spf13/cast"
 )
 
-// 同时继承scan和value方法
 type Int64 struct {
 	Int64 int64
 	Valid bool
@@ -36,9 +36,10 @@ func (th *Int64) Scan(value any) error {
 		th.Int64, th.Valid = 0, false
 		return nil
 	}
+	var err error
 	th.Valid = true
-	th.Int64 = cast.ToInt64(value)
-	return nil
+	th.Int64, err = cast.ToInt64E(value)
+	return err
 }
 
 // Value implements the driver Valuer interface.
@@ -70,6 +71,8 @@ func (th *Int64) Set(val any) *Int64 {
 		if err == nil {
 			th.Int64 = i
 			th.Valid = true
+		} else {
+			panic(exception.New(err.Error()))
 		}
 	}
 	return th

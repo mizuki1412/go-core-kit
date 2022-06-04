@@ -2,6 +2,7 @@ package class
 
 import (
 	"database/sql/driver"
+	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/class/utils"
 	"github.com/spf13/cast"
 )
@@ -37,8 +38,9 @@ func (th *Int32) Scan(value any) error {
 		return nil
 	}
 	th.Valid = true
-	th.Int32 = cast.ToInt32(value)
-	return nil
+	var err error
+	th.Int32, err = cast.ToInt32E(value)
+	return err
 }
 
 // Value implements the driver Valuer interface.
@@ -70,6 +72,8 @@ func (th *Int32) Set(val any) *Int32 {
 		if err == nil {
 			th.Int32 = i
 			th.Valid = true
+		} else {
+			panic(exception.New(err.Error()))
 		}
 	}
 	return th

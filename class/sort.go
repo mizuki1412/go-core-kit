@@ -12,7 +12,7 @@ func (l Int64List) Len() int           { return len(l) }
 func (l Int64List) Swap(i, j int)      { l[i], l[j] = l[j], l[i] }
 func (l Int64List) Less(i, j int) bool { return l[i] < l[j] }
 
-// x,y坐标系的数据集，用于图表数据
+// XYDataMapper x,y坐标系的数据集，用于图表数据
 type XYDataMapper struct {
 	Desc      bool                                `description:"表示倒序"`
 	Round     int32                               `description:"保留几位小数"`

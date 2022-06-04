@@ -8,9 +8,7 @@ import (
 	"github.com/spf13/cast"
 )
 
-/** 针对PG的array */
-
-// 同时继承scan和value方法
+// ArrInt 针对PG的array
 type ArrInt struct {
 	Array pq.Int64Array
 	Valid bool

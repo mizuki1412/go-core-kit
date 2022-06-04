@@ -10,8 +10,7 @@ import (
 	"time"
 )
 
-// 同时继承scan和value方法
-//  sql.NullTime 对时区没控制
+// Time sql.NullTime 对时区没控制
 type Time struct {
 	Time  time.Time
 	Valid bool
@@ -63,7 +62,7 @@ func (th *Time) Scan(value any) error {
 	}
 	th.Valid = true
 	th.Time = s
-	return nil
+	return err
 }
 
 // Value implements the driver Valuer interface.

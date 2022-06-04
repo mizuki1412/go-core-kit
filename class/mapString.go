@@ -8,8 +8,6 @@ import (
 	"github.com/spf13/cast"
 )
 
-/** 针对PG的jsonb */
-
 type MapString struct {
 	Map   map[string]any
 	Valid bool
@@ -44,6 +42,7 @@ func (th *MapString) Scan(value any) error {
 	}
 	th.Valid = true
 	th.Map = jsonkit.ParseMap(string(value.([]byte)))
+	// todo no error
 	return nil
 }
 

@@ -3,6 +3,7 @@ package class
 import (
 	"database/sql/driver"
 	"encoding/xml"
+	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/class/utils"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/spf13/cast"
@@ -69,9 +70,10 @@ func (th *String) Scan(value any) error {
 		th.String, th.Valid = "", false
 		return nil
 	}
+	var err error
 	th.Valid = true
-	th.String = cast.ToString(value)
-	return nil
+	th.String, err = cast.ToStringE(value)
+	return err
 }
 
 // Value implements the driver Valuer interface.
@@ -103,6 +105,8 @@ func (th *String) Set(val any) *String {
 		if err == nil {
 			th.String = s
 			th.Valid = true
+		} else {
+			panic(exception.New(err.Error()))
 		}
 	}
 	return th

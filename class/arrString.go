@@ -8,11 +8,6 @@ import (
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 )
 
-/**
-针对PG的array
-*/
-
-// 同时继承scan和value方法
 type ArrString struct {
 	Array pq.StringArray
 	Valid bool
