@@ -39,7 +39,12 @@ func (th *Int32) Scan(value any) error {
 	}
 	th.Valid = true
 	var err error
-	th.Int32, err = cast.ToInt32E(value)
+	switch value.(type) {
+	case []uint8:
+		th.Int32, err = cast.ToInt32E(string(value.([]uint8)))
+	default:
+		th.Int32, err = cast.ToInt32E(value)
+	}
 	return err
 }
 
