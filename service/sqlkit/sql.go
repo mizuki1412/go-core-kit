@@ -36,7 +36,8 @@ func connector() *sqlx.DB {
 		if driver == "postgres" {
 			param = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", configkit.GetString(configkey.DBHost, ""), configkit.GetInt(configkey.DBPort, 0), configkit.GetString(configkey.DBUser, ""), configkit.GetString(configkey.DBPwd, ""), configkit.GetString(configkey.DBName, ""))
 		} else if driver == "mysql" {
-			param = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8", configkit.GetString(configkey.DBUser, ""), configkit.GetString(configkey.DBPwd, ""), configkit.GetString(configkey.DBHost, ""), configkit.GetString(configkey.DBPort, ""), configkit.GetString(configkey.DBName, ""))
+			// todo 时区
+			param = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=true&loc=%s", configkit.GetString(configkey.DBUser, ""), configkit.GetString(configkey.DBPwd, ""), configkit.GetString(configkey.DBHost, ""), configkit.GetString(configkey.DBPort, ""), configkit.GetString(configkey.DBName, ""), "Asia%2FShanghai")
 		}
 		db = sqlx.MustConnect(driver, param)
 		lt := cast.ToInt(configkit.GetInt(configkey.DBMaxLife, 20))
