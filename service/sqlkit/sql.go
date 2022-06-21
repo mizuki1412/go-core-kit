@@ -36,8 +36,9 @@ func connector() *sqlx.DB {
 		if driver == "postgres" {
 			param = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", configkit.GetString(configkey.DBHost, ""), configkit.GetInt(configkey.DBPort, 0), configkit.GetString(configkey.DBUser, ""), configkit.GetString(configkey.DBPwd, ""), configkit.GetString(configkey.DBName, ""))
 		} else if driver == "mysql" {
-			// todo 时区
 			param = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=true&loc=%s", configkit.GetString(configkey.DBUser, ""), configkit.GetString(configkey.DBPwd, ""), configkit.GetString(configkey.DBHost, ""), configkit.GetString(configkey.DBPort, ""), configkit.GetString(configkey.DBName, ""), "Asia%2FShanghai")
+		} else if driver == "mssql" {
+			param = fmt.Sprintf("server=%s;user id=%s;password=%s;port=%s;database=%s", configkit.GetString(configkey.DBHost, ""), configkit.GetString(configkey.DBUser, ""), configkit.GetString(configkey.DBPwd, ""), configkit.GetString(configkey.DBPort, ""), configkit.GetString(configkey.DBName, ""))
 		}
 		db = sqlx.MustConnect(driver, param)
 		lt := cast.ToInt(configkit.GetInt(configkey.DBMaxLife, 20))
@@ -68,6 +69,8 @@ func StartTx() *sqlx.Tx {
 }
 
 func (dao *Dao[T]) Builder() squirrel.StatementBuilderType {
+	// 赋值默认driver
+	dao.Connector()
 	if dao.Driver == "postgres" {
 		return squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 	} else {
