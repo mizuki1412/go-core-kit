@@ -3,6 +3,9 @@ package configkey
 // ProjectDir 项目目录
 const ProjectDir = "project.dir"
 
+// ProjectName 项目的唯一名称（业务名称）
+const ProjectName = "project.name"
+
 // ProfileDev 开发模式
 const ProfileDev = "profile.dev"
 
