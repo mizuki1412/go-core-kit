@@ -3,7 +3,7 @@
 
 toolkit for golang projects
 
-`go get github.com/mizuki1412/go-core-kit@v1.2.1`
+`go get github.com/mizuki1412/go-core-kit@v1.4.5`
 
 # init
 本库使用的入口，以及配置参数信息相关的绑定函数
@@ -31,10 +31,12 @@ toolkit for golang projects
 
 # 其他
 
-## 可替换的函数目录
+## 可替换的函数
 
 # TODO
+
 - [ ] https://github.com/gin-contrib/sessions/pull/148 等官方更新
+- [ ] https://github.com/unrolled/render 模板渲染
 
 ## 旧项目升级注意
 

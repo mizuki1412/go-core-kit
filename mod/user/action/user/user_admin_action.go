@@ -80,7 +80,6 @@ func AddUserHandle(ctx *context.Context, params AddUserParams, checkSms bool) mo
 		panic(exception.New("验证码错误"))
 	}
 	roleDao := roledao.NewWithSchema(ctx.SessionGetSchema())
-	roleDao.SetResultType(roledao.ResultNone)
 	r := roleDao.FindById(params.Role)
 	if r == nil {
 		panic(exception.New("角色不存在"))
@@ -93,6 +92,7 @@ func AddUserHandle(ctx *context.Context, params AddUserParams, checkSms bool) mo
 		u.Pwd.Set(cryptokit.MD5(params.Pwd.String))
 	}
 	u.Role = r
+	u.Department = r.Department
 	if params.Name.Valid {
 		u.Name.Set(params.Name)
 	}
@@ -161,6 +161,7 @@ func UpdateUserHandle(ctx *context.Context, params UpdateParams) {
 			panic(exception.New("role不存在"))
 		}
 		u.Role = r
+		u.Department = r.Department
 	}
 	if params.Name.Valid {
 		u.Name.Set(params.Name.String)
