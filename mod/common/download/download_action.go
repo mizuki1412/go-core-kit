@@ -1,13 +1,15 @@
 package download
 
 import (
+	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/init/configkey"
-	"github.com/mizuki1412/go-core-kit/library/cryptokit"
+	"github.com/mizuki1412/go-core-kit/library/filekit"
 	"github.com/mizuki1412/go-core-kit/mod/middleware"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
 	"github.com/mizuki1412/go-core-kit/service/restkit/router"
+	"github.com/mizuki1412/go-core-kit/service/storagekit"
 	"strings"
 )
 
@@ -18,6 +20,9 @@ func Init(router *router.Router) {
 	{
 		r.Post("/download", download).Swagger.Tag(tag).Summary("私有下载").Param(downloadParams{}).ProduceStream()
 		r.Get("/download", download).Swagger.Tag(tag).Summary("私有下载").Param(downloadParams{}).ProduceStream()
+		r.Post("/upload", upload).Swagger.Tag(tag).Summary("私有上传").Param(uploadParams{})
+		r.Post("/file/list", fileList).Swagger.Tag(tag).Summary("文件列表").Param(fileListParams{})
+		r.Post("/file/del", fileDel).Swagger.Tag(tag).Summary("文件删除").Param(fileListParams{})
 	}
 	r2 := router.Group("/rest/common")
 	{
@@ -33,14 +38,19 @@ type downloadParams struct {
 func download(ctx *context.Context) {
 	params := downloadParams{}
 	ctx.BindForm(&params)
-	dotIndex := strings.LastIndex(params.Name, ".")
-	var filename string
-	if dotIndex >= 0 {
-		filename = cryptokit.URLEncode(params.Name[0:dotIndex]) + params.Name[dotIndex:]
-	} else {
-		filename = cryptokit.URLEncode(params.Name)
+	subDir := configkit.GetStringD(configkey.ProjectSubDir4PrivateDownload)
+	if subDir == "" {
+		// 默认开启
+		subDir = "."
 	}
-	ctx.File(params.Name, filename)
+	if params.Name[0] == '/' {
+		params.Name = params.Name[1:]
+	}
+	subs := strings.Split(params.Name, "/")
+	if subDir == "" || (subDir != "." && (len(subs) == 1 || strings.Index(subDir, subs[0]) < 0)) {
+		panic(exception.New("未授权开放目录"))
+	}
+	ctx.File2(params.Name)
 }
 
 func downloadPublic(ctx *context.Context) {
@@ -54,12 +64,53 @@ func downloadPublic(ctx *context.Context) {
 	if subDir == "" || (subDir != "." && (len(subs) == 1 || strings.Index(subDir, subs[0]) < 0)) {
 		panic(exception.New("未授权开放目录"))
 	}
-	//dotIndex := strings.LastIndex(params.Name, ".")
-	//var filename string
-	//if dotIndex >= 0 {
-	//	filename = cryptokit.URLEncode(params.Name[0:dotIndex]) + params.Name[dotIndex:]
-	//} else {
-	//	filename = cryptokit.URLEncode(params.Name)
-	//}
 	ctx.File2(params.Name)
+}
+
+type uploadParams struct {
+	File class.File   `validate:"required"`
+	Path class.String `description:"相对项目目录地址"`
+}
+
+func upload(ctx *context.Context) {
+	params := uploadParams{}
+	ctx.BindForm(&params)
+	if !params.Path.Valid {
+		params.Path.Set("/")
+	}
+	if params.Path.String[len(params.Path.String)-1] != '/' {
+		params.Path.String += "/"
+	}
+	storagekit.SaveInHome(&params.File, params.Path.String+params.File.Header.Filename)
+	ctx.JsonSuccess(nil)
+}
+
+type fileListParams struct {
+	Path string `description:"相对项目目录地址" validate:"required"`
+}
+
+func fileList(ctx *context.Context) {
+	params := fileListParams{}
+	ctx.BindForm(&params)
+	fullPath := storagekit.GetFullPath(params.Path)
+	files := filekit.ListFileNames(fullPath)
+	ret := make([]string, 0, len(files))
+	if fullPath[len(fullPath)-1] != '/' {
+		fullPath += "/"
+	}
+	for _, e := range files {
+		ret = append(ret, strings.ReplaceAll(e, fullPath, ""))
+	}
+	ctx.JsonSuccess(ret)
+}
+
+func fileDel(ctx *context.Context) {
+	params := fileListParams{}
+	ctx.BindForm(&params)
+	fullPath := storagekit.GetFullPath(params.Path)
+	err := filekit.DelFile(fullPath)
+	if err != nil {
+		panic(exception.New(err.Error()))
+	}
+	ctx.JsonSuccess(nil)
 }

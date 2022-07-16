@@ -16,7 +16,7 @@ func GetFullPath(path string) string {
 	return p
 }
 
-// SaveInHome 存入项目目录下
+// SaveInHome 存入项目目录下, path是全路径
 func SaveInHome(file *class.File, path string) {
 	path = GetFullPath(path)
 	_ = filekit.CheckFilePath(path)

@@ -26,6 +26,7 @@ func DefFlags(cmd *cobra.Command) {
 	cmd.Flags().String(configkey.ProjectDir, ".", "项目目录")
 	cmd.Flags().String(configkey.ProjectName, "", "项目名称")
 	cmd.Flags().String(configkey.ProjectSubDir4PublicDownload, "", "项目目录中用于公共下载的开放目录（一层），逗号分隔，.表示所有")
+	cmd.Flags().String(configkey.ProjectSubDir4PrivateDownload, "", "项目目录中用于私有下载的开放目录（一层），逗号分隔，.表示所有")
 	cmd.Flags().String(configkey.ProfileDev, "", "开发模式 default:false")
 	cmd.Flags().String(configkey.TimeLocation, "Asia/Shanghai", "项目中用到的时区")
 
