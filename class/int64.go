@@ -36,6 +36,7 @@ func (th *Int64) Scan(value any) error {
 		th.Int64, th.Valid = 0, false
 		return nil
 	}
+	th.Valid = true
 	var err error
 	switch value.(type) {
 	case []uint8:
