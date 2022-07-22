@@ -13,3 +13,6 @@ const RestRequestBodySize = "rest.requestBodySize"
 const RestPPROF = "rest.pprof"
 
 const SessionExpire = "rest.sessionExpire"
+
+// SessionSecure 上传cookie时是否需要https，关系到浏览器的跨域策略和具体是否用https部署服务
+const SessionSecure = "rest.sessionSecure"

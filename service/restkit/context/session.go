@@ -71,12 +71,20 @@ func (ctx *Context) SessionSet(key string, val any) {
 // SessionSave 刷新session 到cookie
 func (ctx *Context) SessionSave() {
 	session := sessions.Default(ctx.Proxy)
+	// 关于跨域（chrome）：需要设置为samesite=none，secure=true，也就是必须在https下才能跨域
+	// 如果需要在http下访问，但无跨域要求，需要设置secure=false
+	secure := true
+	samesite := http.SameSiteNoneMode
+	if configkit.Exist(configkey.SessionSecure) && !configkit.GetBoolD(configkey.SessionSecure) {
+		secure = false
+		samesite = http.SameSiteLaxMode
+	}
 	session.Options(sessions.Options{
 		Path:     "/",
 		MaxAge:   configkit.GetInt(configkey.SessionExpire, 6) * 3600,
 		HttpOnly: true,
-		Secure:   true,
-		SameSite: http.SameSiteNoneMode,
+		Secure:   secure,
+		SameSite: samesite,
 	})
 	// todo save时是否也会存入redis，还是其他情况也会
 	err := session.Save()

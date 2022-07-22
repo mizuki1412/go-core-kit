@@ -54,6 +54,7 @@ func DefFlags(cmd *cobra.Command) {
 	cmd.Flags().String(configkey.RestRequestBodySize, "", "限制request最大，单位MB")
 	cmd.Flags().String(configkey.RestPPROF, "", "开启pprof, /debug/pprof")
 	cmd.Flags().String(configkey.SessionExpire, "", "session expire 单位小时")
+	cmd.Flags().String(configkey.SessionSecure, "true", "上传cookie时是否需要https，关系到浏览器的跨域策略和具体是否用https部署服务")
 
 	cmd.Flags().String(configkey.DBDriver, "", "")
 	cmd.Flags().String(configkey.DBHost, "", "")
