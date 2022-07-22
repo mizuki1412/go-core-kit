@@ -7,6 +7,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cast"
+	"sync"
 	"time"
 )
 
@@ -16,36 +17,42 @@ var subscribeList []func()
 
 // 第一次连接
 var first = true
+var _once sync.Once
 
 func New() *MQTT.Client {
-	opts := MQTT.NewClientOptions()
-	opts.AddBroker(configkit.GetStringD(configkey.MQTTBroker))
-	opts.SetKeepAlive(time.Duration(1) * time.Minute)
-	opts.SetAutoReconnect(true)
-	opts.SetConnectRetry(true)
-	opts.SetConnectRetryInterval(time.Duration(5) * time.Second)
-	opts.SetClientID(configkit.GetStringD(configkey.MQTTClientID))
-	opts.SetUsername(configkit.GetStringD(configkey.MQTTUsername)).SetPassword(configkit.GetStringD(configkey.MQTTPwd))
-	var lostHan MQTT.OnConnectHandler = func(c MQTT.Client) {
-		if first {
-			first = false
-			return
+	_once.Do(func() {
+		opts := MQTT.NewClientOptions()
+		if configkit.GetStringD(configkey.MQTTBroker) == "" || configkit.GetStringD(configkey.MQTTClientID) == "" {
+			panic(exception.New("请填写broker和clientId"))
 		}
-		// 重连后重新订阅
-		logkit.Info("mqtt reconnect, subs:" + cast.ToString(len(subscribeList)))
-		for _, sub := range subscribeList {
-			sub()
+		opts.AddBroker(configkit.GetStringD(configkey.MQTTBroker))
+		opts.SetKeepAlive(time.Duration(1) * time.Minute)
+		opts.SetAutoReconnect(true)
+		opts.SetConnectRetry(true)
+		opts.SetConnectRetryInterval(time.Duration(5) * time.Second)
+		opts.SetClientID(configkit.GetStringD(configkey.MQTTClientID))
+		opts.SetUsername(configkit.GetStringD(configkey.MQTTUsername)).SetPassword(configkit.GetStringD(configkey.MQTTPwd))
+		var lostHan MQTT.OnConnectHandler = func(c MQTT.Client) {
+			if first {
+				first = false
+				return
+			}
+			// 重连后重新订阅
+			logkit.Info("mqtt reconnect, subs:" + cast.ToString(len(subscribeList)))
+			for _, sub := range subscribeList {
+				sub()
+			}
 		}
-	}
-	opts.SetOnConnectHandler(lostHan)
-	//opts.SetDefaultPublishHandler(func(client MQTT.Client, msg MQTT.Message) {
-	//})
-	//create and start a client using the above ClientOptions
-	client = MQTT.NewClient(opts)
-	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		panic(exception.New(token.Error().Error()))
-	}
-	logkit.Info("mqtt connect success")
+		opts.SetOnConnectHandler(lostHan)
+		//opts.SetDefaultPublishHandler(func(client MQTT.Client, msg MQTT.Message) {
+		//})
+		//create and start a client using the above ClientOptions
+		client = MQTT.NewClient(opts)
+		if token := client.Connect(); token.Wait() && token.Error() != nil {
+			panic(exception.New(token.Error().Error()))
+		}
+		logkit.Info("mqtt connect success")
+	})
 	return &client
 }
 

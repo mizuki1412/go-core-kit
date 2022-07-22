@@ -33,6 +33,9 @@ var allClientsMux sync.RWMutex
 func NewClient(param ConnectParam) *Client {
 	newClient := &Client{First: true, Id: param.Id}
 	opts := MQTT.NewClientOptions()
+	if param.Broker == "" || param.Id == "" {
+		panic(exception.New("请填写broker和clientId"))
+	}
 	opts.AddBroker(param.Broker)
 	opts.SetKeepAlive(time.Duration(1) * time.Minute)
 	opts.SetAutoReconnect(true)
