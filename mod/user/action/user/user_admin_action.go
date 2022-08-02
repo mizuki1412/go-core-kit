@@ -224,6 +224,9 @@ func DelUser(ctx *context.Context) {
 	if target.Role != nil && target.Role.Id == 0 {
 		panic(exception.New("该用户不能设置"))
 	}
+	if target.Extend.GetBool("immutable") {
+		panic(exception.New("该用户不可删除"))
+	}
 	//
 	if params.Off.Int32 == 0 {
 		dao.OffUser(params.Id, model.UserOffDelete)

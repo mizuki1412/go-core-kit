@@ -18,7 +18,7 @@ type User struct {
 	Image      class.String    `json:"image,omitempty" db:"image" description:"头像"`
 	Address    class.String    `json:"address,omitempty" db:"address"`
 	Off        class.Int32     `json:"off,omitempty" db:"off" description:"冻结 1， 删除 -1"`
-	Extend     class.MapString `json:"extend,omitempty" db:"extend" description:"权限剔除privilegeExclude:[]"`
+	Extend     class.MapString `json:"extend,omitempty" db:"extend" description:"权限剔除privilegeExclude:[], 不可删除immutable:bool"`
 	CreateDt   class.Time      `json:"createDt,omitempty" db:"createdt"`
 }
 
@@ -39,12 +39,12 @@ func (th User) Value() (driver.Value, error) {
 	return int64(th.Id), nil
 }
 
-// 判断属于某个部门
+// BelongDepartment 判断属于某个部门
 func (th *User) BelongDepartment(department int32) bool {
 	return th != nil && th.Role != nil && th.Role.Department != nil && th.Role.Department.Id == department
 }
 
-// 判断是否有权限
+// HasPrivilege 判断是否有权限
 func (th *User) HasPrivilege(privilege string) bool {
 	return th != nil && th.Role != nil && th.Role.Privileges.Contains(privilege)
 }
