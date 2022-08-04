@@ -5,6 +5,7 @@ import (
 	"fmt"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/library/cryptokit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cast"
 	"sync"
@@ -33,8 +34,11 @@ var allClientsMux sync.RWMutex
 func NewClient(param ConnectParam) *Client {
 	newClient := &Client{First: true, Id: param.Id}
 	opts := MQTT.NewClientOptions()
-	if param.Broker == "" || param.Id == "" {
-		panic(exception.New("请填写broker和clientId"))
+	if param.Broker == "" {
+		panic(exception.New("请填写broker"))
+	}
+	if param.Id == "" {
+		param.Id = cryptokit.ID()
 	}
 	opts.AddBroker(param.Broker)
 	opts.SetKeepAlive(time.Duration(1) * time.Minute)

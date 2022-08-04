@@ -4,6 +4,7 @@ import (
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/init/configkey"
+	"github.com/mizuki1412/go-core-kit/library/cryptokit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cast"
@@ -22,15 +23,15 @@ var _once sync.Once
 func New() *MQTT.Client {
 	_once.Do(func() {
 		opts := MQTT.NewClientOptions()
-		if configkit.GetStringD(configkey.MQTTBroker) == "" || configkit.GetStringD(configkey.MQTTClientID) == "" {
-			panic(exception.New("请填写broker和clientId"))
+		if configkit.GetStringD(configkey.MQTTBroker) == "" {
+			panic(exception.New("请填写broker"))
 		}
 		opts.AddBroker(configkit.GetStringD(configkey.MQTTBroker))
 		opts.SetKeepAlive(time.Duration(1) * time.Minute)
 		opts.SetAutoReconnect(true)
 		opts.SetConnectRetry(true)
 		opts.SetConnectRetryInterval(time.Duration(5) * time.Second)
-		opts.SetClientID(configkit.GetStringD(configkey.MQTTClientID))
+		opts.SetClientID(configkit.GetString(configkey.MQTTClientID, cryptokit.ID()))
 		opts.SetUsername(configkit.GetStringD(configkey.MQTTUsername)).SetPassword(configkit.GetStringD(configkey.MQTTPwd))
 		var lostHan MQTT.OnConnectHandler = func(c MQTT.Client) {
 			if first {
