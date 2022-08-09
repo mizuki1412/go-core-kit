@@ -5,6 +5,7 @@ import (
 	"fmt"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/library/commonkit"
 	"github.com/mizuki1412/go-core-kit/library/cryptokit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cast"
@@ -81,8 +82,13 @@ func (th *Client) Subscribe(topic string, qos byte, callback MQTT.MessageHandler
 		logkit.Error("please newClient first")
 		return
 	}
+	callback1 := func(c MQTT.Client, message MQTT.Message) {
+		_ = commonkit.RecoverFuncWrapper(func() {
+			callback(c, message)
+		})
+	}
 	f := func() {
-		if token := th.C.Subscribe(topic, qos, callback); token.Wait() && token.Error() != nil {
+		if token := th.C.Subscribe(topic, qos, callback1); token.Wait() && token.Error() != nil {
 			logkit.Error(token.Error().Error())
 		} else {
 			logkit.Info("mqtt subscribe success: " + topic)
