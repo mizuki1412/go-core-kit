@@ -65,10 +65,14 @@ func (ctx *Context) BindForm(bean any) {
 				panic(exception.New("validation failed: " + stringkit.LowerFirst(err0.Field()) + ", need " + err0.Tag()))
 			}
 		}
+		body := jsonkit.ToString(bean)
+		if len(body) > 1024 {
+			body = body[:1024]
+		}
 		logkit.Info("request-body", logkit.Param{
 			Key: "session",
 			Val: ctx.SessionID(),
-		}, logkit.Param{Key: "body", Val: jsonkit.ToString(bean)})
+		}, logkit.Param{Key: "body", Val: body})
 	}
 }
 
