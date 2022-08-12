@@ -37,6 +37,7 @@ toolkit for golang projects
 
 - [ ] https://github.com/gin-contrib/sessions/pull/148 等官方更新
 - [ ] https://github.com/unrolled/render 模板渲染
+- [ ] mqtt subscribe 中如果执行太久，会重复执行subscribe？ 暂时用go fun处理
 
 ## 旧项目升级注意
 
@@ -44,3 +45,4 @@ toolkit for golang projects
 - interface{}->any
 - 配置文件：aliyun
 - dao
+- mqttkit subscribe 不加recover

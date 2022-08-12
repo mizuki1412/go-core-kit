@@ -74,6 +74,10 @@ func (dao *Dao) FindByUsername(username string) *model.User {
 	sql, args := sqlkit.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("username=?", username).Where("off>=0").MustSql()
 	return dao.ScanOne(sql, args)
 }
+func (dao *Dao) FindByUsernameDeleted(username string) *model.User {
+	sql, args := sqlkit.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("username=?", username).Where("off=-1").MustSql()
+	return dao.ScanOne(sql, args)
+}
 
 // FindParam 可以通过extend的值来find
 type FindParam struct {
@@ -107,7 +111,7 @@ type ListParam struct {
 }
 
 func (dao *Dao) List(param ListParam) []*model.User {
-	builder := sqlkit.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("off>-1").OrderBy("name, id")
+	builder := sqlkit.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("off>-1").OrderBy("id")
 	if param.RoleId != 0 {
 		builder = builder.Where("role=?", param.RoleId)
 	}

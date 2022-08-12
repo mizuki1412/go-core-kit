@@ -21,7 +21,7 @@ func init() {
 	rootCmd.AddCommand(cmd.PGSqlToStructCMD("", ""))
 	//rootCmd.AddCommand(cmd.FrontDaoCMDNext(""))
 	//rootCmd.AddCommand(cmd.MarkdownDocCMD("go-core-kit 说明文档"))
-	//rootCmd.AddCommand(cmd.WebStaticServerCMD())
+	rootCmd.AddCommand(cmd.WebStaticServerCMD())
 }
 
 var rootCmd = &cobra.Command{

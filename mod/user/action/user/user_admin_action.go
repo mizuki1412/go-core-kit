@@ -67,7 +67,7 @@ func AddUser(ctx *context.Context) {
 	ctx.JsonSuccess(u)
 }
 
-func AddUserHandle(ctx *context.Context, params AddUserParams, checkSms bool) model.User {
+func AddUserHandle(ctx *context.Context, params AddUserParams, checkSms bool) *model.User {
 	dao := userdao.NewWithSchema(ctx.SessionGetSchema())
 	dao.SetResultType(userdao.ResultNone)
 	if dao.FindByUsername(params.Username.String) != nil {
@@ -84,7 +84,13 @@ func AddUserHandle(ctx *context.Context, params AddUserParams, checkSms bool) mo
 	if r == nil {
 		panic(exception.New("角色不存在"))
 	}
-	u := model.User{}
+	var u *model.User
+	// 复用username存在的用户
+	u = dao.FindByUsernameDeleted(params.Username.String)
+	if u == nil {
+		u = &model.User{}
+		u.CreateDt.Set(time.Now())
+	}
 	if params.Username.Valid {
 		u.Username.Set(params.Username)
 	}
@@ -111,8 +117,11 @@ func AddUserHandle(ctx *context.Context, params AddUserParams, checkSms bool) mo
 	if params.ExtendJson.Valid {
 		u.Extend.PutAll(params.ExtendJson.Map)
 	}
-	u.CreateDt.Set(time.Now())
-	dao.Insert(&u)
+	if u.Id > 0 {
+		dao.Update(u)
+	} else {
+		dao.Insert(u)
+	}
 	return u
 }
 
