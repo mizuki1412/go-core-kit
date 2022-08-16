@@ -30,7 +30,7 @@ func ToString(obj any) string {
 	return s
 }
 
-// ParseObj string, &p
+// ParseObj string, &p, 数组也必须point
 func ParseObj(data string, p any) error {
 	err := JSON().Unmarshal([]byte(data), p)
 	return err
