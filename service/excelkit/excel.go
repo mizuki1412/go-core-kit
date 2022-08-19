@@ -86,16 +86,20 @@ func Export(param Param, ctx *context.Context) {
 		panic(exception.New(err.Error()))
 	}
 	// title
-	err = f.MergeCell(param.Sheet, "A1", string(rune('A'+len(param.Keys)-1))+"1")
-	err = f.SetCellStyle(param.Sheet, "A1", string(rune('A'+len(param.Keys)-1))+"1", titleStyle)
+	//err = f.MergeCell(param.Sheet, "A1", string(rune('A'+len(param.Keys)-1))+"1")
+	//err = f.SetCellStyle(param.Sheet, "A1", string(rune('A'+len(param.Keys)-1))+"1", titleStyle)
+	err = f.MergeCell(param.Sheet, "A1", baseConversion(len(param.Keys)-1)+"1")
+	err = f.SetCellStyle(param.Sheet, "A1", baseConversion(len(param.Keys)-1)+"1", titleStyle)
 	err = f.SetCellValue(param.Sheet, "A1", param.Title)
 	// key title
 	for _, v := range keyMap {
-		cell := string(rune('A'+v.Index)) + "2"
+		//cell := string(rune('A'+v.Index)) + "2"
+		cell := baseConversion(v.Index) + "2"
 		err = f.SetCellStyle(param.Sheet, cell, cell, cellStyle)
 		err = f.SetCellValue(param.Sheet, cell, v.Name)
 		if v.Width > 0 {
-			err = f.SetColWidth(param.Sheet, string(rune('A'+v.Index)), string(rune('A'+v.Index)), v.Width)
+			//err = f.SetColWidth(param.Sheet, string(rune('A'+v.Index)), string(rune('A'+v.Index)), v.Width)
+			err = f.SetColWidth(param.Sheet, baseConversion(v.Index), baseConversion(v.Index), v.Width)
 		}
 	}
 	// data
@@ -103,14 +107,16 @@ func Export(param Param, ctx *context.Context) {
 		index := i + 3
 		// 每个cell加style
 		for j := range param.Keys {
-			cell := string(rune('A'+j)) + cast.ToString(index)
+			//cell := string(rune('A'+j)) + cast.ToString(index)
+			cell := baseConversion(j) + cast.ToString(index)
 			err = f.SetCellStyle(param.Sheet, cell, cell, cellStyle)
 		}
 		for k, v := range data {
 			if _, ok := keyMap[k]; !ok {
 				continue
 			}
-			cell := string(rune('A'+keyMap[k].Index)) + cast.ToString(index)
+			//cell := string(rune('A'+keyMap[k].Index)) + cast.ToString(index)
+			cell := baseConversion(keyMap[k].Index) + cast.ToString(index)
 			err = f.SetCellValue(param.Sheet, cell, v)
 		}
 	}
@@ -211,4 +217,30 @@ func BorderStyleDefault() []excelize.Border {
 			Style: 1,
 		},
 	}
+}
+
+var base = []rune{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
+
+func baseConversion(number int) string {
+	var ret string
+	var m []rune
+	length := len(base)
+	flag := false
+	for number >= 0 {
+		if flag {
+			break
+		}
+		index := number % length
+		m = append(m, base[index])
+		temp := number / length
+		if temp == 0 {
+			flag = true
+		}
+		number = (number - 26) / length
+
+	}
+	for i := len(m) - 1; i >= 0; i-- {
+		ret += string(m[i])
+	}
+	return ret
 }
