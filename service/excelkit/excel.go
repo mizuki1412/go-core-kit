@@ -236,7 +236,7 @@ func baseConversion(number int) string {
 		if temp == 0 {
 			flag = true
 		}
-		number = (number - 26) / length
+		number = temp - 1
 
 	}
 	for i := len(m) - 1; i >= 0; i-- {
