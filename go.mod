@@ -9,8 +9,8 @@ require (
 	github.com/albenik/go-serial/v2 v2.5.0
 	github.com/alecthomas/chroma v0.10.0
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.1536
-	github.com/eclipse/paho.mqtt.golang v1.3.5
-	github.com/gin-gonic/gin v1.8.0
+	github.com/eclipse/paho.mqtt.golang v1.4.1
+	github.com/gin-gonic/gin v1.8.1
 	github.com/go-playground/validator/v10 v10.11.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/googollee/go-socket.io v1.6.1
@@ -19,20 +19,20 @@ require (
 	github.com/lib/pq v1.10.6
 	github.com/mizuki1412/go-webview2 v0.0.0-20211216070425-b98c07fd76eb
 	github.com/mizuki1412/sessions v1.0.0
-	github.com/panjf2000/gnet v1.6.5
+	github.com/panjf2000/gnet v1.6.6
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/xid v1.4.0
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/shopspring/decimal v1.3.1
-	github.com/spf13/afero v1.8.2
+	github.com/spf13/afero v1.9.2
 	github.com/spf13/cast v1.5.0
-	github.com/spf13/cobra v1.4.0
+	github.com/spf13/cobra v1.5.0
 	github.com/spf13/viper v1.12.0
-	github.com/tidwall/gjson v1.14.1
+	github.com/tidwall/gjson v1.14.3
 	github.com/xuri/excelize/v2 v2.6.0
 	github.com/zserge/lorca v0.1.10
 	go.uber.org/automaxprocs v1.5.1
-	go.uber.org/zap v1.21.0
+	go.uber.org/zap v1.22.0
 	golang.org/x/text v0.3.7
 	gopkg.in/ini.v1 v1.66.4
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
@@ -92,6 +92,7 @@ require (
 	go.uber.org/multierr v1.7.0 // indirect
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4 // indirect
 	golang.org/x/net v0.0.0-20220520000938-2e3eb7b945c2 // indirect
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
