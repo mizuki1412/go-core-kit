@@ -29,6 +29,12 @@ func SaveBytesInHome(data []byte, path string) {
 	_ = filekit.WriteFile(path, data)
 }
 
+func SaveBytesAppendInHome(data []byte, path string) {
+	path = GetFullPath(path)
+	_ = filekit.CheckFilePath(path)
+	_ = filekit.WriteFileAppend(path, data)
+}
+
 func GetInHome(path string) []byte {
 	path = GetFullPath(path)
 	//file,err := os.OpenFile(path, os.O_RDONLY, 644)

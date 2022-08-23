@@ -28,7 +28,7 @@ func New() *MQTT.Client {
 			panic(exception.New("请填写broker"))
 		}
 		opts.AddBroker(configkit.GetStringD(configkey.MQTTBroker))
-		opts.SetKeepAlive(time.Duration(1) * time.Minute)
+		opts.SetKeepAlive(time.Duration(10) * time.Second)
 		opts.SetAutoReconnect(true)
 		opts.SetConnectRetry(true)
 		opts.SetConnectRetryInterval(time.Duration(5) * time.Second)
@@ -83,10 +83,14 @@ func Publish(topic string, qos byte, retained bool, payload any) error {
 		New()
 	}
 	token := client.Publish(topic, qos, retained, payload)
-	token.Wait()
+	token.WaitTimeout(time.Duration(1) * time.Minute)
 	if token.Error() != nil {
 		logkit.Error(token.Error().Error())
 		return token.Error()
 	}
 	return nil
+}
+
+func GetClient() MQTT.Client {
+	return client
 }
