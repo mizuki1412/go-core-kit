@@ -38,7 +38,7 @@ func (th *Decimal) Set(val any) *Decimal {
 		th.Valid = true
 		th.Decimal = v
 	} else {
-		panic(exception.New("class.Decimal set error: " + err.Error()))
+		panic(exception.New("class.Decimal set (" + cast.ToString(val) + ") error: " + err.Error()))
 	}
 	return th
 }

@@ -2,7 +2,7 @@ package class
 
 import "sync"
 
-// LockWait 用于异步等待
+// LockWait 用于异步等待 todo chan close？
 type LockWait struct {
 	sync.RWMutex
 	Data map[string]chan map[string]any
