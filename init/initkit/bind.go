@@ -89,6 +89,11 @@ func DefFlags(cmd *cobra.Command) {
 	cmd.Flags().String(configkey.MQTTPwd, "", "")
 	// netkit
 	cmd.Flags().String(configkey.NetPort, "", "")
+
+	// softether
+	cmd.Flags().String(configkey.SoftEtherHost, "", "")
+	cmd.Flags().String(configkey.SoftEtherPort, "", "")
+	cmd.Flags().String(configkey.SoftEtherPwd, "", "")
 }
 
 func BindFlags(cmd *cobra.Command) {
