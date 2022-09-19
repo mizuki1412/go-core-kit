@@ -3,13 +3,15 @@ package stringkit
 import (
 	"bytes"
 	"encoding/hex"
+	"fmt"
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
 	"io"
 	"strconv"
+	"strings"
 )
 
-// 获取中文字符串第一个首字母
+// GetChineseFirstLetter 获取中文字符串第一个首字母
 func GetChineseFirstLetter(chinese string) string {
 
 	// 获取中文字符串第一个字符
@@ -104,7 +106,6 @@ func GetChineseFirstLetter(chinese string) string {
 	return ""
 }
 
-// Utf8ToGbk
 func Utf8ToGbk(s []byte) ([]byte, error) {
 	reader := transform.NewReader(bytes.NewReader(s), simplifiedchinese.GBK.NewEncoder())
 	d, e := io.ReadAll(reader)
@@ -112,4 +113,21 @@ func Utf8ToGbk(s []byte) ([]byte, error) {
 		return nil, e
 	}
 	return d, nil
+}
+
+// UnicodeStrToStr unicode字符串（转义的）转string
+func UnicodeStrToStr(str string) string {
+	sUnicodev := strings.Split(str, "\\u")
+	var context string
+	for _, v := range sUnicodev {
+		if len(v) < 1 {
+			continue
+		}
+		temp, err := strconv.ParseInt(v, 16, 32)
+		if err != nil {
+			panic(err)
+		}
+		context += fmt.Sprintf("%c", temp)
+	}
+	return context
 }
