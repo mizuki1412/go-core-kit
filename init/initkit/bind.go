@@ -94,6 +94,7 @@ func DefFlags(cmd *cobra.Command) {
 	cmd.Flags().String(configkey.SoftEtherHost, "", "")
 	cmd.Flags().String(configkey.SoftEtherPort, "", "")
 	cmd.Flags().String(configkey.SoftEtherPwd, "", "")
+	cmd.Flags().String(configkey.SoftEtherOpenVpnPort, "", "")
 }
 
 func BindFlags(cmd *cobra.Command) {
