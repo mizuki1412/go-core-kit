@@ -17,7 +17,6 @@ import (
 type Client struct {
 	C             MQTT.Client
 	SubscribeList []func()
-	First         bool // 第一次连接
 	Id            string
 }
 
@@ -33,7 +32,7 @@ var allClients = map[MQTT.Client]*Client{}
 var allClientsMux sync.RWMutex
 
 func NewClient(param ConnectParam) *Client {
-	newClient := &Client{First: true, Id: param.Id}
+	newClient := &Client{Id: param.Id}
 	opts := MQTT.NewClientOptions()
 	if param.Broker == "" {
 		panic(exception.New("请填写broker"))
@@ -42,22 +41,17 @@ func NewClient(param ConnectParam) *Client {
 		param.Id = cryptokit.ID()
 	}
 	opts.AddBroker(param.Broker)
-	opts.SetKeepAlive(time.Duration(1) * time.Minute)
+	opts.SetKeepAlive(time.Duration(30) * time.Second)
 	opts.SetAutoReconnect(true)
 	opts.SetConnectRetry(true)
 	opts.SetConnectRetryInterval(time.Duration(5) * time.Second)
 	opts.SetClientID(param.Id)
 	opts.SetUsername(param.Username).SetPassword(param.Pwd)
 	var lostHan MQTT.OnConnectHandler = func(c MQTT.Client) {
-		// todo 测试c是否前后一致
 		allClientsMux.RLock()
 		defer allClientsMux.RUnlock()
+		// 连接成功后才会
 		if cl, ok := allClients[c]; ok {
-			// 第一次连接不处理
-			if cl.First {
-				cl.First = false
-				return
-			}
 			// 重连后重新订阅
 			logkit.Info(fmt.Sprintf("mqtt reconnect: %s, subs:%s", cl.Id, cast.ToString(len(cl.SubscribeList))))
 			for _, sub := range cl.SubscribeList {
@@ -105,7 +99,7 @@ func (th *Client) Publish(topic string, qos byte, retained bool, payload any) er
 		return err
 	}
 	token := th.C.Publish(topic, qos, retained, payload)
-	token.Wait()
+	token.WaitTimeout(time.Duration(1) * time.Minute)
 	if token.Error() != nil {
 		logkit.Error(token.Error().Error())
 		return token.Error()
