@@ -22,6 +22,9 @@ func init() {
 	//rootCmd.AddCommand(cmd.FrontDaoCMDNext(""))
 	//rootCmd.AddCommand(cmd.MarkdownDocCMD("go-core-kit 说明文档"))
 	rootCmd.AddCommand(cmd.WebStaticServerCMD())
+	mqttcmd := cmd.MQTTTestCMD()
+	rootCmd.AddCommand(mqttcmd)
+	initkit.DefFlags(mqttcmd)
 }
 
 var rootCmd = &cobra.Command{
