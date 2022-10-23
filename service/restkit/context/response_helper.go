@@ -23,6 +23,11 @@ const ResultSuccess = 1
 const ResultAuthErr = 2
 const ResultUnauthorized = 403
 
+// TransferRestRet 用于自定义返回结构时的转换
+var TransferRestRet = func(ret RestRet) any {
+	return ret
+}
+
 // Json http返回json数据
 func (ctx *Context) Json(ret RestRet) {
 	var code int
@@ -34,7 +39,7 @@ func (ctx *Context) Json(ret RestRet) {
 	default:
 		code = http.StatusBadRequest
 	}
-	ctx.Proxy.JSON(code, ret)
+	ctx.Proxy.JSON(code, TransferRestRet(ret))
 }
 
 func (ctx *Context) JsonSuccess(data any) {

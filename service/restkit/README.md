@@ -56,6 +56,10 @@ https://github.com/kataras/iris/wiki/Sessions-database
 
 redis session key的expire时间，受iris session config控制，同时renew时，旧的也会删除。
 
+### context/response
+
+- context.TransferRestRet：用于定制转换自定义的输入json结构
+
 ### swagger
 
 标准：https://swagger.io/specification/v2/
