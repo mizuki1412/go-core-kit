@@ -63,6 +63,29 @@ func Bytes2Int32(bs []byte) int32 {
 	_ = binary.Read(buf, binary.BigEndian, &target)
 	return target
 }
+func Bytes2Uint32(bs []byte) uint32 {
+	length := len(bs)
+	switch length {
+	case 0:
+		return 0
+	case 1:
+		data := []byte{0x00, 0x00, 0x00}
+		data = append(data, bs...)
+		bs = data
+	case 2:
+		data := []byte{0x00, 0x00}
+		data = append(data, bs...)
+		bs = data
+	case 3:
+		data := []byte{0x00}
+		data = append(data, bs...)
+		bs = data
+	}
+	buf := bytes.NewBuffer(bs)
+	var target uint32
+	_ = binary.Read(buf, binary.BigEndian, &target)
+	return target
+}
 
 func Bytes2Int64(bs []byte) int64 {
 	length := len(bs)
