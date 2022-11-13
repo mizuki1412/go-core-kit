@@ -138,7 +138,7 @@ func (dao *Dao) OffUser(uid int32, off int32) {
 	dao.Exec(sql, args...)
 }
 func (dao *Dao) SetNull(id int32) {
-	sql, args, err := sqlkit.Builder().Update(meta.GetTableName(dao.Schema)).Set("phone", squirrel.Expr("null")).Where("id=?", id).ToSql()
+	sql, args, err := sqlkit.Builder().Update(meta.GetTableName(dao.Schema)).Set("phone", squirrel.Expr("null")).Set("username", squirrel.Expr("null")).Where("id=?", id).ToSql()
 	if err != nil {
 		panic(exception.New(err.Error()))
 	}

@@ -6,14 +6,14 @@ require (
 	github.com/Depado/bfchroma v1.3.0
 	github.com/Masterminds/squirrel v1.5.3
 	github.com/SebastiaanKlippert/go-wkhtmltopdf v1.7.2
-	github.com/albenik/go-serial/v2 v2.5.0
+	github.com/albenik/go-serial/v2 v2.5.1
 	github.com/alecthomas/chroma v0.10.0
-	github.com/aliyun/alibaba-cloud-sdk-go v1.61.1536
-	github.com/eclipse/paho.mqtt.golang v1.4.1
+	github.com/aliyun/alibaba-cloud-sdk-go v1.61.1826
+	github.com/eclipse/paho.mqtt.golang v1.4.2
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-playground/validator/v10 v10.11.1
 	github.com/go-redis/redis/v8 v8.11.5
-	github.com/googollee/go-socket.io v1.6.1
+	github.com/googollee/go-socket.io v1.6.2
 	github.com/jlaffaye/ftp v0.1.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/json-iterator/go v1.1.12
@@ -27,14 +27,14 @@ require (
 	github.com/shopspring/decimal v1.3.1
 	github.com/spf13/afero v1.9.2
 	github.com/spf13/cast v1.5.0
-	github.com/spf13/cobra v1.5.0
+	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.13.0
 	github.com/tidwall/gjson v1.14.3
 	github.com/xuri/excelize/v2 v2.6.1
 	github.com/zserge/lorca v0.1.10
 	go.uber.org/automaxprocs v1.5.1
 	go.uber.org/zap v1.23.0
-	golang.org/x/text v0.3.7
+	golang.org/x/text v0.4.0
 	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
@@ -61,7 +61,7 @@ require (
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/inconshreveable/mousetrap v1.0.0 // indirect
+	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/jchv/go-winloader v0.0.0-20200815041850-dec1ee9a7fd5 // indirect
 	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af // indirect
 	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
