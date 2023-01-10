@@ -16,4 +16,4 @@ publish:
 	@git push origin v${VERSION}
 
 build:
-	@GOOS=windows GOARCH=amd64 go build -o build/corekit.exe
+	@GOOS=windows GOARCH=amd64 go build -tags timetzdata -o build/corekit.exe

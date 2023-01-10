@@ -6,12 +6,10 @@ import (
 	"github.com/mizuki1412/go-core-kit/cmd"
 	"github.com/mizuki1412/go-core-kit/init/initkit"
 	"github.com/mizuki1412/go-core-kit/library/bytekit"
-	"github.com/mizuki1412/go-core-kit/library/httpkit"
 	"github.com/mizuki1412/go-core-kit/library/mathkit"
 	"github.com/mizuki1412/go-core-kit/library/timekit"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
-	"log"
 	"net"
 	"strings"
 	"time"
@@ -34,28 +32,6 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		initkit.BindFlags(cmd)
 
-		res, _ := httpkit.Request(httpkit.Req{
-			Url: "http://47.96.160.63:10179",
-			FormData: map[string]string{
-				"line1":      "1 53818U 22114A   22291.91667824  .00002209  00000+0  20150-4 0  9998",
-				"start":      "2022-10-22 00:00:00",
-				"end":        "2022-11-22 00:00:00",
-				"line2":      "2 53818  53.2175 110.9746 0001074 100.5397 299.3925 15.73202758  5278",
-				"obsLat":     "26.43600000",
-				"obsLon":     "118.06600000",
-				"obsHeight":  "600",
-				"slice":      "1",
-				"minEle":     "5",
-				"maxEle":     "90",
-				"minAzi":     "0",
-				"maxAzi":     "360",
-				"minDist":    "0",
-				"maxDist":    "1000000000",
-				"pointSlice": "60",
-			},
-			//Timeout: 5 * 60,
-		})
-		log.Println(len(res))
 	},
 }
 

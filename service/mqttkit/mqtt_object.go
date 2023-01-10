@@ -18,6 +18,7 @@ type Client struct {
 	C             MQTT.Client
 	SubscribeList []func()
 	Id            string
+	Param         ConnectParam
 }
 
 type ConnectParam struct {
@@ -32,7 +33,6 @@ var allClients = map[MQTT.Client]*Client{}
 var allClientsMux sync.RWMutex
 
 func NewClient(param ConnectParam) *Client {
-	newClient := &Client{Id: param.Id}
 	opts := MQTT.NewClientOptions()
 	if param.Broker == "" {
 		panic(exception.New("请填写broker"))
@@ -40,8 +40,9 @@ func NewClient(param ConnectParam) *Client {
 	if param.Id == "" {
 		param.Id = cryptokit.ID()
 	}
+	newClient := &Client{Id: param.Id, Param: param}
 	opts.AddBroker(param.Broker)
-	opts.SetKeepAlive(time.Duration(30) * time.Second)
+	opts.SetKeepAlive(time.Duration(5) * time.Second)
 	opts.SetAutoReconnect(true)
 	opts.SetConnectRetry(true)
 	opts.SetConnectRetryInterval(time.Duration(5) * time.Second)
@@ -64,7 +65,7 @@ func NewClient(param ConnectParam) *Client {
 	if token := newClient.C.Connect(); token.Wait() && token.Error() != nil {
 		panic(exception.New(token.Error().Error()))
 	}
-	logkit.Info("mqtt connect success")
+	logkit.Info(fmt.Sprintf("mqtt connect success: %s, clientId:%s", param.Broker, param.Id))
 	allClientsMux.Lock()
 	defer allClientsMux.Unlock()
 	allClients[newClient.C] = newClient
@@ -85,7 +86,7 @@ func (th *Client) Subscribe(topic string, qos byte, callback MQTT.MessageHandler
 		if token := th.C.Subscribe(topic, qos, callback1); token.Wait() && token.Error() != nil {
 			logkit.Error(token.Error().Error())
 		} else {
-			logkit.Info("mqtt subscribe success: " + topic)
+			logkit.Info(fmt.Sprintf("client<%s> subscribe: %s", th.Id, topic))
 		}
 	}
 	th.SubscribeList = append(th.SubscribeList, f)
