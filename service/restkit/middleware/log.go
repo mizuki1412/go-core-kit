@@ -10,13 +10,8 @@ import (
 func Log() router.Handler {
 	return func(ctx *context.Context) {
 		t := time.Now()
-		// 当前上传的cookies中的session，不一定等于response中的
-		sessionId := ctx.SessionID()
 		logkit.Info("request",
 			logkit.Param{
-				Key: "session",
-				Val: sessionId,
-			}, logkit.Param{
 				Key: "url",
 				Val: ctx.Request.URL.String(),
 			})

@@ -7,7 +7,6 @@ import (
 	"github.com/mizuki1412/go-core-kit/init/configkey"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
-	"github.com/mizuki1412/go-core-kit/service/restkit/context"
 	"github.com/mizuki1412/go-core-kit/service/restkit/middleware"
 	router2 "github.com/mizuki1412/go-core-kit/service/restkit/router"
 	"github.com/spf13/cast"
@@ -29,7 +28,7 @@ func defaultEngine() {
 	router = &router2.Router{
 		Proxy: gin.New(),
 	}
-	router.Proxy.Use(context.InitSession())
+	//router.Proxy.Use(context.InitSession())
 	router.Use(middleware.Log())
 	router.Use(middleware.Cors())
 	router.Use(middleware.Recover())

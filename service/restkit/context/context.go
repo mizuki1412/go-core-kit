@@ -71,14 +71,14 @@ func (ctx *Context) BindForm(bean any) {
 		}
 		logkit.Info("request-body", logkit.Param{
 			Key: "session",
-			Val: ctx.SessionID(),
+			Val: ctx.SessionToken(),
 		}, logkit.Param{Key: "body", Val: body})
 	}
 }
 
-/// bean:指针
+// / bean:指针
 // 实现form/query/json中的数据合并获取。
-/// description:"xxx" default:"" trim:"true"
+// / description:"xxx" default:"" trim:"true"
 func (ctx *Context) bindStruct(bean any) {
 	rt := reflect.TypeOf(bean).Elem()
 	rv := reflect.ValueOf(bean).Elem()

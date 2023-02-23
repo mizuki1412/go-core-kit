@@ -7,18 +7,23 @@ import (
 	"github.com/mizuki1412/go-core-kit/init/configkey"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
+	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cast"
+	"sync"
 	"time"
 )
 
 var client *redis.Client
+var once sync.Once
 
 func Instance() *redis.Client {
 	if client == nil {
-		client = redis.NewClient(&redis.Options{
-			Addr:     configkit.GetStringD(configkey.RedisHost) + ":" + configkit.GetString(configkey.RedisPort, "6379"),
-			Password: configkit.GetStringD(configkey.RedisPwd), // no password set
-			DB:       cast.ToInt(configkit.GetString(configkey.RedisDB, "0")),
+		once.Do(func() {
+			client = redis.NewClient(&redis.Options{
+				Addr:     configkit.GetStringD(configkey.RedisHost) + ":" + configkit.GetString(configkey.RedisPort, "6379"),
+				Password: configkit.GetStringD(configkey.RedisPwd), // no password set
+				DB:       cast.ToInt(configkit.GetString(configkey.RedisDB, "0")),
+			})
 		})
 	}
 	return client
@@ -42,7 +47,15 @@ func Set(ctx context.Context, key string, val any, expire time.Duration) {
 	}
 	_, err := client.Set(ctx, key, val, expire).Result()
 	if err != nil {
-		panic(exception.New("redis 存入失败：" + err.Error()))
+		panic(exception.New("redis save failed: " + err.Error()))
+	}
+}
+
+func Del(ctx context.Context, keys ...string) {
+	client = Instance()
+	_, err := client.Del(ctx, keys...).Result()
+	if err != nil {
+		logkit.Error("redis delete error: " + jsonkit.ToString(keys))
 	}
 }
 

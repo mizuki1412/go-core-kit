@@ -7,8 +7,8 @@ import (
 
 func Init(router *router.Router) {
 	tag := "user:用户模块"
-	router.Group("/rest/user/loginByUsername").Post("", loginByUsername).Swagger.Tag(tag).Summary("登录-用户名").Param(loginByUsernameParam{})
-	router.Group("/rest/user/login").Post("", login).Swagger.Tag(tag).Summary("登录").Param(loginParam{})
+	router.Group("/rest/user/loginByUsername").Use(middleware.CreateSession()).Post("", loginByUsername).Swagger.Tag(tag).Summary("登录-用户名").Param(loginByUsernameParam{})
+	router.Group("/rest/user/login").Use(middleware.CreateSession()).Post("", login).Swagger.Tag(tag).Summary("登录").Param(loginParam{})
 	router.Group("/rest/user/info").Use(middleware.AuthUsernameAndPwd()).Post("", info).Swagger.Tag(tag).Summary("用户信息")
 	r := router.Group("/rest/user", middleware.AuthUsernameAndPwd())
 	{

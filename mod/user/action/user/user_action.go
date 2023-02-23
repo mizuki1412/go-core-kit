@@ -38,11 +38,9 @@ func loginByUsername(ctx *context.Context) {
 	}
 	ctx.SessionSetUser(user)
 	ctx.SessionSetSchema(params.Schema)
-	ctx.SessionSetToken(ctx.SessionID())
-	ctx.SessionSave()
 	ret := map[string]any{
 		"user":  user,
-		"token": ctx.SessionID(),
+		"token": ctx.SessionToken(),
 	}
 	if AdditionLoginFunc != nil {
 		AdditionLoginFunc(ctx, ret)
@@ -58,7 +56,7 @@ type loginParam struct {
 	Schema   string `default:"public"`
 }
 
-/// 通用登录
+// / 通用登录
 func login(ctx *context.Context) {
 	//session := ctx.RenewSession()
 	params := loginParam{}
@@ -81,11 +79,9 @@ func login(ctx *context.Context) {
 	}
 	ctx.SessionSetUser(user)
 	ctx.SessionSetSchema(params.Schema)
-	ctx.SessionSetToken(ctx.SessionID())
-	ctx.SessionSave()
 	ret := map[string]any{
 		"user":  user,
-		"token": ctx.SessionID(),
+		"token": ctx.SessionToken(),
 	}
 	if AdditionLoginFunc != nil {
 		AdditionLoginFunc(ctx, ret)
@@ -132,7 +128,7 @@ func info(ctx *context.Context) {
 		}
 		ctx.JsonSuccess(map[string]any{
 			"user":   user,
-			"token":  ctx.SessionGetToken(),
+			"token":  ctx.SessionToken(),
 			"schema": ctx.SessionGetSchema(),
 		})
 	} else {
@@ -171,7 +167,6 @@ func updatePwd(ctx *context.Context) {
 	user.Pwd.Set(cryptokit.MD5(params.NewPwd))
 	usermapper.Update(user)
 	ctx.SessionSetUser(user)
-	ctx.SessionSave()
 	ctx.JsonSuccess(nil)
 }
 
