@@ -29,12 +29,14 @@ func (ctx *Context) SessionSetSchema(schema string) {
 	}
 	cachekit.Set("session-schema-"+ctx.SessionToken(), schema, &cachekit.Param{Redis: true, Ttl: time.Duration(configkit.GetInt(configkey.SessionExpire, 12)) * time.Hour})
 }
-func (ctx *Context) SessionSet(key string, val any) {
-	if ctx.SessionToken() == "" {
-		panic(exception.New("session token is nil"))
-	}
-	cachekit.Set("session-"+key+"-"+ctx.SessionToken(), val, &cachekit.Param{Redis: true, Ttl: time.Duration(configkit.GetInt(configkey.SessionExpire, 12)) * time.Hour})
-}
+
+// todo 管理session的key
+//func (ctx *Context) SessionSet(key string, val any) {
+//	if ctx.SessionToken() == "" {
+//		panic(exception.New("session token is nil"))
+//	}
+//	cachekit.Set("session-"+key+"-"+ctx.SessionToken(), val, &cachekit.Param{Redis: true, Ttl: time.Duration(configkit.GetInt(configkey.SessionExpire, 12)) * time.Hour})
+//}
 
 // SessionGetUser return eg *model.User
 func (ctx *Context) SessionGetUser() *model.User {
@@ -72,6 +74,11 @@ func (ctx *Context) SessionClear() {
 	cachekit.Del("session-user-"+ctx.SessionToken(), &cachekit.Param{Redis: true})
 	cachekit.Del("session-schema-"+ctx.SessionToken(), &cachekit.Param{Redis: true})
 	// todo session的其他key？
+}
+
+func (ctx *Context) SessionRenew() {
+	cachekit.Renew("session-user-"+ctx.SessionToken(), &cachekit.Param{Redis: true, Ttl: time.Duration(configkit.GetInt(configkey.SessionExpire, 12)) * time.Hour})
+	cachekit.Renew("session-schema-"+ctx.SessionToken(), &cachekit.Param{Redis: true, Ttl: time.Duration(configkit.GetInt(configkey.SessionExpire, 12)) * time.Hour})
 }
 
 func (ctx *Context) SessionToken() string {

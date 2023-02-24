@@ -59,6 +59,11 @@ func Del(ctx context.Context, keys ...string) {
 	}
 }
 
+func Expire(ctx context.Context, key string, expire time.Duration) {
+	client = Instance()
+	client.Expire(ctx, key, expire)
+}
+
 func GetKeyWithPrefix(key string) string {
 	p := configkit.GetStringD(configkey.RedisPrefix)
 	if p == "" {

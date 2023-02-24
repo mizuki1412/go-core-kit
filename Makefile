@@ -1,5 +1,5 @@
 BINARY=go-core-kit
-VERSION=1.5.4
+VERSION=1.5.5
 DATE=`date +%FT%T%z`
 .PHONY: build publish upgrade
 

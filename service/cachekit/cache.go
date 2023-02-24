@@ -91,3 +91,17 @@ func Del(key string, ps ...*Param) {
 	}
 	_cache.Del(key)
 }
+
+func Renew(key string, ps ...*Param) {
+	p := _handleParam(ps)
+	if p.Ttl <= 0 {
+		return
+	}
+	if p.Redis {
+		rediskit.Expire(context.Background(), key, p.Ttl)
+	}
+	v, ok := _cache.Get(key)
+	if ok {
+		_cache.SetWithTTL(key, v, p.Cost, p.Ttl)
+	}
+}

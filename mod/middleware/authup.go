@@ -24,6 +24,7 @@ func AuthUsernameAndPwd() router.Handler {
 			})
 			ctx.Proxy.Abort()
 		} else {
+			ctx.SessionRenew()
 			ctx.Proxy.Next()
 		}
 	}
