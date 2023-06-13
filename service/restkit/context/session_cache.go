@@ -10,6 +10,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/mizuki1412/go-core-kit/service/sqlkit"
 	"github.com/spf13/cast"
+	"strings"
 	"time"
 )
 
@@ -94,9 +95,7 @@ func (ctx *Context) SessionToken() string {
 
 func (ctx *Context) _set(key string, val any) {
 	cachekit.Set(key, val, &cachekit.Param{Redis: true, Ttl: time.Duration(configkit.GetInt(configkey.SessionExpire, 12)) * time.Hour})
-	if ctx.Response.Header().Get("set-cookie") == "" {
-		ctx.Proxy.SetCookie("token", ctx.SessionToken(), configkit.GetInt(configkey.SessionExpire, 12)*3600, "", "", false, true)
-	}
+	ctx._setCookie()
 }
 func (ctx *Context) _renew(key string) {
 	v := renewCache[key]
@@ -104,8 +103,21 @@ func (ctx *Context) _renew(key string) {
 	if (now - v) > (cast.ToInt64(configkit.GetInt(configkey.SessionExpire, 12)) / 2 * 3600) {
 		cachekit.Renew(key, &cachekit.Param{Redis: true, Ttl: time.Duration(configkit.GetInt(configkey.SessionExpire, 12)) * time.Hour})
 		renewCache[key] = now
-		if ctx.Response.Header().Get("set-cookie") == "" {
-			ctx.Proxy.SetCookie("token", ctx.SessionToken(), configkit.GetInt(configkey.SessionExpire, 12)*3600, "", "", false, true)
+		ctx._setCookie()
+	}
+}
+func (ctx *Context) _setCookie() {
+	if ctx.Response.Header().Get("set-cookie") == "" {
+		//ctx.Proxy.SetSameSite(http.SameSiteNoneMode)
+		origin := ctx.Proxy.GetHeader("origin")
+		origins := strings.Split(origin, "//")
+		if len(origins) > 1 {
+			origin = origins[1]
 		}
+		// 可能域名是省略www的，但是origin有; 此时浏览器还是会当成不同的。所以尽量不省略。
+		//if strings.Index(origin, "www") == 0 {
+		//	origin = origin[3:]
+		//}
+		ctx.Proxy.SetCookie("token", ctx.SessionToken(), configkit.GetInt(configkey.SessionExpire, 12)*3600, "/", origin, false, true)
 	}
 }
