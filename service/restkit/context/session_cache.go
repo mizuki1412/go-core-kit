@@ -21,13 +21,13 @@ func (ctx *Context) SessionSetUser(user any) {
 	if user == nil {
 		return
 	}
-	cachekit.Set("session-user-"+ctx.SessionToken(), user, &cachekit.Param{Redis: true, Ttl: time.Duration(configkit.GetInt(configkey.SessionExpire, 12)) * time.Hour})
+	ctx._set("session-user-"+ctx.SessionToken(), user)
 }
 func (ctx *Context) SessionSetSchema(schema string) {
 	if ctx.SessionToken() == "" {
 		panic(exception.New("session token is nil"))
 	}
-	cachekit.Set("session-schema-"+ctx.SessionToken(), schema, &cachekit.Param{Redis: true, Ttl: time.Duration(configkit.GetInt(configkey.SessionExpire, 12)) * time.Hour})
+	ctx._set("session-schema-"+ctx.SessionToken(), schema)
 }
 
 // todo 管理session的key
@@ -76,11 +76,36 @@ func (ctx *Context) SessionClear() {
 	// todo session的其他key？
 }
 
+// 优化renew的频次
+var renewCache = map[string]int64{}
+
 func (ctx *Context) SessionRenew() {
-	cachekit.Renew("session-user-"+ctx.SessionToken(), &cachekit.Param{Redis: true, Ttl: time.Duration(configkit.GetInt(configkey.SessionExpire, 12)) * time.Hour})
-	cachekit.Renew("session-schema-"+ctx.SessionToken(), &cachekit.Param{Redis: true, Ttl: time.Duration(configkit.GetInt(configkey.SessionExpire, 12)) * time.Hour})
+	token := ctx.SessionToken()
+	v := renewCache[token]
+	if (time.Now().Unix() - v) > (cast.ToInt64(configkit.GetInt(configkey.SessionExpire, 12)) / 2 * 3600) {
+		ctx._renew("session-user-" + token)
+		ctx._renew("session-schema-" + token)
+	}
 }
 
 func (ctx *Context) SessionToken() string {
 	return cast.ToString(ctx.Get("_token"))
+}
+
+func (ctx *Context) _set(key string, val any) {
+	cachekit.Set(key, val, &cachekit.Param{Redis: true, Ttl: time.Duration(configkit.GetInt(configkey.SessionExpire, 12)) * time.Hour})
+	if ctx.Response.Header().Get("set-cookie") == "" {
+		ctx.Proxy.SetCookie("token", ctx.SessionToken(), configkit.GetInt(configkey.SessionExpire, 12)*3600, "", "", false, true)
+	}
+}
+func (ctx *Context) _renew(key string) {
+	v := renewCache[key]
+	now := time.Now().Unix()
+	if (now - v) > (cast.ToInt64(configkit.GetInt(configkey.SessionExpire, 12)) / 2 * 3600) {
+		cachekit.Renew(key, &cachekit.Param{Redis: true, Ttl: time.Duration(configkit.GetInt(configkey.SessionExpire, 12)) * time.Hour})
+		renewCache[key] = now
+		if ctx.Response.Header().Get("set-cookie") == "" {
+			ctx.Proxy.SetCookie("token", ctx.SessionToken(), configkit.GetInt(configkey.SessionExpire, 12)*3600, "", "", false, true)
+		}
+	}
 }

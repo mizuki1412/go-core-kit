@@ -11,7 +11,7 @@ import (
 // CreateSession 在登录等需要开启session的时候使用
 func CreateSession() router.Handler {
 	return func(ctx *context.Context) {
-		token := ctx.Request.Header.Get("token")
+		token := context.GetTokenFromReq(ctx)
 		if token == "" {
 			// 开启session id
 			token = cryptokit.ID() + "-" + cast.ToString(time.Now().UnixMilli())

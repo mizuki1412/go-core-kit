@@ -44,9 +44,7 @@ func Gen(urlPrefix string) {
 		b := beanMap[name]
 		content := ""
 		// 函数描述
-		if all[key].Get("post.summary").String() != "" {
-			content += fmt.Sprintf("/// %s", all[key].Get("post.summary").String())
-		}
+		content += fmt.Sprintf("/// %s", all[key].Get("post.summary").String())
 		// 参数
 		for _, e := range all[key].Get("post.parameters").Array() {
 			require := ""
@@ -117,7 +115,7 @@ export async function %s(%s){
 	for _, e := range beanMap {
 		final := fmt.Sprintf("import {%s} from '/lib/request'\n\n", strings.Join(e.Imports, ","))
 		final += strings.Join(e.Contents, "\n")
-		_ = filekit.WriteFileAppend("./gen-front-dao/"+e.Name+".js", []byte(final))
+		_ = filekit.WriteFile("./gen-front-dao/"+e.Name+".js", []byte(final))
 	}
 
 }

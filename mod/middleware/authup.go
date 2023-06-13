@@ -9,7 +9,8 @@ import (
 // AuthUsernameAndPwd 用户名密码校验
 func AuthUsernameAndPwd() router.Handler {
 	return func(ctx *context.Context) {
-		token := ctx.Request.Header.Get("token")
+		// 注意另外的token情况是在 create_session
+		token := context.GetTokenFromReq(ctx)
 		if token != "" && ctx.Get("_token") == nil {
 			ctx.Set("_token", token)
 		}

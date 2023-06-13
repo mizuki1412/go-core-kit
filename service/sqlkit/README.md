@@ -19,15 +19,16 @@
 ### demo
 ```go
 func (dao *Dao) UpdateConfirm(id int64){
-	sql, args, err := sqlkit.Builder().Update(dao.GetTableD("device_alarm_record")).Set("extend",squirrel.Expr("jsonb_set(extend, '{confirm}','true',true)")).Where("id=?",id).ToSql()
-	if err != nil {
-		panic(exception.New(err.Error()))
-	}
-	dao.Exec(sql, args...)
+    sql, args, err := dao.Builder().Update(meta.GetTableName(dao.Schema)).Set("extend",squirrel.Expr("jsonb_set(extend, '{confirm}','true',true)")).Where("id=?",id).ToSql()
+    if err != nil {
+        panic(exception.New(err.Error()))
+    }
+    dao.Exec(sql, args...)
 }
 
 func (dao *Dao) List(dTypes []string) []model.AlarmMsg {
-	builder := sqlkit.Builder().Select("msg.*").From(dao.GetTableD("alarm_msg msg") + dao.GetTableD("device_type_info info")).Where("msg.deviceType=info.id").OrderBy("msg.deviceType, msg.id")
+	// todo
+	builder := dao.Builder().Select(meta.GetColumnsWithPrefix("msg")).From(dao.GetTableD("alarm_msg msg") + dao.GetTableD("device_type_info info")).Where("msg.deviceType=info.id").OrderBy("msg.deviceType, msg.id")
 	if dTypes!=nil && len(dTypes) > 0 {
 		flag, arg := pghelper.GenUnnestString(dTypes)
 		builder = builder.Where("msg.deviceType in "+flag, arg)
@@ -37,7 +38,7 @@ func (dao *Dao) List(dTypes []string) []model.AlarmMsg {
 }
 
 func (dao *Dao) ListId(dType []string) []string {
-	builder := sqlkit.Builder().Select("id").From(dao.GetTableD("device")).Where("off=?", false).OrderBy("id")
+	builder := dao.Builder().Select("id").From(meta.GetTableName(dao.Schema)).Where("off=?", false).OrderBy("id")
 	if dType!=nil && len(dType)>0{
 		builder = pghelper.WhereUnnestInt(builder,"id in ", dType)
 	}

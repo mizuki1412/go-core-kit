@@ -90,6 +90,6 @@ func (dao *Dao) ListByDepartment(did int32) []*model.Role {
 
 // ListPrivileges privilege
 func (dao *Dao) ListPrivileges() []*model.PrivilegeConstant {
-	sql, args := sqlkit.Builder().Select("*").From(sqlkit.GetSchemaTable(dao.Schema, "privilege_constant")).Where("type<>'dev'").OrderBy("sort").MustSql()
+	sql, args := sqlkit.Builder().Select("*").From(sqlkit.GetSchemaTable(dao.Schema, "privilege_constant")).OrderBy("sort").MustSql()
 	return dao.scanPrivilege(sql, args)
 }
