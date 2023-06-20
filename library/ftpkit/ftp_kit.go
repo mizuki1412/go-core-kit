@@ -2,7 +2,6 @@ package ftpkit
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/jlaffaye/ftp"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"io"
@@ -58,7 +57,6 @@ func (th *Conn) DownloadSlice(src string, dst string, buffer int) {
 	for {
 		n1, err := reader.Read(buf)
 		if err == io.EOF {
-			fmt.Println("done")
 			if err = os.Remove(temp); err != nil {
 				panic(exception.New(err.Error()))
 			}
@@ -86,11 +84,10 @@ func (th *Conn) UploadSlice(src string, dst string) {
 	}
 	defer srcFile.Close()
 	srcFile.Seek(int64(index), 0)
-	buf := make([]byte, 4096, 4096)
 	for {
+		buf := make([]byte, 4096, 4096)
 		n, err := srcFile.Read(buf)
 		if err == io.EOF {
-			fmt.Println("done")
 			th.C.Rename(dsttmp, dst)
 			break
 		}
