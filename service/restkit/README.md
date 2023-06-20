@@ -78,4 +78,15 @@ swagger-ui更新时注意：需要修改index.html中的 `href`、`src`、`Swagg
 
 在router/router.go中将自动配置```<base>/swagger```为访问地址。
 
-todo： 暂不能从core/swagger-ui导入资源。
+更新swagger-ui：
+
+```js
+// 从github上下载更新的源码
+// 取出源码中dist/下除.map外的文件放入本目录的swagger-ui中。
+
+// 修改 index.html
+<script> <style> href加前缀./swagger
+
+// 修改 swagger-initializer.js
+url: "./swagger-doc",
+```
