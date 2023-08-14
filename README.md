@@ -3,7 +3,7 @@
 
 toolkit for golang projects
 
-`go get github.com/mizuki1412/go-core-kit@v1.4.5`
+`go get github.com/mizuki1412/go-core-kit@v1.5.5`
 
 # init
 本库使用的入口，以及配置参数信息相关的绑定函数
@@ -38,11 +38,6 @@ toolkit for golang projects
 - [ ] https://github.com/gin-contrib/sessions/pull/148 等官方更新
 - [ ] https://github.com/unrolled/render 模板渲染
 - [ ] mqtt subscribe 中如果执行太久，会重复执行subscribe？ 暂时用go fun处理
-
-## 旧项目升级注意
-
-- ctx.SessionGetUser().(*model2.User); 
-- interface{}->any
-- 配置文件：aliyun
-- dao
-- mqttkit subscribe 不加recover
+- [ ] class中有些类型是写死pg的，对其他数据库不友好
+- [ ] 多数据库的方言
+- [ ] 多数据配置

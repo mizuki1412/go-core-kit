@@ -1,3 +1,6 @@
+# goland-live-templates
+
+用于golang的模板代码示例
 
 ## action_init
 ```

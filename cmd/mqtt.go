@@ -2,7 +2,7 @@ package cmd
 
 import (
 	MQTT "github.com/eclipse/paho.mqtt.golang"
-	"github.com/mizuki1412/go-core-kit/init/initkit"
+	"github.com/mizuki1412/go-core-kit/cli/commandkit"
 	"github.com/mizuki1412/go-core-kit/library/timekit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/mqttkit"
@@ -15,7 +15,7 @@ func MQTTTestCMD() *cobra.Command {
 	mqttCmd := &cobra.Command{
 		Use: "mqtt",
 		Run: func(cmd *cobra.Command, args []string) {
-			initkit.BindFlags(cmd)
+			commandkit.BindFlags(cmd)
 			if configkit.GetStringD("topic.sub") != "" {
 				mqttkit.Subscribe(configkit.GetStringD("topic.sub"), 2, func(client MQTT.Client, message MQTT.Message) {
 					log.Println(message.Topic(), string(message.Payload()))

@@ -3,8 +3,8 @@ package markdown
 import (
 	"bytes"
 	"fmt"
-	"github.com/Depado/bfchroma"
-	"github.com/alecthomas/chroma/formatters/html"
+	"github.com/Depado/bfchroma/v2"
+	"github.com/alecthomas/chroma/v2/formatters/html"
 	"github.com/mizuki1412/go-core-kit/library/filekit"
 	"github.com/mizuki1412/go-core-kit/service/pdfkit"
 	"github.com/russross/blackfriday/v2"

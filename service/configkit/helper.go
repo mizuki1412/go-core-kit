@@ -1,7 +1,7 @@
 package configkit
 
 import (
-	"github.com/mizuki1412/go-core-kit/init/configkey"
+	"github.com/mizuki1412/go-core-kit/cli/configkey"
 	"time"
 )
 

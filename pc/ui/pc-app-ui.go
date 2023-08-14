@@ -3,7 +3,7 @@ package ui
 import (
 	"embed"
 	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/init/configkey"
+	"github.com/mizuki1412/go-core-kit/cli/configkey"
 	"github.com/mizuki1412/go-core-kit/service/restkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/router"
 	"github.com/spf13/cast"

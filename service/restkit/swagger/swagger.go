@@ -1,8 +1,8 @@
 package swagger
 
 import (
-	"github.com/mizuki1412/go-core-kit/init/configkey"
-	"github.com/mizuki1412/go-core-kit/init/httpconst"
+	"github.com/mizuki1412/go-core-kit/cli/configkey"
+	"github.com/mizuki1412/go-core-kit/cli/httpconst"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"

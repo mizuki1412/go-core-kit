@@ -4,7 +4,7 @@ import (
 	"embed"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/render"
-	"github.com/mizuki1412/go-core-kit/init/httpconst"
+	"github.com/mizuki1412/go-core-kit/cli/httpconst"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
 	swg "github.com/mizuki1412/go-core-kit/service/restkit/swagger"
 	"mime"

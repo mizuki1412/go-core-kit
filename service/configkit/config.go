@@ -1,63 +1,39 @@
 package configkit
 
 import (
-	"github.com/mizuki1412/go-core-kit/library/jsonkit"
-	"github.com/spf13/cast"
 	"github.com/spf13/viper"
 )
 
 func Exist(key string) bool {
-	if !viper.IsSet(key) {
-		return false
-	}
-	switch viper.Get(key).(type) {
-	case string:
-		if cast.ToString(viper.Get(key)) == "" {
-			return false
-		}
-	}
-	return true
+	return viper.IsSet(key)
 }
-func Get(key string, defaultVal any) any {
-	if !Exist(key) {
-		return defaultVal
-	}
-	return viper.Get(key)
-}
-func GetString(key, defaultVal string) string {
-	if !Exist(key) {
-		return defaultVal
+
+func GetString(key string, defaultVal ...string) string {
+	if !Exist(key) && len(defaultVal) > 0 {
+		return defaultVal[0]
 	}
 	return viper.GetString(key)
 }
-func GetStringD(key string) string {
-	return viper.GetString(key)
-}
-func GetInt(key string, defaultVal int) int {
-	if !Exist(key) {
-		return defaultVal
+
+func GetInt(key string, defaultVal ...int) int {
+	if !Exist(key) && len(defaultVal) > 0 {
+		return defaultVal[0]
 	}
 	return viper.GetInt(key)
 }
-func GetBool(key string, defaultVal bool) bool {
-	if !Exist(key) {
-		return defaultVal
+func GetBool(key string, defaultVal ...bool) bool {
+	if !Exist(key) && len(defaultVal) > 0 {
+		return defaultVal[0]
 	}
 	return viper.GetBool(key)
 }
 
-func GetBoolD(key string) bool {
-	return viper.GetBool(key)
+func GetStringList(key string) []string {
+	return viper.GetStringSlice(key)
 }
 
-func GetStringListD(key string) []string {
-	str := GetStringD(key)
-	if str == "" {
-		return nil
-	}
-	var arr []string
-	_ = jsonkit.ParseObj(key, &arr)
-	return arr
+func GetStringMap(key string) map[string]any {
+	return viper.GetStringMap(key)
 }
 
 func Set(key string, val any) {

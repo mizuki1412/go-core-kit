@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/mizuki1412/go-core-kit/init/initkit"
+	"github.com/mizuki1412/go-core-kit/cli/commandkit"
 	"github.com/mizuki1412/go-core-kit/library/bytekit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
@@ -19,7 +19,7 @@ func TCPServerCMD() *cobra.Command {
 		Use:   "tcp-server",
 		Short: "本地tcp服务器",
 		Run: func(cmd *cobra.Command, args []string) {
-			initkit.BindFlags(cmd)
+			commandkit.BindFlags(cmd)
 			if configkit.GetStringD("port") == "" {
 				logkit.Fatal("port参数缺失")
 			}

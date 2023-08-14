@@ -2,7 +2,7 @@ package frontdao
 
 import (
 	"fmt"
-	"github.com/mizuki1412/go-core-kit/init/httpconst"
+	"github.com/mizuki1412/go-core-kit/cli/httpconst"
 	"github.com/mizuki1412/go-core-kit/library/arraykit"
 	"github.com/mizuki1412/go-core-kit/library/filekit"
 	"github.com/mizuki1412/go-core-kit/library/httpkit"

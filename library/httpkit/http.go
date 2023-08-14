@@ -5,7 +5,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/init/httpconst"
+	"github.com/mizuki1412/go-core-kit/cli/httpconst"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/tidwall/gjson"
 	"io"
