@@ -1,30 +1,29 @@
 package jsonkit
 
 import (
-	"encoding/json"
-	jsoniter "github.com/json-iterator/go"
-	"github.com/tidwall/gjson"
-	"strings"
+	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
+	"github.com/bytedance/sonic/decoder"
+	"log"
 )
 
-var jsonAPI jsoniter.API
-
-func JSON() jsoniter.API {
-	if jsonAPI == nil {
-		jsonAPI = jsoniter.ConfigCompatibleWithStandardLibrary
+func Marshal(obj any) ([]byte, error) {
+	r, err := sonic.Marshal(obj)
+	if err != nil {
+		return []byte("null"), err
 	}
-	return jsonAPI
+	return r, nil
 }
 
-func Test(obj any) string {
-	s, _ := json.Marshal(obj)
-	return string(s)
+func Unmarshal(data []byte, p any) error {
+	err := sonic.Unmarshal(data, p)
+	return err
 }
 
 func ToString(obj any) string {
-	s, err := JSON().MarshalToString(obj)
-	// todo ?
+	s, err := sonic.MarshalString(obj)
 	if err != nil {
+		log.Println(err)
 		return "{}"
 	}
 	return s
@@ -32,16 +31,14 @@ func ToString(obj any) string {
 
 // ParseObj string, &p, 数组也必须point
 func ParseObj(data string, p any) error {
-	err := JSON().Unmarshal([]byte(data), p)
-	return err
+	return Unmarshal([]byte(data), p)
 }
 
 func ParseMap(data string) map[string]any {
-	//m := map[string]any{}
-	//ParseObj(data,&m)
-	m, ok := gjson.Parse(data).Value().(map[string]any)
-	if !ok {
-		return map[string]any{}
+	m := map[string]any{}
+	err := ParseObj(data, &m)
+	if err != nil {
+		return nil
 	}
 	return m
 }
@@ -52,11 +49,16 @@ func ParseMap(data string) map[string]any {
 func ParseMapUseNumber(data string) map[string]any {
 	para := make(map[string]any)
 	// gjson存在精度问题，jsoniter出现nil错误
-	decoder := json.NewDecoder(strings.NewReader(data))
-	decoder.UseNumber()
-	err := decoder.Decode(&para)
+	dc := decoder.NewDecoder(data)
+	dc.UseNumber()
+	err := dc.Decode(&para)
 	if err != nil {
 		return map[string]any{}
 	}
 	return para
+}
+
+func Get(src string, path ...any) ast.Node {
+	node, _ := sonic.GetFromString(src, path...)
+	return node
 }

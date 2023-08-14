@@ -1,15 +1,15 @@
 package main
 
 import (
-	"fmt"
+	"github.com/bytedance/sonic"
+	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/cli"
-	"github.com/mizuki1412/go-core-kit/cli/configkey"
-	"github.com/mizuki1412/go-core-kit/cmd"
+	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/mod/common/download"
 	"github.com/mizuki1412/go-core-kit/mod/user"
-	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit"
 	"github.com/spf13/cobra"
+	"log"
 )
 
 func main() {
@@ -24,9 +24,18 @@ func main() {
 	cli.AddChildCMD(&cobra.Command{
 		Use: "test",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println(configkit.GetString(configkey.ProjectDir))
+			t := map[string]any{
+				"id":  1.2,
+				"abc": class.ArrInt{},
+				"ccd": map[string]any{
+					"aa": 1,
+				},
+			}
+			log.Println(jsonkit.ToString(t))
+			r, _ := sonic.GetFromString(jsonkit.ToString(t), "ccd", "aa")
+			log.Println(r.Float64())
+			log.Println(jsonkit.ToString(nil))
 		},
 	})
-	cli.AddChildCMD(cmd.TCPServerCMD())
 	cli.Execute()
 }

@@ -16,7 +16,7 @@ type ArrInt struct {
 
 func (th ArrInt) MarshalJSON() ([]byte, error) {
 	if th.Valid {
-		return jsonkit.JSON().Marshal(th.Array)
+		return jsonkit.Marshal(th.Array)
 	}
 	return []byte("null"), nil
 }
@@ -26,7 +26,7 @@ func (th *ArrInt) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 	var s []int64
-	if err := jsonkit.JSON().Unmarshal(data, &s); err != nil {
+	if err := jsonkit.Unmarshal(data, &s); err != nil {
 		return err
 	}
 	th.Valid = true

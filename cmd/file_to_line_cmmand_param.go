@@ -2,22 +2,25 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/mizuki1412/go-core-kit/library/filekit"
-	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"strings"
 )
 
-func Json2CliCMD(title string) *cobra.Command {
+func File2LineCli() *cobra.Command {
 	var json2CliCmd = &cobra.Command{
-		Use:   "json2cli",
-		Short: `json config file转命令行的参数形式`,
+		Use:   "config2line",
+		Short: `config file转命令行的参数形式`,
 		Run: func(cmd *cobra.Command, args []string) {
-			json, _ := filekit.ReadString("config.deploy.json")
-			config := jsonkit.ParseMap(json)
-			ret := handleMap("", config)
-			fmt.Println(strings.Join(ret, "\n"))
+			// 用 cli 中的 loadconfig
+			var res []string
+			for _, e := range viper.AllKeys() {
+				if viper.IsSet(e) && e != "config" {
+					res = append(res, fmt.Sprintf("--%s=%s", e, viper.GetString(e)))
+				}
+			}
+			fmt.Println(strings.Join(res, " "))
 		},
 	}
 	return json2CliCmd

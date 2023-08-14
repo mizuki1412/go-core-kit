@@ -19,7 +19,7 @@ type Time struct {
 func (th Time) MarshalJSON() ([]byte, error) {
 	if th.Valid {
 		// 兼容iphone
-		return jsonkit.JSON().Marshal(th.Time.Format(timekit.TimeLayout2))
+		return jsonkit.Marshal(th.Time.Format(timekit.TimeLayout2))
 	}
 	return []byte("null"), nil
 }

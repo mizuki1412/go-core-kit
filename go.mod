@@ -9,14 +9,14 @@ require (
 	github.com/albenik/go-serial/v2 v2.6.0
 	github.com/alecthomas/chroma/v2 v2.2.0
 	github.com/aliyun/alibaba-cloud-sdk-go v1.62.510
+	github.com/bytedance/sonic v1.10.0
 	github.com/dgraph-io/ristretto v0.1.1
 	github.com/eclipse/paho.mqtt.golang v1.4.3
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-playground/validator/v10 v10.15.0
 	github.com/googollee/go-socket.io v1.7.0
-	github.com/jlaffaye/ftp v0.1.0
+	github.com/jlaffaye/ftp v0.2.0
 	github.com/jmoiron/sqlx v1.3.5
-	github.com/json-iterator/go v1.1.12
 	github.com/lib/pq v1.10.7
 	github.com/mizuki1412/go-webview2 v0.0.0-20211216070425-b98c07fd76eb
 	github.com/panjf2000/gnet v1.6.6
@@ -29,7 +29,7 @@ require (
 	github.com/spf13/cast v1.5.1
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.15.0
-	github.com/tidwall/gjson v1.14.4
+	github.com/tidwall/gjson v1.16.0
 	github.com/xuri/excelize/v2 v2.7.1
 	github.com/zserge/lorca v0.1.10
 	go.uber.org/zap v1.25.0
@@ -39,9 +39,9 @@ require (
 )
 
 require (
-	github.com/bytedance/sonic v1.9.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
-	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
+	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
+	github.com/chenzhuoyu/iasm v0.9.0 // indirect
 	github.com/creack/goselect v0.1.2 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dlclark/regexp2 v1.4.0 // indirect
@@ -62,6 +62,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jchv/go-winloader v0.0.0-20200815041850-dec1ee9a7fd5 // indirect
 	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af // indirect
+	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.4 // indirect
 	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
 	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect

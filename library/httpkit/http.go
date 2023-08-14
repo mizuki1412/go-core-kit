@@ -20,7 +20,7 @@ import (
 var client *http.Client
 
 func init() {
-	// 忽略证书校验 todo
+	// 忽略证书校验
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}

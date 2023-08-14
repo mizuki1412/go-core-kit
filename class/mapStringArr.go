@@ -15,7 +15,7 @@ type MapStringArr struct {
 
 func (th MapStringArr) MarshalJSON() ([]byte, error) {
 	if th.Valid {
-		return jsonkit.JSON().Marshal(th.Arr)
+		return jsonkit.Marshal(th.Arr)
 	}
 	return []byte("null"), nil
 }
@@ -25,7 +25,7 @@ func (th *MapStringArr) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 	var s []map[string]any
-	if err := jsonkit.JSON().Unmarshal(data, &s); err != nil {
+	if err := jsonkit.Unmarshal(data, &s); err != nil {
 		return err
 	}
 	th.Valid = true

@@ -50,7 +50,7 @@ func (th *String) UnmarshalXMLAttr(attr xml.Attr) error {
 func (th String) MarshalJSON() ([]byte, error) {
 	if th.Valid {
 		// 可能存在逃逸字符
-		return jsonkit.JSON().Marshal(th.String)
+		return jsonkit.Marshal(th.String)
 	}
 	// 返回json中的null
 	return []byte("null"), nil
