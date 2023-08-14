@@ -28,8 +28,8 @@ func InitVodClient(keys ...string) {
 			accessKeyId = keys[0]
 			accessKeySecret = keys[1]
 		} else {
-			accessKeyId = configkit.GetStringD(configkey.AliAccessKey)
-			accessKeySecret = configkit.GetStringD(configkey.AliAccessKeySecret)
+			accessKeyId = configkit.GetString(configkey.AliAccessKey)
+			accessKeySecret = configkit.GetString(configkey.AliAccessKeySecret)
 		}
 		// 点播服务接入地域
 		regionId := configkit.GetString(configkey.AliRegionId, "cn-shanghai")

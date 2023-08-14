@@ -20,7 +20,7 @@ func startUI(param *WinParam) {
 	var err error
 	// 增加user-data-dir后，一些配置将会存入其中，包括安全策略的设置
 	// windows下，每次开启可能提示未正确关闭：需要在设置的user-data-dir中的Default/Preferences的exit_type为Normal，并设置文件为只读
-	pdr := configkit.GetStringD(configkey.ProjectDir)
+	pdr := configkit.GetString(configkey.ProjectDir)
 	if pdr == "" {
 		pdr = "."
 	}

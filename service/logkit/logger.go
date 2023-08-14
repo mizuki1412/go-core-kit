@@ -36,7 +36,7 @@ func Init() *zap.Logger {
 	}
 	var core zapcore.Core
 	level := zap.InfoLevel
-	switch configkit.GetStringD(configkey.LogLevel) {
+	switch configkit.GetString(configkey.LogLevel) {
 	case "debug":
 		level = zap.DebugLevel
 	case "warn":
@@ -44,7 +44,7 @@ func Init() *zap.Logger {
 	case "error":
 		level = zap.ErrorLevel
 	}
-	if configkit.GetBoolD(configkey.LogFileOff) {
+	if configkit.GetBool(configkey.LogFileOff) {
 		core = zapcore.NewTee(
 			// console中基本展示
 			zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout)), level),
@@ -64,9 +64,9 @@ func Init() *zap.Logger {
 // bug: in windows rename error https://github.com/arthurkiller/rollingwriter/issues/11
 //func getWriter() io.Writer {
 //	filename := configkit.GetString(ConfigKeyLogName, "main")
-//	filepath := configkit.GetStringD(ConfigKeyLogPath)
+//	filepath := configkit.GetString(ConfigKeyLogPath)
 //	if stringkit.IsNull(filepath) {
-//		filepath = configkit.GetStringD(corekit.ConfigKeyProjectDir)
+//		filepath = configkit.GetString(corekit.ConfigKeyProjectDir)
 //	}
 //	if stringkit.IsNull(filepath) {
 //		filepath = "./log"
@@ -103,9 +103,9 @@ func Init() *zap.Logger {
 
 func getWriter2() io.Writer {
 	filename := configkit.GetString(configkey.LogName, "main")
-	filepath := configkit.GetStringD(configkey.LogPath)
+	filepath := configkit.GetString(configkey.LogPath)
 	if stringkit.IsNull(filepath) {
-		filepath = configkit.GetStringD(configkey.ProjectDir)
+		filepath = configkit.GetString(configkey.ProjectDir)
 	}
 	if stringkit.IsNull(filepath) {
 		filepath = "./log"

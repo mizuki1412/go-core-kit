@@ -17,7 +17,7 @@ type SwaggerPath struct {
 
 func NewPath(path string, method string) *SwaggerPath {
 	// 由于gin的关系，手动处理 basePath
-	basePath := configkit.GetStringD(configkey.SwaggerBasePath)
+	basePath := configkit.GetString(configkey.SwaggerBasePath)
 	if strings.Index(path, basePath) == 0 {
 		path = path[len(basePath):]
 	}
@@ -151,11 +151,11 @@ func init() {
 func (s *SwaggerDoc) ReadDoc() string {
 	// match openapi 3.0
 	s.Swagger = "2.0"
-	s.Info["description"] = configkit.GetStringD(configkey.SwaggerDescription)
-	s.Info["title"] = configkit.GetStringD(configkey.SwaggerTitle)
+	s.Info["description"] = configkit.GetString(configkey.SwaggerDescription)
+	s.Info["title"] = configkit.GetString(configkey.SwaggerTitle)
 	s.Info["version"] = configkit.GetString(configkey.SwaggerVersion, "1.0.0")
-	s.Host = configkit.GetStringD(configkey.SwaggerHost)
+	s.Host = configkit.GetString(configkey.SwaggerHost)
 	// basePath已经在router中直接加上了，在NewPath中需要额外处理
-	s.BasePath = configkit.GetStringD(configkey.SwaggerBasePath)
+	s.BasePath = configkit.GetString(configkey.SwaggerBasePath)
 	return jsonkit.ToString(*s)
 }

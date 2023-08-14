@@ -6,16 +6,20 @@ import (
 	"github.com/spf13/viper"
 )
 
-// LoadConfig 注意，load比一般的init慢
-func LoadConfig() {
-	viper.SetConfigName("config")
-	viper.SetConfigType("json")
-	// 这里可以执行多次的 搜索多个地址
-	viper.AddConfigPath(".")
+// 这里将在 run 之后执行
+func loadConfig() {
+	if viper.GetString("config") != "" {
+		viper.SetConfigFile(viper.GetString("config"))
+	} else {
+		viper.SetConfigName("config")
+		viper.SetConfigType("yaml")
+		viper.AddConfigPath(".")
+	}
 	_ = viper.ReadInConfig()
 }
 
 func bindDefaultFlags(cmd *cobra.Command) {
+	cmd.PersistentFlags().StringP("config", "c", "", "配置文件全路径")
 	cmd.PersistentFlags().String(configkey.ProjectDir, ".", "项目目录")
 	cmd.PersistentFlags().String(configkey.ProjectName, "", "项目名称")
 	cmd.PersistentFlags().String(configkey.ProjectSubDir4PublicDownload, "", "项目目录中用于公共下载的开放目录（一层），逗号分隔，.表示所有")
@@ -89,7 +93,15 @@ func bindDefaultFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().String(configkey.SoftEtherPwd, "", "")
 	cmd.PersistentFlags().String(configkey.SoftEtherOpenVpnPort, "", "")
 
+	bind(cmd)
+}
+
+func bind(cmd *cobra.Command) {
 	err := viper.BindPFlags(cmd.PersistentFlags())
+	if err != nil {
+		panic(err)
+	}
+	err = viper.BindPFlags(cmd.Flags())
 	if err != nil {
 		panic(err)
 	}

@@ -5,10 +5,10 @@ package context
 /**
 func InitSession() gin.HandlerFunc {
 	// redis
-	redisHost := configkit.GetStringD(configkey.RedisHost)
+	redisHost := configkit.GetString(configkey.RedisHost)
 	redisPort := configkit.GetString(configkey.RedisPort, "6379")
-	redisPwd := configkit.GetStringD(configkey.RedisPwd)
-	redisDB := configkit.GetStringD(configkey.RedisDB)
+	redisPwd := configkit.GetString(configkey.RedisPwd)
+	redisDB := configkit.GetString(configkey.RedisDB)
 	if redisHost != "" {
 		logkit.Info("session use redis")
 		redisClient := redis.NewClient(&redis.Options{
@@ -58,7 +58,7 @@ func (ctx *Context) SessionSave() {
 	// 如果需要在http下访问，但无跨域要求，需要设置secure=false
 	secure := true
 	samesite := http.SameSiteNoneMode
-	if configkit.Exist(configkey.SessionSecure) && !configkit.GetBoolD(configkey.SessionSecure) {
+	if configkit.Exist(configkey.SessionSecure) && !configkit.GetBool(configkey.SessionSecure) {
 		secure = false
 		samesite = http.SameSiteLaxMode
 	}

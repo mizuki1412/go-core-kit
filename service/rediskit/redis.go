@@ -20,8 +20,8 @@ func Instance() *redis.Client {
 	if client == nil {
 		once.Do(func() {
 			client = redis.NewClient(&redis.Options{
-				Addr:     configkit.GetStringD(configkey.RedisHost) + ":" + configkit.GetString(configkey.RedisPort, "6379"),
-				Password: configkit.GetStringD(configkey.RedisPwd), // no password set
+				Addr:     configkit.GetString(configkey.RedisHost) + ":" + configkit.GetString(configkey.RedisPort, "6379"),
+				Password: configkit.GetString(configkey.RedisPwd), // no password set
 				DB:       cast.ToInt(configkit.GetString(configkey.RedisDB, "0")),
 			})
 		})
@@ -65,7 +65,7 @@ func Expire(ctx context.Context, key string, expire time.Duration) {
 }
 
 func GetKeyWithPrefix(key string) string {
-	p := configkit.GetStringD(configkey.RedisPrefix)
+	p := configkit.GetString(configkey.RedisPrefix)
 	if p == "" {
 		return key
 	} else {
@@ -75,7 +75,7 @@ func GetKeyWithPrefix(key string) string {
 
 // GetDecoratedKey 分层路径按:分隔，会自动加上项目前缀(ConfigKeyRedisPrefix)
 func GetDecoratedKey(subPath string) string {
-	name := configkit.GetStringD(configkey.RedisPrefix)
+	name := configkit.GetString(configkey.RedisPrefix)
 	if name != "" {
 		name += ":"
 	}

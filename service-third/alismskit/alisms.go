@@ -22,8 +22,8 @@ func InitSMSClient(keys ...string) {
 			accessKeyId = keys[0]
 			accessKeySecret = keys[1]
 		} else {
-			accessKeyId = configkit.GetStringD(configkey.AliAccessKey)
-			accessKeySecret = configkit.GetStringD(configkey.AliAccessKeySecret)
+			accessKeyId = configkit.GetString(configkey.AliAccessKey)
+			accessKeySecret = configkit.GetString(configkey.AliAccessKeySecret)
 		}
 		client, err = dysmsapi.NewClientWithAccessKey(configkit.GetString(configkey.AliRegionId, "cn-hangzhou"), accessKeyId, accessKeySecret)
 		if err != nil {
@@ -52,10 +52,10 @@ func Send(param SendParams) {
 		panic(exception.New("手机号参数未填"))
 	}
 	if param.SignName == "" {
-		param.SignName = configkit.GetStringD(configkey.AliSMSSign1)
+		param.SignName = configkit.GetString(configkey.AliSMSSign1)
 	}
 	if param.TemplateCode == "" {
-		param.TemplateCode = configkit.GetStringD(configkey.AliSMSTemplate1)
+		param.TemplateCode = configkit.GetString(configkey.AliSMSTemplate1)
 	}
 	request := dysmsapi.CreateSendSmsRequest()
 	request.Scheme = "https"

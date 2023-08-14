@@ -21,7 +21,7 @@ func Init(router *router.Router) {
 }
 
 var AdditionFunc = func(user *model.User, schema string) aliosskit.STSData {
-	return aliosskit.GetSTS("user"+cast.ToString(user.Id), configkit.GetStringD(configkey.AliOSSBucketName), "*")
+	return aliosskit.GetSTS("user"+cast.ToString(user.Id), configkit.GetString(configkey.AliOSSBucketName), "*")
 }
 
 func get(ctx *context.Context) {

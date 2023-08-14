@@ -5,8 +5,7 @@ toolkit for golang projects
 
 `go get github.com/mizuki1412/go-core-kit@v1.5.5`
 
-# init
-本库使用的入口，以及配置参数信息相关的绑定函数
+详细说明见 doc/go-core-kit-doc.md
 
 # class
 通用的一些类的封装和定义
@@ -35,6 +34,7 @@ toolkit for golang projects
 
 # TODO
 
+- [ ] log 默认不写文件
 - [ ] https://github.com/gin-contrib/sessions/pull/148 等官方更新
 - [ ] https://github.com/unrolled/render 模板渲染
 - [ ] mqtt subscribe 中如果执行太久，会重复执行subscribe？ 暂时用go fun处理

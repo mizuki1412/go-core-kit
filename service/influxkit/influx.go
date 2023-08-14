@@ -12,11 +12,11 @@ import (
 )
 
 func QueryDefaultDB(sql string) []map[string]any {
-	return QueryWithDBName(configkit.GetStringD(configkey.InfluxDBName), sql)
+	return QueryWithDBName(configkit.GetString(configkey.InfluxDBName), sql)
 }
 
 //func QueryWithPrefix(prefix, sql string) []map[string]any {
-//	queryResult(prefix+configkit.GetStringD(configkey.InfluxDBName), sql)
+//	queryResult(prefix+configkit.GetString(configkey.InfluxDBName), sql)
 //	return nil
 //}
 
@@ -25,7 +25,7 @@ func QueryWithDBName(dbName, sql string) []map[string]any {
 }
 
 func QueryMultiDefaultDB(sql []string) [][]map[string]any {
-	return QueryMultiWithDBName(configkit.GetStringD(configkey.InfluxDBName), sql)
+	return QueryMultiWithDBName(configkit.GetString(configkey.InfluxDBName), sql)
 }
 
 func QueryMultiWithDBName(dbName string, sql []string) [][]map[string]any {
@@ -33,7 +33,7 @@ func QueryMultiWithDBName(dbName string, sql []string) [][]map[string]any {
 }
 
 func url(action, dbName string) string {
-	url := configkit.GetStringD(configkey.InfluxURL)
+	url := configkit.GetString(configkey.InfluxURL)
 	if url == "" {
 		panic(exception.New("influx url is null"))
 	}
@@ -41,16 +41,16 @@ func url(action, dbName string) string {
 	if dbName != "" {
 		params += "db=" + dbName
 	}
-	if configkit.GetStringD(configkey.InfluxUser) != "" {
+	if configkit.GetString(configkey.InfluxUser) != "" {
 		if params != "" {
 			params += "&"
 		}
-		params += "u=" + configkit.GetStringD(configkey.InfluxUser) + "&p=" + configkit.GetStringD(configkey.InfluxPwd)
+		params += "u=" + configkit.GetString(configkey.InfluxUser) + "&p=" + configkit.GetString(configkey.InfluxPwd)
 	}
 	if params == "" {
-		return configkit.GetStringD(configkey.InfluxURL) + "/" + action
+		return configkit.GetString(configkey.InfluxURL) + "/" + action
 	} else {
-		return configkit.GetStringD(configkey.InfluxURL) + "/" + action + "?" + params
+		return configkit.GetString(configkey.InfluxURL) + "/" + action + "?" + params
 	}
 }
 
@@ -153,7 +153,7 @@ func CreateDB(name string) {
 
 // sql: dv_x key1=1,key2="val2" timestamp
 func WriteDefaultDB(sql string) {
-	writeData(configkit.GetStringD(configkey.InfluxDBName), sql)
+	writeData(configkit.GetString(configkey.InfluxDBName), sql)
 }
 
 func WriteWithDBName(dbName, sql string) {

@@ -22,7 +22,7 @@ var router *router2.Router
 var server *http.Server
 
 func defaultEngine() {
-	if !configkit.GetBoolD(configkey.ProfileDev) {
+	if !configkit.GetBool(configkey.ProfileDev) {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	router = &router2.Router{
@@ -42,7 +42,7 @@ func defaultEngine() {
 	// 其他错误如404，
 	//router.OnError(middleware.Cors())
 	// add base path
-	base := configkit.GetStringD(configkey.RestServerBase)
+	base := configkit.GetString(configkey.RestServerBase)
 	if base != "" {
 		if base[0] != '/' {
 			base = "/" + base

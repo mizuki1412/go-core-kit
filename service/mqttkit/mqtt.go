@@ -15,14 +15,14 @@ var _once sync.Once
 
 func New() *Client {
 	_once.Do(func() {
-		if configkit.GetStringD(configkey.MQTTBroker) == "" {
+		if configkit.GetString(configkey.MQTTBroker) == "" {
 			panic(exception.New("请填写broker"))
 		}
 		client = NewClient(ConnectParam{
-			Broker:   configkit.GetStringD(configkey.MQTTBroker),
+			Broker:   configkit.GetString(configkey.MQTTBroker),
 			Id:       configkit.GetString(configkey.MQTTClientID, cryptokit.ID()),
-			Username: configkit.GetStringD(configkey.MQTTUsername),
-			Pwd:      configkit.GetStringD(configkey.MQTTPwd),
+			Username: configkit.GetString(configkey.MQTTUsername),
+			Pwd:      configkit.GetString(configkey.MQTTPwd),
 		})
 	})
 	return client

@@ -38,7 +38,7 @@ type downloadParams struct {
 func download(ctx *context.Context) {
 	params := downloadParams{}
 	ctx.BindForm(&params)
-	subDir := configkit.GetStringD(configkey.ProjectSubDir4PrivateDownload)
+	subDir := configkit.GetString(configkey.ProjectSubDir4PrivateDownload)
 	if subDir == "" {
 		// 默认开启
 		subDir = "."
@@ -56,7 +56,7 @@ func download(ctx *context.Context) {
 func downloadPublic(ctx *context.Context) {
 	params := downloadParams{}
 	ctx.BindForm(&params)
-	subDir := configkit.GetStringD(configkey.ProjectSubDir4PublicDownload)
+	subDir := configkit.GetString(configkey.ProjectSubDir4PublicDownload)
 	if params.Name[0] == '/' {
 		params.Name = params.Name[1:]
 	}

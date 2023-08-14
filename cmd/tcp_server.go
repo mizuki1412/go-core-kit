@@ -2,10 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/mizuki1412/go-core-kit/cli/commandkit"
 	"github.com/mizuki1412/go-core-kit/library/bytekit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
-	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/mizuki1412/go-core-kit/service/netkit"
 	"github.com/panjf2000/gnet"
 	"github.com/spf13/cast"
@@ -19,12 +17,8 @@ func TCPServerCMD() *cobra.Command {
 		Use:   "tcp-server",
 		Short: "本地tcp服务器",
 		Run: func(cmd *cobra.Command, args []string) {
-			commandkit.BindFlags(cmd)
-			if configkit.GetStringD("port") == "" {
-				logkit.Fatal("port参数缺失")
-			}
 			server := netkit.NetServer{
-				Port: cast.ToInt32(configkit.GetStringD("port")),
+				Port: cast.ToInt32(configkit.GetString("port")),
 				OnConnect: func(c gnet.Conn) (out []byte, action gnet.Action) {
 					log.Println("OnConnect： ", c.RemoteAddr())
 					return
@@ -41,7 +35,8 @@ func TCPServerCMD() *cobra.Command {
 			server.Run()
 		},
 	}
-	cmd.Flags().StringP("port", "", "", "端口")
+	cmd.Flags().String("port", "", "端口")
+	_ = cmd.MarkFlagRequired("port")
 	return cmd
 }
 
