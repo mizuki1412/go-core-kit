@@ -46,7 +46,7 @@ _ = cmd.MarkFlagRequired("port")
 
 `/cmd`下包括了一些场景下使用的工具：
 
-- FrontDaoCMDNext：将 swagger 接口导出成前端 dao 文件。
+- FrontDaoCMDNext：将 swagger 接口导出成前端 dao 文件（js）。
 - File2LineCli: 配置文件转命令行文字
 - MarkdownDocCMD：markdown 文件导出
 - MQTTTestCMD：mqtt demo
@@ -57,6 +57,8 @@ _ = cmd.MarkFlagRequired("port")
 # class 封装类
 
 # library
+
+工具库
 
 ## jsonkit
 
@@ -76,9 +78,25 @@ http client
 
 异步等待。
 
+## timekit
+
+时间处理
+
 ## framekit
 
 应用于数据流帧的拆包粘包处理。
+
+## stringkit
+
+字符串相关处理
+
+## tarkit
+
+压缩包处理
+
+## templatekit
+
+模板
 
 ## ftpkit
 
@@ -112,9 +130,105 @@ cfg.SaveTo("my.ini.local")
 
 ip 的处理
 
+# service
+
+## configkit
+
+封装viper，获取配置参数
+
+**注意：请勿在init中获取configkit的参数值，那时还未加载。**
+
+## logkit
+
+日志，包括rolling package。
+
+## cachekit
+
+缓存服务。包含内存和redis。
+
+## rediskit
 
 
 
+## cronkit
+
+定时任务
+
+note: https://godoc.org/github.com/robfig/cron
+
+```go
+c := cron.New()
+c.AddFunc("0 30 * * * *", func() { fmt.Println("Every hour on the half hour") })
+c.AddFunc("@hourly",      func() { fmt.Println("Every hour") })
+c.AddFunc("@every 1h30m", func() { fmt.Println("Every hour thirty") })
+c.Start()
+..
+// Funcs are invoked in their own goroutine, asynchronously.
+...
+// Funcs may also be added to a running Cron
+c.AddFunc("@daily", func() { fmt.Println("Every day") })
+..
+// Inspect the cron job entries' next and previous run times.
+inspect(c.Entries())
+..
+c.Stop()  // Stop the scheduler (does not stop any jobs already running).
+```
+
+cron库语法说明：
+```text
+cron format: 
+Field name   | Mandatory? | Allowed values  | Allowed special characters
+----------   | ---------- | --------------  | --------------------------
+Seconds      | Yes        | 0-59            | * / , -
+Minutes      | Yes        | 0-59            | * / , -
+Hours        | Yes        | 0-23            | * / , -
+Day of month | Yes        | 1-31            | * / , - ?
+Month        | Yes        | 1-12 or JAN-DEC | * / , -
+Day of week  | Yes        | 0-6 or SUN-SAT  | * / , - ?
+
+```
+
+## excelkit
+
+excel表格处理
+
+## influxkit
+
+influx1
+
+## mqttkit
+
+mqtt服务
+
+## netkit
+
+tcp/udp server and client。
+
+https://gnet.host/docs/quickstart/
+
+## storagekit
+
+本地文件存储服务
+
+## serialkit
+
+串口相关
+
+## pdfkit
+
+html转pdf
+
+# service-restkit
+
+web后端服务
+
+# service-sqlkit
+
+数据库服务
+
+# pc
+
+应用于pc端，web+go的模式，go作为基座的一些封装。
 
 # iot
 

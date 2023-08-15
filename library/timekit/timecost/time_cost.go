@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-// 程序执行耗时记录打点
+// TimeCost 程序执行耗时记录打点
 type TimeCost struct {
 	Start time.Time
 }

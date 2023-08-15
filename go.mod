@@ -19,8 +19,8 @@ require (
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/lib/pq v1.10.7
 	github.com/mizuki1412/go-webview2 v0.0.0-20211216070425-b98c07fd76eb
-	github.com/panjf2000/gnet v1.6.6
-	github.com/redis/go-redis/v9 v9.0.2
+	github.com/panjf2000/gnet/v2 v2.3.1
+	github.com/redis/go-redis/v9 v9.0.5
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/xid v1.4.0
 	github.com/russross/blackfriday/v2 v2.1.0
@@ -92,7 +92,7 @@ require (
 	golang.org/x/arch v0.3.0 // indirect
 	golang.org/x/crypto v0.9.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
-	golang.org/x/sync v0.1.0 // indirect
+	golang.org/x/sync v0.2.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

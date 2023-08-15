@@ -4,69 +4,44 @@ import (
 	"fmt"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
-	"github.com/panjf2000/gnet"
+	"github.com/panjf2000/gnet/v2"
+	"github.com/spf13/cast"
 )
 
 type NetServer struct {
+	gnet.BuiltinEventEngine
+	eng         gnet.Engine
 	ProtoSchema string `description:"tcp/udp"`
 	Port        int32
-	OnConnect   func(c gnet.Conn) (out []byte, action gnet.Action)
-	OnMessage   func(frame []byte, c gnet.Conn) (out []byte, action gnet.Action)
-	OnClose     func(c gnet.Conn, err error) (action gnet.Action)
+
+	TrafficHandler func(c gnet.Conn)
+	//OnConnect func(c gnet.Conn) (out []byte, action gnet.Action)
+	//OnMessage func(frame []byte, c gnet.Conn) (out []byte, action gnet.Action)
+	//OnClose   func(c gnet.Conn, err error) (action gnet.Action)
 	// 数据message前的组包拆包
 	//UnPacket func(c *connection.Connection, buffer *ringbuffer.RingBuffer) (any, []byte)
 	//Packet   func(c *connection.Connection, data []byte) []byte
 }
 
-type handler struct {
-	*gnet.EventServer
-	OnConnectFunc func(c gnet.Conn) (out []byte, action gnet.Action)
-	OnMessageFunc func(frame []byte, c gnet.Conn) (out []byte, action gnet.Action)
-	OnCloseFunc   func(c gnet.Conn, err error) (action gnet.Action)
+func (th *NetServer) OnBoot(eng gnet.Engine) gnet.Action {
+	th.eng = eng
+	logkit.Info("net server is listening on " + cast.ToString(th.Port))
+	return gnet.None
 }
 
-func (th *handler) OnInitComplete(srv gnet.Server) (action gnet.Action) {
-	logkit.Info(fmt.Sprintf("net server is listening on %s (multi-cores: %t, loops: %d)\n",
-		srv.Addr.String(), srv.Multicore, srv.NumEventLoop))
-	return
-}
-
-func (th *handler) OnOpened(c gnet.Conn) (out []byte, action gnet.Action) {
-	if th.OnConnectFunc == nil {
-		return
+func (th *NetServer) OnTraffic(c gnet.Conn) gnet.Action {
+	if th.TrafficHandler != nil {
+		th.TrafficHandler(c)
 	}
-	return th.OnConnectFunc(c)
-}
-
-func (th *handler) OnClosed(c gnet.Conn, err error) (action gnet.Action) {
-	if th.OnCloseFunc == nil {
-		return
-	}
-	return th.OnCloseFunc(c, err)
-}
-
-func (th *handler) React(frame []byte, c gnet.Conn) (out []byte, action gnet.Action) {
-	if th.OnMessageFunc == nil {
-		return
-	}
-	return th.OnMessageFunc(frame, c)
+	return gnet.None
 }
 
 func (th *NetServer) Run() {
-	handler0 := &handler{
-		OnConnectFunc: th.OnConnect,
-		OnMessageFunc: th.OnMessage,
-		OnCloseFunc:   th.OnClose,
-	}
-	//options := []gev.Option{
-	//	gev.Address(":" + cast.ToString(th.Port)),
-	//	gev.NumLoops(-1),
-	//}
 	if th.ProtoSchema == "" {
 		th.ProtoSchema = "tcp"
 	}
-	err := gnet.Serve(
-		handler0,
+	err := gnet.Run(
+		th,
 		fmt.Sprintf("%s://:%d", th.ProtoSchema, th.Port),
 		gnet.WithMulticore(true),
 		gnet.WithReusePort(true))

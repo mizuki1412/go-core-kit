@@ -34,7 +34,7 @@ func defaultEngine() {
 	router.Use(middleware.Recover())
 	//router.Use(cors.Default())
 
-	if configkit.GetBool(configkey.RestPPROF, false) {
+	if configkit.GetBool(configkey.RestPPROF) {
 		// todo  p := pprof.New()
 	}
 	// max request size todo

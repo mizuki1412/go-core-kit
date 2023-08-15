@@ -41,10 +41,10 @@ func connector() *sqlx.DB {
 			param = fmt.Sprintf("server=%s;user id=%s;password=%s;port=%s;database=%s", configkit.GetString(configkey.DBHost, ""), configkit.GetString(configkey.DBUser, ""), configkit.GetString(configkey.DBPwd, ""), configkit.GetString(configkey.DBPort, ""), configkit.GetString(configkey.DBName, ""))
 		}
 		db = sqlx.MustConnect(driver, param)
-		lt := cast.ToInt(configkit.GetInt(configkey.DBMaxLife, 20))
+		lt := cast.ToInt(configkit.GetInt(configkey.DBMaxLife))
 		db.SetConnMaxLifetime(time.Duration(lt) * time.Minute)
-		db.SetMaxOpenConns(configkit.GetInt(configkey.DBMaxOpen, 25))
-		db.SetMaxIdleConns(configkit.GetInt(configkey.DBMaxIdle, 5))
+		db.SetMaxOpenConns(configkit.GetInt(configkey.DBMaxOpen))
+		db.SetMaxIdleConns(configkit.GetInt(configkey.DBMaxIdle))
 	})
 	return db
 }

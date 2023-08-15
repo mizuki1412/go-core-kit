@@ -21,10 +21,10 @@ func loadConfig() {
 func bindDefaultFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringP("config", "c", "", "配置文件全路径")
 	cmd.PersistentFlags().String(configkey.ProjectDir, ".", "项目目录")
-	cmd.PersistentFlags().String(configkey.ProjectName, "", "项目名称")
+	cmd.PersistentFlags().String(configkey.ProjectName, "app", "项目名称")
 	cmd.PersistentFlags().String(configkey.ProjectSubDir4PublicDownload, "", "项目目录中用于公共下载的开放目录（一层），逗号分隔，.表示所有")
 	cmd.PersistentFlags().String(configkey.ProjectSubDir4PrivateDownload, "", "项目目录中用于私有下载的开放目录（一层），逗号分隔，.表示所有")
-	cmd.PersistentFlags().String(configkey.ProfileDev, "", "开发模式 default:false")
+	cmd.PersistentFlags().Bool(configkey.ProfileDev, false, "开发模式 default:false")
 	cmd.PersistentFlags().String(configkey.TimeLocation, "Asia/Shanghai", "项目中用到的时区")
 
 	cmd.PersistentFlags().String(configkey.RedisPrefix, "", "redis key的前缀")
@@ -38,20 +38,19 @@ func bindDefaultFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().String(configkey.InfluxPwd, "", "")
 	cmd.PersistentFlags().String(configkey.InfluxDBName, "", "默认的数据库")
 
-	cmd.PersistentFlags().String(configkey.LogPath, "", "日志目录；默认在project.dir下")
+	cmd.PersistentFlags().String(configkey.LogPath, "", "日志目录；空则表示在project.dir/log下；不填不开启文件日志")
 	cmd.PersistentFlags().String(configkey.LogName, "main", "日志文件名，无后缀")
-	cmd.PersistentFlags().String(configkey.LogMaxRemain, "", "最大保留天数")
-	cmd.PersistentFlags().String(configkey.LogMaxBackups, "", "最大保留个数")
-	cmd.PersistentFlags().String(configkey.LogMaxSize, "", "单文件最大尺寸")
-	cmd.PersistentFlags().String(configkey.LogFileOff, "", "关闭文件日志")
+	cmd.PersistentFlags().Int(configkey.LogMaxRemain, 0, "最大保留天数")
+	cmd.PersistentFlags().Int(configkey.LogMaxBackups, 0, "最大保留个数")
+	cmd.PersistentFlags().Int(configkey.LogMaxSize, 20, "单文件最大尺寸")
 	cmd.PersistentFlags().String(configkey.LogLevel, "", "日志等级 debug/info/warn/error")
 
 	cmd.PersistentFlags().String(configkey.RestServerBase, "", "rest base url")
 	cmd.PersistentFlags().String(configkey.RestServerPort, "", "")
 	cmd.PersistentFlags().String(configkey.RestRequestBodySize, "", "限制request最大，单位MB")
-	cmd.PersistentFlags().String(configkey.RestPPROF, "", "开启pprof, /debug/pprof")
-	cmd.PersistentFlags().String(configkey.SessionExpire, "", "session expire 单位小时，默认12小时")
-	cmd.PersistentFlags().String(configkey.SessionSecure, "true", "上传cookie时是否需要https，关系到浏览器的跨域策略和具体是否用https部署服务")
+	cmd.PersistentFlags().Bool(configkey.RestPPROF, false, "开启pprof, /debug/pprof")
+	cmd.PersistentFlags().Int(configkey.SessionExpire, 12, "session expire 单位小时")
+	cmd.PersistentFlags().Bool(configkey.SessionSecure, true, "上传cookie时是否需要https，关系到浏览器的跨域策略和具体是否用https部署服务")
 
 	cmd.PersistentFlags().String(configkey.DBDriver, "", "")
 	cmd.PersistentFlags().String(configkey.DBHost, "", "")
@@ -59,9 +58,9 @@ func bindDefaultFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().String(configkey.DBName, "", "")
 	cmd.PersistentFlags().String(configkey.DBUser, "", "")
 	cmd.PersistentFlags().String(configkey.DBPwd, "", "")
-	cmd.PersistentFlags().String(configkey.DBMaxOpen, "", "最大连接 默认25")
-	cmd.PersistentFlags().String(configkey.DBMaxIdle, "", "最大空闲连接 默认5")
-	cmd.PersistentFlags().String(configkey.DBMaxLife, "", "单位分钟，默认20")
+	cmd.PersistentFlags().Int(configkey.DBMaxOpen, 25, "最大连接")
+	cmd.PersistentFlags().Int(configkey.DBMaxIdle, 5, "最大空闲连接")
+	cmd.PersistentFlags().Int(configkey.DBMaxLife, 20, "单位/分钟")
 
 	cmd.PersistentFlags().String(configkey.SwaggerBasePath, "", "/path")
 	cmd.PersistentFlags().String(configkey.SwaggerHost, "", "可选，默认按swagger-ui所在路径")
@@ -81,7 +80,7 @@ func bindDefaultFlags(cmd *cobra.Command) {
 
 	// mqtt
 	cmd.PersistentFlags().String(configkey.MQTTBroker, "", "eg: tcp://xx.xx.xx")
-	cmd.PersistentFlags().String(configkey.MQTTClientID, "", "")
+	cmd.PersistentFlags().String(configkey.MQTTClientID, "client", "")
 	cmd.PersistentFlags().String(configkey.MQTTUsername, "", "")
 	cmd.PersistentFlags().String(configkey.MQTTPwd, "", "")
 	// netkit

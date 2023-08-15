@@ -46,6 +46,7 @@ func DelFile(fileName string) error {
 }
 
 func CheckFilePath(fileName string) error {
+	// 获取文件的路径
 	i := strings.LastIndex(fileName, "/")
 	if i > 0 {
 		return CheckDir(fileName[:i])

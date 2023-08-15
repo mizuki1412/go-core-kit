@@ -87,3 +87,16 @@ func MatchReg(reg string, target string) bool {
 	}
 	return false
 }
+
+// ClearFilePath 去掉文件路径末尾的/或\
+func ClearFilePath(path string) string {
+	if len(path) > 1 {
+		if path[len(path)-1] == '/' {
+			path = path[:len(path)-1]
+		}
+		if path[len(path)-1] == '\\' {
+			path = path[:len(path)-1]
+		}
+	}
+	return path
+}

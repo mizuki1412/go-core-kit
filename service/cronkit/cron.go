@@ -3,13 +3,12 @@ package cronkit
 import (
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/commonkit"
-	"github.com/mizuki1412/go-core-kit/service/configkit"
+	"github.com/mizuki1412/go-core-kit/library/timekit"
 	"github.com/robfig/cron/v3"
 )
 
 var scheduler *cron.Cron
 
-//
 var pool map[string]*cron.Cron
 
 func Scheduler() *cron.Cron {
@@ -20,7 +19,7 @@ func Scheduler() *cron.Cron {
 }
 
 func NewScheduler() *cron.Cron {
-	return cron.New(cron.WithSeconds(), cron.WithLocation(configkit.GetLocation()))
+	return cron.New(cron.WithSeconds(), cron.WithLocation(timekit.GetLocation()))
 }
 
 func AddPool(key string, cron *cron.Cron) {

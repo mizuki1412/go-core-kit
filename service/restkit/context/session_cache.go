@@ -83,7 +83,7 @@ var renewCache = map[string]int64{}
 func (ctx *Context) SessionRenew() {
 	token := ctx.SessionToken()
 	v := renewCache[token]
-	if (time.Now().Unix() - v) > (cast.ToInt64(configkit.GetInt(configkey.SessionExpire, 12)) / 2 * 3600) {
+	if (time.Now().Unix() - v) > (cast.ToInt64(configkit.GetInt(configkey.SessionExpire)) / 2 * 3600) {
 		ctx._renew("session-user-" + token)
 		ctx._renew("session-schema-" + token)
 	}
@@ -94,14 +94,14 @@ func (ctx *Context) SessionToken() string {
 }
 
 func (ctx *Context) _set(key string, val any) {
-	cachekit.Set(key, val, &cachekit.Param{Redis: true, Ttl: time.Duration(configkit.GetInt(configkey.SessionExpire, 12)) * time.Hour})
+	cachekit.Set(key, val, &cachekit.Param{Redis: true, Ttl: time.Duration(configkit.GetInt(configkey.SessionExpire)) * time.Hour})
 	ctx._setCookie()
 }
 func (ctx *Context) _renew(key string) {
 	v := renewCache[key]
 	now := time.Now().Unix()
-	if (now - v) > (cast.ToInt64(configkit.GetInt(configkey.SessionExpire, 12)) / 2 * 3600) {
-		cachekit.Renew(key, &cachekit.Param{Redis: true, Ttl: time.Duration(configkit.GetInt(configkey.SessionExpire, 12)) * time.Hour})
+	if (now - v) > (cast.ToInt64(configkit.GetInt(configkey.SessionExpire)) / 2 * 3600) {
+		cachekit.Renew(key, &cachekit.Param{Redis: true, Ttl: time.Duration(configkit.GetInt(configkey.SessionExpire)) * time.Hour})
 		renewCache[key] = now
 		ctx._setCookie()
 	}
@@ -118,6 +118,6 @@ func (ctx *Context) _setCookie() {
 		//if strings.Index(origin, "www") == 0 {
 		//	origin = origin[3:]
 		//}
-		ctx.Proxy.SetCookie("token", ctx.SessionToken(), configkit.GetInt(configkey.SessionExpire, 12)*3600, "/", origin, false, true)
+		ctx.Proxy.SetCookie("token", ctx.SessionToken(), configkit.GetInt(configkey.SessionExpire)*3600, "/", origin, false, true)
 	}
 }
