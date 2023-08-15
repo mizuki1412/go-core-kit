@@ -48,32 +48,27 @@ func (ctx *Context) DBTxExist() bool {
 
 // data: query, form, json/xml, param
 
-// BindForm bean 指针
+// BindForm bean 指针、bean 必须是 struct 定义过的
 func (ctx *Context) BindForm(bean any) {
-	switch bean.(type) {
-	case map[string]any:
-		// query会和form合并 post时 todo
-	default:
-		ctx.bindStruct(bean)
-		// validator
-		err := Validator.Struct(bean)
-		if err != nil {
-			if _, ok := err.(*validator.InvalidValidationError); ok {
-				panic(exception.New(err.Error()))
-			}
-			for _, err0 := range err.(validator.ValidationErrors) {
-				panic(exception.New("validation failed: " + stringkit.LowerFirst(err0.Field()) + ", need " + err0.Tag()))
-			}
+	ctx.bindStruct(bean)
+	// validator
+	err := Validator.Struct(bean)
+	if err != nil {
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			panic(exception.New(err.Error()))
 		}
-		body := jsonkit.ToString(bean)
-		if len(body) > 1024 {
-			body = body[:1024]
+		for _, err0 := range err.(validator.ValidationErrors) {
+			panic(exception.New("validation failed: " + stringkit.LowerFirst(err0.Field()) + ", need " + err0.Tag()))
 		}
-		logkit.Info("request-body", logkit.Param{
-			Key: "session",
-			Val: ctx.SessionToken(),
-		}, logkit.Param{Key: "body", Val: body})
 	}
+	body := jsonkit.ToString(bean)
+	if len(body) > 1024 {
+		body = body[:1024]
+	}
+	logkit.Info("request-body", logkit.Param{
+		Key: "session",
+		Val: ctx.SessionToken(),
+	}, logkit.Param{Key: "body", Val: body})
 }
 
 // bean:指针

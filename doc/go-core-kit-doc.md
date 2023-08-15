@@ -268,43 +268,55 @@ type Context struct {
 }
 ```
 
+- Get、Set：会话的临时变量
+- DBTx：当前会话的数据库事务
+- BindForm：对 request 的 form/query/json 的参数解析/校验/打印等，需要用 struct 定义参数
+- Json/JsonSuccess/RawSuccess/Html/File/...：response 输出
+- SessionToken/SessionSetUser/...：session 的支持
 
+### context.session
 
-## context/validator
+- 不再支持 cookie，因为有禁用的场景；改用 header 中的token 字段。
+- 在登录拦截的时候会获取 token，然后 context.Set/Get，判断后续逻辑。其他拦截如果需要可以参考`authup.go`。
+- session的存储通过 cachekit，支持 redis 和内存。
 
-https://github.com/go-playground/validator
+### router
 
-## context/session
+实现正常配置路由信息的同时，配置 swagger 的信息，在代码过程中配置，避免另外生成或写易错的标签。
 
-https://github.com/kataras/iris/wiki/Sessions-database
+```go
+type Router struct {
+	Proxy      *gin.Engine
+	Base       string
+	ProxyGroup *gin.RouterGroup
+	Swagger    *swg.SwaggerPath
+}
 
-实际iris redis存储的内容有：
-- (prefix)+sessionID
-- (prefix)+sessionID-(session的每个key)
+router.Group("/rest/user/loginByUsername").Use(middleware.CreateSession()).Post("", loginByUsername).Swagger.Tag(tag).Summary("登录-用户名").Param(loginByUsernameParam{})
+	router.Group("/rest/user/login").Use(middleware.CreateSession()).Post("", login).Swagger.Tag(tag).Summary("登录").Param(loginParam{})
+	router.Group("/rest/user/info").Use(middleware.AuthUsernameAndPwd()).Post("", info).Swagger.Tag(tag).Summary("用户信息")
+	r := router.Group("/rest/user", middleware.AuthUsernameAndPwd())
+	{
+		r.Post("/logout", logout).Swagger.Tag(tag).Summary("登出")
+		r.Post("/updatePwd", updatePwd).Swagger.Tag(tag).Summary("密码修改").Param(updatePwdParam{})
+		r.Post("/updateUserInfo", updateUserInfo).Swagger.Tag(tag).Summary("更新用户信息").Param(updateUserInfoParam{})
+	}
+```
 
-redis session key的expire时间，受iris session config控制，同时renew时，旧的也会删除。
+- Group: 路径组，附带 baseUrl
+- Use：中间处理组件使用
+- Post/Get/Any：附带 baseUrl
+- GetOrigin: 不附带 baseUrl
+- 和 swagger 绑定配置，通过 Router.Swagger 来配置 swagger 相关参数。
+- RegisterSwagger：将内置的 swagger-ui 注册到路由
 
-## context/response
-
-- context.TransferRestRet：用于定制转换自定义的输入json结构
-
-## swagger
+### swagger
 
 标准：https://swagger.io/specification/v2/
 
 swagger-ui可以单独部署，后端只提供doc.json
 
 需要在实际项目中配合使用swagger-ui，访问地址为 `ip:port/projectName/swagger` 
-
-swagger-ui更新时注意：需要修改index.html中的 `href`、`src`、`SwaggerUIBundle.url` 三处的值。
-
-### swagger-ui
-
-用github.com/markbates/pkger打包静态资源。swagger-ui需要放置在子项目根目录下。
-
-需要在子项目中的main.go顶行写入 ```//go:generate pkger -include /swagger-ui```，然后运行 ```go generate``` 生成pkged.go。
-
-在router/router.go中将自动配置```<base>/swagger```为访问地址。
 
 更新swagger-ui：
 
@@ -313,7 +325,7 @@ swagger-ui更新时注意：需要修改index.html中的 `href`、`src`、`Swagg
 // 取出源码中dist/下除.map外的文件放入本目录的swagger-ui中。
 
 // 修改 index.html
-<script> <style> href加前缀./swagger
+<script> <style> href/src 加前缀./swagger
 
 // 修改 swagger-initializer.js
 url: "./swagger-doc",
@@ -321,10 +333,46 @@ url: "./swagger-doc",
 
 
 
+## middleware
+
+
+
+
+
 
 # service-sqlkit
 
 数据库服务
+
+# 框架内可配置函数或变量
+
+## restkit
+
+### context.TransferRestRet
+
+转换自定义的 response 输出格式。
+
+```go
+// 自定义输出格式：{status:0, errmsg:xxx, message:xxx}
+context.TransferRestRet = func(ret context.RestRet) any {
+  r := Ret{}
+  if ret.Result == context.ResultSuccess {
+    r.Status = 0
+  } else if ret.Result == context.ResultAuthErr {
+    r.Status = 2
+    r.Errmsg.Set(ret.Message)
+  } else {
+    r.Status = 1
+    r.Errmsg.Set(ret.Message)
+  }
+  r.Message = ret.Data
+  return r
+}
+```
+
+### context.HeaderTokenKey
+
+request header 中的 token 字段名，用于 session
 
 # service-third
 

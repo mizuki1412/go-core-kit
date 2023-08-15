@@ -15,6 +15,7 @@ toolkit for golang projects
 
 - [ ] https://github.com/gin-contrib/sessions/pull/148 等官方更新
 - [ ] https://github.com/unrolled/render 模板渲染
+- 测试当 redis 没配置时，session 是否正常
 - [ ] mqtt subscribe 中如果执行太久，会重复执行subscribe？ 暂时用go fun处理
 - [ ] class中有些类型是写死pg的，对其他数据库不友好
 - [ ] 多数据库的方言
