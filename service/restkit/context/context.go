@@ -76,9 +76,9 @@ func (ctx *Context) BindForm(bean any) {
 	}
 }
 
-// / bean:指针
+// bean:指针
 // 实现form/query/json中的数据合并获取。
-// / description:"xxx" default:"" trim:"true"
+// description:"xxx" default:"" trim:"true"
 func (ctx *Context) bindStruct(bean any) {
 	rt := reflect.TypeOf(bean).Elem()
 	rv := reflect.ValueOf(bean).Elem()
