@@ -64,7 +64,7 @@ func Init() *zap.Logger {
 }
 
 func getWriter2() io.Writer {
-	filename := configkit.GetString(configkey.LogName, "main")
+	filename := configkit.GetString(configkey.LogName)
 	filepath := configkit.GetString(configkey.LogPath)
 	if stringkit.IsNull(filepath) {
 		filepath = configkit.GetString(configkey.ProjectDir) + "/log"

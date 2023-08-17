@@ -25,7 +25,7 @@ func GetSTS(roleSession, bucket string, paths ...string) STSData {
 	if ak == "" || aks == "" || role == "" {
 		panic(exception.New("sts 必要参数未设置"))
 	}
-	region := configkit.GetString(configkey.AliRegionId, "cn-hangzhou")
+	region := configkit.GetString(configkey.AliRegionId)
 	client, err := sts.NewClientWithAccessKey(region, ak, aks)
 	if err != nil {
 		panic(exception.New("sts初始化错误: " + err.Error()))

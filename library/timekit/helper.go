@@ -7,6 +7,6 @@ import (
 )
 
 func GetLocation() *time.Location {
-	loc, _ := time.LoadLocation(configkit.GetString(configkey.TimeLocation, "Asia/Shanghai"))
+	loc, _ := time.LoadLocation(configkit.GetString(configkey.TimeLocation))
 	return loc
 }

@@ -58,7 +58,7 @@ func Run(listeners ...net.Listener) error {
 	if router == nil {
 		defaultEngine()
 	}
-	port := configkit.GetString(configkey.RestServerPort, "8080")
+	port := configkit.GetString(configkey.RestServerPort)
 	router.RegisterSwagger()
 	if len(listeners) == 0 {
 		server = &http.Server{

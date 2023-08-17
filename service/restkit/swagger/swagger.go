@@ -131,6 +131,12 @@ func (swagger *SwaggerPath) ProduceStream() *SwaggerPath {
 	return swagger.Produce(httpconst.MimeStream)
 }
 
+// todo response
+func (swagger *SwaggerPath) Response(bean any) *SwaggerPath {
+
+	return swagger
+}
+
 var Doc SwaggerDoc
 
 type SwaggerDoc struct {
@@ -153,7 +159,7 @@ func (s *SwaggerDoc) ReadDoc() string {
 	s.Swagger = "2.0"
 	s.Info["description"] = configkit.GetString(configkey.SwaggerDescription)
 	s.Info["title"] = configkit.GetString(configkey.SwaggerTitle)
-	s.Info["version"] = configkit.GetString(configkey.SwaggerVersion, "1.0.0")
+	s.Info["version"] = configkit.GetString(configkey.SwaggerVersion)
 	s.Host = configkit.GetString(configkey.SwaggerHost)
 	// basePath已经在router中直接加上了，在NewPath中需要额外处理
 	s.BasePath = configkit.GetString(configkey.SwaggerBasePath)

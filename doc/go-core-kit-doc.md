@@ -234,15 +234,22 @@ restkit.Run()
 
 /// 其中action的初始定义demo，并配合使用swagger
 func Init(router *router.Router) {
-	tag := "系统用户模块"
-	r := router.Group("/rest/user")
-	r.Use(middleware.AuthUsernameAndPwd())
+	tag := "user:用户模块"
+	router.Group("/rest/user/loginByUsername").Use(middleware.CreateSession()).Post("", loginByUsername).Swagger.Tag(tag).Summary("登录-用户名").Param(loginByUsernameParam{})
+	router.Group("/rest/user/login").Use(middleware.CreateSession()).Post("", login).Swagger.Tag(tag).Summary("登录").Param(loginParam{})
+	router.Group("/rest/user/info").Use(middleware.AuthUsernameAndPwd()).Post("", info).Swagger.Tag(tag).Summary("用户信息")
+	r := router.Group("/rest/user", middleware.AuthUsernameAndPwd())
 	{
-		r.Post("/info", info).Tag(tag).Summary("用户信息")
-		r.Post("/logout", logout).Tag(tag).Summary("登出")
-		r.Post("/listRoles", listRoles).Tag(tag).Summary("角色列表").Param(listRolesParam{})
+		r.Post("/logout", logout).Swagger.Tag(tag).Summary("登出")
+		r.Post("/updatePwd", updatePwd).Swagger.Tag(tag).Summary("密码修改").Param(updatePwdParam{})
+		r.Post("/updateUserInfo", updateUserInfo).Swagger.Tag(tag).Summary("更新用户信息").Param(updateUserInfoParam{})
 	}
-	router.Group("/rest/user/loginByUsername").Post("", loginByUsername).Tag(tag).Summary("用户名登录").Param(loginByUsernameParam{})
+	r1 := router.Group("/rest/user/admin", middleware.AuthUsernameAndPwd())
+	{
+		r1.Post("/list", listUsers).Swagger.Tag(tag).Summary("用户列表").Param(listUsersParams{})
+		r1.Post("/listByRole", listByRole).Swagger.Tag(tag).Summary("用户列表 by role").Param(listByRoleParams{})
+		r1.Post("/info", infoAdmin).Swagger.Tag(tag).Summary("用户信息").Param(infoAdminParams{})
+	}
 }
 ```
 
@@ -291,16 +298,6 @@ type Router struct {
 	ProxyGroup *gin.RouterGroup
 	Swagger    *swg.SwaggerPath
 }
-
-router.Group("/rest/user/loginByUsername").Use(middleware.CreateSession()).Post("", loginByUsername).Swagger.Tag(tag).Summary("登录-用户名").Param(loginByUsernameParam{})
-	router.Group("/rest/user/login").Use(middleware.CreateSession()).Post("", login).Swagger.Tag(tag).Summary("登录").Param(loginParam{})
-	router.Group("/rest/user/info").Use(middleware.AuthUsernameAndPwd()).Post("", info).Swagger.Tag(tag).Summary("用户信息")
-	r := router.Group("/rest/user", middleware.AuthUsernameAndPwd())
-	{
-		r.Post("/logout", logout).Swagger.Tag(tag).Summary("登出")
-		r.Post("/updatePwd", updatePwd).Swagger.Tag(tag).Summary("密码修改").Param(updatePwdParam{})
-		r.Post("/updateUserInfo", updateUserInfo).Swagger.Tag(tag).Summary("更新用户信息").Param(updateUserInfoParam{})
-	}
 ```
 
 - Group: 路径组，附带 baseUrl

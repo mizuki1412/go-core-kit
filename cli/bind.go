@@ -46,7 +46,7 @@ func bindDefaultFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().String(configkey.LogLevel, "", "日志等级 debug/info/warn/error")
 
 	cmd.PersistentFlags().String(configkey.RestServerBase, "", "rest base url")
-	cmd.PersistentFlags().String(configkey.RestServerPort, "", "")
+	cmd.PersistentFlags().String(configkey.RestServerPort, "10000", "")
 	cmd.PersistentFlags().String(configkey.RestRequestBodySize, "", "限制request最大，单位MB")
 	cmd.PersistentFlags().Bool(configkey.RestPPROF, false, "开启pprof, /debug/pprof")
 	cmd.PersistentFlags().Int(configkey.SessionExpire, 12, "session expire 单位小时")
