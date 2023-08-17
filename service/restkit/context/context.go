@@ -3,14 +3,12 @@ package context
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/library/timekit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
-	"github.com/mizuki1412/go-core-kit/service/sqlkit"
 	"github.com/spf13/cast"
 	"net/http"
 	"reflect"
@@ -31,19 +29,6 @@ func (ctx *Context) Set(key string, val any) {
 func (ctx *Context) Get(key string) any {
 	r, _ := ctx.Proxy.Get(key)
 	return r
-}
-
-func (ctx *Context) DBTx() *sqlx.Tx {
-	var dao *sqlx.Tx
-	if ctx.Get("dbtx") == nil {
-		ctx.Set("dbtx", sqlkit.StartTx())
-	} else {
-		dao = ctx.Get("dbtx").(*sqlx.Tx)
-	}
-	return dao
-}
-func (ctx *Context) DBTxExist() bool {
-	return ctx.Get("dbtx") != nil
 }
 
 // data: query, form, json/xml, param

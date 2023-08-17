@@ -26,7 +26,7 @@ func NewWithSchema(schema string, tx ...*sqlx.Tx) *Dao {
 }
 
 func (dao *Dao) Set(data map[string]interface{}) {
-	sql, args, err := sqlkit.Builder().Update(sqlkit.GetSchemaTable(dao.Schema, "more_setting")).Set("data", jsonkit.ToString(data)).Where("id=?", 1).ToSql()
+	sql, args, err := dao.Builder().Update(sqlkit.GetSchemaTable(dao.Schema, "more_setting")).Set("data", jsonkit.ToString(data)).Where("id=?", 1).ToSql()
 	if err != nil {
 		panic(exception.New(err.Error()))
 	}
@@ -34,7 +34,7 @@ func (dao *Dao) Set(data map[string]interface{}) {
 }
 
 func (dao *Dao) Get() map[string]interface{} {
-	sql, args := sqlkit.Builder().Select("data").From(sqlkit.GetSchemaTable(dao.Schema, "more_setting")).Where("id=?", 1).MustSql()
+	sql, args := dao.Builder().Select("data").From(sqlkit.GetSchemaTable(dao.Schema, "more_setting")).Where("id=?", 1).MustSql()
 	rows := dao.Query(sql, args...)
 	var data string
 	defer rows.Close()

@@ -335,14 +335,26 @@ url: "./swagger-doc",
 
 ## middleware
 
+```go
+router.Use(middleware.Log())
+router.Use(middleware.Cors())
+router.Use(middleware.Recover())
+```
 
-
-
+- log: 请求前请求后打印
+- cors：跨域
+- recover：异常捕捉：打印、回滚/提交、返回错误信息
 
 
 # service-sqlkit
 
 数据库服务
+
+
+
+支持的driver name
+
+
 
 # 框架内可配置函数或变量
 

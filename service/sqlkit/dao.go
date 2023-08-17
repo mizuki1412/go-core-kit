@@ -1,104 +1,50 @@
 package sqlkit
 
 import (
-	"fmt"
 	"github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/cli/configkey"
-	"github.com/mizuki1412/go-core-kit/service/configkit"
-	"github.com/mizuki1412/go-core-kit/service/logkit"
-	"github.com/spf13/cast"
 	"reflect"
-	"sync"
-	"time"
 )
-
-/**
-数据库连接和CRUD的通用接口
-在项目的main中须要导入driver
-*/
-
-var driver string
-var db *sqlx.DB
-var once sync.Once
-
-const SchemaDefault = "public"
-
-// 前提数据库驱动需要默认导入
-func connector() *sqlx.DB {
-	once.Do(func() {
-		if !configkit.Exist(configkey.DBDriver) || !configkit.Exist(configkey.DBHost) || !configkit.Exist(configkey.DBPort) || !configkit.Exist(configkey.DBPwd) || !configkit.Exist(configkey.DBUser) || !configkit.Exist(configkey.DBName) {
-			panic(exception.New("sqlkit: database config error"))
-		}
-		driver = configkit.GetString(configkey.DBDriver, "")
-		var param string
-		if driver == "postgres" {
-			param = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", configkit.GetString(configkey.DBHost, ""), configkit.GetInt(configkey.DBPort, 0), configkit.GetString(configkey.DBUser, ""), configkit.GetString(configkey.DBPwd, ""), configkit.GetString(configkey.DBName, ""))
-		} else if driver == "mysql" {
-			param = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=true&loc=%s", configkit.GetString(configkey.DBUser, ""), configkit.GetString(configkey.DBPwd, ""), configkit.GetString(configkey.DBHost, ""), configkit.GetString(configkey.DBPort, ""), configkit.GetString(configkey.DBName, ""), "Asia%2FShanghai")
-		} else if driver == "mssql" {
-			param = fmt.Sprintf("server=%s;user id=%s;password=%s;port=%s;database=%s", configkit.GetString(configkey.DBHost, ""), configkit.GetString(configkey.DBUser, ""), configkit.GetString(configkey.DBPwd, ""), configkit.GetString(configkey.DBPort, ""), configkit.GetString(configkey.DBName, ""))
-		}
-		db = sqlx.MustConnect(driver, param)
-		lt := cast.ToInt(configkit.GetInt(configkey.DBMaxLife))
-		db.SetConnMaxLifetime(time.Duration(lt) * time.Minute)
-		db.SetMaxOpenConns(configkit.GetInt(configkey.DBMaxOpen))
-		db.SetMaxIdleConns(configkit.GetInt(configkey.DBMaxIdle))
-	})
-	return db
-}
 
 type Dao[T any] struct {
 	// 返回级联的类型
 	ResultType byte
-	// 级联的函数
+	// 级联实现的函数
 	Cascade func(*T)
-	Schema  string
-	// 事务时使用
-	TX *sqlx.Tx
-	// 指定连接
-	Conn *sqlx.DB
-	// 指定连接时的driver
-	Driver string
+	// 数据源
+	DataSource *DataSource
 }
 
-// StartTx todo 未处理指定连接时的场景
-func StartTx() *sqlx.Tx {
-	return connector().MustBegin()
-}
-
+// Builder 结构化语句
 func (dao *Dao[T]) Builder() squirrel.StatementBuilderType {
-	// 赋值默认driver
-	dao.Connector()
-	if dao.Driver == "postgres" {
-		return squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
-	} else {
-		// todo 未处理oracle
-		return squirrel.StatementBuilder.PlaceholderFormat(squirrel.Question)
+	if dao.DataSource == nil {
+		dao.DataSource = DefaultDataSource()
 	}
-}
-
-func (dao *Dao[T]) Connector() *sqlx.DB {
-	if dao.Conn == nil {
-		dao.Conn = connector()
-		dao.Driver = driver
-	}
-	return dao.Conn
+	return getStatementBuilderType(dao.DataSource)
 }
 
 func (dao *Dao[T]) SetResultType(rt byte) *Dao[T] {
+	if dao.DataSource == nil {
+		dao.DataSource = DefaultDataSource()
+	}
 	dao.ResultType = rt
 	return dao
 }
 
 func (dao *Dao[T]) SetSchema(schema string) *Dao[T] {
-	dao.Schema = schema
+	if dao.DataSource == nil {
+		dao.DataSource = DefaultDataSource()
+	}
+	dao.DataSource.Schema = schema
 	return dao
 }
 
 // GetTable 根据类获取tablename，并判断schema
 func (dao *Dao[T]) GetTable(dest any) string {
+	if dao.DataSource == nil {
+		dao.DataSource = DefaultDataSource()
+	}
 	rt := reflect.TypeOf(dest).Elem()
 	return getTable(rt, dao.Schema)
 }
@@ -116,26 +62,10 @@ func getTable(rt reflect.Type, schema string) string {
 	return GetSchemaTable(schema, tname)
 }
 
-// Commit transaction
-func (dao *Dao[T]) Commit() {
-	if dao.TX != nil {
-		err := dao.TX.Commit()
-		if err != nil {
-			logkit.Error(exception.New(err.Error()))
-			//panic(exception.New(err.Error(), 2))
-		}
-	}
-}
-func (dao *Dao[T]) Rollback() {
-	if dao.TX != nil {
-		err := dao.TX.Rollback()
-		if err != nil {
-			logkit.Error(exception.New(err.Error()))
-		}
-	}
-}
-
 func (dao *Dao[T]) Query(sql string, args ...any) *sqlx.Rows {
+	if dao.DataSource == nil {
+		dao.DataSource = DefaultDataSource()
+	}
 	var rows *sqlx.Rows
 	var err error
 	if dao.TX != nil {
@@ -149,6 +79,9 @@ func (dao *Dao[T]) Query(sql string, args ...any) *sqlx.Rows {
 	return rows
 }
 func (dao *Dao[T]) Exec(sql string, args ...any) {
+	if dao.DataSource == nil {
+		dao.DataSource = DefaultDataSource()
+	}
 	if dao.TX != nil {
 		dao.TX.MustExec(sql, args...)
 	} else {
@@ -159,6 +92,9 @@ func (dao *Dao[T]) Exec(sql string, args ...any) {
 // dest a struct
 // todo select会引起no-struct错误（Scan()导致）；structScan 对any报错
 func (dao *Dao[T]) QueryStruct(destType func(rs *sqlx.Rows) (any, error), sql string, args []any, err error) []any {
+	if dao.DataSource == nil {
+		dao.DataSource = DefaultDataSource()
+	}
 	if err != nil {
 		panic(exception.New(err.Error(), 2))
 	}
@@ -178,6 +114,9 @@ func (dao *Dao[T]) QueryStruct(destType func(rs *sqlx.Rows) (any, error), sql st
 }
 
 func (dao *Dao[T]) QueryMap(sql string, args []any, err error) []map[string]any {
+	if dao.DataSource == nil {
+		dao.DataSource = DefaultDataSource()
+	}
 	if err != nil {
 		panic(exception.New(err.Error(), 2))
 	}
@@ -229,6 +168,9 @@ func (dao *Dao[T]) QueryMap(sql string, args []any, err error) []map[string]any 
 
 // Insert dest should be elem
 func (dao *Dao[T]) Insert(dest any) {
+	if dao.DataSource == nil {
+		dao.DataSource = DefaultDataSource()
+	}
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
 	builder := Builder().Insert(getTable(rt, dao.Schema))
@@ -287,6 +229,9 @@ func (dao *Dao[T]) Insert(dest any) {
 
 // Update dest should be elem
 func (dao *Dao[T]) Update(dest any) {
+	if dao.DataSource == nil {
+		dao.DataSource = DefaultDataSource()
+	}
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
 	builder := Builder().Update(getTable(rt, dao.Schema))
@@ -326,6 +271,9 @@ func (dao *Dao[T]) Update(dest any) {
 
 // Delete dest should be elem
 func (dao *Dao[T]) Delete(dest any) {
+	if dao.DataSource == nil {
+		dao.DataSource = DefaultDataSource()
+	}
 	rt := reflect.TypeOf(dest).Elem()
 	rv := reflect.ValueOf(dest).Elem()
 	builder := Builder().Delete(getTable(rt, dao.Schema))
@@ -379,6 +327,9 @@ func getPKs(rt reflect.Type, rv reflect.Value) map[string]any {
 
 // ScanList 取值封装list
 func (dao *Dao[T]) ScanList(sql string, args []any) []*T {
+	if dao.DataSource == nil {
+		dao.DataSource = DefaultDataSource()
+	}
 	rows := dao.Query(sql, args...)
 	list := make([]*T, 0, 5)
 	defer rows.Close()
@@ -399,6 +350,9 @@ func (dao *Dao[T]) ScanList(sql string, args []any) []*T {
 }
 
 func (dao *Dao[T]) ScanOne(sql string, args []any) *T {
+	if dao.DataSource == nil {
+		dao.DataSource = DefaultDataSource()
+	}
 	rows := dao.Query(sql, args...)
 	defer rows.Close()
 	for rows.Next() {

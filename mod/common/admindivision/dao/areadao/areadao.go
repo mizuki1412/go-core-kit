@@ -27,12 +27,12 @@ func NewWithSchema(schema string, tx ...*sqlx.Tx) *Dao {
 }
 
 func (dao *Dao) FindById(id class.String) *model.Area {
-	sql, args := sqlkit.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("code=?", id).MustSql()
+	sql, args := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("code=?", id).MustSql()
 	return dao.ScanOne(sql, args)
 }
 
 func (dao *Dao) FindCodeByName(name, ccode, pcode string) string {
-	sql, args := sqlkit.Builder().Select("code").From(meta.GetTableName(dao.Schema)).Where("name=?", name).Where("city=?", ccode).Where("province=?", pcode).MustSql()
+	sql, args := dao.Builder().Select("code").From(meta.GetTableName(dao.Schema)).Where("name=?", name).Where("city=?", ccode).Where("province=?", pcode).MustSql()
 	rows := dao.Query(sql, args...)
 	defer rows.Close()
 	for rows.Next() {
@@ -46,6 +46,6 @@ func (dao *Dao) FindCodeByName(name, ccode, pcode string) string {
 }
 
 func (dao *Dao) ListByCity(id class.String) []*model.Area {
-	sql, args := sqlkit.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("city=?", id).OrderBy("code").MustSql()
+	sql, args := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("city=?", id).OrderBy("code").MustSql()
 	return dao.ScanList(sql, args)
 }

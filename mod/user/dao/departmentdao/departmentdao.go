@@ -50,16 +50,16 @@ func NewWithSchema(schema string, tx ...*sqlx.Tx) *Dao {
 }
 
 func (dao *Dao) FindById(id int32) *model.Department {
-	sql, args := sqlkit.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("id=?", id).MustSql()
+	sql, args := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("id=?", id).MustSql()
 	return dao.ScanOne(sql, args)
 }
 
 func (dao *Dao) ListByParent(id int32) []*model.Department {
-	sql, args := sqlkit.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("parent=?", id).OrderBy("no", "id").MustSql()
+	sql, args := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("parent=?", id).OrderBy("no", "id").MustSql()
 	return dao.ScanList(sql, args)
 }
 
 func (dao *Dao) ListAll() []*model.Department {
-	sql, args := sqlkit.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("id>=0").OrderBy("parent", "no", "id").MustSql()
+	sql, args := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("id>=0").OrderBy("parent", "no", "id").MustSql()
 	return dao.ScanList(sql, args)
 }

@@ -39,12 +39,12 @@ func NewWithSchema(schema string, tx ...*sqlx.Tx) *Dao {
 }
 
 func (dao *Dao) FindById(id class.String) *model.Province {
-	sql, args := sqlkit.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("code=?", id).MustSql()
+	sql, args := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("code=?", id).MustSql()
 	return dao.ScanOne(sql, args)
 }
 
 func (dao *Dao) FindCodeByName(name string) string {
-	sql, args := sqlkit.Builder().Select("code").From(sqlkit.GetSchemaTable(dao.Schema, "province")).Where("name=?", name).MustSql()
+	sql, args := dao.Builder().Select("code").From(sqlkit.GetSchemaTable(dao.Schema, "province")).Where("name=?", name).MustSql()
 	rows := dao.Query(sql, args...)
 	defer rows.Close()
 	for rows.Next() {
@@ -58,6 +58,6 @@ func (dao *Dao) FindCodeByName(name string) string {
 }
 
 func (dao *Dao) ListAll() []*model.Province {
-	sql, args := sqlkit.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).OrderBy("code").MustSql()
+	sql, args := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).OrderBy("code").MustSql()
 	return dao.ScanList(sql, args)
 }
