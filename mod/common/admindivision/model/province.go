@@ -6,7 +6,7 @@ import (
 )
 
 type Province struct {
-	Code   class.String `json:"code,omitempty" db:"code" pk:"true" tablename:"province"`
+	Code   class.String `json:"code,omitempty" db:"code" pk:"true" table:"province"`
 	Name   class.String `json:"name,omitempty" db:"name"`
 	Cities []*City      `json:"cities"`
 }

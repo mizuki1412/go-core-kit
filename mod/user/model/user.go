@@ -7,7 +7,7 @@ import (
 )
 
 type User struct {
-	Id         int32           `json:"id,omitempty" db:"id" pk:"true" tablename:"admin_user" autoincrement:"true"`
+	Id         int32           `json:"id,omitempty" db:"id" pk:"true" table:"admin_user" autoincrement:"true"`
 	Role       *Role           `json:"role,omitempty" db:"role"`
 	Department *Department     `json:"department,omitempty" db:"department"`
 	Username   class.String    `json:"username,omitempty" db:"username"`

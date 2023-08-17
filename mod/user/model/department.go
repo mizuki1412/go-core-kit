@@ -7,7 +7,7 @@ import (
 )
 
 type Department struct {
-	Id       int32           `autoincrement:"true" json:"id" db:"id" pk:"true" tablename:"department"`
+	Id       int32           `autoincrement:"true" json:"id" db:"id" pk:"true" table:"department"`
 	No       class.String    `json:"no,omitempty" db:"no" description:"编号"`
 	Name     class.String    `json:"name,omitempty" db:"name"`
 	Descr    class.String    `json:"descr,omitempty" db:"descr" description:"描述"`

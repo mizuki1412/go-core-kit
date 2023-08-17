@@ -6,7 +6,7 @@ import (
 )
 
 type Area struct {
-	Code class.String `json:"code,omitempty" db:"code" pk:"true" tablename:"area"`
+	Code class.String `json:"code,omitempty" db:"code" pk:"true" table:"area"`
 	Name class.String `json:"name,omitempty" db:"name"`
 }
 

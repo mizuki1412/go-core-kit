@@ -14,6 +14,9 @@ type Dao[T any] struct {
 	Cascade func(*T)
 	// 数据源
 	DataSource *DataSource
+	// 目标表结构
+	ModelMeta  *ModelMeta
+	SqlBuilder *SQLBuilder
 }
 
 // Builder 结构化语句
@@ -32,106 +35,18 @@ func (dao *Dao[T]) SetResultType(rt byte) *Dao[T] {
 	return dao
 }
 
-func (dao *Dao[T]) SetSchema(schema string) *Dao[T] {
-	if dao.DataSource == nil {
-		dao.DataSource = DefaultDataSource()
-	}
-	dao.DataSource.Schema = schema
-	return dao
-}
-
-// GetTable 根据类获取tablename，并判断schema
-func (dao *Dao[T]) GetTable(dest any) string {
-	if dao.DataSource == nil {
-		dao.DataSource = DefaultDataSource()
-	}
-	rt := reflect.TypeOf(dest).Elem()
-	return getTable(rt, dao.Schema)
-}
-func getTable(rt reflect.Type, schema string) string {
-	var tname string
-	for i := 0; i < rt.NumField(); i++ {
-		if t, ok := rt.Field(i).Tag.Lookup("tablename"); ok {
-			tname = t
-			break
-		}
-	}
-	if tname == "" {
-		panic(exception.New("tablename未设置", 2))
-	}
-	return GetSchemaTable(schema, tname)
-}
-
 func (dao *Dao[T]) Query(sql string, args ...any) *sqlx.Rows {
 	if dao.DataSource == nil {
 		dao.DataSource = DefaultDataSource()
 	}
-	var rows *sqlx.Rows
-	var err error
-	if dao.TX != nil {
-		rows, err = dao.TX.Queryx(sql, args...)
-	} else {
-		rows, err = dao.Connector().Queryx(sql, args...)
-	}
-	if err != nil {
-		panic(exception.New(err.Error(), 2))
-	}
-	return rows
+	return dao.DataSource.Query(sql, args...)
 }
+
 func (dao *Dao[T]) Exec(sql string, args ...any) {
 	if dao.DataSource == nil {
 		dao.DataSource = DefaultDataSource()
 	}
-	if dao.TX != nil {
-		dao.TX.MustExec(sql, args...)
-	} else {
-		dao.Connector().MustExec(sql, args...)
-	}
-}
-
-// dest a struct
-// todo select会引起no-struct错误（Scan()导致）；structScan 对any报错
-func (dao *Dao[T]) QueryStruct(destType func(rs *sqlx.Rows) (any, error), sql string, args []any, err error) []any {
-	if dao.DataSource == nil {
-		dao.DataSource = DefaultDataSource()
-	}
-	if err != nil {
-		panic(exception.New(err.Error(), 2))
-	}
-	//log.Println("sqlkit:", sql, args)
-	//err = DB().Select(dest, sql, args...)
-	var list []any
-	rows := dao.Query(sql, args...)
-	defer rows.Close()
-	for rows.Next() {
-		m, err := destType(rows)
-		if err != nil {
-			panic(exception.New(err.Error(), 2))
-		}
-		list = append(list, m)
-	}
-	return list
-}
-
-func (dao *Dao[T]) QueryMap(sql string, args []any, err error) []map[string]any {
-	if dao.DataSource == nil {
-		dao.DataSource = DefaultDataSource()
-	}
-	if err != nil {
-		panic(exception.New(err.Error(), 2))
-	}
-	var list []map[string]any
-	rows := dao.Query(sql, args...)
-	defer rows.Close()
-	for rows.Next() {
-		m := map[string]any{}
-		err := rows.MapScan(m)
-		if err != nil {
-			panic(exception.New(err.Error(), 2))
-		}
-		list = append(list, m)
-	}
-	return list
+	dao.DataSource.Exec(sql, args...)
 }
 
 // dest a pointer
@@ -166,14 +81,12 @@ func (dao *Dao[T]) QueryMap(sql string, args []any, err error) []map[string]any 
 //	}
 //}
 
-// Insert dest should be elem
 func (dao *Dao[T]) Insert(dest any) {
 	if dao.DataSource == nil {
 		dao.DataSource = DefaultDataSource()
 	}
-	rt := reflect.TypeOf(dest).Elem()
-	rv := reflect.ValueOf(dest).Elem()
-	builder := Builder().Insert(getTable(rt, dao.Schema))
+	rt, rv := reflectModel(dest)
+	builder := dao.Builder().Insert(dao.getTable(rt))
 	var pks []string
 	var columns []string
 	var vals []any
@@ -227,14 +140,12 @@ func (dao *Dao[T]) Insert(dest any) {
 	}
 }
 
-// Update dest should be elem
 func (dao *Dao[T]) Update(dest any) {
 	if dao.DataSource == nil {
 		dao.DataSource = DefaultDataSource()
 	}
-	rt := reflect.TypeOf(dest).Elem()
-	rv := reflect.ValueOf(dest).Elem()
-	builder := Builder().Update(getTable(rt, dao.Schema))
+	rt, rv := reflectModel(dest)
+	builder := dao.Builder().Update(dao.getTable(rt))
 	for i := 0; i < rt.NumField(); i++ {
 		// db字段
 		dbKey, ok := rt.Field(i).Tag.Lookup("db")
@@ -274,9 +185,8 @@ func (dao *Dao[T]) Delete(dest any) {
 	if dao.DataSource == nil {
 		dao.DataSource = DefaultDataSource()
 	}
-	rt := reflect.TypeOf(dest).Elem()
-	rv := reflect.ValueOf(dest).Elem()
-	builder := Builder().Delete(getTable(rt, dao.Schema))
+	rt, rv := reflectModel(dest)
+	builder := dao.Builder().Delete(dao.getTable(rt))
 	pks := getPKs(rt, rv)
 	for k, v := range pks {
 		builder = builder.Where(k+"=?", v)
@@ -305,28 +215,8 @@ func (dao *Dao[T]) DeleteOff(dest any) {
 	dao.Exec(sql, args...)
 }
 
-// 多或单主键
-func getPKs(rt reflect.Type, rv reflect.Value) map[string]any {
-	pks := map[string]any{}
-	for i := 0; i < rt.NumField(); i++ {
-		if t, ok := rt.Field(i).Tag.Lookup("pk"); ok {
-			if t == "true" {
-				name := rt.Field(i).Tag.Get("db")
-				if name == "" {
-					panic(exception.New("field "+rt.Field(i).Name+" no db tag", 2))
-				}
-				pks[name] = rv.Field(i).Interface()
-			}
-		}
-	}
-	if len(pks) == 0 {
-		panic(exception.New("未设置pk", 2))
-	}
-	return pks
-}
-
 // ScanList 取值封装list
-func (dao *Dao[T]) ScanList(sql string, args []any) []*T {
+func (dao *Dao[T]) ScanList(sql string, args ...any) []*T {
 	if dao.DataSource == nil {
 		dao.DataSource = DefaultDataSource()
 	}
@@ -349,7 +239,7 @@ func (dao *Dao[T]) ScanList(sql string, args []any) []*T {
 	return list
 }
 
-func (dao *Dao[T]) ScanOne(sql string, args []any) *T {
+func (dao *Dao[T]) ScanOne(sql string, args ...any) *T {
 	if dao.DataSource == nil {
 		dao.DataSource = DefaultDataSource()
 	}
@@ -367,4 +257,39 @@ func (dao *Dao[T]) ScanOne(sql string, args []any) *T {
 		return m
 	}
 	return nil
+}
+
+func (dao *Dao[T]) ScanOneMap(sql string, args []any) map[string]any {
+	if dao.DataSource == nil {
+		dao.DataSource = DefaultDataSource()
+	}
+	rows := dao.Query(sql, args...)
+	defer rows.Close()
+	for rows.Next() {
+		m := map[string]any{}
+		err := rows.MapScan(m)
+		if err != nil {
+			panic(exception.New(err.Error()))
+		}
+		return m
+	}
+	return nil
+}
+
+func (dao *Dao[T]) ScanListMap(sql string, args ...any) []map[string]any {
+	if dao.DataSource == nil {
+		dao.DataSource = DefaultDataSource()
+	}
+	rows := dao.Query(sql, args...)
+	list := make([]map[string]any, 0, 5)
+	defer rows.Close()
+	for rows.Next() {
+		m := map[string]any{}
+		err := rows.MapScan(m)
+		if err != nil {
+			panic(exception.New(err.Error()))
+		}
+		list = append(list, m)
+	}
+	return list
 }

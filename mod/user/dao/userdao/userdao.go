@@ -3,7 +3,6 @@ package userdao
 import (
 	"fmt"
 	"github.com/Masterminds/squirrel"
-	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/mod/user/dao/departmentdao"
@@ -25,23 +24,19 @@ const (
 	ResultNone
 )
 
-func New(tx ...*sqlx.Tx) *Dao {
-	return NewWithSchema("", tx...)
-}
-func NewWithSchema(schema string, tx ...*sqlx.Tx) *Dao {
+func New(ds ...*sqlkit.DataSource) *Dao {
 	dao := &Dao{}
-	dao.SetSchema(schema)
-	if len(tx) > 0 {
-		dao.TX = tx[0]
+	if len(ds) > 0 {
+		dao.DataSource = ds[0]
 	}
 	dao.Cascade = func(obj *model.User) {
 		switch dao.ResultType {
 		case ResultDefault:
 			if obj.Role != nil {
-				obj.Role = roledao.NewWithSchema(dao.Schema).FindById(obj.Role.Id)
+				obj.Role = roledao.New(dao.DataSource).FindById(obj.Role.Id)
 			}
 			if obj.Department != nil {
-				obj.Department = departmentdao.NewWithSchema(dao.Schema).FindById(obj.Department.Id)
+				obj.Department = departmentdao.New(dao.DataSource).FindById(obj.Department.Id)
 			}
 		case ResultNone:
 			obj.Role = nil

@@ -89,6 +89,21 @@ func DefaultDataSource() *DataSource {
 	return ds
 }
 
+// 获取 schema 修饰tableName
+func (ds *DataSource) getDecoSchema() string {
+	if ds.Schema != "" {
+		return ds.Schema + "."
+	} else if ds.Driver == "postgres" {
+		return "public."
+	}
+	return ""
+}
+
+func (ds *DataSource) setSchema(schema string) *DataSource {
+	ds.Schema = schema
+	return ds
+}
+
 func (ds *DataSource) Commit() {
 	if ds.TX == nil {
 		return
@@ -111,4 +126,26 @@ func (ds *DataSource) Rollback() {
 
 func (ds *DataSource) BeginTX() *sqlx.Tx {
 	return ds.DBPool.MustBegin()
+}
+
+func (ds *DataSource) Query(sql string, args ...any) *sqlx.Rows {
+	var rows *sqlx.Rows
+	var err error
+	if ds.TX != nil {
+		rows, err = ds.TX.Queryx(sql, args...)
+	} else {
+		rows, err = ds.DBPool.Queryx(sql, args...)
+	}
+	if err != nil {
+		panic(exception.New(err.Error(), 2))
+	}
+	return rows
+}
+
+func (ds *DataSource) Exec(sql string, args ...any) {
+	if ds.TX != nil {
+		ds.TX.MustExec(sql, args...)
+	} else {
+		ds.DBPool.MustExec(sql, args...)
+	}
 }

@@ -7,7 +7,7 @@ import (
 )
 
 type PrivilegeConstant struct {
-	Id   string       `json:"id" db:"id" pk:"true" tablename:"privilege_constant"`
+	Id   string       `json:"id" db:"id" pk:"true" table:"privilege_constant"`
 	Name class.String `json:"name,omitempty" db:"name"`
 	Type class.String `json:"type,omitempty" db:"type" description:"暂不用"`
 	Sort int32        `json:"sort" db:"sort"`
