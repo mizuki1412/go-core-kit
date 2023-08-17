@@ -8,7 +8,6 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/cachekit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
-	"github.com/mizuki1412/go-core-kit/service/sqlkit"
 	"github.com/spf13/cast"
 	"strings"
 	"time"
@@ -66,7 +65,7 @@ func (ctx *Context) SessionGetUserOrigin() any {
 func (ctx *Context) SessionGetSchema() string {
 	r := cast.ToString(cachekit.Get("session-schema-"+ctx.SessionToken(), &cachekit.Param{Redis: true}))
 	if r == "" {
-		r = sqlkit.SchemaDefault
+		r = "public"
 	}
 	return r
 }

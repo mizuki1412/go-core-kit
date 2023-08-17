@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cast"
 )
 
-// Recover 错误处理，以及db事务处理。
+// Recover 错误处理。
 func Recover() router.Handler {
 	return func(ctx *context.Context) {
 		defer func() {
@@ -22,10 +22,6 @@ func Recover() router.Handler {
 					msg = cast.ToString(err)
 					logkit.Error(exception.New(msg, 3))
 				}
-				// transaction
-				if ctx.DBTxExist() {
-					_ = ctx.DBTx().Rollback()
-				}
 				if ctx.Proxy.IsAborted() {
 					return
 				}
@@ -34,9 +30,5 @@ func Recover() router.Handler {
 			}
 		}()
 		ctx.Proxy.Next()
-		// transaction
-		if ctx.DBTxExist() {
-			_ = ctx.DBTx().Commit()
-		}
 	}
 }

@@ -52,7 +52,7 @@ func bindDefaultFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().Int(configkey.SessionExpire, 12, "session expire 单位小时")
 	cmd.PersistentFlags().Bool(configkey.SessionSecure, true, "上传cookie时是否需要https，关系到浏览器的跨域策略和具体是否用https部署服务")
 
-	cmd.PersistentFlags().String(configkey.DBDriver, "", "")
+	cmd.PersistentFlags().String(configkey.DBDriver, "", "postgres/mysql/mssql")
 	cmd.PersistentFlags().String(configkey.DBHost, "", "")
 	cmd.PersistentFlags().String(configkey.DBPort, "", "")
 	cmd.PersistentFlags().String(configkey.DBName, "", "")

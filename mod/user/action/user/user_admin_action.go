@@ -10,6 +10,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/mod/user/model"
 	"github.com/mizuki1412/go-core-kit/service/rediskit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
+	"github.com/mizuki1412/go-core-kit/service/sqlkit"
 	"time"
 )
 
@@ -225,32 +226,34 @@ func DelUser(ctx *context.Context) {
 	if mine.Id == params.Id {
 		panic(exception.New("不能操作自己"))
 	}
-	dao := userdao.New(ctx.DBTx())
-	target := userdao.NewWithSchema(ctx.SessionGetSchema()).FindById(params.Id)
-	if target == nil {
-		panic(exception.New("用户不存在"))
-	}
-	if target.Role != nil && target.Role.Id == 0 {
-		panic(exception.New("该用户不能设置"))
-	}
-	if target.Extend.GetBool("immutable") {
-		panic(exception.New("该用户不可删除"))
-	}
-	//
-	if params.Off.Int32 == 0 {
-		dao.OffUser(params.Id, model.UserOffDelete)
-		dao.SetNull(params.Id)
-		//target.setOff(User.OFF_DEL);
-		// todo
-		//userCenter.add(target);
-	} else if params.Off.Int32 == 1 {
-		dao.OffUser(params.Id, model.UserOffFreeze)
-		//target.setOff(User.OFF_FREEZE);
-		//userCenter.add(target);
-	} else if params.Off.Int32 == 2 {
-		dao.OffUser(params.Id, model.UserOffOK)
-		//target.setOff(User.OFF_OK);
-		//userCenter.add(target);
-	}
+	sqlkit.TxArea(func(targetDS *sqlkit.DataSource) {
+		dao := userdao.New(ctx.DBTx())
+		target := userdao.NewWithSchema(ctx.SessionGetSchema()).FindById(params.Id)
+		if target == nil {
+			panic(exception.New("用户不存在"))
+		}
+		if target.Role != nil && target.Role.Id == 0 {
+			panic(exception.New("该用户不能设置"))
+		}
+		if target.Extend.GetBool("immutable") {
+			panic(exception.New("该用户不可删除"))
+		}
+		//
+		if params.Off.Int32 == 0 {
+			dao.OffUser(params.Id, model.UserOffDelete)
+			dao.SetNull(params.Id)
+			//target.setOff(User.OFF_DEL);
+			// todo
+			//userCenter.add(target);
+		} else if params.Off.Int32 == 1 {
+			dao.OffUser(params.Id, model.UserOffFreeze)
+			//target.setOff(User.OFF_FREEZE);
+			//userCenter.add(target);
+		} else if params.Off.Int32 == 2 {
+			dao.OffUser(params.Id, model.UserOffOK)
+			//target.setOff(User.OFF_OK);
+			//userCenter.add(target);
+		}
+	})
 	ctx.JsonSuccess(nil)
 }
