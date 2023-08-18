@@ -32,11 +32,12 @@ func InitModelMeta(obj any) *ModelMeta {
 	return meta
 }
 
-func (th *ModelMeta) GetColumns(excludes ...string) string {
+// todo 加引号装饰
+func (th *ModelMeta) GetColumns(excludes ...string) []string {
 	return th.GetColumnsWithPrefix("", excludes...)
 }
 
-func (th *ModelMeta) GetColumnsWithPrefix(prefix string, excludes ...string) string {
+func (th *ModelMeta) GetColumnsWithPrefix(prefix string, excludes ...string) []string {
 	if prefix != "" {
 		prefix += "."
 	}
@@ -59,31 +60,14 @@ func (th *ModelMeta) GetColumnsWithPrefix(prefix string, excludes ...string) str
 	if len(arr) == 0 {
 		panic(exception.New("sql columns 不能为空"))
 	}
-	return strings.Join(arr, ",")
+	return arr
 }
 
 // GetTableName alias 可以包括table别名
-func (th *ModelMeta) GetTableName(ds, alias ...string) string {
+func (th *ModelMeta) GetTableName(alias ...string) string {
 	if len(alias) > 0 {
 		return GetSchemaTable(schema, th.TableName) + " " + alias[0]
 	} else {
 		return GetSchemaTable(schema, th.TableName)
-	}
-}
-
-// GetSchemaTable name可能是表名，带join信息
-func GetSchemaTable(schema string, name string) string {
-	var schema0 string
-	if schema != "" {
-		schema0 = schema
-	} else if driver == "postgres" {
-		schema0 = SchemaDefault
-	} else {
-		schema0 = ""
-	}
-	if schema0 == "" {
-		return name
-	} else {
-		return schema0 + "." + name
 	}
 }

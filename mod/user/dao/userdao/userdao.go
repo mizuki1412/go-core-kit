@@ -47,7 +47,7 @@ func New(ds ...*sqlkit.DataSource) *Dao {
 }
 
 func (dao *Dao) Login(pwd, username, phone string) *model.User {
-	builder := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema))
+	builder := dao.Builder().Select().From()
 	if !stringkit.IsNull(username) {
 		builder = builder.Where("username=?", username)
 	} else {
