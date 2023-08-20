@@ -18,6 +18,6 @@ func (th *Province) Scan(value any) error {
 	th.Code.Set(value)
 	return nil
 }
-func (th Province) Value() (driver.Value, error) {
+func (th *Province) Value() (driver.Value, error) {
 	return th.Code.String, nil
 }

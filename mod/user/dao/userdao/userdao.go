@@ -17,26 +17,25 @@ type Dao struct {
 	sqlkit.Dao[model.User]
 }
 
-var meta = sqlkit.InitModelMeta(&model.User{})
-
 const (
 	ResultDefault byte = iota
 	ResultNone
 )
 
-func New(ds ...*sqlkit.DataSource) *Dao {
-	dao := &Dao{}
+func New(ds ...*sqlkit.DataSource) Dao {
+	dao := Dao{}
+	dao.LogicDelVal = []any{-1, 0}
 	if len(ds) > 0 {
-		dao.DataSource = ds[0]
+		dao.SetDataSource(ds[0])
 	}
 	dao.Cascade = func(obj *model.User) {
 		switch dao.ResultType {
 		case ResultDefault:
 			if obj.Role != nil {
-				obj.Role = roledao.New(dao.DataSource).FindById(obj.Role.Id)
+				obj.Role = roledao.New(dao.DataSource()).SelectOneById(obj.Role.Id)
 			}
 			if obj.Department != nil {
-				obj.Department = departmentdao.New(dao.DataSource).FindById(obj.Department.Id)
+				obj.Department = departmentdao.New(dao.DataSource()).SelectOneById(obj.Department.Id)
 			}
 		case ResultNone:
 			obj.Role = nil
@@ -47,30 +46,27 @@ func New(ds ...*sqlkit.DataSource) *Dao {
 }
 
 func (dao *Dao) Login(pwd, username, phone string) *model.User {
-	builder := dao.Builder().Select().From()
+	builder := dao.Builder().Select()
 	if !stringkit.IsNull(username) {
 		builder = builder.Where("username=?", username)
 	} else {
 		builder = builder.Where("phone=?", phone)
 	}
-	sql, args := builder.Where("pwd=?", pwd).Where("off>=0").Limit(1).MustSql()
+	sql, args := builder.Where("pwd=?", pwd).Where("off>=0").Limit(1).Sql()
 	return dao.ScanOne(sql, args)
 }
-func (dao *Dao) FindById(id int32) *model.User {
-	sql, args := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("id=?", id).MustSql()
-	return dao.ScanOne(sql, args)
-}
+
 func (dao *Dao) FindByPhone(phone string) *model.User {
-	sql, args := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("phone=?", phone).Where("off>=0").MustSql()
+	sql, args := dao.Builder().Select().Where("phone=?", phone).Where("off>=0").Sql()
 	return dao.ScanOne(sql, args)
 }
 
 func (dao *Dao) FindByUsername(username string) *model.User {
-	sql, args := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("username=?", username).Where("off>=0").MustSql()
+	sql, args := dao.Builder().Select().Where("username=?", username).Where("off>=0").Sql()
 	return dao.ScanOne(sql, args)
 }
 func (dao *Dao) FindByUsernameDeleted(username string) *model.User {
-	sql, args := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("username=?", username).Where("off=-1").MustSql()
+	sql, args := dao.Builder().Select().Where("username=?", username).Where("off=-1").Sql()
 	return dao.ScanOne(sql, args)
 }
 
@@ -80,11 +76,11 @@ type FindParam struct {
 }
 
 func (dao *Dao) Find(param FindParam) *model.User {
-	builder := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("off>=0").Limit(1)
+	builder := dao.Builder().Select().Where("off>=0").Limit(1)
 	for k, v := range param.Extend {
 		builder = builder.Where(fmt.Sprintf("extend->>'%s'=?", k), cast.ToString(v))
 	}
-	sql, args := builder.MustSql()
+	sql, args := builder.Sql()
 	return dao.ScanOne(sql, args)
 }
 
@@ -94,7 +90,7 @@ off>-1 and role>0 and role in
   ( select id from %s where department in 
      (with recursive t(id) as( values(%d) union all select d.id from %s d, t where t.id=d.parent) select id from t )
   )`, dao.GetTable(&model.Role{}), departId, dao.GetTable(&model.Department{}))
-	sql, args := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where(where).OrderBy("name, id").MustSql()
+	sql, args := dao.Builder().Select().Where(where).OrderBy("name, id").Sql()
 	return dao.ScanList(sql, args)
 }
 
@@ -106,7 +102,7 @@ type ListParam struct {
 }
 
 func (dao *Dao) List(param ListParam) []*model.User {
-	builder := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("off>-1").OrderBy("id")
+	builder := dao.Builder().Select().Where("off>-1").OrderBy("id")
 	if param.RoleId != 0 {
 		builder = builder.Where("role=?", param.RoleId)
 	}
@@ -121,19 +117,19 @@ func (dao *Dao) List(param ListParam) []*model.User {
 		flag, arg := pghelper.GenUnnestInt(param.Departments)
 		builder = builder.Where(fmt.Sprintf("role in (select id from role where department in %s)", flag), arg...)
 	}
-	sql, args := builder.MustSql()
+	sql, args := builder.Sql()
 	return dao.ScanList(sql, args)
 }
 
 func (dao *Dao) OffUser(uid int32, off int32) {
-	sql, args, err := dao.Builder().Update(meta.GetTableName(dao.Schema)).Set("off", off).Where("id=?", uid).ToSql()
+	sql, args, err := dao.Builder().Update().Set("off", off).Where("id=?", uid).ToSql()
 	if err != nil {
 		panic(exception.New(err.Error()))
 	}
 	dao.Exec(sql, args...)
 }
 func (dao *Dao) SetNull(id int32) {
-	sql, args, err := dao.Builder().Update(meta.GetTableName(dao.Schema)).Set("phone", squirrel.Expr("null")).Set("username", squirrel.Expr("null")).Where("id=?", id).ToSql()
+	sql, args, err := dao.Builder().Update().Set("phone", squirrel.Expr("null")).Set("username", squirrel.Expr("null")).Where("id=?", id).ToSql()
 	if err != nil {
 		panic(exception.New(err.Error()))
 	}

@@ -7,13 +7,13 @@ import (
 )
 
 type Role struct {
-	Id          int32           `json:"id" db:"id" pk:"true" table:"role" autoincrement:"true"`
+	Id          int32           `json:"id" db:"id" pk:"true" table:"role" auto:"true"`
 	Department  *Department     `json:"department,omitempty" db:"department"`
 	Name        class.String    `json:"name,omitempty" db:"name"`
 	Description class.String    `json:"description,omitempty" db:"description"`
 	Privileges  class.ArrString `json:"privileges,omitempty" db:"privileges"`
 	CreateDt    class.Time      `json:"createDt,omitempty" db:"createdt"`
-	Off         class.Bool      `json:"off,omitempty" db:"off"`
+	Off         class.Bool      `json:"off,omitempty" db:"off" logicDel:"true"`
 	Extend      class.MapString `json:"extend,omitempty" db:"extend" description:"immutable:不可删除"`
 }
 
@@ -25,7 +25,7 @@ func (th *Role) Scan(value any) error {
 	th.Id = id
 	return nil
 }
-func (th Role) Value() (driver.Value, error) {
+func (th *Role) Value() (driver.Value, error) {
 	return int64(th.Id), nil
 }
 

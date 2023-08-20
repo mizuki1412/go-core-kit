@@ -1,7 +1,6 @@
 package areadao
 
 import (
-	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/mod/common/admindivision/model"
@@ -12,27 +11,16 @@ type Dao struct {
 	sqlkit.Dao[model.Area]
 }
 
-var meta = sqlkit.InitModelMeta(&model.Area{})
-
-func New(tx ...*sqlx.Tx) *Dao {
-	return NewWithSchema("", tx...)
-}
-func NewWithSchema(schema string, tx ...*sqlx.Tx) *Dao {
-	dao := &Dao{}
-	dao.SetSchema(schema)
-	if len(tx) > 0 {
-		dao.TX = tx[0]
+func New(ds ...*sqlkit.DataSource) Dao {
+	dao := Dao{}
+	if len(ds) > 0 {
+		dao.SetDataSource(ds[0])
 	}
 	return dao
 }
 
-func (dao *Dao) FindById(id class.String) *model.Area {
-	sql, args := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("code=?", id).MustSql()
-	return dao.ScanOne(sql, args)
-}
-
-func (dao *Dao) FindCodeByName(name, ccode, pcode string) string {
-	sql, args := dao.Builder().Select("code").From(meta.GetTableName(dao.Schema)).Where("name=?", name).Where("city=?", ccode).Where("province=?", pcode).MustSql()
+func (dao Dao) FindCodeByName(name, ccode, pcode string) string {
+	sql, args := dao.Builder().Select("code").Where("name=?", name).Where("city=?", ccode).Where("province=?", pcode).Sql()
 	rows := dao.Query(sql, args...)
 	defer rows.Close()
 	for rows.Next() {
@@ -45,7 +33,7 @@ func (dao *Dao) FindCodeByName(name, ccode, pcode string) string {
 	return ""
 }
 
-func (dao *Dao) ListByCity(id class.String) []*model.Area {
-	sql, args := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("city=?", id).OrderBy("code").MustSql()
+func (dao Dao) ListByCity(id class.String) []*model.Area {
+	sql, args := dao.Builder().Select().Where("city=?", id).OrderBy("code").Sql()
 	return dao.ScanList(sql, args)
 }

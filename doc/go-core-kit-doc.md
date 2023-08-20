@@ -256,7 +256,7 @@ func Init(router *router.Router) {
 ## 约定/注意
 
 - action的params tags: `validate:"required" description:"xxx" default:"" trim:"true"`
-- bean struct tags: `json:"" db:"db-field-name" pk:"true" table:"x" autoincrement:"true"`
+- bean struct tags: `json:"" db:"db-field-name" pk:"true" table:"x" auto:"true"`
 - context BindForm: 将会先trim，空字符串当做nil。
 - context BindForm: 支持在params中直接指定基本类型和class包中的类型。
 - 在action中，处理bean中的field时，注意field的valid属性，class中的类可以用Set方法来作为参数设置；自定义的field struct用指针。
@@ -347,41 +347,115 @@ router.Use(middleware.Recover())
 
 数据库服务
 
+```go
+type Dao[T any] struct {
+	meta T
+	// 逻辑删除的字段，可替代全局的LogicDelVal
+	LogicDelVal []any
+	// 返回级联的类型
+	ResultType byte
+	// 级联实现的函数
+	Cascade func(*T)
+	// 数据源
+	dataSource *DataSource
+	// 目标表结构
+	modelMeta ModelMeta
+}
 
+type Dao struct {
+	sqlkit.Dao[$name$]
+}
 
-支持的driver name
+const (
+	ResultDefault byte = iota
+	ResultNone
+)
 
-多数据源
+func New(ds ...*sqlkit.DataSource) Dao {
+	dao := Dao{}
+	if len(ds) > 0 {
+		dao.SetDataSource(ds[0])
+	}
+	dao.Cascade = func(obj *$name$) {
+		switch dao.ResultType {
+		case ResultDefault:
+		case ResultNone:
+		}
+	}
+	return dao
+}
+```
 
-事务处理
+## 代码结构说明
 
-### 注意
+- dao: dao 封装类
+
+- dao_mapper: 提供 baseMapper 的增删改查功能
+
+- dao_private: dao 中用到的私有函数
+
+- datasource：和数据源有关，包括事务、schema、dialect
+
+- modelmeta：当前 dao 所对应的 model 的 tablename 和 columnsName
+
+- sqlbuilder：sql 语句构造
+
+- transaction：事务相关的外部函数
+
+## 支持的driver name
+
+- postgres：`"github.com/lib/pq"`
+- mysql： `"github.com/go-sql-driver/mysql"`
+- mssql: todo
+- oracle: todo
+- kingbase: todo
+
+## model 标签定义
+
+- pk: bool
+
+- table: 表名
+
+- auto：bool，可用于所有 key
+
+- db：数据库字段名，必须填写才能纳入管理
+
+- logicDel: bool 逻辑删除字段
+
+## 多数据源
+
+通过在 Dao.New 中设置 DataSource 实现数据源的切换。
+
+DataSource 有默认数据源，取自配置文件，也可通过手动创建 NewDataSource()
+
+## 事务处理
+
+通过 sqlkit.TxArea() 实现代码块的事务处理。
+
+## 逻辑删除
+
+全局的指定：sqlkit.LogicDelVal，默认[true,false]
+
+Dao 中可以设置 LogicDelVal 实现局部的逻辑删除，[]any{删除的值，不删除的值}
+
+## 注意
 
 - **注意 commit: 如果事务中第一句是select语句，commit将会出错, 错误提示 parse C 等。**
 - 在rows遍历时，注意close，特别是有级联查询存在时，如果不close将会占用连接。
-- bean struct中如果没有db标签，则不会被通用接口insert/update
 - sqlx的`missing destination name sth in sth`，是查询出来的字段和类字段不符，在select中限定字段即可。
 - update set时：`Set("extend",squirrel.Expr("'{}'::jsonb"))` or `Set("extend","{}")`
 - class.mapString在插入数据库时将用jsonb格式，并且不是完全替换，而是merge的方式(```coalesce(extend, '{}'::jsonb) || '$param'::jsonb```)。如果要删除其中的key，需要设置key为null。 merge时只会merge顶层的keys。
 
-###
-数据库驱动：
-- postgres: _ "github.com/lib/pq"
-- mysql: _ "github.com/go-sql-driver/mysql"
+## demo
 
-### demo
 ```go
-func (dao *Dao) UpdateConfirm(id int64){
-    sql, args, err := dao.Builder().Update(meta.GetTableName(dao.Schema)).Set("extend",squirrel.Expr("jsonb_set(extend, '{confirm}','true',true)")).Where("id=?",id).ToSql()
-    if err != nil {
-        panic(exception.New(err.Error()))
-    }
+func (dao Dao) UpdateConfirm(id int64){
+    sql, args := dao.Builder().Update().Set("extend",squirrel.Expr("jsonb_set(extend, '{confirm}','true',true)")).Where("id=?",id).Sql()
     dao.Exec(sql, args...)
 }
 
-func (dao *Dao) List(dTypes []string) []model.AlarmMsg {
-	// todo
-	builder := dao.Builder().Select(meta.GetColumnsWithPrefix("msg")).From(dao.GetTableD("alarm_msg msg") + dao.GetTableD("device_type_info info")).Where("msg.deviceType=info.id").OrderBy("msg.deviceType, msg.id")
+func (dao Dao) List(dTypes []string) []model.AlarmMsg {
+  builder := dao.Builder().Select(dao.SelectColumns("msg")).FromAs("msg").Join(infodao.New(dao.DataSource()).Table("info")).Where("msg.deviceType=info.id").OrderBy("msg.deviceType").OrderBy("msg.id")
 	if dTypes!=nil && len(dTypes) > 0 {
 		flag, arg := pghelper.GenUnnestString(dTypes)
 		builder = builder.Where("msg.deviceType in "+flag, arg)
@@ -390,8 +464,8 @@ func (dao *Dao) List(dTypes []string) []model.AlarmMsg {
 	return dao.scan(sql, args)
 }
 
-func (dao *Dao) ListId(dType []string) []string {
-	builder := dao.Builder().Select("id").From(meta.GetTableName(dao.Schema)).Where("off=?", false).OrderBy("id")
+func (dao Dao) ListId(dType []string) []string {
+	builder := dao.Builder().Select("id").Where("off=?", false).OrderBy("id")
 	if dType!=nil && len(dType)>0{
 		builder = pghelper.WhereUnnestInt(builder,"id in ", dType)
 	}

@@ -7,7 +7,7 @@ import (
 )
 
 type User struct {
-	Id         int32           `json:"id,omitempty" db:"id" pk:"true" table:"admin_user" autoincrement:"true"`
+	Id         int32           `json:"id,omitempty" db:"id" pk:"true" table:"admin_user" auto:"true"`
 	Role       *Role           `json:"role,omitempty" db:"role"`
 	Department *Department     `json:"department,omitempty" db:"department"`
 	Username   class.String    `json:"username,omitempty" db:"username"`
@@ -17,7 +17,7 @@ type User struct {
 	Gender     class.Int32     `json:"gender,omitempty" db:"gender" description:"1-nan,2-nv"`
 	Image      class.String    `json:"image,omitempty" db:"image" description:"头像"`
 	Address    class.String    `json:"address,omitempty" db:"address"`
-	Off        class.Int32     `json:"off,omitempty" db:"off" description:"冻结 1， 删除 -1"`
+	Off        class.Int32     `json:"off,omitempty" db:"off" logicDel:"true" description:"冻结 1， 删除 -1"`
 	Extend     class.MapString `json:"extend,omitempty" db:"extend" description:"权限剔除privilegeExclude:[], 不可删除immutable:bool"`
 	CreateDt   class.Time      `json:"createDt,omitempty" db:"createdt"`
 }
@@ -35,7 +35,7 @@ func (th *User) Scan(value any) error {
 	return nil
 }
 
-func (th User) Value() (driver.Value, error) {
+func (th *User) Value() (driver.Value, error) {
 	return int64(th.Id), nil
 }
 

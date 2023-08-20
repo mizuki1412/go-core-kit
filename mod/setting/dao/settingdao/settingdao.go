@@ -1,7 +1,6 @@
 package settingdao
 
 import (
-	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/service/sqlkit"
@@ -13,14 +12,10 @@ type Dao struct {
 	sqlkit.Dao[map[string]any]
 }
 
-func New(tx ...*sqlx.Tx) *Dao {
-	return NewWithSchema("", tx...)
-}
-func NewWithSchema(schema string, tx ...*sqlx.Tx) *Dao {
-	dao := &Dao{}
-	dao.SetSchema(schema)
-	if len(tx) > 0 {
-		dao.TX = tx[0]
+func New(ds ...*sqlkit.DataSource) Dao {
+	dao := Dao{}
+	if len(ds) > 0 {
+		dao.SetDataSource(ds[0])
 	}
 	return dao
 }

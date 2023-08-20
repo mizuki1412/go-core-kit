@@ -108,7 +108,7 @@ func (th *$struct$) Scan(value any) error {
 	return nil
 }
 // 注意：这不能用point方式接收
-func (th $struct$) Value() (driver.Value, error) {
+func (th *$struct$) Value() (driver.Value, error) {
     // todo 注意返回值类型
 	return int64(th.Id), nil
 }
@@ -152,21 +152,16 @@ func (l $name$List) MapReduce(fun func(ele *$name$) any) []any {
 type Dao struct {
 	sqlkit.Dao[$name$]
 }
-var meta = sqlkit.InitModelMeta(&$name${})
 
 const (
 	ResultDefault byte = iota
 	ResultNone
 )
 
-func New(tx ...*sqlx.Tx) *Dao {
-	return NewWithSchema("", tx...)
-}
-func NewWithSchema(schema string,tx ...*sqlx.Tx) *Dao {
-	dao := &Dao{}
-	dao.SetSchema(schema)
-	if len(tx) > 0 {
-		dao.TX = tx[0]
+func New(ds ...*sqlkit.DataSource) Dao {
+	dao := Dao{}
+	if len(ds) > 0 {
+		dao.SetDataSource(ds[0])
 	}
 	dao.Cascade = func(obj *$name$) {
 		switch dao.ResultType {
@@ -184,16 +179,10 @@ type Dao struct {
 	sqlkit.Dao[$name$]
 }
 
-var meta = sqlkit.InitModelMeta(&$name${})
-
-func New(tx ...*sqlx.Tx) *Dao {
-	return NewWithSchema("", tx...)
-}
-func NewWithSchema(schema string,tx ...*sqlx.Tx) *Dao {
-	dao := &Dao{}
-	dao.SetSchema(schema)
-	if len(tx) > 0 {
-		dao.TX = tx[0]
+func New(ds ...*sqlkit.DataSource) Dao {
+	dao := Dao{}
+	if len(ds) > 0 {
+		dao.SetDataSource(ds[0])
 	}
 	return dao
 }
@@ -201,18 +190,14 @@ func NewWithSchema(schema string,tx ...*sqlx.Tx) *Dao {
 
 ## dao_demo
 ```
-func (dao *Dao) FindById(id int32) *$bean$ {
-	sql, args := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("id=?",id).MustSql()
-	return dao.ScanOne(sql, args)
-}
 
 type ListParam struct {
 	IdList []int32
 }
 
-func (dao *Dao) List(param ListParam) []*$bean$ {
-	builder := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("off=false").OrderBy("id")
-	sql, args := builder.MustSql()
+func (dao Dao) List(param ListParam) []*$bean$ {
+	builder := dao.Builder().Select().Where("off=false").OrderBy("id")
+	sql, args := builder.Sql()
 	return dao.ScanList(sql, args)
 }
 ```

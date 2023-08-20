@@ -7,14 +7,14 @@ import (
 
 type SQLBuilder struct {
 	inner     squirrel.StatementBuilderType
-	ModelMeta *ModelMeta
+	modelMeta ModelMeta
 }
 
 // Select 默认取modelmeta中的columns，并装饰引号；fields中不装饰，因为可能存在表达式
 func (b SQLBuilder) _select(fields ...string) SelectBuilder {
 	return SelectBuilder{
 		inner:     b.inner.Select(fields...),
-		ModelMeta: b.ModelMeta,
+		modelMeta: b.modelMeta,
 	}
 }
 
@@ -33,48 +33,48 @@ func (b SQLBuilder) SelectWithout(fields ...string) SelectBuilder {
 
 // SelectPrefix 在modelmeta的字段前增加prefix
 func (b SQLBuilder) SelectPrefix(prefix string, without ...string) SelectBuilder {
-	if b.ModelMeta == nil {
+	if b.modelMeta.tableName == "" {
 		panic(exception.New("sqlbuilder modelmeta null"))
 	}
-	return b._select(b.ModelMeta.GetColumnsWithPrefix(prefix, without...)...)
+	return b._select(b.modelMeta.getSelectColumnsWithPrefix(prefix, without...)...)
 }
 
 func (b SQLBuilder) Update() UpdateBuilder {
-	if b.ModelMeta == nil {
+	if b.modelMeta.tableName == "" {
 		panic(exception.New("sqlbuilder modelmeta null"))
 	}
 	return UpdateBuilder{
-		inner:     b.inner.Update(b.ModelMeta.GetTableName()),
-		ModelMeta: b.ModelMeta,
+		inner:     b.inner.Update(b.modelMeta.GetTableName()),
+		modelMeta: b.modelMeta,
 	}
 }
 
 func (b SQLBuilder) Delete() DeleteBuilder {
-	if b.ModelMeta == nil {
+	if b.modelMeta.tableName == "" {
 		panic(exception.New("sqlbuilder modelmeta null"))
 	}
 	return DeleteBuilder{
-		inner:     b.inner.Delete(b.ModelMeta.GetTableName()),
-		ModelMeta: b.ModelMeta,
+		inner:     b.inner.Delete(b.modelMeta.GetTableName()),
+		modelMeta: b.modelMeta,
 	}
 }
 
 func (b SQLBuilder) Insert() InsertBuilder {
-	if b.ModelMeta == nil {
+	if b.modelMeta.tableName == "" {
 		panic(exception.New("sqlbuilder modelmeta null"))
 	}
 	return InsertBuilder{
-		inner:     b.inner.Insert(b.ModelMeta.GetTableName()),
-		ModelMeta: b.ModelMeta,
+		inner:     b.inner.Insert(b.modelMeta.GetTableName()),
+		modelMeta: b.modelMeta,
 	}
 }
 
 func (b SQLBuilder) Replace() InsertBuilder {
-	if b.ModelMeta == nil {
+	if b.modelMeta.tableName == "" {
 		panic(exception.New("sqlbuilder modelmeta null"))
 	}
 	return InsertBuilder{
-		inner:     b.inner.Replace(b.ModelMeta.GetTableName()),
-		ModelMeta: b.ModelMeta,
+		inner:     b.inner.Replace(b.modelMeta.GetTableName()),
+		modelMeta: b.modelMeta,
 	}
 }

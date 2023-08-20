@@ -1,6 +1,7 @@
 package sqlkit
 
 import (
+	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/cli/configkey"
@@ -35,6 +36,32 @@ type DataSourceParam struct {
 	MaxLife int
 }
 
+const (
+	Postgres  = "postgres"
+	Mysql     = "mysql"
+	SqlServer = "mssql"
+	Oracle    = "oracle"
+	KingBase  = "kingbase"
+)
+
+func getDataSourceName(p DataSourceParam) (string, string) {
+	if p.Driver == "" || p.Host == "" || p.Port == "" {
+		panic(exception.New("sqlkit: database config error"))
+	}
+	var param string
+	switch p.Driver {
+	case Postgres:
+		param = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", p.Host, p.Port, p.User, p.Pwd, p.Name)
+	case Mysql:
+		param = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=true&loc=%s", p.User, p.Pwd, p.Host, p.Port, p.Name, "Asia%2FShanghai")
+	case SqlServer:
+		param = fmt.Sprintf("server=%s;user id=%s;password=%s;port=%s;database=%s", p.Host, p.User, p.Pwd, p.Port, p.Name)
+	default:
+		panic(exception.New("driver not supported"))
+	}
+	return p.Driver, param
+}
+
 // NewDataSource 创建一个数据源
 func NewDataSource(param DataSourceParam) *DataSource {
 	db := getDB(param)
@@ -42,14 +69,14 @@ func NewDataSource(param DataSourceParam) *DataSource {
 		Driver: param.Driver,
 		DBPool: db,
 	}
-	if param.Driver == "postgres" {
+	if param.Driver == Postgres {
 		ds.Schema = "public"
 	}
 	return ds
 }
 
 func getDB(param DataSourceParam) *sqlx.DB {
-	db := sqlx.MustConnect(GetDataSourceName(param))
+	db := sqlx.MustConnect(getDataSourceName(param))
 	if param.MaxLife > 0 {
 		db.SetConnMaxLifetime(time.Duration(param.MaxLife) * time.Minute)
 	}
@@ -83,25 +110,31 @@ func DefaultDataSource() *DataSource {
 		Driver: driver,
 		DBPool: defaultDB,
 	}
-	if driver == "postgres" {
+	if driver == Postgres {
 		ds.Schema = "public"
 	}
 	return ds
 }
 
-// 获取 schema 修饰tableName
-func (ds *DataSource) getDecoSchema() string {
+// 获取 schema 修饰的转义的tableName
+func (ds *DataSource) decoTableName(tableName string) string {
+	s := ""
 	if ds.Schema != "" {
-		return ds.Schema + "."
-	} else if ds.Driver == "postgres" {
-		return "public."
+		s = ds.Schema + "."
+	} else if ds.Driver == Postgres {
+		s = "public."
 	}
-	return ""
+	return s + ds.escapeName(tableName)
 }
 
-func (ds *DataSource) setSchema(schema string) *DataSource {
-	ds.Schema = schema
-	return ds
+// 表名列名的转义符添加
+func (ds *DataSource) escapeName(name string) string {
+	switch ds.Driver {
+	case Mysql:
+		return "`" + name + "`"
+	default:
+		return "\"" + name + "\""
+	}
 }
 
 func (ds *DataSource) Commit() {

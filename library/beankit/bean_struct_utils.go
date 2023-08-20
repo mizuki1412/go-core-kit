@@ -2,6 +2,7 @@ package beankit
 
 import (
 	"encoding/json"
+	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/spf13/cast"
 	"reflect"
 	"strings"
@@ -88,4 +89,12 @@ func Map2Struct(m map[string]any, bean any) {
 			fieldV.SetString(cast.ToString(v))
 		}
 	}
+}
+
+func ReflectElemType(dest any) reflect.Type {
+	rt := reflect.TypeOf(dest)
+	if rt.Kind() != reflect.Pointer {
+		panic(exception.New("param should be pointer"))
+	}
+	return rt.Elem()
 }

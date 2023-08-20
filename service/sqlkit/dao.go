@@ -4,221 +4,86 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/class/exception"
-	"reflect"
 )
 
+// LogicDelVal 全局逻辑删除的 value
+var LogicDelVal = []any{true, false}
+
 type Dao[T any] struct {
+	meta T
+	// 逻辑删除的字段，可替代全局的LogicDelVal
+	LogicDelVal []any
 	// 返回级联的类型
 	ResultType byte
 	// 级联实现的函数
 	Cascade func(*T)
 	// 数据源
-	DataSource *DataSource
+	dataSource *DataSource
 	// 目标表结构
-	ModelMeta  *ModelMeta
-	SqlBuilder *SQLBuilder
+	modelMeta ModelMeta
+}
+
+type DaoModelMeta interface {
+	getModelMeta() ModelMeta
 }
 
 // Builder 结构化语句
-func (dao *Dao[T]) Builder() squirrel.StatementBuilderType {
-	if dao.DataSource == nil {
-		dao.DataSource = DefaultDataSource()
+func (dao Dao[T]) Builder() SQLBuilder {
+	if dao.dataSource == nil {
+		dao.dataSource = DefaultDataSource()
 	}
-	return getStatementBuilderType(dao.DataSource)
+	sb := SQLBuilder{modelMeta: dao.modelMeta}
+	switch dao.dataSource.Driver {
+	case Postgres:
+		sb.inner = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+	default:
+		// todo 未处理oracle
+		sb.inner = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Question)
+	}
+	return sb
 }
 
-func (dao *Dao[T]) SetResultType(rt byte) *Dao[T] {
-	if dao.DataSource == nil {
-		dao.DataSource = DefaultDataSource()
+func (dao Dao[T]) getModelMeta() ModelMeta {
+	return dao.modelMeta
+}
+
+// SetDataSource 设置数据源，同时 init modelMeta
+func (dao Dao[T]) SetDataSource(ds *DataSource) Dao[T] {
+	dao.dataSource = ds
+	dao.modelMeta.dateSource = ds
+	dao.modelMeta.init(dao.meta)
+	return dao
+}
+func (dao Dao[T]) DataSource() *DataSource {
+	return dao.dataSource
+}
+
+func (dao Dao[T]) SetResultType(rt byte) Dao[T] {
+	if dao.dataSource == nil {
+		dao.dataSource = DefaultDataSource()
 	}
 	dao.ResultType = rt
 	return dao
 }
 
-func (dao *Dao[T]) Query(sql string, args ...any) *sqlx.Rows {
-	if dao.DataSource == nil {
-		dao.DataSource = DefaultDataSource()
+func (dao Dao[T]) Query(sql string, args ...any) *sqlx.Rows {
+	if dao.dataSource == nil {
+		dao.dataSource = DefaultDataSource()
 	}
-	return dao.DataSource.Query(sql, args...)
+	return dao.dataSource.Query(sql, args...)
 }
 
-func (dao *Dao[T]) Exec(sql string, args ...any) {
-	if dao.DataSource == nil {
-		dao.DataSource = DefaultDataSource()
+func (dao Dao[T]) Exec(sql string, args ...any) {
+	if dao.dataSource == nil {
+		dao.dataSource = DefaultDataSource()
 	}
-	dao.DataSource.Exec(sql, args...)
-}
-
-// dest a pointer
-// todo 此方法不能表示nil
-//func (dao *Dao[T]) QueryById(dest any, selects ...string) {
-//	rt := reflect.TypeOf(dest).Elem()
-//	rv := reflect.ValueOf(dest).Elem()
-//	pks := getPKs(rt, rv)
-//	builder0 := Builder()
-//	var builder squirrel.SelectBuilder
-//	if len(selects) > 0 {
-//		builder = builder0.Select(selects...)
-//	} else {
-//		builder = builder0.Select("*")
-//	}
-//	builder = builder.From(getTable(rt, dao.Schema))
-//	for k, v := range pks {
-//		builder = builder.Where(k+"=?", v)
-//	}
-//	sql, args, err := builder.ToSql()
-//	if err != nil {
-//		panic(exception.New(err.Error(), 2))
-//	}
-//	rows := dao.Query(sql, args...)
-//  defer rows.Close()
-//	for rows.Next() {
-//		err := rows.StructScan(dest)
-//		if err != nil {
-//			panic(exception.New(err.Error(), 2))
-//		}
-//		break
-//	}
-//}
-
-func (dao *Dao[T]) Insert(dest any) {
-	if dao.DataSource == nil {
-		dao.DataSource = DefaultDataSource()
-	}
-	rt, rv := reflectModel(dest)
-	builder := dao.Builder().Insert(dao.getTable(rt))
-	var pks []string
-	var columns []string
-	var vals []any
-	for i := 0; i < rt.NumField(); i++ {
-		// 自增的排除
-		if t, ok := rt.Field(i).Tag.Lookup("autoincrement"); ok && t == "true" {
-			name := rt.Field(i).Tag.Get("db")
-			if name == "" {
-				panic(exception.New("field "+rt.Field(i).Name+" no db tag", 2))
-			}
-			pks = append(pks, name)
-			continue
-		}
-		db, ok := rt.Field(i).Tag.Lookup("db")
-		var val any
-		// 判断field是否指针
-		if rt.Field(i).Type.Kind() == reflect.Ptr && rv.Field(i).Elem().IsValid() {
-			val = rv.Field(i).Elem().Interface()
-		} else if rt.Field(i).Type.Kind() != reflect.Ptr {
-			val = rv.Field(i).Interface()
-		}
-		// eg: MapString, 根据类的Value返回判断此field是否可以insert
-		method := rv.Field(i).MethodByName("Value")
-		if ok && val != nil && (!method.IsValid() || method.Call([]reflect.Value{})[0].Interface() != nil) {
-			columns = append(columns, db)
-			vals = append(vals, val)
-		}
-	}
-	if len(columns) == 0 {
-		panic(exception.New("no fields", 2))
-	}
-	builder = builder.Columns(columns...).Values(vals...)
-	// 暂支持一个return
-	if len(pks) > 0 {
-		builder = builder.Suffix("returning " + pks[0])
-	}
-	sql, args, err := builder.ToSql()
-	if err != nil {
-		panic(exception.New(err.Error(), 2))
-	}
-	//log.Println(sql, args)
-	rows := dao.Query(sql, args...)
-	defer rows.Close()
-	for rows.Next() {
-		// return 赋值
-		err := rows.StructScan(dest)
-		if err != nil {
-			panic(exception.New(err.Error(), 2))
-		}
-		break
-	}
-}
-
-func (dao *Dao[T]) Update(dest any) {
-	if dao.DataSource == nil {
-		dao.DataSource = DefaultDataSource()
-	}
-	rt, rv := reflectModel(dest)
-	builder := dao.Builder().Update(dao.getTable(rt))
-	for i := 0; i < rt.NumField(); i++ {
-		// db字段
-		dbKey, ok := rt.Field(i).Tag.Lookup("db")
-		pk := rt.Field(i).Tag.Get("pk")
-		var val any
-		// 判断field是否指针
-		if rt.Field(i).Type.Kind() == reflect.Ptr && rv.Field(i).Elem().IsValid() {
-			val = rv.Field(i).Elem().Interface()
-		} else if rt.Field(i).Type.Kind() != reflect.Ptr {
-			val = rv.Field(i).Interface()
-		}
-		method := rv.Field(i).MethodByName("IsValid")
-		// method.Call([]reflect.Value{})[0].Interface() != nil
-		// 非主键 或 IsValid函数不存在 或 IsValid==true
-		if ok && pk != "true" && val != nil && (!method.IsValid() || (method.IsValid() && method.Call([]reflect.Value{})[0].Bool())) {
-			// 针对class.MapString 采用merge方式
-			if rt.Field(i).Type.String() == "class.MapString" {
-				builder = builder.Set(dbKey, squirrel.Expr("coalesce("+dbKey+",'{}'::jsonb) || ?", val))
-			} else {
-				builder = builder.Set(dbKey, val)
-			}
-		}
-	}
-	pks := getPKs(rt, rv)
-	for k, v := range pks {
-		builder = builder.Where(k+"=?", v)
-	}
-	sql, args, err := builder.ToSql()
-	if err != nil {
-		panic(exception.New(err.Error(), 2))
-	}
-	dao.Exec(sql, args...)
-}
-
-// Delete dest should be elem
-func (dao *Dao[T]) Delete(dest any) {
-	if dao.DataSource == nil {
-		dao.DataSource = DefaultDataSource()
-	}
-	rt, rv := reflectModel(dest)
-	builder := dao.Builder().Delete(dao.getTable(rt))
-	pks := getPKs(rt, rv)
-	for k, v := range pks {
-		builder = builder.Where(k+"=?", v)
-	}
-	sql, args, err := builder.ToSql()
-	if err != nil {
-		panic(exception.New(err.Error(), 2))
-	}
-	//log.Println(sql, args)
-	dao.Exec(sql, args...)
-}
-
-func (dao *Dao[T]) DeleteOff(dest any) {
-	rt := reflect.TypeOf(dest).Elem()
-	rv := reflect.ValueOf(dest).Elem()
-	builder := Builder().Update(getTable(rt, dao.Schema)).Set("off", true)
-	pks := getPKs(rt, rv)
-	for k, v := range pks {
-		builder = builder.Where(k+"=?", v)
-	}
-	sql, args, err := builder.ToSql()
-	if err != nil {
-		panic(exception.New(err.Error(), 2))
-	}
-	//log.Println(sql, args)
-	dao.Exec(sql, args...)
+	dao.dataSource.Exec(sql, args...)
 }
 
 // ScanList 取值封装list
-func (dao *Dao[T]) ScanList(sql string, args ...any) []*T {
-	if dao.DataSource == nil {
-		dao.DataSource = DefaultDataSource()
+func (dao Dao[T]) ScanList(sql string, args ...any) []*T {
+	if dao.dataSource == nil {
+		dao.dataSource = DefaultDataSource()
 	}
 	rows := dao.Query(sql, args...)
 	list := make([]*T, 0, 5)
@@ -239,9 +104,9 @@ func (dao *Dao[T]) ScanList(sql string, args ...any) []*T {
 	return list
 }
 
-func (dao *Dao[T]) ScanOne(sql string, args ...any) *T {
-	if dao.DataSource == nil {
-		dao.DataSource = DefaultDataSource()
+func (dao Dao[T]) ScanOne(sql string, args ...any) *T {
+	if dao.dataSource == nil {
+		dao.dataSource = DefaultDataSource()
 	}
 	rows := dao.Query(sql, args...)
 	defer rows.Close()
@@ -259,9 +124,9 @@ func (dao *Dao[T]) ScanOne(sql string, args ...any) *T {
 	return nil
 }
 
-func (dao *Dao[T]) ScanOneMap(sql string, args []any) map[string]any {
-	if dao.DataSource == nil {
-		dao.DataSource = DefaultDataSource()
+func (dao Dao[T]) ScanOneMap(sql string, args []any) map[string]any {
+	if dao.dataSource == nil {
+		dao.dataSource = DefaultDataSource()
 	}
 	rows := dao.Query(sql, args...)
 	defer rows.Close()
@@ -276,9 +141,9 @@ func (dao *Dao[T]) ScanOneMap(sql string, args []any) map[string]any {
 	return nil
 }
 
-func (dao *Dao[T]) ScanListMap(sql string, args ...any) []map[string]any {
-	if dao.DataSource == nil {
-		dao.DataSource = DefaultDataSource()
+func (dao Dao[T]) ScanListMap(sql string, args ...any) []map[string]any {
+	if dao.dataSource == nil {
+		dao.dataSource = DefaultDataSource()
 	}
 	rows := dao.Query(sql, args...)
 	list := make([]map[string]any, 0, 5)
@@ -292,4 +157,18 @@ func (dao *Dao[T]) ScanListMap(sql string, args ...any) []map[string]any {
 		list = append(list, m)
 	}
 	return list
+}
+
+func (dao Dao[T]) SelectColumns(excludes ...string) []string {
+	return dao.modelMeta.getSelectColumns(excludes...)
+}
+func (dao Dao[T]) SelectColumnsWithP(prefix string, excludes ...string) []string {
+	return dao.modelMeta.getSelectColumnsWithPrefix(prefix, excludes...)
+}
+func (dao Dao[T]) Table(alias ...string) string {
+	return dao.modelMeta.getTable(alias...)
+}
+
+func (dao Dao[T]) EscapeNames(name ...string) []string {
+	return dao.modelMeta.escapeNames(name)
 }

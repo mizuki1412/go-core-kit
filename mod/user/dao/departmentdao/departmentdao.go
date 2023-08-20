@@ -1,16 +1,9 @@
 package departmentdao
 
 import (
-	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/mod/user/model"
 	"github.com/mizuki1412/go-core-kit/service/sqlkit"
 )
-
-type Dao struct {
-	sqlkit.Dao[model.Department]
-}
-
-var meta = sqlkit.InitModelMeta(&model.Department{})
 
 const (
 	ResultDefault byte = iota
@@ -19,14 +12,14 @@ const (
 	ResultNone
 )
 
-func New(tx ...*sqlx.Tx) *Dao {
-	return NewWithSchema("", tx...)
+type Dao struct {
+	sqlkit.Dao[model.Department]
 }
-func NewWithSchema(schema string, tx ...*sqlx.Tx) *Dao {
-	dao := &Dao{}
-	dao.SetSchema(schema)
-	if len(tx) > 0 {
-		dao.TX = tx[0]
+
+func New(ds ...*sqlkit.DataSource) Dao {
+	dao := Dao{}
+	if len(ds) > 0 {
+		dao.SetDataSource(ds[0])
 	}
 	dao.Cascade = func(obj *model.Department) {
 		switch dao.ResultType {
@@ -50,16 +43,16 @@ func NewWithSchema(schema string, tx ...*sqlx.Tx) *Dao {
 }
 
 func (dao *Dao) FindById(id int32) *model.Department {
-	sql, args := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("id=?", id).MustSql()
+	sql, args := dao.Builder().Select().Where("id=?", id).Sql()
 	return dao.ScanOne(sql, args)
 }
 
 func (dao *Dao) ListByParent(id int32) []*model.Department {
-	sql, args := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("parent=?", id).OrderBy("no", "id").MustSql()
+	sql, args := dao.Builder().Select().Where("parent=?", id).OrderBy("no").OrderBy("id").Sql()
 	return dao.ScanList(sql, args)
 }
 
 func (dao *Dao) ListAll() []*model.Department {
-	sql, args := dao.Builder().Select(meta.GetColumns()).From(meta.GetTableName(dao.Schema)).Where("id>=0").OrderBy("parent", "no", "id").MustSql()
+	sql, args := dao.Builder().Select().Where("id>=0").OrderBy("parent").OrderBy("no").OrderBy("id").Sql()
 	return dao.ScanList(sql, args)
 }

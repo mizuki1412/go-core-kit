@@ -18,6 +18,6 @@ func (th *City) Scan(value any) error {
 	th.Code.Set(value)
 	return nil
 }
-func (th City) Value() (driver.Value, error) {
+func (th *City) Value() (driver.Value, error) {
 	return th.Code.String, nil
 }

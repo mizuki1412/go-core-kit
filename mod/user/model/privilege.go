@@ -21,6 +21,6 @@ func (th *PrivilegeConstant) Scan(value any) error {
 	th.Id = id
 	return nil
 }
-func (th PrivilegeConstant) Value() (driver.Value, error) {
+func (th *PrivilegeConstant) Value() (driver.Value, error) {
 	return th.Id, nil
 }

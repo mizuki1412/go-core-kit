@@ -17,6 +17,6 @@ func (th *Area) Scan(value any) error {
 	th.Code.Set(value)
 	return nil
 }
-func (th Area) Value() (driver.Value, error) {
+func (th *Area) Value() (driver.Value, error) {
 	return th.Code.String, nil
 }
