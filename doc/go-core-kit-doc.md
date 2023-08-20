@@ -347,6 +347,8 @@ router.Use(middleware.Recover())
 
 数据库服务
 
+基于squirrel实现 sql 语句的生成，区别于大而全的 ORM 框架，本库借鉴 Mybatis-Plus/Mybatis-Flex 的使用体验，提供了极大的自主性和必要的功能封装。
+
 ```go
 type Dao[T any] struct {
 	meta T
@@ -447,6 +449,8 @@ Dao 中可以设置 LogicDelVal 实现局部的逻辑删除，[]any{删除的值
 - class.mapString在插入数据库时将用jsonb格式，并且不是完全替换，而是merge的方式(```coalesce(extend, '{}'::jsonb) || '$param'::jsonb```)。如果要删除其中的key，需要设置key为null。 merge时只会merge顶层的keys。
 
 ## demo
+
+todo
 
 ```go
 func (dao Dao) UpdateConfirm(id int64){
