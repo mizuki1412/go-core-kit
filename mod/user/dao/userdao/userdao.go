@@ -23,11 +23,8 @@ const (
 )
 
 func New(ds ...*sqlkit.DataSource) Dao {
-	dao := Dao{}
+	dao := sqlkit.New[model.User](ds...)
 	dao.LogicDelVal = []any{-1, 0}
-	if len(ds) > 0 {
-		dao.SetDataSource(ds[0])
-	}
 	dao.Cascade = func(obj *model.User) {
 		switch dao.ResultType {
 		case ResultDefault:
@@ -42,30 +39,30 @@ func New(ds ...*sqlkit.DataSource) Dao {
 			obj.Department = nil
 		}
 	}
-	return dao
+	return Dao{dao}
 }
 
-func (dao *Dao) Login(pwd, username, phone string) *model.User {
+func (dao Dao) Login(pwd, username, phone string) *model.User {
 	builder := dao.Builder().Select()
 	if !stringkit.IsNull(username) {
 		builder = builder.Where("username=?", username)
 	} else {
 		builder = builder.Where("phone=?", phone)
 	}
-	sql, args := builder.Where("pwd=?", pwd).Where("off>=0").Limit(1).Sql()
+	sql, args := builder.Where("pwd=?", pwd).WhereNLogicDel().Limit(1).Sql()
 	return dao.ScanOne(sql, args)
 }
 
-func (dao *Dao) FindByPhone(phone string) *model.User {
-	sql, args := dao.Builder().Select().Where("phone=?", phone).Where("off>=0").Sql()
+func (dao Dao) FindByPhone(phone string) *model.User {
+	sql, args := dao.Builder().Select().Where("phone=?", phone).WhereNLogicDel().Sql()
 	return dao.ScanOne(sql, args)
 }
 
-func (dao *Dao) FindByUsername(username string) *model.User {
-	sql, args := dao.Builder().Select().Where("username=?", username).Where("off>=0").Sql()
+func (dao Dao) FindByUsername(username string) *model.User {
+	sql, args := dao.Builder().Select().Where("username=?", username).WhereNLogicDel().Sql()
 	return dao.ScanOne(sql, args)
 }
-func (dao *Dao) FindByUsernameDeleted(username string) *model.User {
+func (dao Dao) FindByUsernameDeleted(username string) *model.User {
 	sql, args := dao.Builder().Select().Where("username=?", username).Where("off=-1").Sql()
 	return dao.ScanOne(sql, args)
 }
@@ -75,8 +72,8 @@ type FindParam struct {
 	Extend map[string]any
 }
 
-func (dao *Dao) Find(param FindParam) *model.User {
-	builder := dao.Builder().Select().Where("off>=0").Limit(1)
+func (dao Dao) Find(param FindParam) *model.User {
+	builder := dao.Builder().Select().WhereNLogicDel().Limit(1)
 	for k, v := range param.Extend {
 		builder = builder.Where(fmt.Sprintf("extend->>'%s'=?", k), cast.ToString(v))
 	}
@@ -84,12 +81,12 @@ func (dao *Dao) Find(param FindParam) *model.User {
 	return dao.ScanOne(sql, args)
 }
 
-func (dao *Dao) ListFromRootDepart(departId int) []*model.User {
+func (dao Dao) ListFromRootDepart(departId int) []*model.User {
 	where := fmt.Sprintf(`
 off>-1 and role>0 and role in 
   ( select id from %s where department in 
      (with recursive t(id) as( values(%d) union all select d.id from %s d, t where t.id=d.parent) select id from t )
-  )`, dao.GetTable(&model.Role{}), departId, dao.GetTable(&model.Department{}))
+  )`, roledao.New(dao.DataSource()).Table(), departId, departmentdao.New(dao.DataSource()).Table())
 	sql, args := dao.Builder().Select().Where(where).OrderBy("name, id").Sql()
 	return dao.ScanList(sql, args)
 }
@@ -101,16 +98,16 @@ type ListParam struct {
 	IdList      []int32
 }
 
-func (dao *Dao) List(param ListParam) []*model.User {
+func (dao Dao) List(param ListParam) []*model.User {
 	builder := dao.Builder().Select().Where("off>-1").OrderBy("id")
 	if param.RoleId != 0 {
 		builder = builder.Where("role=?", param.RoleId)
 	}
 	if len(param.IdList) > 0 {
-		builder = pghelper.WhereUnnestInt(builder, "id in ", param.IdList)
+		builder = builder.WhereUnnestIn("id", param.IdList)
 	}
 	if len(param.Roles) > 0 {
-		builder = pghelper.WhereUnnestInt(builder, "role in ", param.Roles)
+		builder = builder.WhereUnnestIn("role", param.Roles)
 	}
 	// 根据role组筛选
 	if len(param.Departments) > 0 {
@@ -121,14 +118,14 @@ func (dao *Dao) List(param ListParam) []*model.User {
 	return dao.ScanList(sql, args)
 }
 
-func (dao *Dao) OffUser(uid int32, off int32) {
+func (dao Dao) OffUser(uid int32, off int32) {
 	sql, args, err := dao.Builder().Update().Set("off", off).Where("id=?", uid).ToSql()
 	if err != nil {
 		panic(exception.New(err.Error()))
 	}
 	dao.Exec(sql, args...)
 }
-func (dao *Dao) SetNull(id int32) {
+func (dao Dao) SetNull(id int32) {
 	sql, args, err := dao.Builder().Update().Set("phone", squirrel.Expr("null")).Set("username", squirrel.Expr("null")).Where("id=?", id).ToSql()
 	if err != nil {
 		panic(exception.New(err.Error()))

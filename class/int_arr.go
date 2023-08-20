@@ -14,7 +14,7 @@ type ArrInt struct {
 	Valid bool
 }
 
-func (th ArrInt) MarshalJSON() ([]byte, error) {
+func (th *ArrInt) MarshalJSON() ([]byte, error) {
 	if th.Valid {
 		return jsonkit.Marshal(th.Array)
 	}
@@ -45,7 +45,7 @@ func (th *ArrInt) Scan(value any) error {
 }
 
 // Value implements the driver Valuer interface.
-func (th ArrInt) Value() (driver.Value, error) {
+func (th *ArrInt) Value() (driver.Value, error) {
 	if !th.Valid {
 		return nil, nil
 	}
@@ -60,7 +60,7 @@ func NewArrInt(val any) *ArrInt {
 	return th
 }
 
-func (th ArrInt) IsValid() bool {
+func (th *ArrInt) IsValid() bool {
 	return th.Valid
 }
 

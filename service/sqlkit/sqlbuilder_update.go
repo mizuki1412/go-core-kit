@@ -7,6 +7,7 @@ import (
 type UpdateBuilder struct {
 	inner     squirrel.UpdateBuilder
 	modelMeta ModelMeta
+	logicDel  []any
 }
 
 func (b UpdateBuilder) Sql() (string, []interface{}) {

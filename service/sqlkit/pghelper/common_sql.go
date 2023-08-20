@@ -8,7 +8,7 @@ import (
 )
 
 func CheckSchemaExist(schema string) bool {
-	dao := &sqlkit.Dao[any]{}
+	dao := sqlkit.Dao[any]{}
 	rows := dao.Query(fmt.Sprintf("SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = '%s')", schema))
 	defer rows.Close()
 	for rows.Next() {

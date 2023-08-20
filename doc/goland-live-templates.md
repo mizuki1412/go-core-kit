@@ -159,10 +159,7 @@ const (
 )
 
 func New(ds ...*sqlkit.DataSource) Dao {
-	dao := Dao{}
-	if len(ds) > 0 {
-		dao.SetDataSource(ds[0])
-	}
+	dao := Dao{sqlkit.New[$name$](ds...)}
 	dao.Cascade = func(obj *$name$) {
 		switch dao.ResultType {
 		case ResultDefault:
@@ -180,11 +177,7 @@ type Dao struct {
 }
 
 func New(ds ...*sqlkit.DataSource) Dao {
-	dao := Dao{}
-	if len(ds) > 0 {
-		dao.SetDataSource(ds[0])
-	}
-	return dao
+	return Dao{sqlkit.New[$name$](ds...)}
 }
 ```
 

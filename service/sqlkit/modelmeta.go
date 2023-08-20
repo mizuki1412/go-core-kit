@@ -10,7 +10,7 @@ import (
 type ModelMeta struct {
 	tableName   string
 	keys        []ModelMetaKey
-	logicDelKey string
+	logicDelKey string // escaped
 	dateSource  *DataSource
 	// 处理后的 keys array
 	// 用于 select 的 全量columns
@@ -42,6 +42,10 @@ func (th ModelMetaKey) val(rv reflect.Value) any {
 		method := v.MethodByName("Value")
 		if !method.IsValid() {
 			panic(exception.New("must add Value function"))
+		}
+		// 对 class 类中的可能出现空类型，或者其他对象类型
+		if method.Call(nil)[0].Interface() == nil {
+			val = nil
 		}
 	}
 	return val

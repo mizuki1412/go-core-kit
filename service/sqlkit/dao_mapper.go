@@ -7,9 +7,6 @@ import (
 )
 
 func (dao Dao[T]) Insert(dest *T) {
-	if dao.dataSource == nil {
-		dao.dataSource = DefaultDataSource()
-	}
 	builder := dao.Builder().Insert()
 	var columns []string
 	var vals []any
@@ -45,9 +42,6 @@ func (dao Dao[T]) Insert(dest *T) {
 }
 
 func (dao Dao[T]) Update(dest any) {
-	if dao.dataSource == nil {
-		dao.dataSource = DefaultDataSource()
-	}
 	builder := dao.Builder().Update()
 	rv := reflect.ValueOf(dest)
 	for _, e := range dao.modelMeta.allUpdateKeys {
@@ -78,20 +72,13 @@ func (dao Dao[T]) Update(dest any) {
 
 // Delete dest should be elem
 func (dao Dao[T]) Delete(dest any) {
-	if dao.dataSource == nil {
-		dao.dataSource = DefaultDataSource()
-	}
 	rv := reflect.ValueOf(dest)
 	var sql string
 	var args []interface{}
 	var err error
 	if dao.modelMeta.logicDelKey != "" {
 		builder := dao.Builder().Update()
-		ldv := LogicDelVal[0]
-		if len(dao.LogicDelVal) > 0 {
-			ldv = dao.LogicDelVal[0]
-		}
-		builder.Set(dao.modelMeta.logicDelKey, ldv)
+		builder.Set(dao.modelMeta.logicDelKey, builder.logicDel[0])
 		for _, e := range dao.modelMeta.allPKs {
 			v := e.val(rv)
 			if v == nil {
@@ -119,9 +106,6 @@ func (dao Dao[T]) Delete(dest any) {
 }
 
 func (dao Dao[T]) SelectOneById(id ...any) *T {
-	if dao.dataSource == nil {
-		dao.dataSource = DefaultDataSource()
-	}
 	builder := dao.Builder().Select()
 	if len(id) != len(dao.modelMeta.allPKs) {
 		panic(exception.New("主键数量不匹配"))

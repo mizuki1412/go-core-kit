@@ -12,11 +12,7 @@ type Dao struct {
 }
 
 func New(ds ...*sqlkit.DataSource) Dao {
-	dao := Dao{}
-	if len(ds) > 0 {
-		dao.SetDataSource(ds[0])
-	}
-	return dao
+	return Dao{sqlkit.New[model.Area](ds...)}
 }
 
 func (dao Dao) FindCodeByName(name, ccode, pcode string) string {

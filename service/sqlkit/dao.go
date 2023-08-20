@@ -27,18 +27,44 @@ type DaoModelMeta interface {
 	getModelMeta() ModelMeta
 }
 
-// Builder 结构化语句
-func (dao Dao[T]) Builder() SQLBuilder {
-	if dao.dataSource == nil {
+// New 必须从初始化函数生成 dao
+func New[T any](ds ...*DataSource) Dao[T] {
+	dao := Dao[T]{}
+	if len(ds) > 0 {
+		dao.dataSource = ds[0]
+	} else {
 		dao.dataSource = DefaultDataSource()
 	}
+	dao.modelMeta.dateSource = dao.dataSource
+	dao.modelMeta.init(dao.meta)
+	return dao
+}
+
+//func (dao *Dao[T]) Init(ds ...*DataSource) {
+//	if len(ds) > 0 {
+//		dao.dataSource = ds[0]
+//	} else {
+//		dao.dataSource = DefaultDataSource()
+//	}
+//	dao.modelMeta.dateSource = dao.dataSource
+//	dao.modelMeta.init(dao.meta)
+//}
+
+// Builder 结构化语句
+func (dao Dao[T]) Builder() SQLBuilder {
 	sb := SQLBuilder{modelMeta: dao.modelMeta}
+	ldv := LogicDelVal
+	if len(dao.LogicDelVal) > 0 {
+		ldv = dao.LogicDelVal
+	}
+	sb.logicDel = ldv
+	sb.driver = dao.dataSource.Driver
 	switch dao.dataSource.Driver {
 	case Postgres:
-		sb.inner = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+		sb.inner0 = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 	default:
 		// todo 未处理oracle
-		sb.inner = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Question)
+		sb.inner0 = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Question)
 	}
 	return sb
 }
@@ -47,44 +73,20 @@ func (dao Dao[T]) getModelMeta() ModelMeta {
 	return dao.modelMeta
 }
 
-// SetDataSource 设置数据源，同时 init modelMeta
-func (dao Dao[T]) SetDataSource(ds *DataSource) Dao[T] {
-	dao.dataSource = ds
-	dao.modelMeta.dateSource = ds
-	dao.modelMeta.init(dao.meta)
-	return dao
-}
 func (dao Dao[T]) DataSource() *DataSource {
 	return dao.dataSource
 }
 
-func (dao Dao[T]) SetResultType(rt byte) Dao[T] {
-	if dao.dataSource == nil {
-		dao.dataSource = DefaultDataSource()
-	}
-	dao.ResultType = rt
-	return dao
-}
-
 func (dao Dao[T]) Query(sql string, args ...any) *sqlx.Rows {
-	if dao.dataSource == nil {
-		dao.dataSource = DefaultDataSource()
-	}
 	return dao.dataSource.Query(sql, args...)
 }
 
 func (dao Dao[T]) Exec(sql string, args ...any) {
-	if dao.dataSource == nil {
-		dao.dataSource = DefaultDataSource()
-	}
 	dao.dataSource.Exec(sql, args...)
 }
 
 // ScanList 取值封装list
 func (dao Dao[T]) ScanList(sql string, args ...any) []*T {
-	if dao.dataSource == nil {
-		dao.dataSource = DefaultDataSource()
-	}
 	rows := dao.Query(sql, args...)
 	list := make([]*T, 0, 5)
 	defer rows.Close()
@@ -105,9 +107,6 @@ func (dao Dao[T]) ScanList(sql string, args ...any) []*T {
 }
 
 func (dao Dao[T]) ScanOne(sql string, args ...any) *T {
-	if dao.dataSource == nil {
-		dao.dataSource = DefaultDataSource()
-	}
 	rows := dao.Query(sql, args...)
 	defer rows.Close()
 	for rows.Next() {
@@ -125,9 +124,6 @@ func (dao Dao[T]) ScanOne(sql string, args ...any) *T {
 }
 
 func (dao Dao[T]) ScanOneMap(sql string, args []any) map[string]any {
-	if dao.dataSource == nil {
-		dao.dataSource = DefaultDataSource()
-	}
 	rows := dao.Query(sql, args...)
 	defer rows.Close()
 	for rows.Next() {
@@ -142,9 +138,6 @@ func (dao Dao[T]) ScanOneMap(sql string, args []any) map[string]any {
 }
 
 func (dao Dao[T]) ScanListMap(sql string, args ...any) []map[string]any {
-	if dao.dataSource == nil {
-		dao.dataSource = DefaultDataSource()
-	}
 	rows := dao.Query(sql, args...)
 	list := make([]map[string]any, 0, 5)
 	defer rows.Close()

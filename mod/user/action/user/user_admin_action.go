@@ -23,7 +23,9 @@ type listUsersParams struct {
 func listUsers(ctx *context.Context) {
 	params := listUsersParams{}
 	ctx.BindForm(&params)
-	list := userdao.NewWithSchema(ctx.SessionGetSchema()).ListFromRootDepart(params.DepartmentId)
+	dao := userdao.New()
+	dao.DataSource().Schema = ctx.SessionGetSchema()
+	list := dao.ListFromRootDepart(params.DepartmentId)
 	if AdditionUserExAdminFunc != nil {
 		for _, u := range list {
 			AdditionUserExAdminFunc(ctx, u)
@@ -39,7 +41,9 @@ type listByRoleParams struct {
 func listByRole(ctx *context.Context) {
 	params := listByRoleParams{}
 	ctx.BindForm(&params)
-	list := userdao.NewWithSchema(ctx.SessionGetSchema()).List(userdao.ListParam{RoleId: params.RoleId})
+	dao := userdao.New()
+	dao.DataSource().Schema = ctx.SessionGetSchema()
+	list := dao.List(userdao.ListParam{RoleId: params.RoleId})
 	if AdditionUserExAdminFunc != nil {
 		for _, u := range list {
 			AdditionUserExAdminFunc(ctx, u)
@@ -69,8 +73,9 @@ func AddUser(ctx *context.Context) {
 }
 
 func AddUserHandle(ctx *context.Context, params AddUserParams, checkSms bool) *model.User {
-	dao := userdao.NewWithSchema(ctx.SessionGetSchema())
-	dao.SetResultType(userdao.ResultNone)
+	dao := userdao.New()
+	dao.DataSource().Schema = ctx.SessionGetSchema()
+	dao.ResultType = userdao.ResultNone
 	if dao.FindByUsername(params.Username.String) != nil {
 		panic(exception.New("用户名已经存在"))
 	}
@@ -80,8 +85,9 @@ func AddUserHandle(ctx *context.Context, params AddUserParams, checkSms bool) *m
 	if params.Phone.Valid && checkSms && (!params.Sms.Valid || rediskit.Get(context2.Background(), rediskit.GetKeyWithPrefix("sms:"+params.Phone.String), "") != params.Sms.String) {
 		panic(exception.New("验证码错误"))
 	}
-	roleDao := roledao.NewWithSchema(ctx.SessionGetSchema())
-	r := roleDao.FindById(params.Role)
+	roleDao := roledao.New()
+	roleDao.DataSource().Schema = ctx.SessionGetSchema()
+	r := roleDao.SelectOneById(params.Role)
 	if r == nil {
 		panic(exception.New("角色不存在"))
 	}
@@ -147,8 +153,9 @@ func UpdateUser(ctx *context.Context) {
 }
 
 func UpdateUserHandle(ctx *context.Context, params UpdateParams) {
-	dao := userdao.NewWithSchema(ctx.SessionGetSchema())
-	u := dao.FindById(params.Id)
+	dao := userdao.New()
+	dao.DataSource().Schema = ctx.SessionGetSchema()
+	u := dao.SelectOneById(params.Id)
 	if u == nil || u.Off.Int32 == model.UserOffDelete {
 		panic(exception.New("用户不存在"))
 	}
@@ -166,7 +173,9 @@ func UpdateUserHandle(ctx *context.Context, params UpdateParams) {
 		}
 	}
 	if params.Role > 0 && (u.Role == nil || params.Role != u.Role.Id) {
-		r := roledao.NewWithSchema(ctx.SessionGetSchema()).FindById(params.Role)
+		rdao := roledao.New()
+		rdao.DataSource().Schema = ctx.SessionGetSchema()
+		r := rdao.SelectOneById(params.Role)
 		if r == nil {
 			panic(exception.New("role不存在"))
 		}
@@ -204,7 +213,9 @@ type infoAdminParams struct {
 func infoAdmin(ctx *context.Context) {
 	params := infoAdminParams{}
 	ctx.BindForm(&params)
-	user := userdao.NewWithSchema(ctx.SessionGetSchema()).FindById(params.Uid)
+	dao := userdao.New()
+	dao.DataSource().Schema = ctx.SessionGetSchema()
+	user := dao.SelectOneById(params.Uid)
 	if user == nil {
 		panic(exception.New("无此用户"))
 	}
@@ -226,18 +237,20 @@ func DelUser(ctx *context.Context) {
 	if mine.Id == params.Id {
 		panic(exception.New("不能操作自己"))
 	}
+	dao := userdao.New()
+	dao.DataSource().Schema = ctx.SessionGetSchema()
+	target := dao.SelectOneById(params.Id)
+	if target == nil {
+		panic(exception.New("用户不存在"))
+	}
+	if target.Role != nil && target.Role.Id == 0 {
+		panic(exception.New("该用户不能设置"))
+	}
+	if target.Extend.GetBool("immutable") {
+		panic(exception.New("该用户不可删除"))
+	}
 	sqlkit.TxArea(func(targetDS *sqlkit.DataSource) {
-		dao := userdao.New(ctx.DBTx())
-		target := userdao.NewWithSchema(ctx.SessionGetSchema()).FindById(params.Id)
-		if target == nil {
-			panic(exception.New("用户不存在"))
-		}
-		if target.Role != nil && target.Role.Id == 0 {
-			panic(exception.New("该用户不能设置"))
-		}
-		if target.Extend.GetBool("immutable") {
-			panic(exception.New("该用户不可删除"))
-		}
+		dao := userdao.New(targetDS)
 		//
 		if params.Off.Int32 == 0 {
 			dao.OffUser(params.Id, model.UserOffDelete)
@@ -254,6 +267,6 @@ func DelUser(ctx *context.Context) {
 			//target.setOff(User.OFF_OK);
 			//userCenter.add(target);
 		}
-	})
+	}, dao.DataSource())
 	ctx.JsonSuccess(nil)
 }

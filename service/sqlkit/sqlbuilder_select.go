@@ -1,28 +1,32 @@
 package sqlkit
 
 import (
+	"fmt"
 	"github.com/Masterminds/squirrel"
+	"github.com/mizuki1412/go-core-kit/class/exception"
 )
 
 type SelectBuilder struct {
 	inner     squirrel.SelectBuilder
 	modelMeta ModelMeta
+	logicDel  []any
+	driver    string
 	fromAs    string
 }
 
 func (b SelectBuilder) Sql() (string, []interface{}) {
 	if b.fromAs == "" {
-		b.inner = b.inner.From(b.modelMeta.GetTableName())
+		b.inner = b.inner.From(b.modelMeta.getTable())
 	} else {
-		b.inner = b.inner.From(b.modelMeta.GetTableName(b.fromAs))
+		b.inner = b.inner.From(b.modelMeta.getTable(b.fromAs))
 	}
 	return b.inner.MustSql()
 }
 func (b SelectBuilder) ToSql() (string, []interface{}, error) {
 	if b.fromAs == "" {
-		b.inner = b.inner.From(b.modelMeta.GetTableName())
+		b.inner = b.inner.From(b.modelMeta.getTable())
 	} else {
-		b.inner = b.inner.From(b.modelMeta.GetTableName(b.fromAs))
+		b.inner = b.inner.From(b.modelMeta.getTable(b.fromAs))
 	}
 	return b.inner.ToSql()
 }
@@ -74,23 +78,23 @@ func (b SelectBuilder) Options(options ...string) SelectBuilder {
 }
 
 func (b SelectBuilder) Join(dm DaoModelMeta, as string, rest ...interface{}) SelectBuilder {
-	b.inner = b.inner.Join(dm.modelMeta().GetTableName(as), rest...)
+	b.inner = b.inner.Join(dm.getModelMeta().getTable(as), rest...)
 	return b
 }
 func (b SelectBuilder) LeftJoin(dm DaoModelMeta, as string, rest ...interface{}) SelectBuilder {
-	b.inner = b.inner.LeftJoin(dm.modelMeta().GetTableName(as), rest...)
+	b.inner = b.inner.LeftJoin(dm.getModelMeta().getTable(as), rest...)
 	return b
 }
 func (b SelectBuilder) RightJoin(dm DaoModelMeta, as string, rest ...interface{}) SelectBuilder {
-	b.inner = b.inner.RightJoin(dm.modelMeta().GetTableName(as), rest...)
+	b.inner = b.inner.RightJoin(dm.getModelMeta().getTable(as), rest...)
 	return b
 }
 func (b SelectBuilder) InnerJoin(dm DaoModelMeta, as string, rest ...interface{}) SelectBuilder {
-	b.inner = b.inner.InnerJoin(dm.modelMeta().GetTableName(as), rest...)
+	b.inner = b.inner.InnerJoin(dm.getModelMeta().getTable(as), rest...)
 	return b
 }
 func (b SelectBuilder) CrossJoin(dm DaoModelMeta, as string, rest ...interface{}) SelectBuilder {
-	b.inner = b.inner.CrossJoin(dm.modelMeta().GetTableName(as), rest...)
+	b.inner = b.inner.CrossJoin(dm.getModelMeta().getTable(as), rest...)
 	return b
 }
 
@@ -150,4 +154,31 @@ func (b SelectBuilder) Limit(limit uint64) SelectBuilder {
 func (b SelectBuilder) Offset(offset uint64) SelectBuilder {
 	b.inner = b.inner.Offset(offset)
 	return b
+}
+
+// custom
+
+func (b SelectBuilder) WhereNLogicDel() SelectBuilder {
+	if b.modelMeta.logicDelKey != "" {
+		b.Where(b.modelMeta.logicDelKey+"<>?", b.logicDel[0])
+	}
+	return b
+}
+
+// 生成sql中: sth in (select unnest(Array[?,?,?])) []any
+// 注意使用时 args...
+func (b SelectBuilder) whereUnnest(arr any, key, flag string) SelectBuilder {
+	switch b.driver {
+	case Postgres:
+		s, v := pgArray(arr)
+		return b.Where(fmt.Sprintf("%s %s (select unnest(%s)", b.modelMeta.escapeName(key), flag, s), v...)
+	default:
+		panic(exception.New("whereUnnest not supported"))
+	}
+}
+func (b SelectBuilder) WhereUnnestIn(key string, arr any) SelectBuilder {
+	return b.whereUnnest(arr, key, "IN")
+}
+func (b SelectBuilder) WhereUnnestNotIn(key string, arr any) SelectBuilder {
+	return b.whereUnnest(arr, key, "NOT IN")
 }

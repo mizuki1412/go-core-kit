@@ -17,10 +17,8 @@ type Dao struct {
 }
 
 func New(ds ...*sqlkit.DataSource) Dao {
-	dao := Dao{}
-	if len(ds) > 0 {
-		dao.SetDataSource(ds[0])
-	}
+	d := sqlkit.New[model.Department](ds...)
+	dao := Dao{d}
 	dao.Cascade = func(obj *model.Department) {
 		switch dao.ResultType {
 		case ResultChildren:
