@@ -70,31 +70,24 @@ func (dao Dao[T]) Update(dest any) {
 	dao.Exec(sql, args...)
 }
 
-// Delete dest should be elem
-func (dao Dao[T]) Delete(dest any) {
-	rv := reflect.ValueOf(dest)
+func (dao Dao[T]) DeleteById(id ...any) {
 	var sql string
 	var args []interface{}
 	var err error
+	if len(id) != len(dao.modelMeta.allPKs) {
+		panic(exception.New("主键数量不匹配"))
+	}
 	if dao.modelMeta.logicDelKey != "" {
 		builder := dao.Builder().Update()
 		builder.Set(dao.modelMeta.logicDelKey, builder.logicDel[0])
-		for _, e := range dao.modelMeta.allPKs {
-			v := e.val(rv)
-			if v == nil {
-				panic(exception.New("pk val is nil"))
-			}
-			builder = builder.Where(e.Key+"=?", v)
+		for i := 0; i < len(dao.modelMeta.allPKs); i++ {
+			builder = builder.Where(dao.modelMeta.allPKs[i].Key+"=?", id[i])
 		}
 		sql, args, err = builder.ToSql()
 	} else {
 		builder := dao.Builder().Delete()
-		for _, e := range dao.modelMeta.allPKs {
-			v := e.val(rv)
-			if v == nil {
-				panic(exception.New("pk val is nil"))
-			}
-			builder = builder.Where(e.Key+"=?", v)
+		for i := 0; i < len(dao.modelMeta.allPKs); i++ {
+			builder = builder.Where(dao.modelMeta.allPKs[i].Key+"=?", id[i])
 		}
 		sql, args, err = builder.ToSql()
 	}

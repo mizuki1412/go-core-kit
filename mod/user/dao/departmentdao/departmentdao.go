@@ -26,12 +26,12 @@ func New(ds ...*sqlkit.DataSource) Dao {
 			obj.Parent = nil
 		case ResultDefault:
 			if obj.Parent != nil {
-				obj.Parent = dao.FindById(obj.Parent.Id)
+				obj.Parent = dao.SelectOneById(obj.Parent.Id)
 			}
 		case ResultAll:
 			obj.Children = dao.ListByParent(obj.Id)
 			if obj.Parent != nil {
-				obj.Parent = dao.FindById(obj.Parent.Id)
+				obj.Parent = dao.SelectOneById(obj.Parent.Id)
 			}
 		case ResultNone:
 			obj.Parent = nil
@@ -40,17 +40,12 @@ func New(ds ...*sqlkit.DataSource) Dao {
 	return dao
 }
 
-func (dao *Dao) FindById(id int32) *model.Department {
-	sql, args := dao.Builder().Select().Where("id=?", id).Sql()
-	return dao.ScanOne(sql, args)
-}
-
-func (dao *Dao) ListByParent(id int32) []*model.Department {
+func (dao Dao) ListByParent(id int32) []*model.Department {
 	sql, args := dao.Builder().Select().Where("parent=?", id).OrderBy("no").OrderBy("id").Sql()
 	return dao.ScanList(sql, args)
 }
 
-func (dao *Dao) ListAll() []*model.Department {
+func (dao Dao) ListAll() []*model.Department {
 	sql, args := dao.Builder().Select().Where("id>=0").OrderBy("parent").OrderBy("no").OrderBy("id").Sql()
 	return dao.ScanList(sql, args)
 }

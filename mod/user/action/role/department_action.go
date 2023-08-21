@@ -22,10 +22,11 @@ func departmentCreate(ctx *context.Context) {
 	params := departmentCreateParams{}
 	ctx.BindForm(&params)
 	department := &model.Department{}
-	dao := departmentdao.NewWithSchema(ctx.SessionGetSchema())
-	dao.SetResultType(departmentdao.ResultNone)
+	dao := departmentdao.New()
+	dao.DataSource().Schema = ctx.SessionGetSchema()
+	dao.ResultType = departmentdao.ResultNone
 	if params.ParentId.Valid {
-		parent := dao.FindById(params.ParentId.Int32)
+		parent := dao.SelectOneById(params.ParentId.Int32)
 		if parent == nil {
 			panic(exception.New("父级部门不存在"))
 		}
@@ -54,9 +55,10 @@ type departmentUpdateParams struct {
 func departmentUpdate(ctx *context.Context) {
 	params := departmentUpdateParams{}
 	ctx.BindForm(&params)
-	dao := departmentdao.NewWithSchema(ctx.SessionGetSchema())
-	department := dao.FindById(params.Id)
-	dao.SetResultType(departmentdao.ResultNone)
+	dao := departmentdao.New()
+	dao.DataSource().Schema = ctx.SessionGetSchema()
+	department := dao.SelectOneById(params.Id)
+	dao.ResultType = departmentdao.ResultNone
 	if department == nil {
 		panic(exception.New("部门不存在"))
 	}
@@ -70,7 +72,7 @@ func departmentUpdate(ctx *context.Context) {
 		department.Descr.Set(params.Description.String)
 	}
 	if params.ParentId.Valid && (department.Parent == nil || params.ParentId.Int32 != department.Parent.Id) {
-		parent := dao.FindById(params.ParentId.Int32)
+		parent := dao.SelectOneById(params.ParentId.Int32)
 		if parent == nil {
 			panic(exception.New("父级部门不存在"))
 		}
@@ -82,14 +84,16 @@ func departmentUpdate(ctx *context.Context) {
 func departmentDel(ctx *context.Context) {
 	params := delParams{}
 	ctx.BindForm(&params)
-	dao := departmentdao.NewWithSchema(ctx.SessionGetSchema())
-	dao.SetResultType(departmentdao.ResultNone)
-	department := dao.FindById(params.Id)
+	dao := departmentdao.New()
+	dao.DataSource().Schema = ctx.SessionGetSchema()
+	dao.ResultType = departmentdao.ResultNone
+	department := dao.SelectOneById(params.Id)
 	if department == nil {
 		panic(exception.New("部门不存在"))
 	}
-	roleDao := roledao.NewWithSchema(ctx.SessionGetSchema())
-	roleDao.SetResultType(userdao.ResultNone)
+	roleDao := roledao.New()
+	roleDao.DataSource().Schema = ctx.SessionGetSchema()
+	roleDao.ResultType = userdao.ResultNone
 	rs := roleDao.ListByDepartment(params.Id)
 	if rs != nil && len(rs) > 0 {
 		panic(exception.New("部门下还有角色,不能删除"))
@@ -97,12 +101,13 @@ func departmentDel(ctx *context.Context) {
 	if val, ok := department.Extend.Map["immutable"]; ok && val.(bool) {
 		panic(exception.New("该部门不可删除"))
 	}
-	dao.DeleteOff(department)
+	dao.DeleteById(department.Id)
 	ctx.JsonSuccess(nil)
 }
 
 func listDepartment(ctx *context.Context) {
-	dao := departmentdao.NewWithSchema(ctx.SessionGetSchema())
-	dao.SetResultType(departmentdao.ResultAll)
+	dao := departmentdao.New()
+	dao.DataSource().Schema = ctx.SessionGetSchema()
+	dao.ResultType = departmentdao.ResultAll
 	ctx.JsonSuccess(dao.ListAll())
 }

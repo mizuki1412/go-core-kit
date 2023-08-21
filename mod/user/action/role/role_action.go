@@ -4,6 +4,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/mod/user/dao/departmentdao"
+	"github.com/mizuki1412/go-core-kit/mod/user/dao/privilegedao"
 	"github.com/mizuki1412/go-core-kit/mod/user/dao/roledao"
 	"github.com/mizuki1412/go-core-kit/mod/user/dao/userdao"
 	"github.com/mizuki1412/go-core-kit/mod/user/model"
@@ -11,7 +12,9 @@ import (
 )
 
 func listAllPrivileges(ctx *context.Context) {
-	ctx.JsonSuccess(roledao.NewWithSchema(ctx.SessionGetSchema()).ListPrivileges())
+	dao := privilegedao.New()
+	dao.DataSource().Schema = ctx.SessionGetSchema()
+	ctx.JsonSuccess(dao.ListPrivileges())
 }
 
 type createParams struct {
@@ -23,9 +26,10 @@ type createParams struct {
 func create(ctx *context.Context) {
 	params := createParams{}
 	ctx.BindForm(&params)
-	departmentDao := departmentdao.NewWithSchema(ctx.SessionGetSchema())
-	departmentDao.SetResultType(departmentdao.ResultNone)
-	department := departmentDao.FindById(params.DepartmentId)
+	departmentDao := departmentdao.New()
+	departmentDao.DataSource().Schema = ctx.SessionGetSchema()
+	departmentDao.ResultType = departmentdao.ResultNone
+	department := departmentDao.SelectOneById(params.DepartmentId)
 	if department == nil {
 		panic(exception.New("部门不存在"))
 	}
@@ -33,7 +37,9 @@ func create(ctx *context.Context) {
 	role.Name.Set(params.Name)
 	role.Privileges = params.PrivilegesJson
 	role.Department = department
-	roledao.NewWithSchema(ctx.SessionGetSchema()).Insert(role)
+	rdao := roledao.New()
+	rdao.DataSource().Schema = ctx.SessionGetSchema()
+	rdao.Insert(role)
 	ctx.JsonSuccess(nil)
 }
 
@@ -47,15 +53,17 @@ type updateParams struct {
 func update(ctx *context.Context) {
 	params := updateParams{}
 	ctx.BindForm(&params)
-	dao := roledao.NewWithSchema(ctx.SessionGetSchema())
-	role := dao.FindById(params.Id)
+	dao := roledao.New()
+	dao.DataSource().Schema = ctx.SessionGetSchema()
+	role := dao.SelectOneById(params.Id)
 	if role == nil {
 		panic(exception.New("角色不存在"))
 	}
 	if params.DepartmentId.Valid && (role.Department == nil || params.DepartmentId.Int32 != role.Department.Id) {
-		departmentDao := departmentdao.NewWithSchema(ctx.SessionGetSchema())
-		departmentDao.SetResultType(departmentdao.ResultNone)
-		d := departmentDao.FindById(params.DepartmentId.Int32)
+		departmentDao := departmentdao.New()
+		departmentDao.DataSource().Schema = ctx.SessionGetSchema()
+		departmentDao.ResultType = departmentdao.ResultNone
+		d := departmentDao.SelectOneById(params.DepartmentId.Int32)
 		if d == nil {
 			panic(exception.New("部门不存在"))
 		}
@@ -78,22 +86,24 @@ type delParams struct {
 func del(ctx *context.Context) {
 	params := delParams{}
 	ctx.BindForm(&params)
-	dao := roledao.NewWithSchema(ctx.SessionGetSchema())
-	dao.SetResultType(roledao.ResultNone)
-	role := dao.FindById(params.Id)
+	dao := roledao.New()
+	dao.DataSource().Schema = ctx.SessionGetSchema()
+	dao.ResultType = roledao.ResultNone
+	role := dao.SelectOneById(params.Id)
 	if role == nil {
 		panic(exception.New("角色不存在"))
 	}
 	if val, ok := role.Extend.Map["immutable"]; ok && val.(bool) {
 		panic(exception.New("该角色不可删除"))
 	}
-	userDao := userdao.NewWithSchema(ctx.SessionGetSchema())
-	userDao.SetResultType(userdao.ResultNone)
+	userDao := userdao.New()
+	userDao.DataSource().Schema = ctx.SessionGetSchema()
+	userDao.ResultType = userdao.ResultNone
 	us := userDao.List(userdao.ListParam{RoleId: params.Id})
 	if us != nil && len(us) > 0 {
 		panic(exception.New("角色下还有用户,不能删除"))
 	}
-	dao.DeleteOff(role)
+	dao.DeleteById(role.Id)
 	ctx.JsonSuccess(nil)
 }
 
@@ -105,10 +115,12 @@ func listRoles(ctx *context.Context) {
 	params := listRolesParam{}
 	ctx.BindForm(&params)
 	var roles []*model.Role
+	dao := roledao.New()
+	dao.DataSource().Schema = ctx.SessionGetSchema()
 	if params.Root.Valid {
-		roles = roledao.NewWithSchema(ctx.SessionGetSchema()).ListFromRootDepart(params.Root.Int32)
+		roles = dao.ListFromRootDepart(params.Root.Int32)
 	} else {
-		roles = roledao.NewWithSchema(ctx.SessionGetSchema()).List(roledao.ListParam{})
+		roles = dao.List(roledao.ListParam{})
 	}
 	for _, r := range roles {
 		if !r.Privileges.Valid {
@@ -126,10 +138,14 @@ type listByRoleParams struct {
 func listRolesWithUser(ctx *context.Context) {
 	params := listByRoleParams{}
 	ctx.BindForm(&params)
-	list := roledao.NewWithSchema(ctx.SessionGetSchema()).List(roledao.ListParam{})
+	dao := roledao.New()
+	dao.DataSource().Schema = ctx.SessionGetSchema()
+	list := dao.List(roledao.ListParam{})
+	udao := userdao.New()
+	udao.DataSource().Schema = ctx.SessionGetSchema()
 	for _, r := range list {
 		r.Extend.PutAll(map[string]any{
-			"users": userdao.NewWithSchema(ctx.SessionGetSchema()).List(userdao.ListParam{RoleId: r.Id}),
+			"users": udao.List(userdao.ListParam{RoleId: r.Id}),
 		})
 	}
 	ctx.JsonSuccess(list)

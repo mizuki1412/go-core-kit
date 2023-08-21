@@ -11,7 +11,9 @@ var _once sync.Once
 
 func Get(schema string) *class.MapStringSync {
 	_once.Do(func() {
-		_cache := settingdao.NewWithSchema(schema).Get()
+		dao := settingdao.New()
+		dao.DataSource().Schema = schema
+		_cache := dao.Get()
 		cache.Set(_cache)
 	})
 	return cache
@@ -19,5 +21,7 @@ func Get(schema string) *class.MapStringSync {
 
 // Sync 先get后set
 func Sync(schema string) {
-	settingdao.NewWithSchema(schema).Set(cache.Map)
+	dao := settingdao.New()
+	dao.DataSource().Schema = schema
+	dao.Set(cache.Map)
 }
