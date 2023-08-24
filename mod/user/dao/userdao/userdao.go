@@ -9,7 +9,6 @@ import (
 	"github.com/mizuki1412/go-core-kit/mod/user/dao/roledao"
 	"github.com/mizuki1412/go-core-kit/mod/user/model"
 	"github.com/mizuki1412/go-core-kit/service/sqlkit"
-	"github.com/mizuki1412/go-core-kit/service/sqlkit/pghelper"
 	"github.com/spf13/cast"
 )
 
@@ -99,7 +98,7 @@ type ListParam struct {
 }
 
 func (dao Dao) List(param ListParam) []*model.User {
-	builder := dao.Builder().Select().Where("off>-1").OrderBy("id")
+	builder := dao.Builder().Select().WhereNLogicDel().OrderBy("id")
 	if param.RoleId != 0 {
 		builder = builder.Where("role=?", param.RoleId)
 	}
@@ -111,8 +110,10 @@ func (dao Dao) List(param ListParam) []*model.User {
 	}
 	// 根据role组筛选
 	if len(param.Departments) > 0 {
-		flag, arg := pghelper.GenUnnestInt(param.Departments)
-		builder = builder.Where(fmt.Sprintf("role in (select id from role where department in %s)", flag), arg...)
+		rb := roledao.New().Builder().Select("id").WhereUnnestIn("department", param.Departments)
+		builder = builder.WhereIn("role", rb)
+		//flag, arg := pghelper.GenUnnestInt(param.Departments)
+		//builder = builder.Where(fmt.Sprintf("role in (select id from role where department in %s)", flag), arg...)
 	}
 	sql, args := builder.Sql()
 	return dao.ScanList(sql, args)
@@ -123,12 +124,12 @@ func (dao Dao) OffUser(uid int32, off int32) {
 	if err != nil {
 		panic(exception.New(err.Error()))
 	}
-	dao.Exec(sql, args...)
+	dao.Exec(sql, args)
 }
 func (dao Dao) SetNull(id int32) {
 	sql, args, err := dao.Builder().Update().Set("phone", squirrel.Expr("null")).Set("username", squirrel.Expr("null")).Where("id=?", id).ToSql()
 	if err != nil {
 		panic(exception.New(err.Error()))
 	}
-	dao.Exec(sql, args...)
+	dao.Exec(sql, args)
 }

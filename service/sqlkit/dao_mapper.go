@@ -10,13 +10,13 @@ func (dao Dao[T]) Insert(dest *T) {
 	builder := dao.Builder().Insert()
 	var columns []string
 	var vals []any
-	rv := reflect.ValueOf(dest)
+	rv := reflect.ValueOf(dest).Elem()
 	for _, e := range dao.modelMeta.allInsertKeys {
 		var val = e.val(rv)
 		if val == nil {
 			continue
 		}
-		columns = append(columns, e.Key)
+		columns = append(columns, e.OriKey)
 		vals = append(vals, val)
 	}
 	if len(columns) == 0 {
@@ -28,8 +28,7 @@ func (dao Dao[T]) Insert(dest *T) {
 	if err != nil {
 		panic(exception.New(err.Error(), 2))
 	}
-	//log.Println(sql, args)
-	rows := dao.Query(sql, args...)
+	rows := dao.Query(sql, args)
 	defer rows.Close()
 	for rows.Next() {
 		// return 赋值
@@ -41,9 +40,9 @@ func (dao Dao[T]) Insert(dest *T) {
 	}
 }
 
-func (dao Dao[T]) Update(dest any) {
+func (dao Dao[T]) Update(dest *T) {
 	builder := dao.Builder().Update()
-	rv := reflect.ValueOf(dest)
+	rv := reflect.ValueOf(dest).Elem()
 	for _, e := range dao.modelMeta.allUpdateKeys {
 		var val = e.val(rv)
 		if val == nil {
@@ -51,9 +50,9 @@ func (dao Dao[T]) Update(dest any) {
 		}
 		// 针对class.MapString 采用merge方式 todo mysql
 		if e.RStruct.Type.String() == "class.MapString" && dao.dataSource.Driver == Postgres {
-			builder = builder.Set(e.Key, squirrel.Expr("coalesce("+e.Key+",'{}'::jsonb) || ?", val))
+			builder = builder.Set(e.OriKey, squirrel.Expr("coalesce("+e.OriKey+",'{}'::jsonb) || ?", val))
 		} else {
-			builder = builder.Set(e.Key, val)
+			builder = builder.Set(e.OriKey, val)
 		}
 	}
 	for _, e := range dao.modelMeta.allPKs {
@@ -67,7 +66,7 @@ func (dao Dao[T]) Update(dest any) {
 	if err != nil {
 		panic(exception.New(err.Error(), 2))
 	}
-	dao.Exec(sql, args...)
+	dao.Exec(sql, args)
 }
 
 func (dao Dao[T]) DeleteById(id ...any) {
@@ -77,9 +76,9 @@ func (dao Dao[T]) DeleteById(id ...any) {
 	if len(id) != len(dao.modelMeta.allPKs) {
 		panic(exception.New("主键数量不匹配"))
 	}
-	if dao.modelMeta.logicDelKey != "" {
+	if dao.modelMeta.logicDelKey.Key != "" {
 		builder := dao.Builder().Update()
-		builder.Set(dao.modelMeta.logicDelKey, builder.logicDel[0])
+		builder = builder.Set(dao.modelMeta.logicDelKey.OriKey, builder.logicDel[0])
 		for i := 0; i < len(dao.modelMeta.allPKs); i++ {
 			builder = builder.Where(dao.modelMeta.allPKs[i].Key+"=?", id[i])
 		}
@@ -94,11 +93,23 @@ func (dao Dao[T]) DeleteById(id ...any) {
 	if err != nil {
 		panic(exception.New(err.Error(), 2))
 	}
-	//log.Println(sql, args)
-	dao.Exec(sql, args...)
+	dao.Exec(sql, args)
 }
 
 func (dao Dao[T]) SelectOneById(id ...any) *T {
+	builder := dao.Builder().Select()
+	if len(id) != len(dao.modelMeta.allPKs) {
+		panic(exception.New("主键数量不匹配"))
+	}
+	for i := 0; i < len(dao.modelMeta.allPKs); i++ {
+		builder = builder.Where(dao.modelMeta.allPKs[i].Key+"=?", id[i])
+	}
+	builder = builder.WhereNLogicDel()
+	sql, args := builder.Sql()
+	return dao.ScanOne(sql, args)
+}
+
+func (dao Dao[T]) SelectOneWithDelById(id ...any) *T {
 	builder := dao.Builder().Select()
 	if len(id) != len(dao.modelMeta.allPKs) {
 		panic(exception.New("主键数量不匹配"))

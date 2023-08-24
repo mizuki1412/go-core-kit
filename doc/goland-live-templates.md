@@ -107,8 +107,8 @@ func (th *$struct$) Scan(value any) error {
 	th.Id = cast.ToInt32(value)
 	return nil
 }
-// 注意：这不能用point方式接收
-func (th $struct$) Value() (driver.Value, error) {
+
+func (th *$struct$) Value() (driver.Value, error) {
     // todo 注意返回值类型
 	return int64(th.Id), nil
 }

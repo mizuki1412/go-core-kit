@@ -5,6 +5,7 @@ package logkit
 import (
 	"fmt"
 	"github.com/mizuki1412/go-core-kit/cli/configkey"
+	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/library/timekit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
@@ -153,7 +154,7 @@ func transfer(params []Param, length int) []zapcore.Field {
 		case float32:
 			fields[i] = zap.Float32(p.Key, p.Val.(float32))
 		default:
-			fields[i] = zap.String(p.Key, cast.ToString(p.Val))
+			fields[i] = zap.String(p.Key, jsonkit.ToString(p.Val))
 		}
 	}
 	return fields

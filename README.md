@@ -21,4 +21,13 @@ toolkit for golang projects
 - [ ] sql base mapper: list - LogicDel, array 类型的
 - [ ] 性能：每次 dao 都会重新解析 model
 - [ ] class 和 model 中的接受函数测试下，可能在 scan 时有问题
-- debug add
+- [ ] class.time scan test
+- [ ] 改进：关于子查询的优化。where in 等
+
+# 1.0 升级 2.0 指南
+
+- sqlkit 重构，参考 `doc/goland-live-templates.md`，重新生成dao模板代码
+- cmd 重构，改用新的 cli 包
+- class 基础类重构，推荐用 NewXX() 或 NXX() 新建
+- class.Decimal 指针改为值类型
+- dao 函数中带 args 参数的，都改用[]any

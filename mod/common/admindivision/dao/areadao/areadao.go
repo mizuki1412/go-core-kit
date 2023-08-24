@@ -17,7 +17,7 @@ func New(ds ...*sqlkit.DataSource) Dao {
 
 func (dao Dao) FindCodeByName(name, ccode, pcode string) string {
 	sql, args := dao.Builder().Select("code").Where("name=?", name).Where("city=?", ccode).Where("province=?", pcode).Sql()
-	rows := dao.Query(sql, args...)
+	rows := dao.Query(sql, args)
 	defer rows.Close()
 	for rows.Next() {
 		ret, err := rows.SliceScan()

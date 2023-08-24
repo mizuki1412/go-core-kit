@@ -35,7 +35,7 @@ func (dao Dao) FindById(id class.String) *model.Province {
 
 func (dao Dao) FindCodeByName(name string) string {
 	sql, args := dao.Builder().Select("code").Where("name=?", name).Sql()
-	rows := dao.Query(sql, args...)
+	rows := dao.Query(sql, args)
 	defer rows.Close()
 	for rows.Next() {
 		ret, err := rows.SliceScan()

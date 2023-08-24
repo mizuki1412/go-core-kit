@@ -159,8 +159,8 @@ func (b SelectBuilder) Offset(offset uint64) SelectBuilder {
 // custom
 
 func (b SelectBuilder) WhereNLogicDel() SelectBuilder {
-	if b.modelMeta.logicDelKey != "" {
-		b.Where(b.modelMeta.logicDelKey+"<>?", b.logicDel[0])
+	if b.modelMeta.logicDelKey.Key != "" {
+		return b.Where(b.modelMeta.logicDelKey.Key+"<>?", b.logicDel[0])
 	}
 	return b
 }
@@ -171,7 +171,7 @@ func (b SelectBuilder) whereUnnest(arr any, key, flag string) SelectBuilder {
 	switch b.driver {
 	case Postgres:
 		s, v := pgArray(arr)
-		return b.Where(fmt.Sprintf("%s %s (select unnest(%s)", b.modelMeta.escapeName(key), flag, s), v...)
+		return b.Where(fmt.Sprintf("%s %s (select unnest(%s))", b.modelMeta.escapeName(key), flag, s), v...)
 	default:
 		panic(exception.New("whereUnnest not supported"))
 	}
@@ -181,4 +181,11 @@ func (b SelectBuilder) WhereUnnestIn(key string, arr any) SelectBuilder {
 }
 func (b SelectBuilder) WhereUnnestNotIn(key string, arr any) SelectBuilder {
 	return b.whereUnnest(arr, key, "NOT IN")
+}
+
+func (b SelectBuilder) WhereIn(key string, sub SelectBuilder) SelectBuilder {
+	// 子查询用 问号
+	sub.inner = sub.inner.PlaceholderFormat(squirrel.Dollar)
+	sql, args := sub.Sql()
+	return b.Where(key+" IN ("+sql+")", args...)
 }

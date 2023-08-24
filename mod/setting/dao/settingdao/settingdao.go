@@ -20,12 +20,12 @@ func (dao Dao) Set(data map[string]interface{}) {
 	if err != nil {
 		panic(exception.New(err.Error()))
 	}
-	dao.Exec(sql, args...)
+	dao.Exec(sql, args)
 }
 
 func (dao Dao) Get() map[string]interface{} {
 	sql, args := dao.Builder().Select("data").Where("id=?", 1).Sql()
-	rows := dao.Query(sql, args...)
+	rows := dao.Query(sql, args)
 	var data string
 	defer rows.Close()
 	for rows.Next() {

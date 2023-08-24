@@ -4,6 +4,8 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/library/jsonkit"
+	"github.com/mizuki1412/go-core-kit/service/logkit"
 )
 
 // LogicDelVal 全局逻辑删除的 value
@@ -36,7 +38,7 @@ func New[T any](ds ...*DataSource) Dao[T] {
 		dao.dataSource = DefaultDataSource()
 	}
 	dao.modelMeta.dateSource = dao.dataSource
-	dao.modelMeta.init(dao.meta)
+	dao.modelMeta = dao.modelMeta.init(dao.meta)
 	return dao
 }
 
@@ -77,17 +79,19 @@ func (dao Dao[T]) DataSource() *DataSource {
 	return dao.dataSource
 }
 
-func (dao Dao[T]) Query(sql string, args ...any) *sqlx.Rows {
-	return dao.dataSource.Query(sql, args...)
+func (dao Dao[T]) Query(sql string, args []any) *sqlx.Rows {
+	logkit.DebugConcat(sql, " | args:", jsonkit.ToString(args))
+	return dao.dataSource.Query(sql, args)
 }
 
-func (dao Dao[T]) Exec(sql string, args ...any) {
-	dao.dataSource.Exec(sql, args...)
+func (dao Dao[T]) Exec(sql string, args []any) {
+	logkit.DebugConcat(sql, " | args:", jsonkit.ToString(args))
+	dao.dataSource.Exec(sql, args)
 }
 
 // ScanList 取值封装list
-func (dao Dao[T]) ScanList(sql string, args ...any) []*T {
-	rows := dao.Query(sql, args...)
+func (dao Dao[T]) ScanList(sql string, args []any) []*T {
+	rows := dao.Query(sql, args)
 	list := make([]*T, 0, 5)
 	defer rows.Close()
 	for rows.Next() {
@@ -106,8 +110,8 @@ func (dao Dao[T]) ScanList(sql string, args ...any) []*T {
 	return list
 }
 
-func (dao Dao[T]) ScanOne(sql string, args ...any) *T {
-	rows := dao.Query(sql, args...)
+func (dao Dao[T]) ScanOne(sql string, args []any) *T {
+	rows := dao.Query(sql, args)
 	defer rows.Close()
 	for rows.Next() {
 		m := new(T)
@@ -124,7 +128,7 @@ func (dao Dao[T]) ScanOne(sql string, args ...any) *T {
 }
 
 func (dao Dao[T]) ScanOneMap(sql string, args []any) map[string]any {
-	rows := dao.Query(sql, args...)
+	rows := dao.Query(sql, args)
 	defer rows.Close()
 	for rows.Next() {
 		m := map[string]any{}
@@ -137,8 +141,8 @@ func (dao Dao[T]) ScanOneMap(sql string, args []any) map[string]any {
 	return nil
 }
 
-func (dao Dao[T]) ScanListMap(sql string, args ...any) []map[string]any {
-	rows := dao.Query(sql, args...)
+func (dao Dao[T]) ScanListMap(sql string, args []any) []map[string]any {
+	rows := dao.Query(sql, args)
 	list := make([]map[string]any, 0, 5)
 	defer rows.Close()
 	for rows.Next() {

@@ -85,5 +85,6 @@ func pgArray(arr any) (string, []any) {
 	default:
 		panic(exception.New("pgArray params not supported"))
 	}
-	return "'{" + strings.Join(flags, ",") + "}'::" + suffix, args
+	// 用{} 有错误：invalid input syntax for type integer
+	return "ARRAY[" + strings.Join(flags, ",") + "]::" + suffix, args
 }

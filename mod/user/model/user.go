@@ -35,7 +35,7 @@ func (th *User) Scan(value any) error {
 	return nil
 }
 
-func (th User) Value() (driver.Value, error) {
+func (th *User) Value() (driver.Value, error) {
 	return int64(th.Id), nil
 }
 

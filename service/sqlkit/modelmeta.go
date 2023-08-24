@@ -10,7 +10,7 @@ import (
 type ModelMeta struct {
 	tableName   string
 	keys        []ModelMetaKey
-	logicDelKey string // escaped
+	logicDelKey ModelMetaKey
 	dateSource  *DataSource
 	// 处理后的 keys array
 	// 用于 select 的 全量columns
@@ -23,7 +23,9 @@ type ModelMeta struct {
 // ModelMetaKey 除 logicdelete 外的 keys
 type ModelMetaKey struct {
 	// escape 后的 key
-	Key     string
+	Key string
+	// 没有 escape 的 key
+	OriKey  string
 	RStruct reflect.StructField
 	Primary bool
 	Auto    bool
@@ -32,18 +34,18 @@ type ModelMetaKey struct {
 func (th ModelMetaKey) val(rv reflect.Value) any {
 	var val any
 	v := rv.FieldByName(th.RStruct.Name)
-	// 判断field是否指针
-	if th.RStruct.Type.Kind() == reflect.Pointer && v.Elem().IsValid() {
-		val = v.Elem().Interface()
-	} else if th.RStruct.Type.Kind() != reflect.Pointer {
+	if v.IsValid() {
 		val = v.Interface()
 	}
-	if val != nil {
+	if v.Kind() == reflect.Pointer && v.IsNil() {
+		return nil
+	}
+	// 当非基础类型时，需要判断 Value 来决定是否有值
+	if val != nil && (v.Kind() == reflect.Struct || v.Kind() == reflect.Pointer) {
 		method := v.MethodByName("Value")
 		if !method.IsValid() {
-			panic(exception.New("must add Value function"))
+			panic(exception.New("must add Value function or use value receiver: " + th.RStruct.Name))
 		}
-		// 对 class 类中的可能出现空类型，或者其他对象类型
 		if method.Call(nil)[0].Interface() == nil {
 			val = nil
 		}
@@ -53,7 +55,6 @@ func (th ModelMetaKey) val(rv reflect.Value) any {
 
 // InitModelMeta obj should be elem
 func (th ModelMeta) init(obj any) ModelMeta {
-	meta := ModelMeta{}
 	rt := reflect.TypeOf(obj)
 	if rt.Kind() != reflect.Struct {
 		panic(exception.New("dao model must struct"))
@@ -63,19 +64,20 @@ func (th ModelMeta) init(obj any) ModelMeta {
 		if name == "" {
 			continue
 		}
+		oriKey := name
 		name = th.escapeName(name)
-		key := ModelMetaKey{Key: name, RStruct: rt.Field(i)}
+		key := ModelMetaKey{Key: name, OriKey: oriKey, RStruct: rt.Field(i)}
 		// tableName; fetch once
-		if meta.tableName == "" {
+		if th.tableName == "" {
 			if t, ok := rt.Field(i).Tag.Lookup("table"); ok {
-				meta.tableName = t
+				th.tableName = t
 			} else if t, ok := rt.Field(i).Tag.Lookup("tablename"); ok {
 				// Deprecated
-				meta.tableName = t
+				th.tableName = t
 			}
 		}
 		if t, ok := rt.Field(i).Tag.Lookup("logicDel"); ok && t == "true" {
-			meta.logicDelKey = name
+			th.logicDelKey = key
 			continue
 		}
 		// pk
@@ -89,28 +91,29 @@ func (th ModelMeta) init(obj any) ModelMeta {
 		if t, ok := rt.Field(i).Tag.Lookup("autoincrement"); ok && t == "true" {
 			key.Auto = true
 		}
-		meta.keys = append(meta.keys, key)
+		th.keys = append(th.keys, key)
 	}
-	if meta.tableName == "" {
+	if th.tableName == "" {
 		panic(exception.New("model meta tableName error"))
 	}
 	// 处理
-	for _, e := range meta.keys {
-		meta.allSelectColumns = append(meta.allSelectColumns, e.Key)
+	for _, e := range th.keys {
+		th.allSelectColumns = append(th.allSelectColumns, e.Key)
 		if e.Primary {
-			meta.allPKs = append(meta.allPKs, e)
+			th.allPKs = append(th.allPKs, e)
 		}
 		if !e.Primary && !e.Auto {
-			meta.allUpdateKeys = append(meta.allUpdateKeys, e)
+			th.allUpdateKeys = append(th.allUpdateKeys, e)
 		}
 		if !e.Auto {
-			meta.allInsertKeys = append(meta.allInsertKeys, e)
+			th.allInsertKeys = append(th.allInsertKeys, e)
 		}
 	}
-	if meta.logicDelKey != "" {
-		meta.allSelectColumns = append(meta.allSelectColumns, meta.logicDelKey)
+	if th.logicDelKey.OriKey != "" {
+		th.allSelectColumns = append(th.allSelectColumns, th.logicDelKey.Key)
+		th.allUpdateKeys = append(th.allUpdateKeys, th.logicDelKey)
 	}
-	return meta
+	return th
 }
 
 func (th ModelMeta) getSelectColumns(excludes ...string) []string {

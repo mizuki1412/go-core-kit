@@ -161,7 +161,7 @@ func (ds *DataSource) BeginTX() *sqlx.Tx {
 	return ds.DBPool.MustBegin()
 }
 
-func (ds *DataSource) Query(sql string, args ...any) *sqlx.Rows {
+func (ds *DataSource) Query(sql string, args []any) *sqlx.Rows {
 	var rows *sqlx.Rows
 	var err error
 	if ds.TX != nil {
@@ -175,7 +175,7 @@ func (ds *DataSource) Query(sql string, args ...any) *sqlx.Rows {
 	return rows
 }
 
-func (ds *DataSource) Exec(sql string, args ...any) {
+func (ds *DataSource) Exec(sql string, args []any) {
 	if ds.TX != nil {
 		ds.TX.MustExec(sql, args...)
 	} else {
