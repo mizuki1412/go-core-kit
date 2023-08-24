@@ -23,7 +23,7 @@ func (th *File) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (th *File) GetBytes() []byte {
+func (th File) GetBytes() []byte {
 	bytes, err := io.ReadAll(th.File)
 	if err != nil {
 		panic(exception.New(err.Error()))

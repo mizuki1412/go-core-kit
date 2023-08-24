@@ -70,11 +70,8 @@ func (ctx *Context) JsonSuccessWithPage(data any, currentPage, totalPage, total 
 }
 func (ctx *Context) JsonError(msg string) {
 	ctx.Json(RestRet{
-		Result: ResultErr,
-		Message: class.String{
-			String: msg,
-			Valid:  true,
-		},
+		Result:  ResultErr,
+		Message: class.NewString(msg),
 	})
 }
 

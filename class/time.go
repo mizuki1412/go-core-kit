@@ -1,7 +1,7 @@
 package class
 
 import (
-	"database/sql/driver"
+	"database/sql"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/class/utils"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
@@ -10,10 +10,8 @@ import (
 	"time"
 )
 
-// Time sql.NullTime 对时区没控制
 type Time struct {
-	Time  time.Time
-	Valid bool
+	sql.NullTime
 }
 
 func (th Time) MarshalJSON() ([]byte, error) {
@@ -39,7 +37,7 @@ func (th *Time) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// Scan implements the Scanner interface.
+// todo 默认实现对时区没控制
 func (th *Time) Scan(value any) error {
 	if value == nil {
 		th.Time, th.Valid = time.Time{}, false
@@ -65,19 +63,18 @@ func (th *Time) Scan(value any) error {
 	return err
 }
 
-// Value implements the driver Valuer interface.
-func (th Time) Value() (driver.Value, error) {
-	if !th.Valid {
-		return nil, nil
-	}
-	return th.Time, nil
-}
-
 func (th Time) IsValid() bool {
 	return th.Valid && !th.Time.IsZero()
 }
 
-func NewTime(val any) *Time {
+func NewTime(val any) Time {
+	th := Time{}
+	if val != nil {
+		th.Set(val)
+	}
+	return th
+}
+func NTime(val any) *Time {
 	th := &Time{}
 	if val != nil {
 		th.Set(val)
@@ -85,7 +82,7 @@ func NewTime(val any) *Time {
 	return th
 }
 
-func (th *Time) Set(val any) *Time {
+func (th *Time) Set(val any) {
 	if v, ok := val.(Time); ok {
 		th.Time = v.Time
 		th.Valid = v.Valid
@@ -107,7 +104,6 @@ func (th *Time) Set(val any) *Time {
 		th.Time = t
 		th.Valid = true
 	}
-	return th
 }
 
 func (th *Time) UnixMill() int64 {

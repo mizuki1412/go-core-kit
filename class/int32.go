@@ -1,7 +1,7 @@
 package class
 
 import (
-	"database/sql/driver"
+	"database/sql"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/class/utils"
 	"github.com/spf13/cast"
@@ -9,8 +9,7 @@ import (
 
 // Int32 同时继承scan和value方法
 type Int32 struct {
-	Int32 int32
-	Valid bool
+	sql.NullInt32
 }
 
 func (th Int32) MarshalJSON() ([]byte, error) {
@@ -32,35 +31,19 @@ func (th *Int32) UnmarshalJSON(data []byte) error {
 	th.Int32 = s
 	return nil
 }
-func (th *Int32) Scan(value any) error {
-	if value == nil {
-		th.Int32, th.Valid = 0, false
-		return nil
-	}
-	th.Valid = true
-	var err error
-	switch value.(type) {
-	case []uint8:
-		th.Int32, err = cast.ToInt32E(string(value.([]uint8)))
-	default:
-		th.Int32, err = cast.ToInt32E(value)
-	}
-	return err
-}
-
-// Value implements the driver Valuer interface.
-func (th Int32) Value() (driver.Value, error) {
-	if !th.Valid {
-		return nil, nil
-	}
-	return int64(th.Int32), nil
-}
 
 func (th Int32) IsValid() bool {
 	return th.Valid
 }
 
-func NewInt32(val any) *Int32 {
+func NewInt32(val any) Int32 {
+	th := Int32{}
+	if val != nil {
+		th.Set(val)
+	}
+	return th
+}
+func NInt32(val any) *Int32 {
 	th := &Int32{}
 	if val != nil {
 		th.Set(val)
@@ -68,11 +51,17 @@ func NewInt32(val any) *Int32 {
 	return th
 }
 
-func (th *Int32) Set(val any) *Int32 {
-	if v, ok := val.(Int32); ok {
+func (th *Int32) Set(val any) {
+	switch val.(type) {
+	case Int32:
+		v := val.(Int32)
 		th.Int32 = v.Int32
 		th.Valid = v.Valid
-	} else {
+	case *Int32:
+		v := val.(*Int32)
+		th.Int32 = v.Int32
+		th.Valid = v.Valid
+	default:
 		i, err := cast.ToInt32E(val)
 		if err == nil {
 			th.Int32 = i
@@ -81,5 +70,4 @@ func (th *Int32) Set(val any) *Int32 {
 			panic(exception.New(err.Error()))
 		}
 	}
-	return th
 }

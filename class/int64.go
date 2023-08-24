@@ -1,15 +1,14 @@
 package class
 
 import (
-	"database/sql/driver"
+	"database/sql"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/class/utils"
 	"github.com/spf13/cast"
 )
 
 type Int64 struct {
-	Int64 int64
-	Valid bool
+	sql.NullInt64
 }
 
 func (th Int64) MarshalJSON() ([]byte, error) {
@@ -31,35 +30,19 @@ func (th *Int64) UnmarshalJSON(data []byte) error {
 	th.Int64 = s
 	return nil
 }
-func (th *Int64) Scan(value any) error {
-	if value == nil {
-		th.Int64, th.Valid = 0, false
-		return nil
-	}
-	th.Valid = true
-	var err error
-	switch value.(type) {
-	case []uint8:
-		th.Int64, err = cast.ToInt64E(string(value.([]uint8)))
-	default:
-		th.Int64, err = cast.ToInt64E(value)
-	}
-	return err
-}
-
-// Value implements the driver Valuer interface.
-func (th Int64) Value() (driver.Value, error) {
-	if !th.Valid {
-		return nil, nil
-	}
-	return th.Int64, nil
-}
 
 func (th Int64) IsValid() bool {
 	return th.Valid
 }
 
-func NewInt64(val any) *Int64 {
+func NewInt64(val any) Int64 {
+	th := Int64{}
+	if val != nil {
+		th.Set(val)
+	}
+	return th
+}
+func NInt64(val any) *Int64 {
 	th := &Int64{}
 	if val != nil {
 		th.Set(val)
@@ -67,11 +50,17 @@ func NewInt64(val any) *Int64 {
 	return th
 }
 
-func (th *Int64) Set(val any) *Int64 {
-	if v, ok := val.(Int64); ok {
+func (th *Int64) Set(val any) {
+	switch val.(type) {
+	case Int64:
+		v := val.(Int64)
 		th.Int64 = v.Int64
 		th.Valid = v.Valid
-	} else {
+	case *Int64:
+		v := val.(*Int64)
+		th.Int64 = v.Int64
+		th.Valid = v.Valid
+	default:
 		i, err := cast.ToInt64E(val)
 		if err == nil {
 			th.Int64 = i
@@ -80,5 +69,4 @@ func (th *Int64) Set(val any) *Int64 {
 			panic(exception.New(err.Error()))
 		}
 	}
-	return th
 }

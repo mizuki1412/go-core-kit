@@ -58,37 +58,42 @@ func (th MapStringArr) IsValid() bool {
 	return th.Valid
 }
 
-func NewMapStringArr(val any) *MapStringArr {
-	th := &MapStringArr{}
+func NewMapStringArr(val any) MapStringArr {
+	th := MapStringArr{}
 	if val != nil {
 		th.Set(val)
 	}
 	return th
 }
 
-func (th *MapStringArr) Set(val any) *MapStringArr {
-	if v, ok := val.(MapStringArr); ok {
+func (th *MapStringArr) Set(val any) {
+	switch val.(type) {
+	case MapStringArr:
+		v := val.(MapStringArr)
 		th.Arr = v.Arr
 		th.Valid = v.Valid
-	} else if v, ok := val.([]map[string]any); ok {
+	case *MapStringArr:
+		v := val.(*MapStringArr)
+		th.Arr = v.Arr
+		th.Valid = v.Valid
+	case []map[string]any:
+		v := val.([]map[string]any)
 		th.Arr = v
 		th.Valid = true
-	} else {
+	default:
 		panic(exception.New("class.MapStringArr set error"))
 	}
-	return th
 }
 
-func (th *MapStringArr) Length() int {
+func (th MapStringArr) Length() int {
 	return len(th.Arr)
 }
-func (th *MapStringArr) Remove() *MapStringArr {
+func (th MapStringArr) Remove() {
 	th.Valid = false
 	th.Arr = []map[string]any{}
-	return th
 }
 
-func (th *MapStringArr) IsEmpty() bool {
+func (th MapStringArr) IsEmpty() bool {
 	if !th.Valid {
 		return true
 	}

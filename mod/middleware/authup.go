@@ -17,11 +17,8 @@ func AuthUsernameAndPwd() router.Handler {
 		user := ctx.SessionGetUserOrigin()
 		if user == nil {
 			ctx.Json(context.RestRet{
-				Result: context.ResultAuthErr,
-				Message: class.String{
-					String: "登录失效",
-					Valid:  true,
-				},
+				Result:  context.ResultAuthErr,
+				Message: class.NewString("登录失效"),
 			})
 			ctx.Proxy.Abort()
 		} else {

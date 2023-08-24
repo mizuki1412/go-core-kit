@@ -1,15 +1,14 @@
 package class
 
 import (
-	"database/sql/driver"
+	"database/sql"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/class/utils"
 	"github.com/spf13/cast"
 )
 
 type Float64 struct {
-	Float64 float64
-	Valid   bool
+	sql.NullFloat64
 }
 
 func (th Float64) MarshalJSON() ([]byte, error) {
@@ -31,36 +30,19 @@ func (th *Float64) UnmarshalJSON(data []byte) error {
 	th.Float64 = s
 	return nil
 }
-func (th *Float64) Scan(value any) error {
-	if value == nil {
-		th.Float64, th.Valid = 0, false
-		return nil
-	}
-	th.Valid = true
-	var err error
-	switch value.(type) {
-	case []uint8:
-		// 数据库中decimal的值是字符数组返回
-		th.Float64, err = cast.ToFloat64E(string(value.([]uint8)))
-	default:
-		th.Float64, err = cast.ToFloat64E(value)
-	}
-	return err
-}
-
-// Value implements the driver Valuer interface.
-func (th Float64) Value() (driver.Value, error) {
-	if !th.Valid {
-		return nil, nil
-	}
-	return th.Float64, nil
-}
 
 func (th Float64) IsValid() bool {
 	return th.Valid
 }
 
-func NewFloat64(val any) *Float64 {
+func NewFloat64(val any) Float64 {
+	th := Float64{}
+	if val != nil {
+		th.Set(val)
+	}
+	return th
+}
+func NFloat64(val any) *Float64 {
 	th := &Float64{}
 	if val != nil {
 		th.Set(val)
@@ -68,11 +50,17 @@ func NewFloat64(val any) *Float64 {
 	return th
 }
 
-func (th *Float64) Set(val any) *Float64 {
-	if v, ok := val.(Float64); ok {
+func (th *Float64) Set(val any) {
+	switch val.(type) {
+	case Float64:
+		v := val.(Float64)
 		th.Float64 = v.Float64
 		th.Valid = v.Valid
-	} else {
+	case *Float64:
+		v := val.(*Float64)
+		th.Float64 = v.Float64
+		th.Valid = v.Valid
+	default:
 		i, err := cast.ToFloat64E(val)
 		if err == nil {
 			th.Float64 = i
@@ -81,5 +69,4 @@ func (th *Float64) Set(val any) *Float64 {
 			panic(exception.New(err.Error()))
 		}
 	}
-	return th
 }

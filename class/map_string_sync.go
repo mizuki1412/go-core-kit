@@ -61,7 +61,16 @@ func (th *MapStringSync) IsValid() bool {
 	return th.Valid
 }
 
-func NewMapStringSync(val any) *MapStringSync {
+func NewMapStringSync(val any) MapStringSync {
+	th := MapStringSync{}
+	if val != nil {
+		th.Set(val)
+	} else {
+		th.Set(map[string]any{})
+	}
+	return th
+}
+func NMapStringSync(val any) *MapStringSync {
 	th := &MapStringSync{}
 	if val != nil {
 		th.Set(val)
@@ -71,26 +80,48 @@ func NewMapStringSync(val any) *MapStringSync {
 	return th
 }
 
-func (th *MapStringSync) Set(val any) *MapStringSync {
+func (th *MapStringSync) Set(val any) {
 	th.Lock()
 	defer th.Unlock()
-	if v, ok := val.(MapStringSync); ok {
-		if v.Map == nil {
+	switch val.(type) {
+	case MapStringSync:
+		if val.(MapStringSync).Map == nil {
 			th.Map = map[string]any{}
 		} else {
-			th.Map = v.Map
+			th.Map = val.(MapStringSync).Map
 		}
-		th.Valid = v.Valid
-	} else if v, ok := val.(map[string]any); ok {
+		th.Valid = val.(MapStringSync).Valid
+	case *MapStringSync:
+		if val.(*MapStringSync).Map == nil {
+			th.Map = map[string]any{}
+		} else {
+			th.Map = val.(*MapStringSync).Map
+		}
+		th.Valid = val.(*MapStringSync).Valid
+	case MapString:
+		if val.(MapString).Map == nil {
+			th.Map = map[string]any{}
+		} else {
+			th.Map = val.(MapString).Map
+		}
+		th.Valid = val.(MapString).Valid
+	case *MapString:
+		if val.(*MapString).Map == nil {
+			th.Map = map[string]any{}
+		} else {
+			th.Map = val.(*MapString).Map
+		}
+		th.Valid = val.(*MapString).Valid
+	case map[string]any:
+		v := val.(map[string]any)
 		th.Map = v
 		th.Valid = true
-	} else {
+	default:
 		panic(exception.New("class.MapStringSync set error"))
 	}
-	return th
 }
 
-func (th *MapStringSync) PutAll(val map[string]any) *MapStringSync {
+func (th *MapStringSync) PutAll(val map[string]any) {
 	th.Lock()
 	defer th.Unlock()
 	if th.Map == nil {
@@ -98,10 +129,9 @@ func (th *MapStringSync) PutAll(val map[string]any) *MapStringSync {
 	}
 	mapkit.PutAll(th.Map, val)
 	th.Valid = true
-	return th
 }
 
-func (th *MapStringSync) PutIfAbsent(key string, val any) *MapStringSync {
+func (th *MapStringSync) PutIfAbsent(key string, val any) {
 	th.Lock()
 	defer th.Unlock()
 	if th.Map == nil {
@@ -111,10 +141,9 @@ func (th *MapStringSync) PutIfAbsent(key string, val any) *MapStringSync {
 		th.Map[key] = val
 	}
 	th.Valid = true
-	return th
 }
 
-func (th *MapStringSync) Put(key string, val any) *MapStringSync {
+func (th *MapStringSync) Put(key string, val any) {
 	th.Lock()
 	defer th.Unlock()
 	if th.Map == nil {
@@ -122,22 +151,19 @@ func (th *MapStringSync) Put(key string, val any) *MapStringSync {
 	}
 	th.Map[key] = val
 	th.Valid = true
-	return th
 }
 
-func (th *MapStringSync) Remove() *MapStringSync {
+func (th *MapStringSync) Remove() {
 	th.Lock()
 	defer th.Unlock()
 	th.Valid = false
 	th.Map = map[string]any{}
-	return th
 }
 
-func (th *MapStringSync) Delete(key string) *MapStringSync {
+func (th *MapStringSync) Delete(key string) {
 	th.Lock()
 	defer th.Unlock()
 	delete(th.Map, key)
-	return th
 }
 
 func (th *MapStringSync) IsEmpty() bool {

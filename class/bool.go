@@ -1,15 +1,14 @@
 package class
 
 import (
-	"database/sql/driver"
+	"database/sql"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/class/utils"
 	"github.com/spf13/cast"
 )
 
 type Bool struct {
-	Bool  bool
-	Valid bool
+	sql.NullBool
 }
 
 func (th Bool) MarshalJSON() ([]byte, error) {
@@ -31,30 +30,19 @@ func (th *Bool) UnmarshalJSON(data []byte) error {
 	th.Bool = s
 	return nil
 }
-func (th *Bool) Scan(value any) error {
-	if value == nil {
-		th.Bool, th.Valid = false, false
-		return nil
-	}
-	th.Valid = true
-	var err error
-	th.Bool, err = cast.ToBoolE(value)
-	return err
-}
 
-// Value implements the driver Valuer interface.
-func (th Bool) Value() (driver.Value, error) {
-	if !th.Valid {
-		return nil, nil
-	}
-	return th.Bool, nil
-}
-
-func (th Bool) IsValid() bool {
+func (th *Bool) IsValid() bool {
 	return th.Valid
 }
 
-func NewBool(val any) *Bool {
+func NewBool(val any) Bool {
+	th := Bool{}
+	if val != nil {
+		th.Set(val)
+	}
+	return th
+}
+func NBool(val any) *Bool {
 	th := &Bool{}
 	if val != nil {
 		th.Set(val)
@@ -62,11 +50,17 @@ func NewBool(val any) *Bool {
 	return th
 }
 
-func (th *Bool) Set(val any) *Bool {
-	if v, ok := val.(Bool); ok {
+func (th *Bool) Set(val any) {
+	switch val.(type) {
+	case Bool:
+		v := val.(Bool)
 		th.Bool = v.Bool
 		th.Valid = v.Valid
-	} else {
+	case *Bool:
+		v := val.(*Bool)
+		th.Bool = v.Bool
+		th.Valid = v.Valid
+	default:
 		i, err := cast.ToBoolE(val)
 		if err == nil {
 			th.Bool = i
@@ -75,5 +69,4 @@ func (th *Bool) Set(val any) *Bool {
 			panic(exception.New(err.Error()))
 		}
 	}
-	return th
 }

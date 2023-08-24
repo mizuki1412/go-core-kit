@@ -143,27 +143,27 @@ func (ctx *Context) bindStruct(bean any) {
 			}
 		case "class.Int32":
 			if !stringkit.IsNull(val) {
-				tmp := class.Int32{Int32: cast.ToInt32(val), Valid: true}
+				tmp := class.NewInt32(val)
 				fieldV.Set(reflect.ValueOf(tmp))
 			}
 		case "class.Int64":
 			if !stringkit.IsNull(val) {
-				tmp := class.Int64{Int64: cast.ToInt64(val), Valid: true}
+				tmp := class.NewInt64(val)
 				fieldV.Set(reflect.ValueOf(tmp))
 			}
 		case "class.Float64":
 			if !stringkit.IsNull(val) {
-				tmp := class.Float64{Float64: cast.ToFloat64(val), Valid: true}
+				tmp := class.NewFloat64(val)
 				fieldV.Set(reflect.ValueOf(tmp))
 			}
 		case "class.Bool":
 			if !stringkit.IsNull(val) {
-				tmp := class.Bool{Bool: cast.ToBool(val), Valid: true}
+				tmp := class.NewBool(val)
 				fieldV.Set(reflect.ValueOf(tmp))
 			}
 		case "class.String":
 			if keyExist {
-				tmp := class.String{String: val, Valid: true}
+				tmp := class.NewString(val)
 				fieldV.Set(reflect.ValueOf(tmp))
 			}
 		case "class.ArrInt":

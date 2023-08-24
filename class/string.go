@@ -1,7 +1,7 @@
 package class
 
 import (
-	"database/sql/driver"
+	"database/sql"
 	"encoding/xml"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/class/utils"
@@ -11,8 +11,7 @@ import (
 
 // String 同时继承scan和value方法
 type String struct {
-	String string
-	Valid  bool
+	sql.NullString
 }
 
 func (th String) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
@@ -65,30 +64,20 @@ func (th *String) UnmarshalJSON(data []byte) error {
 	th.Valid = true
 	return nil
 }
-func (th *String) Scan(value any) error {
-	if value == nil {
-		th.String, th.Valid = "", false
-		return nil
-	}
-	var err error
-	th.Valid = true
-	th.String, err = cast.ToStringE(value)
-	return err
-}
-
-// Value implements the driver Valuer interface.
-func (th String) Value() (driver.Value, error) {
-	if !th.Valid {
-		return nil, nil
-	}
-	return th.String, nil
-}
 
 func (th String) IsValid() bool {
 	return th.Valid
 }
 
-func NewString(val any) *String {
+func NewString(val any) String {
+	th := String{}
+	if val != nil {
+		th.Set(val)
+	}
+	return th
+}
+
+func NString(val any) *String {
 	th := &String{}
 	if val != nil {
 		th.Set(val)
@@ -96,11 +85,17 @@ func NewString(val any) *String {
 	return th
 }
 
-func (th *String) Set(val any) *String {
-	if v, ok := val.(String); ok {
+func (th *String) Set(val any) {
+	switch val.(type) {
+	case String:
+		v := val.(String)
 		th.String = v.String
 		th.Valid = v.Valid
-	} else {
+	case *String:
+		v := val.(*String)
+		th.String = v.String
+		th.Valid = v.Valid
+	default:
 		s, err := cast.ToStringE(val)
 		if err == nil {
 			th.String = s
@@ -109,11 +104,9 @@ func (th *String) Set(val any) *String {
 			panic(exception.New(err.Error()))
 		}
 	}
-	return th
 }
 
-func (th *String) Remove() *String {
+func (th *String) Remove() {
 	th.Valid = false
 	th.String = ""
-	return th
 }

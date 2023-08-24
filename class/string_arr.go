@@ -55,15 +55,15 @@ func (th ArrString) Value() (driver.Value, error) {
 	return th.Array.Value()
 }
 
-func NewArrString(val any) *ArrString {
-	th := &ArrString{}
+func NewArrString(val any) ArrString {
+	th := ArrString{}
 	if val != nil {
 		th.Set(val)
 	}
 	return th
 }
 
-func (th *ArrString) Set(val any) *ArrString {
+func (th *ArrString) Set(val any) {
 	if v, ok := val.([]string); ok {
 		th.Array = v
 	} else if v, ok := val.(ArrString); ok {
@@ -74,31 +74,27 @@ func (th *ArrString) Set(val any) *ArrString {
 		panic(exception.New("class.ArrString set error"))
 	}
 	th.Valid = true
-	return th
 }
 
 func (th *ArrString) Length() int {
 	return len(th.Array)
 }
-func (th *ArrString) Remove() *ArrString {
+func (th *ArrString) Remove() {
 	th.Valid = false
 	th.Array = []string{}
-	return th
 }
 
-func (th *ArrString) Delete(vals ...string) *ArrString {
+func (th *ArrString) Delete(vals ...string) {
 	temp := th.Array
 	for _, e := range vals {
 		temp = arraykit.StringDelete(temp, e)
 	}
 	th.Array = temp
-	return th
 }
 
-func (th *ArrString) Add(vals ...string) *ArrString {
+func (th *ArrString) Add(vals ...string) {
 	th.Array = append(th.Array, vals...)
 	th.Valid = true
-	return th
 }
 
 func (th *ArrString) Contains(val string) bool {

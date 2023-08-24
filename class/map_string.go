@@ -58,7 +58,16 @@ func (th MapString) IsValid() bool {
 	return th.Valid
 }
 
-func NewMapString(val any) *MapString {
+func NewMapString(val any) MapString {
+	th := MapString{}
+	if val != nil {
+		th.Set(val)
+	} else {
+		th.Set(map[string]any{})
+	}
+	return th
+}
+func NMapString(val any) *MapString {
 	th := &MapString{}
 	if val != nil {
 		th.Set(val)
@@ -68,33 +77,42 @@ func NewMapString(val any) *MapString {
 	return th
 }
 
-func (th *MapString) Set(val any) *MapString {
-	if v, ok := val.(MapString); ok {
+func (th *MapString) Set(val any) {
+	switch val.(type) {
+	case MapString:
+		v := val.(MapString)
 		if v.Map == nil {
 			th.Map = map[string]any{}
 		} else {
 			th.Map = v.Map
 		}
 		th.Valid = v.Valid
-	} else if v, ok := val.(map[string]any); ok {
+	case *MapString:
+		v := val.(*MapString)
+		if v.Map == nil {
+			th.Map = map[string]any{}
+		} else {
+			th.Map = v.Map
+		}
+		th.Valid = v.Valid
+	case map[string]any:
+		v := val.(map[string]any)
 		th.Map = v
 		th.Valid = true
-	} else {
+	default:
 		panic(exception.New("class.MapString set error"))
 	}
-	return th
 }
 
-func (th *MapString) PutAll(val map[string]any) *MapString {
+func (th *MapString) PutAll(val map[string]any) {
 	if th.Map == nil {
 		th.Map = map[string]any{}
 	}
 	mapkit.PutAll(th.Map, val)
 	th.Valid = true
-	return th
 }
 
-func (th *MapString) PutIfAbsent(key string, val any) *MapString {
+func (th *MapString) PutIfAbsent(key string, val any) {
 	if th.Map == nil {
 		th.Map = map[string]any{}
 	}
@@ -102,25 +120,22 @@ func (th *MapString) PutIfAbsent(key string, val any) *MapString {
 		th.Map[key] = val
 	}
 	th.Valid = true
-	return th
 }
 
-func (th *MapString) Put(key string, val any) *MapString {
+func (th *MapString) Put(key string, val any) {
 	if th.Map == nil {
 		th.Map = map[string]any{}
 	}
 	th.Map[key] = val
 	th.Valid = true
-	return th
 }
 
-func (th *MapString) Remove() *MapString {
+func (th *MapString) Remove() {
 	th.Valid = false
 	th.Map = map[string]any{}
-	return th
 }
 
-func (th *MapString) IsEmpty() bool {
+func (th MapString) IsEmpty() bool {
 	if !th.Valid {
 		return true
 	}
@@ -130,7 +145,7 @@ func (th *MapString) IsEmpty() bool {
 	return false
 }
 
-func (th *MapString) Contains(key string) bool {
+func (th MapString) Contains(key string) bool {
 	v, ok := th.Map[key]
 	if ok {
 		return v != nil
@@ -138,7 +153,7 @@ func (th *MapString) Contains(key string) bool {
 	return ok
 }
 
-func (th *MapString) GetOrDefault(key string, d any) any {
+func (th MapString) GetOrDefault(key string, d any) any {
 	v, ok := th.Map[key]
 	if ok {
 		return v
@@ -146,25 +161,25 @@ func (th *MapString) GetOrDefault(key string, d any) any {
 	return d
 }
 
-func (th *MapString) Get(key string) any {
+func (th MapString) Get(key string) any {
 	v, ok := th.Map[key]
 	if ok {
 		return v
 	}
 	return nil
 }
-func (th *MapString) GetString(key string) string {
+func (th MapString) GetString(key string) string {
 	return cast.ToString(th.Get(key))
 }
-func (th *MapString) GetInt32(key string) int32 {
+func (th MapString) GetInt32(key string) int32 {
 	return cast.ToInt32(th.Get(key))
 }
-func (th *MapString) GetFloat64(key string) float64 {
+func (th MapString) GetFloat64(key string) float64 {
 	return cast.ToFloat64(th.Get(key))
 }
-func (th *MapString) GetBool(key string) bool {
+func (th MapString) GetBool(key string) bool {
 	return cast.ToBool(th.Get(key))
 }
-func (th *MapString) GetMap(key string) map[string]any {
+func (th MapString) GetMap(key string) map[string]any {
 	return cast.ToStringMap(th.Get(key))
 }

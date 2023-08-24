@@ -114,11 +114,8 @@ func info(ctx *context.Context) {
 	if !params.Id.Valid {
 		if params.Schema.String != "" && params.Schema.String != ctx.SessionGetSchema() {
 			ctx.Json(context.RestRet{
-				Result: context.ResultAuthErr,
-				Message: class.String{
-					String: "schema不匹配",
-					Valid:  true,
-				},
+				Result:  context.ResultAuthErr,
+				Message: class.NewString("schema不匹配"),
 			})
 			return
 		}
