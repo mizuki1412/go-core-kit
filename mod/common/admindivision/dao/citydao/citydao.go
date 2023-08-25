@@ -16,8 +16,8 @@ func New(ds ...*sqlkit.DataSource) Dao {
 }
 
 func (dao Dao) FindCodeByName(name, pcode string) string {
-	sql, args := dao.Builder().Select("code").Where("name=?", name).Where("province=?", pcode).Sql()
-	rows := dao.Query(sql, args)
+	builder := dao.Builder().Select("code").Where("name=?", name).Where("province=?", pcode)
+	rows := dao.Query(builder)
 	defer rows.Close()
 	for rows.Next() {
 		ret, err := rows.SliceScan()
@@ -30,6 +30,6 @@ func (dao Dao) FindCodeByName(name, pcode string) string {
 }
 
 func (dao Dao) ListByProvince(id class.String) []*model.City {
-	sql, args := dao.Builder().Select().Where("province=?", id).OrderBy("code").Sql()
-	return dao.ScanList(sql, args)
+	builder := dao.Builder().Select().Where("province=?", id).OrderBy("code")
+	return dao.QueryList(builder)
 }

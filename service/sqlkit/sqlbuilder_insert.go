@@ -2,17 +2,24 @@ package sqlkit
 
 import (
 	"github.com/Masterminds/squirrel"
+	"github.com/mizuki1412/go-core-kit/class/exception"
 )
 
 type InsertBuilder struct {
 	inner     squirrel.InsertBuilder
 	modelMeta ModelMeta
+	driver    string
 }
 
 func (b InsertBuilder) Sql() (string, []interface{}) {
-	return b.inner.MustSql()
+	sql, args, err := b.ToSql()
+	if err != nil {
+		panic(exception.New(err.Error()))
+	}
+	return sql, args
 }
 func (b InsertBuilder) ToSql() (string, []interface{}, error) {
+	b.inner = b.inner.PlaceholderFormat(placeholder(b.driver))
 	return b.inner.ToSql()
 }
 
@@ -43,7 +50,7 @@ func (b InsertBuilder) Options(options ...string) InsertBuilder {
 
 // Columns adds insert columns to the query.
 func (b InsertBuilder) Columns(columns ...string) InsertBuilder {
-	b.inner = b.inner.Columns(columns...)
+	b.inner = b.inner.Columns(b.modelMeta.escapeNames(columns)...)
 	return b
 }
 

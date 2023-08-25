@@ -3,7 +3,6 @@ package userdao
 import (
 	"fmt"
 	"github.com/Masterminds/squirrel"
-	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/mod/user/dao/departmentdao"
 	"github.com/mizuki1412/go-core-kit/mod/user/dao/roledao"
@@ -48,22 +47,22 @@ func (dao Dao) Login(pwd, username, phone string) *model.User {
 	} else {
 		builder = builder.Where("phone=?", phone)
 	}
-	sql, args := builder.Where("pwd=?", pwd).WhereNLogicDel().Limit(1).Sql()
-	return dao.ScanOne(sql, args)
+	builder = builder.Where("pwd=?", pwd).WhereNLogicDel().Limit(1)
+	return dao.QueryOne(builder)
 }
 
 func (dao Dao) FindByPhone(phone string) *model.User {
-	sql, args := dao.Builder().Select().Where("phone=?", phone).WhereNLogicDel().Sql()
-	return dao.ScanOne(sql, args)
+	builder := dao.Builder().Select().Where("phone=?", phone).WhereNLogicDel()
+	return dao.QueryOne(builder)
 }
 
 func (dao Dao) FindByUsername(username string) *model.User {
-	sql, args := dao.Builder().Select().Where("username=?", username).WhereNLogicDel().Sql()
-	return dao.ScanOne(sql, args)
+	builder := dao.Builder().Select().Where("username=?", username).WhereNLogicDel()
+	return dao.QueryOne(builder)
 }
 func (dao Dao) FindByUsernameDeleted(username string) *model.User {
-	sql, args := dao.Builder().Select().Where("username=?", username).Where("off=-1").Sql()
-	return dao.ScanOne(sql, args)
+	builder := dao.Builder().Select().Where("username=?", username).Where("off=-1")
+	return dao.QueryOne(builder)
 }
 
 // FindParam 可以通过extend的值来find
@@ -76,8 +75,7 @@ func (dao Dao) Find(param FindParam) *model.User {
 	for k, v := range param.Extend {
 		builder = builder.Where(fmt.Sprintf("extend->>'%s'=?", k), cast.ToString(v))
 	}
-	sql, args := builder.Sql()
-	return dao.ScanOne(sql, args)
+	return dao.QueryOne(builder)
 }
 
 func (dao Dao) ListFromRootDepart(departId int) []*model.User {
@@ -86,8 +84,8 @@ off>-1 and role>0 and role in
   ( select id from %s where department in 
      (with recursive t(id) as( values(%d) union all select d.id from %s d, t where t.id=d.parent) select id from t )
   )`, roledao.New(dao.DataSource()).Table(), departId, departmentdao.New(dao.DataSource()).Table())
-	sql, args := dao.Builder().Select().Where(where).OrderBy("name, id").Sql()
-	return dao.ScanList(sql, args)
+	builder := dao.Builder().Select().Where(where).OrderBy("name, id")
+	return dao.QueryList(builder)
 }
 
 type ListParam struct {
@@ -112,24 +110,15 @@ func (dao Dao) List(param ListParam) []*model.User {
 	if len(param.Departments) > 0 {
 		rb := roledao.New().Builder().Select("id").WhereUnnestIn("department", param.Departments)
 		builder = builder.WhereIn("role", rb)
-		//flag, arg := pghelper.GenUnnestInt(param.Departments)
-		//builder = builder.Where(fmt.Sprintf("role in (select id from role where department in %s)", flag), arg...)
 	}
-	sql, args := builder.Sql()
-	return dao.ScanList(sql, args)
+	return dao.QueryList(builder)
 }
 
 func (dao Dao) OffUser(uid int32, off int32) {
-	sql, args, err := dao.Builder().Update().Set("off", off).Where("id=?", uid).ToSql()
-	if err != nil {
-		panic(exception.New(err.Error()))
-	}
-	dao.Exec(sql, args)
+	builder := dao.Builder().Update().Set("off", off).Where("id=?", uid)
+	dao.Exec(builder)
 }
 func (dao Dao) SetNull(id int32) {
-	sql, args, err := dao.Builder().Update().Set("phone", squirrel.Expr("null")).Set("username", squirrel.Expr("null")).Where("id=?", id).ToSql()
-	if err != nil {
-		panic(exception.New(err.Error()))
-	}
-	dao.Exec(sql, args)
+	builder := dao.Builder().Update().Set("phone", squirrel.Expr("null")).Set("username", squirrel.Expr("null")).Where("id=?", id)
+	dao.Exec(builder)
 }

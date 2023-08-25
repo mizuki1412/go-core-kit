@@ -1,6 +1,7 @@
 package sqlkit
 
 import (
+	"github.com/Masterminds/squirrel"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"strings"
 )
@@ -87,4 +88,16 @@ func pgArray(arr any) (string, []any) {
 	}
 	// 用{} 有错误：invalid input syntax for type integer
 	return "ARRAY[" + strings.Join(flags, ",") + "]::" + suffix, args
+}
+
+// 占位符
+func placeholder(driver string) squirrel.PlaceholderFormat {
+	switch driver {
+	case Postgres:
+		return squirrel.Dollar
+	case Oracle:
+		return squirrel.Colon
+	default:
+		return squirrel.Question
+	}
 }

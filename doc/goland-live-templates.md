@@ -2,6 +2,26 @@
 
 用于golang的模板代码示例
 
+## cli_init
+
+```
+cli.RootCMD(&cobra.Command{
+    Use: "main",
+    Run: func(cmd *cobra.Command, args []string) {
+        restkit.AddActions(user.All()...)
+        restkit.AddActions(download.Init)
+        _ = restkit.Run()
+    },
+})
+cli.AddChildCMD(&cobra.Command{
+    Use: "test",
+    Run: func(cmd *cobra.Command, args []string) {
+       
+    },
+})
+cli.Execute()
+```
+
 ## action_init
 ```
 func Init(router *router.Router) {
@@ -108,14 +128,16 @@ func (th *$struct$) Scan(value any) error {
 	return nil
 }
 
-func (th *$struct$) Value() (driver.Value, error) {
+func (th $struct$) Value() (driver.Value, error) {
     // todo 注意返回值类型
 	return int64(th.Id), nil
 }
 ```
 
 ## bean_extend_list
+
 bean list的sort/filter/find功能
+
 ```
 type $name$List []*$name$
 func (l $name$List) Len() int           { return len(l) }
@@ -183,15 +205,13 @@ func New(ds ...*sqlkit.DataSource) Dao {
 
 ## dao_demo
 ```
-
 type ListParam struct {
 	IdList []int32
 }
 
 func (dao Dao) List(param ListParam) []*$bean$ {
-	builder := dao.Builder().Select().Where("off=false").OrderBy("id")
-	sql, args := builder.Sql()
-	return dao.ScanList(sql, args)
+	builder := dao.Builder().Select().WhereNLogicDel().OrderBy("id")
+	return dao.QueryList(builder)
 }
 ```
 

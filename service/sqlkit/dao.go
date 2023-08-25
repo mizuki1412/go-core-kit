@@ -1,7 +1,6 @@
 package sqlkit
 
 import (
-	"github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
@@ -61,13 +60,6 @@ func (dao Dao[T]) Builder() SQLBuilder {
 	}
 	sb.logicDel = ldv
 	sb.driver = dao.dataSource.Driver
-	switch dao.dataSource.Driver {
-	case Postgres:
-		sb.inner0 = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
-	default:
-		// todo 未处理oracle
-		sb.inner0 = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Question)
-	}
 	return sb
 }
 
@@ -79,19 +71,30 @@ func (dao Dao[T]) DataSource() *DataSource {
 	return dao.dataSource
 }
 
-func (dao Dao[T]) Query(sql string, args []any) *sqlx.Rows {
+func (dao Dao[T]) QueryRaw(sql string, args []any) *sqlx.Rows {
 	logkit.DebugConcat(sql, " | args:", jsonkit.ToString(args))
 	return dao.dataSource.Query(sql, args)
 }
 
-func (dao Dao[T]) Exec(sql string, args []any) {
+func (dao Dao[T]) Query(builder BuilderInterface) *sqlx.Rows {
+	sql, args := builder.Sql()
+	logkit.DebugConcat(sql, " | args:", jsonkit.ToString(args))
+	return dao.dataSource.Query(sql, args)
+}
+
+func (dao Dao[T]) ExecRaw(sql string, args []any) {
+	logkit.DebugConcat(sql, " | args:", jsonkit.ToString(args))
+	dao.dataSource.Exec(sql, args)
+}
+func (dao Dao[T]) Exec(builder BuilderInterface) {
+	sql, args := builder.Sql()
 	logkit.DebugConcat(sql, " | args:", jsonkit.ToString(args))
 	dao.dataSource.Exec(sql, args)
 }
 
-// ScanList 取值封装list
-func (dao Dao[T]) ScanList(sql string, args []any) []*T {
-	rows := dao.Query(sql, args)
+// QueryList 取值封装list
+func (dao Dao[T]) QueryList(builder BuilderInterface) []*T {
+	rows := dao.Query(builder)
 	list := make([]*T, 0, 5)
 	defer rows.Close()
 	for rows.Next() {
@@ -110,8 +113,8 @@ func (dao Dao[T]) ScanList(sql string, args []any) []*T {
 	return list
 }
 
-func (dao Dao[T]) ScanOne(sql string, args []any) *T {
-	rows := dao.Query(sql, args)
+func (dao Dao[T]) QueryOne(builder BuilderInterface) *T {
+	rows := dao.Query(builder)
 	defer rows.Close()
 	for rows.Next() {
 		m := new(T)
@@ -127,8 +130,8 @@ func (dao Dao[T]) ScanOne(sql string, args []any) *T {
 	return nil
 }
 
-func (dao Dao[T]) ScanOneMap(sql string, args []any) map[string]any {
-	rows := dao.Query(sql, args)
+func (dao Dao[T]) QueryOneMap(builder BuilderInterface) map[string]any {
+	rows := dao.Query(builder)
 	defer rows.Close()
 	for rows.Next() {
 		m := map[string]any{}
@@ -141,8 +144,8 @@ func (dao Dao[T]) ScanOneMap(sql string, args []any) map[string]any {
 	return nil
 }
 
-func (dao Dao[T]) ScanListMap(sql string, args []any) []map[string]any {
-	rows := dao.Query(sql, args)
+func (dao Dao[T]) QueryListMap(builder BuilderInterface) []map[string]any {
+	rows := dao.Query(builder)
 	list := make([]map[string]any, 0, 5)
 	defer rows.Close()
 	for rows.Next() {

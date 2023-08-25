@@ -2,17 +2,24 @@ package sqlkit
 
 import (
 	"github.com/Masterminds/squirrel"
+	"github.com/mizuki1412/go-core-kit/class/exception"
 )
 
 type DeleteBuilder struct {
 	inner     squirrel.DeleteBuilder
 	modelMeta ModelMeta
+	driver    string
 }
 
 func (b DeleteBuilder) Sql() (string, []interface{}) {
-	return b.inner.MustSql()
+	sql, args, err := b.ToSql()
+	if err != nil {
+		panic(exception.New(err.Error()))
+	}
+	return sql, args
 }
 func (b DeleteBuilder) ToSql() (string, []interface{}, error) {
+	b.inner = b.inner.PlaceholderFormat(placeholder(b.driver))
 	return b.inner.ToSql()
 }
 

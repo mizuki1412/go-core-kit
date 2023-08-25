@@ -161,9 +161,9 @@ func (th ModelMeta) escapeNames(name []string) []string {
 	if len(name) == 0 {
 		panic(exception.New("modelmeta escapename nil"))
 	}
-	ret := make([]string, 0, len(name))
-	for _, e := range name {
-		ret = append(ret, th.dateSource.escapeName(e))
+	ret := make([]string, len(name))
+	for i := 0; i < len(name); i++ {
+		ret[i] = th.dateSource.escapeName(name[i])
 	}
 	return ret
 }

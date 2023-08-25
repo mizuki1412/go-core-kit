@@ -29,13 +29,13 @@ func New(ds ...*sqlkit.DataSource) Dao {
 }
 
 func (dao Dao) FindById(id class.String) *model.Province {
-	sql, args := dao.Builder().Select().Where("code=?", id).Sql()
-	return dao.ScanOne(sql, args)
+	builder := dao.Builder().Select().Where("code=?", id)
+	return dao.QueryOne(builder)
 }
 
 func (dao Dao) FindCodeByName(name string) string {
-	sql, args := dao.Builder().Select("code").Where("name=?", name).Sql()
-	rows := dao.Query(sql, args)
+	builder := dao.Builder().Select("code").Where("name=?", name)
+	rows := dao.Query(builder)
 	defer rows.Close()
 	for rows.Next() {
 		ret, err := rows.SliceScan()
@@ -48,6 +48,6 @@ func (dao Dao) FindCodeByName(name string) string {
 }
 
 func (dao Dao) ListAll() []*model.Province {
-	sql, args := dao.Builder().Select().OrderBy("code").Sql()
-	return dao.ScanList(sql, args)
+	builder := dao.Builder().Select().OrderBy("code")
+	return dao.QueryList(builder)
 }

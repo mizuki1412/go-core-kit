@@ -6,17 +6,21 @@ import (
 )
 
 type SQLBuilder struct {
-	inner0    squirrel.StatementBuilderType
 	modelMeta ModelMeta
 	// 逻辑删除标记
 	logicDel []any
 	driver   string
 }
 
+type BuilderInterface interface {
+	Sql() (string, []any)
+	ToSql() (string, []any, error)
+}
+
 // Select 默认取modelmeta中的columns，并装饰引号；fields中不装饰，因为可能存在表达式
 func (b SQLBuilder) _select(fields ...string) SelectBuilder {
 	return SelectBuilder{
-		inner:     b.inner0.Select(fields...),
+		inner:     squirrel.Select(fields...),
 		modelMeta: b.modelMeta,
 		logicDel:  b.logicDel,
 		driver:    b.driver,
@@ -49,9 +53,10 @@ func (b SQLBuilder) Update() UpdateBuilder {
 		panic(exception.New("sqlbuilder modelmeta null"))
 	}
 	return UpdateBuilder{
-		inner:     b.inner0.Update(b.modelMeta.getTable()),
+		inner:     squirrel.Update(b.modelMeta.getTable()),
 		modelMeta: b.modelMeta,
 		logicDel:  b.logicDel,
+		driver:    b.driver,
 	}
 }
 
@@ -60,8 +65,9 @@ func (b SQLBuilder) Delete() DeleteBuilder {
 		panic(exception.New("sqlbuilder modelmeta null"))
 	}
 	return DeleteBuilder{
-		inner:     b.inner0.Delete(b.modelMeta.getTable()),
+		inner:     squirrel.Delete(b.modelMeta.getTable()),
 		modelMeta: b.modelMeta,
+		driver:    b.driver,
 	}
 }
 
@@ -70,8 +76,9 @@ func (b SQLBuilder) Insert() InsertBuilder {
 		panic(exception.New("sqlbuilder modelmeta null"))
 	}
 	return InsertBuilder{
-		inner:     b.inner0.Insert(b.modelMeta.getTable()),
+		inner:     squirrel.Insert(b.modelMeta.getTable()),
 		modelMeta: b.modelMeta,
+		driver:    b.driver,
 	}
 }
 
@@ -80,7 +87,8 @@ func (b SQLBuilder) Replace() InsertBuilder {
 		panic(exception.New("sqlbuilder modelmeta null"))
 	}
 	return InsertBuilder{
-		inner:     b.inner0.Replace(b.modelMeta.getTable()),
+		inner:     squirrel.Replace(b.modelMeta.getTable()),
 		modelMeta: b.modelMeta,
+		driver:    b.driver,
 	}
 }

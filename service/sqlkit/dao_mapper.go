@@ -24,11 +24,7 @@ func (dao Dao[T]) Insert(dest *T) {
 	}
 	builder = builder.Columns(columns...).Values(vals...)
 	builder = builder.Suffix("returning *")
-	sql, args, err := builder.ToSql()
-	if err != nil {
-		panic(exception.New(err.Error(), 2))
-	}
-	rows := dao.Query(sql, args)
+	rows := dao.Query(builder)
 	defer rows.Close()
 	for rows.Next() {
 		// return 赋值
@@ -49,7 +45,7 @@ func (dao Dao[T]) Update(dest *T) {
 			continue
 		}
 		// 针对class.MapString 采用merge方式 todo mysql
-		if e.RStruct.Type.String() == "class.MapString" && dao.dataSource.Driver == Postgres {
+		if (e.RStruct.Type.String() == "class.MapString" || e.RStruct.Type.String() == "class.MapStringSync") && dao.dataSource.Driver == Postgres {
 			builder = builder.Set(e.OriKey, squirrel.Expr("coalesce("+e.OriKey+",'{}'::jsonb) || ?", val))
 		} else {
 			builder = builder.Set(e.OriKey, val)
@@ -62,17 +58,11 @@ func (dao Dao[T]) Update(dest *T) {
 		}
 		builder = builder.Where(e.Key+"=?", v)
 	}
-	sql, args, err := builder.ToSql()
-	if err != nil {
-		panic(exception.New(err.Error(), 2))
-	}
-	dao.Exec(sql, args)
+	dao.Exec(builder)
 }
 
 func (dao Dao[T]) DeleteById(id ...any) {
-	var sql string
-	var args []interface{}
-	var err error
+	var b BuilderInterface
 	if len(id) != len(dao.modelMeta.allPKs) {
 		panic(exception.New("主键数量不匹配"))
 	}
@@ -82,18 +72,15 @@ func (dao Dao[T]) DeleteById(id ...any) {
 		for i := 0; i < len(dao.modelMeta.allPKs); i++ {
 			builder = builder.Where(dao.modelMeta.allPKs[i].Key+"=?", id[i])
 		}
-		sql, args, err = builder.ToSql()
+		b = builder
 	} else {
 		builder := dao.Builder().Delete()
 		for i := 0; i < len(dao.modelMeta.allPKs); i++ {
 			builder = builder.Where(dao.modelMeta.allPKs[i].Key+"=?", id[i])
 		}
-		sql, args, err = builder.ToSql()
+		b = builder
 	}
-	if err != nil {
-		panic(exception.New(err.Error(), 2))
-	}
-	dao.Exec(sql, args)
+	dao.Exec(b)
 }
 
 func (dao Dao[T]) SelectOneById(id ...any) *T {
@@ -105,8 +92,7 @@ func (dao Dao[T]) SelectOneById(id ...any) *T {
 		builder = builder.Where(dao.modelMeta.allPKs[i].Key+"=?", id[i])
 	}
 	builder = builder.WhereNLogicDel()
-	sql, args := builder.Sql()
-	return dao.ScanOne(sql, args)
+	return dao.QueryOne(builder)
 }
 
 func (dao Dao[T]) SelectOneWithDelById(id ...any) *T {
@@ -117,6 +103,5 @@ func (dao Dao[T]) SelectOneWithDelById(id ...any) *T {
 	for i := 0; i < len(dao.modelMeta.allPKs); i++ {
 		builder = builder.Where(dao.modelMeta.allPKs[i].Key+"=?", id[i])
 	}
-	sql, args := builder.Sql()
-	return dao.ScanOne(sql, args)
+	return dao.QueryOne(builder)
 }

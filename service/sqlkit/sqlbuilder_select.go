@@ -14,27 +14,38 @@ type SelectBuilder struct {
 	fromAs    string
 }
 
-func (b SelectBuilder) Sql() (string, []interface{}) {
+func (b SelectBuilder) Sql() (string, []any) {
+	sql, args, err := b.ToSql()
+	if err != nil {
+		panic(exception.New(err.Error()))
+	}
+	return sql, args
+}
+
+// 默认占位符的，一般用于子查询
+func (b SelectBuilder) sqlOriginPlaceholder() (string, []any) {
 	if b.fromAs == "" {
 		b.inner = b.inner.From(b.modelMeta.getTable())
 	} else {
 		b.inner = b.inner.From(b.modelMeta.getTable(b.fromAs))
 	}
+	b.inner = b.inner.PlaceholderFormat(squirrel.Question)
 	return b.inner.MustSql()
 }
-func (b SelectBuilder) ToSql() (string, []interface{}, error) {
+func (b SelectBuilder) ToSql() (string, []any, error) {
 	if b.fromAs == "" {
 		b.inner = b.inner.From(b.modelMeta.getTable())
 	} else {
 		b.inner = b.inner.From(b.modelMeta.getTable(b.fromAs))
 	}
+	b.inner = b.inner.PlaceholderFormat(placeholder(b.driver))
 	return b.inner.ToSql()
 }
 
 // SQL methods
 
 // Prefix 在 sql 前写入语句
-func (b SelectBuilder) Prefix(sql string, args ...interface{}) SelectBuilder {
+func (b SelectBuilder) Prefix(sql string, args ...any) SelectBuilder {
 	b.inner = b.inner.Prefix(sql, args...)
 	return b
 }
@@ -42,7 +53,7 @@ func (b SelectBuilder) PrefixExpr(expr SelectBuilder) SelectBuilder {
 	b.inner = b.inner.PrefixExpr(expr)
 	return b
 }
-func (b SelectBuilder) Suffix(sql string, args ...interface{}) SelectBuilder {
+func (b SelectBuilder) Suffix(sql string, args ...any) SelectBuilder {
 	b.inner = b.inner.Suffix(sql, args...)
 	return b
 }
@@ -77,53 +88,53 @@ func (b SelectBuilder) Options(options ...string) SelectBuilder {
 	return b
 }
 
-func (b SelectBuilder) Join(dm DaoModelMeta, as string, rest ...interface{}) SelectBuilder {
+func (b SelectBuilder) Join(dm DaoModelMeta, as string, rest ...any) SelectBuilder {
 	b.inner = b.inner.Join(dm.getModelMeta().getTable(as), rest...)
 	return b
 }
-func (b SelectBuilder) LeftJoin(dm DaoModelMeta, as string, rest ...interface{}) SelectBuilder {
+func (b SelectBuilder) LeftJoin(dm DaoModelMeta, as string, rest ...any) SelectBuilder {
 	b.inner = b.inner.LeftJoin(dm.getModelMeta().getTable(as), rest...)
 	return b
 }
-func (b SelectBuilder) RightJoin(dm DaoModelMeta, as string, rest ...interface{}) SelectBuilder {
+func (b SelectBuilder) RightJoin(dm DaoModelMeta, as string, rest ...any) SelectBuilder {
 	b.inner = b.inner.RightJoin(dm.getModelMeta().getTable(as), rest...)
 	return b
 }
-func (b SelectBuilder) InnerJoin(dm DaoModelMeta, as string, rest ...interface{}) SelectBuilder {
+func (b SelectBuilder) InnerJoin(dm DaoModelMeta, as string, rest ...any) SelectBuilder {
 	b.inner = b.inner.InnerJoin(dm.getModelMeta().getTable(as), rest...)
 	return b
 }
-func (b SelectBuilder) CrossJoin(dm DaoModelMeta, as string, rest ...interface{}) SelectBuilder {
+func (b SelectBuilder) CrossJoin(dm DaoModelMeta, as string, rest ...any) SelectBuilder {
 	b.inner = b.inner.CrossJoin(dm.getModelMeta().getTable(as), rest...)
 	return b
 }
 
-func (b SelectBuilder) JoinRaw(join string, rest ...interface{}) SelectBuilder {
+func (b SelectBuilder) JoinRaw(join string, rest ...any) SelectBuilder {
 	b.inner = b.inner.Join(join, rest...)
 	return b
 }
-func (b SelectBuilder) LeftJoinRaw(join string, rest ...interface{}) SelectBuilder {
+func (b SelectBuilder) LeftJoinRaw(join string, rest ...any) SelectBuilder {
 	b.inner = b.inner.LeftJoin(join, rest...)
 	return b
 }
-func (b SelectBuilder) RightJoinRaw(join string, rest ...interface{}) SelectBuilder {
+func (b SelectBuilder) RightJoinRaw(join string, rest ...any) SelectBuilder {
 	b.inner = b.inner.RightJoin(join, rest...)
 	return b
 }
-func (b SelectBuilder) InnerJoinRaw(join string, rest ...interface{}) SelectBuilder {
+func (b SelectBuilder) InnerJoinRaw(join string, rest ...any) SelectBuilder {
 	b.inner = b.inner.InnerJoin(join, rest...)
 	return b
 }
-func (b SelectBuilder) CrossJoinRaw(join string, rest ...interface{}) SelectBuilder {
+func (b SelectBuilder) CrossJoinRaw(join string, rest ...any) SelectBuilder {
 	b.inner = b.inner.CrossJoin(join, rest...)
 	return b
 }
 
-func (b SelectBuilder) Where(pred interface{}, args ...interface{}) SelectBuilder {
+func (b SelectBuilder) Where(pred any, args ...any) SelectBuilder {
 	b.inner = b.inner.Where(pred, args...)
 	return b
 }
-func (b SelectBuilder) Having(pred interface{}, rest ...interface{}) SelectBuilder {
+func (b SelectBuilder) Having(pred any, rest ...any) SelectBuilder {
 	b.inner = b.inner.Where(pred, rest...)
 	return b
 }
@@ -184,8 +195,6 @@ func (b SelectBuilder) WhereUnnestNotIn(key string, arr any) SelectBuilder {
 }
 
 func (b SelectBuilder) WhereIn(key string, sub SelectBuilder) SelectBuilder {
-	// 子查询用 问号
-	sub.inner = sub.inner.PlaceholderFormat(squirrel.Dollar)
-	sql, args := sub.Sql()
-	return b.Where(key+" IN ("+sql+")", args...)
+	sql, args := sub.sqlOriginPlaceholder()
+	return b.Where(squirrel.Expr(key+" IN ("+sql+")", args...))
 }

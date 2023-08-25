@@ -41,11 +41,11 @@ func New(ds ...*sqlkit.DataSource) Dao {
 }
 
 func (dao Dao) ListByParent(id int32) []*model.Department {
-	sql, args := dao.Builder().Select().Where("parent=?", id).OrderBy("no").OrderBy("id").Sql()
-	return dao.ScanList(sql, args)
+	builder := dao.Builder().Select().Where("parent=?", id).OrderBy("no").OrderBy("id")
+	return dao.QueryList(builder)
 }
 
 func (dao Dao) ListAll() []*model.Department {
-	sql, args := dao.Builder().Select().Where("id>=0").OrderBy("parent").OrderBy("no").OrderBy("id").Sql()
-	return dao.ScanList(sql, args)
+	builder := dao.Builder().Select().Where("id>=0").OrderBy("parent").OrderBy("no").OrderBy("id")
+	return dao.QueryList(builder)
 }

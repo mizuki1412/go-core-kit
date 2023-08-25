@@ -32,13 +32,13 @@ func New(ds ...*sqlkit.DataSource) Dao {
 }
 
 func (dao Dao) FindByName(name string) *model.Role {
-	sql, args := dao.Builder().Select().Where("name=?", name).Limit(1).Sql()
-	return dao.ScanOne(sql, args)
+	builder := dao.Builder().Select().Where("name=?", name).Limit(1)
+	return dao.QueryOne(builder)
 }
 func (dao Dao) ListFromRootDepart(id int32) []*model.Role {
 	where := fmt.Sprintf(`id>0 and department in ( with recursive t(id) as( values(%d) union all select d.id from %s d, t where t.id=d.parent) select id from t )`, id, departmentdao.New(dao.DataSource()).Table())
-	sql, args := dao.Builder().Select().Where(where).OrderBy("id").Sql()
-	return dao.ScanList(sql, args)
+	builder := dao.Builder().Select().Where(where).OrderBy("id")
+	return dao.QueryList(builder)
 }
 
 type ListParam struct {
@@ -50,10 +50,9 @@ func (dao Dao) List(param ListParam) []*model.Role {
 	if len(param.Departments) > 0 {
 		builder = builder.WhereUnnestIn("department", param.Departments)
 	}
-	sql, args := builder.Sql()
-	return dao.ScanList(sql, args)
+	return dao.QueryList(builder)
 }
 func (dao Dao) ListByDepartment(did int32) []*model.Role {
-	sql, args := dao.Builder().Select().Where("id>0 and department=?", did).OrderBy("id").Sql()
-	return dao.ScanList(sql, args)
+	builder := dao.Builder().Select().Where("id>0 and department=?", did).OrderBy("id")
+	return dao.QueryList(builder)
 }
