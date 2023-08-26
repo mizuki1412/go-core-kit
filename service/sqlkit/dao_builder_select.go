@@ -81,6 +81,11 @@ func (dao SelectDao[T]) Columns(cs ...string) SelectDao[T] {
 	return dao
 }
 
+func (dao SelectDao[T]) RemoveColumns() SelectDao[T] {
+	dao.builder = dao.builder.RemoveColumns()
+	return dao
+}
+
 func (dao SelectDao[T]) FromAs(alias string) SelectDao[T] {
 	dao.fromAs = alias
 	return dao

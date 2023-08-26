@@ -15,7 +15,6 @@ toolkit for golang projects
 
 - [ ] 测试当 redis 没配置时，session 是否正常; 用jwt替代
 - [ ] class中有些类型是写死pg的，对其他数据库不友好： array，jsonarray
-- [ ] class 和 model 中的接受函数测试下，可能在 scan 时有问题
 - [ ] page()
 
   later：

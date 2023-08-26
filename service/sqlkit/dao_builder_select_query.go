@@ -18,7 +18,7 @@ func (dao SelectDao[T]) One() *T {
 	if !dao.ignoreLogicDel {
 		d = dao.whereNLogicDel()
 	}
-	rows := dao.QueryRaw(d.Sql())
+	rows := d.QueryRows()
 	defer rows.Close()
 	for rows.Next() {
 		m := new(T)
@@ -39,23 +39,7 @@ func (dao SelectDao[T]) List() []*T {
 	if !dao.ignoreLogicDel {
 		d = dao.whereNLogicDel()
 	}
-	rows := dao.QueryRaw(d.Sql())
-	list := make([]*T, 0, 5)
-	defer rows.Close()
-	for rows.Next() {
-		m := new(T)
-		err := rows.StructScan(m)
-		if err != nil {
-			panic(exception.New(err.Error()))
-		}
-		list = append(list, m)
-	}
-	if dao.Cascade != nil {
-		for i := range list {
-			dao.Cascade(list[i])
-		}
-	}
-	return list
+	return scanObjList(d)
 }
 
 func (dao SelectDao[T]) OneMap() map[string]any {
@@ -63,7 +47,7 @@ func (dao SelectDao[T]) OneMap() map[string]any {
 	if !dao.ignoreLogicDel {
 		d = dao.whereNLogicDel()
 	}
-	rows := dao.QueryRaw(d.Sql())
+	rows := d.QueryRows()
 	defer rows.Close()
 	for rows.Next() {
 		m := map[string]any{}
@@ -81,7 +65,7 @@ func (dao SelectDao[T]) OneString() string {
 	if !dao.ignoreLogicDel {
 		d = dao.whereNLogicDel()
 	}
-	rows := dao.QueryRaw(d.Sql())
+	rows := d.QueryRows()
 	defer rows.Close()
 	for rows.Next() {
 		ret, err := rows.SliceScan()
@@ -98,7 +82,7 @@ func (dao SelectDao[T]) ListMap() []map[string]any {
 	if !dao.ignoreLogicDel {
 		d = dao.whereNLogicDel()
 	}
-	rows := dao.QueryRaw(d.Sql())
+	rows := d.QueryRows()
 	defer rows.Close()
 	list := make([]map[string]any, 0, 5)
 	for rows.Next() {
@@ -117,7 +101,7 @@ func (dao SelectDao[T]) ListString() []string {
 	if !dao.ignoreLogicDel {
 		d = dao.whereNLogicDel()
 	}
-	rows := dao.QueryRaw(d.Sql())
+	rows := d.QueryRows()
 	defer rows.Close()
 	list := make([]string, 0, 5)
 	defer rows.Close()
@@ -131,5 +115,23 @@ func (dao SelectDao[T]) ListString() []string {
 	return list
 }
 
-// todo
-//func (dao SelectDao[T]) Page()
+type Page struct {
+	PageSize uint64 // 一页数量
+	PageNum  uint64 // 第几页
+}
+
+// Page 分页：返回数据和总数量
+func (dao SelectDao[T]) Page(p Page) ([]*T, uint64) {
+	if !(p.PageSize > 0 && p.PageNum > 0) {
+		panic(exception.New("page 参数范围错误"))
+	}
+	d := dao
+	if !dao.ignoreLogicDel {
+		d = dao.whereNLogicDel()
+	}
+	// 分页数据
+	d1 := d
+	// 总数
+	d2 := d
+	return scanObjList(d1.Limit(p.PageSize).Offset(p.PageSize * (p.PageNum - 1))), cast.ToUint64(d2.Prefix("select count(1) from (").Suffix(") t").OneString())
+}

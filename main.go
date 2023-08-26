@@ -8,6 +8,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/mod/user/dao/userdao"
 	"github.com/mizuki1412/go-core-kit/mod/user/model"
 	"github.com/mizuki1412/go-core-kit/service/restkit"
+	"github.com/mizuki1412/go-core-kit/service/sqlkit"
 	"github.com/spf13/cobra"
 	"log"
 )
@@ -25,7 +26,10 @@ func main() {
 		Use: "test",
 		Run: func(cmd *cobra.Command, args []string) {
 			//testSQL()
-			log.Println(jsonkit.ToString(userdao.New().SelectOneById(9)))
+			list, total := userdao.New().Select().OrderBy("id").Page(sqlkit.Page{
+				PageNum: 2, PageSize: 2,
+			})
+			log.Println(jsonkit.ToString(list), total)
 		},
 	})
 	cli.Execute()

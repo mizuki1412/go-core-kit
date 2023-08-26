@@ -13,9 +13,7 @@ type RestRet struct {
 	Message class.String `json:"message,omitempty"`
 	Data    any          `json:"data,omitempty"`
 	// 分页信息
-	CurrentPage class.Int32 `json:"currentPage,omitempty" description:"分页的当前页"`
-	TotalPage   class.Int32 `json:"totalPage,omitempty" description:"分页的总页数"`
-	Total       class.Int32 `json:"total,omitempty" description:"总数，如果data是列表并且分页"`
+	Total class.Int64 `json:"total,omitempty" description:"总数，如果data是列表并且分页"`
 }
 
 const ResultErr = 0
@@ -58,13 +56,11 @@ func (ctx *Context) Html(data []byte) {
 }
 
 // JsonSuccessWithPage 带分页信息
-func (ctx *Context) JsonSuccessWithPage(data any, currentPage, totalPage, total int32) {
+func (ctx *Context) JsonSuccessWithPage(data any, total uint64) {
 	ret := RestRet{
 		Result: ResultSuccess,
 		Data:   data,
 	}
-	ret.CurrentPage.Set(currentPage)
-	ret.TotalPage.Set(totalPage)
 	ret.Total.Set(total)
 	ctx.Json(ret)
 }
