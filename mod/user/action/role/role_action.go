@@ -39,7 +39,7 @@ func create(ctx *context.Context) {
 	role.Department = department
 	rdao := roledao.New()
 	rdao.DataSource().Schema = ctx.SessionGetSchema()
-	rdao.Insert(role)
+	rdao.InsertObj(role)
 	ctx.JsonSuccess(nil)
 }
 
@@ -75,7 +75,7 @@ func update(ctx *context.Context) {
 	if params.PrivilegesJson.Valid {
 		role.Privileges = params.PrivilegesJson
 	}
-	dao.Update(role)
+	dao.UpdateObj(role)
 	ctx.JsonSuccess(nil)
 }
 

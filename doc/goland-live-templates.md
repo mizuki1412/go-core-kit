@@ -203,18 +203,6 @@ func New(ds ...*sqlkit.DataSource) Dao {
 }
 ```
 
-## dao_demo
-```
-type ListParam struct {
-	IdList []int32
-}
-
-func (dao Dao) List(param ListParam) []*$bean$ {
-	builder := dao.Builder().Select().WhereNLogicDel().OrderBy("id")
-	return dao.QueryList(builder)
-}
-```
-
 ## exception
 ```
 panic(exception.New("$msg$"))

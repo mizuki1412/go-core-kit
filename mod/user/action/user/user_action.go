@@ -167,7 +167,7 @@ func updatePwd(ctx *context.Context) {
 		panic(exception.New("原密码错误"))
 	}
 	user.Pwd.Set(cryptokit.MD5(params.NewPwd))
-	dao.Update(user)
+	dao.UpdateObj(user)
 	ctx.SessionSetUser(user)
 	ctx.JsonSuccess(nil)
 }
@@ -233,6 +233,6 @@ func updateUserInfo(ctx *context.Context) {
 		user.Pwd.Set(cryptokit.MD5(params.NewPwd.String))
 	}
 	//todo usercenter
-	dao.Update(u)
+	dao.UpdateObj(u)
 	ctx.JsonSuccess(nil)
 }

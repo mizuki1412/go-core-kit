@@ -40,7 +40,7 @@ func departmentCreate(ctx *context.Context) {
 		department.Descr.Set(params.Description.String)
 	}
 	department.CreateDt.Set(time.Now())
-	dao.Insert(department)
+	dao.InsertObj(department)
 	ctx.JsonSuccess(nil)
 }
 
@@ -78,7 +78,7 @@ func departmentUpdate(ctx *context.Context) {
 		}
 		department.Parent = parent
 	}
-	dao.Update(department)
+	dao.UpdateObj(department)
 	ctx.JsonSuccess(nil)
 }
 func departmentDel(ctx *context.Context) {

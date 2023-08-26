@@ -14,6 +14,5 @@ func New(ds ...*sqlkit.DataSource) Dao {
 }
 
 func (dao Dao) ListPrivileges() []*model.PrivilegeConstant {
-	builder := dao.Builder().Select().OrderBy("sort")
-	return dao.QueryList(builder)
+	return dao.Select().OrderBy("sort").List()
 }

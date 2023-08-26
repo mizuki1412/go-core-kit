@@ -1,7 +1,6 @@
 package provincedao
 
 import (
-	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/mod/common/admindivision/dao/citydao"
 	"github.com/mizuki1412/go-core-kit/mod/common/admindivision/model"
@@ -28,14 +27,8 @@ func New(ds ...*sqlkit.DataSource) Dao {
 	return dao
 }
 
-func (dao Dao) FindById(id class.String) *model.Province {
-	builder := dao.Builder().Select().Where("code=?", id)
-	return dao.QueryOne(builder)
-}
-
 func (dao Dao) FindCodeByName(name string) string {
-	builder := dao.Builder().Select("code").Where("name=?", name)
-	rows := dao.Query(builder)
+	rows := dao.Select("code").Where("name=?", name).QueryRows()
 	defer rows.Close()
 	for rows.Next() {
 		ret, err := rows.SliceScan()
@@ -48,6 +41,5 @@ func (dao Dao) FindCodeByName(name string) string {
 }
 
 func (dao Dao) ListAll() []*model.Province {
-	builder := dao.Builder().Select().OrderBy("code")
-	return dao.QueryList(builder)
+	return dao.Select().OrderBy("code").List()
 }

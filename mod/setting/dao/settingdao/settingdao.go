@@ -14,14 +14,13 @@ func New(ds ...*sqlkit.DataSource) Dao {
 	return Dao{sqlkit.New[model.Setting](ds...)}
 }
 
-func (dao Dao) Set(data map[string]interface{}) {
-	builder := dao.Builder().Update().Set("data", jsonkit.ToString(data)).Where("id=?", 1)
-	dao.Exec(builder)
+func (dao Dao) Set(data map[string]any) {
+	dao.Update().Set("data", jsonkit.ToString(data)).Where("id=?", 1).Exec()
 }
 
-func (dao Dao) Get() map[string]interface{} {
-	builder := dao.Builder().Select("data").Where("id=?", 1)
-	rows := dao.Query(builder)
+func (dao Dao) Get() map[string]any {
+	builder := dao.Select("data").Where("id=?", 1)
+	rows := dao.QueryRaw(builder.Sql())
 	var data string
 	defer rows.Close()
 	for rows.Next() {

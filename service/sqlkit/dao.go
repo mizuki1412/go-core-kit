@@ -3,8 +3,6 @@ package sqlkit
 import (
 	"database/sql"
 	"github.com/jmoiron/sqlx"
-	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 )
 
@@ -42,28 +40,6 @@ func New[T any](ds ...*DataSource) Dao[T] {
 	return dao
 }
 
-//func (dao *Dao[T]) Init(ds ...*DataSource) {
-//	if len(ds) > 0 {
-//		dao.dataSource = ds[0]
-//	} else {
-//		dao.dataSource = DefaultDataSource()
-//	}
-//	dao.modelMeta.dateSource = dao.dataSource
-//	dao.modelMeta.init(dao.meta)
-//}
-
-// Deprecated
-func (dao Dao[T]) Builder() SQLBuilder {
-	sb := SQLBuilder{modelMeta: dao.modelMeta}
-	ldv := LogicDelVal
-	if len(dao.LogicDelVal) > 0 {
-		ldv = dao.LogicDelVal
-	}
-	sb.logicDel = ldv
-	sb.driver = dao.dataSource.Driver
-	return sb
-}
-
 func (dao Dao[T]) getModelMeta() ModelMeta {
 	return dao.modelMeta
 }
@@ -73,104 +49,17 @@ func (dao Dao[T]) DataSource() *DataSource {
 }
 
 func (dao Dao[T]) QueryRaw(sql string, args []any) *sqlx.Rows {
-	logkit.DebugConcat(sql, " | args:", jsonkit.ToString(args))
-	return dao.dataSource.Query(sql, args)
-}
-
-// Deprecated
-func (dao Dao[T]) Query(builder BuilderInterface) *sqlx.Rows {
-	sql, args := builder.Sql()
-	logkit.DebugConcat(sql, " | args:", jsonkit.ToString(args))
+	logkit.DebugConcat(logReqSqlInfo(sql, args))
 	return dao.dataSource.Query(sql, args)
 }
 
 func (dao Dao[T]) ExecRaw(sql string, args []any) sql.Result {
-	logkit.DebugConcat(sql, " | args:", jsonkit.ToString(args))
+	logkit.DebugConcat(logReqSqlInfo(sql, args))
 	return dao.dataSource.Exec(sql, args)
-}
-
-// Deprecated
-func (dao Dao[T]) Exec(builder BuilderInterface) sql.Result {
-	sqls, args := builder.Sql()
-	logkit.DebugConcat(sqls, " | args:", jsonkit.ToString(args))
-	return dao.dataSource.Exec(sqls, args)
-}
-
-// QueryList 取值封装list
-func (dao Dao[T]) QueryList(builder BuilderInterface) []*T {
-	rows := dao.Query(builder)
-	list := make([]*T, 0, 5)
-	defer rows.Close()
-	for rows.Next() {
-		m := new(T)
-		err := rows.StructScan(m)
-		if err != nil {
-			panic(exception.New(err.Error()))
-		}
-		list = append(list, m)
-	}
-	if dao.Cascade != nil {
-		for i := range list {
-			dao.Cascade(list[i])
-		}
-	}
-	return list
-}
-
-func (dao Dao[T]) QueryOne(builder BuilderInterface) *T {
-	rows := dao.Query(builder)
-	defer rows.Close()
-	for rows.Next() {
-		m := new(T)
-		err := rows.StructScan(m)
-		if err != nil {
-			panic(exception.New(err.Error()))
-		}
-		if dao.Cascade != nil {
-			dao.Cascade(m)
-		}
-		return m
-	}
-	return nil
-}
-
-func (dao Dao[T]) QueryOneMap(builder BuilderInterface) map[string]any {
-	rows := dao.Query(builder)
-	defer rows.Close()
-	for rows.Next() {
-		m := map[string]any{}
-		err := rows.MapScan(m)
-		if err != nil {
-			panic(exception.New(err.Error()))
-		}
-		return m
-	}
-	return nil
-}
-
-func (dao Dao[T]) QueryListMap(builder BuilderInterface) []map[string]any {
-	rows := dao.Query(builder)
-	list := make([]map[string]any, 0, 5)
-	defer rows.Close()
-	for rows.Next() {
-		m := map[string]any{}
-		err := rows.MapScan(m)
-		if err != nil {
-			panic(exception.New(err.Error()))
-		}
-		list = append(list, m)
-	}
-	return list
 }
 
 /// 小功能
 
-func (dao Dao[T]) SelectColumns(excludes ...string) []string {
-	return dao.modelMeta.getSelectColumns(excludes...)
-}
-func (dao Dao[T]) SelectColumnsWithP(prefix string, excludes ...string) []string {
-	return dao.modelMeta.getSelectColumnsWithPrefix(prefix, excludes...)
-}
 func (dao Dao[T]) Table(alias ...string) string {
 	return dao.modelMeta.getTable(alias...)
 }

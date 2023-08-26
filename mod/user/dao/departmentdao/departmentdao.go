@@ -26,12 +26,12 @@ func New(ds ...*sqlkit.DataSource) Dao {
 			obj.Parent = nil
 		case ResultDefault:
 			if obj.Parent != nil {
-				obj.Parent = dao.SelectOneById(obj.Parent.Id)
+				obj.Parent = dao.SelectOneWithDelById(obj.Parent.Id)
 			}
 		case ResultAll:
 			obj.Children = dao.ListByParent(obj.Id)
 			if obj.Parent != nil {
-				obj.Parent = dao.SelectOneById(obj.Parent.Id)
+				obj.Parent = dao.SelectOneWithDelById(obj.Parent.Id)
 			}
 		case ResultNone:
 			obj.Parent = nil
@@ -41,11 +41,9 @@ func New(ds ...*sqlkit.DataSource) Dao {
 }
 
 func (dao Dao) ListByParent(id int32) []*model.Department {
-	builder := dao.Builder().Select().Where("parent=?", id).OrderBy("no").OrderBy("id")
-	return dao.QueryList(builder)
+	return dao.Select().Where("parent=?", id).OrderBy("no").OrderBy("id").List()
 }
 
 func (dao Dao) ListAll() []*model.Department {
-	builder := dao.Builder().Select().Where("id>=0").OrderBy("parent").OrderBy("no").OrderBy("id")
-	return dao.QueryList(builder)
+	return dao.Select().Where("id>=0").OrderBy("parent").OrderBy("no").OrderBy("id").List()
 }

@@ -6,8 +6,8 @@ import (
 	"reflect"
 )
 
-func (dao Dao[T]) Insert(dest *T) {
-	builder := dao.Builder().Insert()
+func (dao Dao[T]) InsertObj(dest *T) {
+	builder := dao.Insert()
 	var columns []string
 	var vals []any
 	rv := reflect.ValueOf(dest).Elem()
@@ -24,20 +24,11 @@ func (dao Dao[T]) Insert(dest *T) {
 	}
 	builder = builder.Columns(columns...).Values(vals...)
 	builder = builder.Suffix("returning *")
-	rows := dao.Query(builder)
-	defer rows.Close()
-	for rows.Next() {
-		// return 赋值
-		err := rows.StructScan(dest)
-		if err != nil {
-			panic(exception.New(err.Error(), 2))
-		}
-		break
-	}
+	builder.ReturnOne(dest)
 }
 
-func (dao Dao[T]) Update(dest *T) int64 {
-	builder := dao.Builder().Update()
+func (dao Dao[T]) UpdateObj(dest *T) int64 {
+	builder := dao.Update()
 	rv := reflect.ValueOf(dest).Elem()
 	for _, e := range dao.modelMeta.allUpdateKeys {
 		var val = e.val(rv)
@@ -58,54 +49,47 @@ func (dao Dao[T]) Update(dest *T) int64 {
 		}
 		builder = builder.Where(e.Key+"=?", v)
 	}
-	res := dao.Exec(builder)
-	rn, _ := res.RowsAffected()
-	return rn
+	return builder.Exec()
 }
 
 func (dao Dao[T]) DeleteById(id ...any) int64 {
-	var b BuilderInterface
 	if len(id) != len(dao.modelMeta.allPKs) {
 		panic(exception.New("主键数量不匹配"))
 	}
 	if dao.modelMeta.logicDelKey.Key != "" {
-		builder := dao.Builder().Update()
-		builder = builder.Set(dao.modelMeta.logicDelKey.OriKey, builder.logicDel[0])
+		builder := dao.Update()
+		builder = builder.Set(dao.modelMeta.logicDelKey.OriKey, builder.LogicDelVal[0])
 		for i := 0; i < len(dao.modelMeta.allPKs); i++ {
 			builder = builder.Where(dao.modelMeta.allPKs[i].Key+"=?", id[i])
 		}
-		b = builder
+		return builder.Exec()
 	} else {
-		builder := dao.Builder().Delete()
+		builder := dao.Delete()
 		for i := 0; i < len(dao.modelMeta.allPKs); i++ {
 			builder = builder.Where(dao.modelMeta.allPKs[i].Key+"=?", id[i])
 		}
-		b = builder
+		return builder.Exec()
 	}
-	res := dao.Exec(b)
-	rn, _ := res.RowsAffected()
-	return rn
 }
 
 func (dao Dao[T]) SelectOneById(id ...any) *T {
-	builder := dao.Builder().Select()
+	builder := dao.Select()
 	if len(id) != len(dao.modelMeta.allPKs) {
 		panic(exception.New("主键数量不匹配"))
 	}
 	for i := 0; i < len(dao.modelMeta.allPKs); i++ {
 		builder = builder.Where(dao.modelMeta.allPKs[i].Key+"=?", id[i])
 	}
-	builder = builder.WhereNLogicDel()
-	return dao.QueryOne(builder)
+	return builder.One()
 }
 
 func (dao Dao[T]) SelectOneWithDelById(id ...any) *T {
-	builder := dao.Builder().Select()
+	builder := dao.Select()
 	if len(id) != len(dao.modelMeta.allPKs) {
 		panic(exception.New("主键数量不匹配"))
 	}
 	for i := 0; i < len(dao.modelMeta.allPKs); i++ {
 		builder = builder.Where(dao.modelMeta.allPKs[i].Key+"=?", id[i])
 	}
-	return dao.QueryOne(builder)
+	return builder.IgnoreLogicDel().One()
 }

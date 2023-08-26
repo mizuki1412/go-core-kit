@@ -125,9 +125,9 @@ func AddUserHandle(ctx *context.Context, params AddUserParams, checkSms bool) *m
 		u.Extend.PutAll(params.ExtendJson.Map)
 	}
 	if u.Id > 0 {
-		dao.Update(u)
+		dao.UpdateObj(u)
 	} else {
-		dao.Insert(u)
+		dao.InsertObj(u)
 	}
 	return u
 }
@@ -203,7 +203,7 @@ func UpdateUserHandle(ctx *context.Context, params UpdateParams) {
 	if params.ExtendJson.Valid {
 		u.Extend.PutAll(params.ExtendJson.Map)
 	}
-	dao.Update(u)
+	dao.UpdateObj(u)
 }
 
 type infoAdminParams struct {

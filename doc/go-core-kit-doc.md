@@ -434,18 +434,12 @@ func New(ds ...*sqlkit.DataSource) Dao {
 
 ## 代码结构说明
 
-- dao: dao 封装类
-
+- dao: dao 封装类，作为 dao 服务的入口
 - dao_mapper: 提供 baseMapper 的增删改查功能
-
-- dao_private: dao 中用到的私有函数
-
+- dao_builder_xxx: dao 链式查询、链式操作
 - datasource：和数据源有关，包括事务、schema、dialect
-
 - modelmeta：当前 dao 所对应的 model 的 tablename 和 columnsName
-
-- sqlbuilder：sql 语句构造
-
+- dialect_help：数据方言的处理
 - transaction：事务相关的外部函数
 
 ## 支持的driver name
@@ -484,6 +478,24 @@ DataSource 有默认数据源，取自配置文件，也可通过手动创建 Ne
 
 Dao 中可以设置 LogicDelVal 实现局部的逻辑删除，[]any{删除的值，不删除的值}
 
+## 链式操作
+
+```go
+userDao.New().Select().Where("phone=?", phone).One()
+userDao.New().Select().Where("age>?", age).Page()
+userDao.New().Update().Set("name", "123").Exec()
+
+dao.Update().Set("extend",squirrel.Expr("jsonb_set(extend, '{confirm}','true',true)")).Where("id=?",id).Exec()
+
+// wherein
+if len(param.Departments) > 0 {
+  rb := roledao.New().Select("id").WhereUnnestIn("department", param.Departments)
+  builder = builder.WhereIn("role", rb)
+}
+```
+
+
+
 ## 注意
 
 - **注意 commit: 如果事务中第一句是select语句，commit将会出错, 错误提示 parse C 等。**
@@ -492,45 +504,7 @@ Dao 中可以设置 LogicDelVal 实现局部的逻辑删除，[]any{删除的值
 - update set时：`Set("extend",squirrel.Expr("'{}'::jsonb"))` or `Set("extend","{}")`
 - class.mapString在插入数据库时将用jsonb格式，并且不是完全替换，而是merge的方式(```coalesce(extend, '{}'::jsonb) || '$param'::jsonb```)。如果要删除其中的key，需要设置key为null。 merge时只会merge顶层的keys。
 
-## demo
 
-todo
-
-```go
-func (dao Dao) UpdateConfirm(id int64){
-    sql, args := dao.Builder().Update().Set("extend",squirrel.Expr("jsonb_set(extend, '{confirm}','true',true)")).Where("id=?",id).Sql()
-    dao.Exec(sql, args...)
-}
-
-func (dao Dao) List(dTypes []string) []model.AlarmMsg {
-  builder := dao.Builder().Select(dao.SelectColumns("msg")).FromAs("msg").Join(infodao.New(dao.DataSource()).Table("info")).Where("msg.deviceType=info.id").OrderBy("msg.deviceType").OrderBy("msg.id")
-	if dTypes!=nil && len(dTypes) > 0 {
-		flag, arg := pghelper.GenUnnestString(dTypes)
-		builder = builder.Where("msg.deviceType in "+flag, arg)
-	}
-	sql, args := builder.MustSql()
-	return dao.scan(sql, args)
-}
-
-func (dao Dao) ListId(dType []string) []string {
-	builder := dao.Builder().Select("id").Where("off=?", false).OrderBy("id")
-	if dType!=nil && len(dType)>0{
-		builder = pghelper.WhereUnnestInt(builder,"id in ", dType)
-	}
-	sql, args := builder.MustSql()
-	rows := dao.Query(sql, args...)
-	list := make([]string, 0, 5)
-	defer rows.Close()
-	for rows.Next() {
-		ret, err := rows.SliceScan()
-		if err != nil {
-			panic(exception.New(err.Error()))
-		}
-		list = append(list, ret[0].(string))
-	}
-	return list
-}
-```
 
 # 框架内可配置函数或变量
 

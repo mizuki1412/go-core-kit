@@ -30,5 +30,5 @@ type listAreaParam struct {
 func listArea(ctx *context.Context) {
 	params := listAreaParam{}
 	ctx.BindForm(&params)
-	ctx.JsonSuccess(areadao.New().ListByCity(class.String{String: params.CityCode, Valid: true}))
+	ctx.JsonSuccess(areadao.New().ListByCity(class.NewString(params.CityCode)))
 }

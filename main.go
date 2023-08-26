@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/mizuki1412/go-core-kit/cli"
+	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/mod/common/download"
 	"github.com/mizuki1412/go-core-kit/mod/user"
 	"github.com/mizuki1412/go-core-kit/mod/user/dao/userdao"
@@ -23,15 +24,21 @@ func main() {
 	cli.AddChildCMD(&cobra.Command{
 		Use: "test",
 		Run: func(cmd *cobra.Command, args []string) {
-			dao := userdao.New()
-			u := &model.User{Id: 5}
-			u.Name.Set("test33")
-			u.Role = &model.Role{Id: 1}
-			u.Extend.Put("abc", 1)
-			rn := dao.Update(u)
-			log.Println(rn)
-			//log.Println(jsonkit.ToString(re))
+			//testSQL()
+			log.Println(jsonkit.ToString(userdao.New().SelectOneById(9)))
 		},
 	})
 	cli.Execute()
+}
+
+func testSQL() {
+	dao := userdao.New()
+	u := &model.User{}
+	u.Name.Set("test33")
+	u.Role = &model.Role{Id: 1}
+	dao.InsertObj(u)
+	u.Extend.Put("abc", 1)
+	dao.UpdateObj(u)
+	log.Println(jsonkit.ToString(dao.SelectOneById(u.Id)))
+	log.Println(jsonkit.ToString(dao.Select().Where("name=?", u.Name).List()))
 }

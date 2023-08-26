@@ -37,35 +37,35 @@ func (th *Time) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// todo 默认实现对时区没控制
-func (th *Time) Scan(value any) error {
-	if value == nil {
-		th.Time, th.Valid = time.Time{}, false
-		return nil
-	}
-	var s time.Time
-	var err error
-	if v, ok := value.(time.Time); ok {
-		// todo 默认时区是0000的
-		if v.Location().String() == "" {
-			s = time.Date(v.Year(), v.Month(), v.Day(), v.Hour(), v.Minute(), v.Second(), v.Nanosecond(), time.Local)
-		} else {
-			s = v
-		}
-	} else {
-		s, err = timekit.Parse(cast.ToString(value))
-		if err != nil {
-			return err
-		}
-	}
-	th.Valid = true
-	th.Time = s
-	return err
-}
+// todo 默认实现对时区没控制?
+//func (th *Time) Scan(value any) error {
+//	if value == nil {
+//		th.Time, th.Valid = time.Time{}, false
+//		return nil
+//	}
+//	var s time.Time
+//	var err error
+//	if v, ok := value.(time.Time); ok {
+//		// todo 默认时区是0000的
+//		if v.Location().String() == "" {
+//			s = time.Date(v.Year(), v.Month(), v.Day(), v.Hour(), v.Minute(), v.Second(), v.Nanosecond(), time.Local)
+//		} else {
+//			s = v
+//		}
+//	} else {
+//		s, err = timekit.Parse(cast.ToString(value))
+//		if err != nil {
+//			return err
+//		}
+//	}
+//	th.Valid = true
+//	th.Time = s
+//	return err
+//}
 
-func (th Time) IsValid() bool {
-	return th.Valid && !th.Time.IsZero()
-}
+//func (th Time) IsValid() bool {
+//	return th.Valid && !th.Time.IsZero()
+//}
 
 func NewTime(val any) Time {
 	th := Time{}
