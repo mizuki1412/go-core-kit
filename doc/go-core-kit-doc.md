@@ -106,6 +106,8 @@ http上传文件流
 
 封装 sonic：https://github.com/bytedance/sonic
 
+https://github.com/bytedance/sonic/blob/main/README_ZH_CN.md
+
 ## httpkit
 
 http client

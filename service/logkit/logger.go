@@ -3,7 +3,6 @@ package logkit
 // logger的抽象
 
 import (
-	"fmt"
 	"github.com/mizuki1412/go-core-kit/cli/configkey"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
@@ -52,7 +51,6 @@ func Init() *zap.Logger {
 			zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout)), level),
 		)
 	} else {
-		fmt.Println(111)
 		core = zapcore.NewTee(
 			// 日志中json方式输出
 			zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.AddSync(getWriter2()), level),

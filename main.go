@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/mizuki1412/go-core-kit/cli"
-	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/mod/common/download"
 	"github.com/mizuki1412/go-core-kit/mod/user"
 	"github.com/mizuki1412/go-core-kit/mod/user/dao/userdao"
@@ -25,14 +24,13 @@ func main() {
 		Use: "test",
 		Run: func(cmd *cobra.Command, args []string) {
 			dao := userdao.New()
-			u := &model.User{}
+			u := &model.User{Id: 5}
 			u.Name.Set("test33")
-			u.Off.Set(1)
-			re := dao.List(userdao.ListParam{
-				RoleId:      12,
-				Departments: []int32{1, 2, 3},
-			})
-			log.Println(jsonkit.ToString(re))
+			u.Role = &model.Role{Id: 1}
+			u.Extend.Put("abc", 1)
+			rn := dao.Update(u)
+			log.Println(rn)
+			//log.Println(jsonkit.ToString(re))
 		},
 	})
 	cli.Execute()

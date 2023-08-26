@@ -1,6 +1,7 @@
 package sqlkit
 
 import (
+	"database/sql"
 	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
@@ -51,7 +52,7 @@ func New[T any](ds ...*DataSource) Dao[T] {
 //	dao.modelMeta.init(dao.meta)
 //}
 
-// Builder 结构化语句
+// Deprecated
 func (dao Dao[T]) Builder() SQLBuilder {
 	sb := SQLBuilder{modelMeta: dao.modelMeta}
 	ldv := LogicDelVal
@@ -76,20 +77,23 @@ func (dao Dao[T]) QueryRaw(sql string, args []any) *sqlx.Rows {
 	return dao.dataSource.Query(sql, args)
 }
 
+// Deprecated
 func (dao Dao[T]) Query(builder BuilderInterface) *sqlx.Rows {
 	sql, args := builder.Sql()
 	logkit.DebugConcat(sql, " | args:", jsonkit.ToString(args))
 	return dao.dataSource.Query(sql, args)
 }
 
-func (dao Dao[T]) ExecRaw(sql string, args []any) {
+func (dao Dao[T]) ExecRaw(sql string, args []any) sql.Result {
 	logkit.DebugConcat(sql, " | args:", jsonkit.ToString(args))
-	dao.dataSource.Exec(sql, args)
+	return dao.dataSource.Exec(sql, args)
 }
-func (dao Dao[T]) Exec(builder BuilderInterface) {
-	sql, args := builder.Sql()
-	logkit.DebugConcat(sql, " | args:", jsonkit.ToString(args))
-	dao.dataSource.Exec(sql, args)
+
+// Deprecated
+func (dao Dao[T]) Exec(builder BuilderInterface) sql.Result {
+	sqls, args := builder.Sql()
+	logkit.DebugConcat(sqls, " | args:", jsonkit.ToString(args))
+	return dao.dataSource.Exec(sqls, args)
 }
 
 // QueryList 取值封装list
@@ -159,6 +163,8 @@ func (dao Dao[T]) QueryListMap(builder BuilderInterface) []map[string]any {
 	return list
 }
 
+/// 小功能
+
 func (dao Dao[T]) SelectColumns(excludes ...string) []string {
 	return dao.modelMeta.getSelectColumns(excludes...)
 }
@@ -168,7 +174,6 @@ func (dao Dao[T]) SelectColumnsWithP(prefix string, excludes ...string) []string
 func (dao Dao[T]) Table(alias ...string) string {
 	return dao.modelMeta.getTable(alias...)
 }
-
 func (dao Dao[T]) EscapeNames(name ...string) []string {
 	return dao.modelMeta.escapeNames(name)
 }

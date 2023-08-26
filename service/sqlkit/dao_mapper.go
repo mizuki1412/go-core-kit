@@ -36,7 +36,7 @@ func (dao Dao[T]) Insert(dest *T) {
 	}
 }
 
-func (dao Dao[T]) Update(dest *T) {
+func (dao Dao[T]) Update(dest *T) int64 {
 	builder := dao.Builder().Update()
 	rv := reflect.ValueOf(dest).Elem()
 	for _, e := range dao.modelMeta.allUpdateKeys {
@@ -58,10 +58,12 @@ func (dao Dao[T]) Update(dest *T) {
 		}
 		builder = builder.Where(e.Key+"=?", v)
 	}
-	dao.Exec(builder)
+	res := dao.Exec(builder)
+	rn, _ := res.RowsAffected()
+	return rn
 }
 
-func (dao Dao[T]) DeleteById(id ...any) {
+func (dao Dao[T]) DeleteById(id ...any) int64 {
 	var b BuilderInterface
 	if len(id) != len(dao.modelMeta.allPKs) {
 		panic(exception.New("主键数量不匹配"))
@@ -80,7 +82,9 @@ func (dao Dao[T]) DeleteById(id ...any) {
 		}
 		b = builder
 	}
-	dao.Exec(b)
+	res := dao.Exec(b)
+	rn, _ := res.RowsAffected()
+	return rn
 }
 
 func (dao Dao[T]) SelectOneById(id ...any) *T {

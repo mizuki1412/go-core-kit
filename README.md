@@ -17,6 +17,7 @@ toolkit for golang projects
 - [ ] class中有些类型是写死pg的，对其他数据库不友好： array，jsonarray
 - [ ] class 和 model 中的接受函数测试下，可能在 scan 时有问题
 - [ ] class.time scan test
+- [ ] page()
 
   later：
 - [ ] https://github.com/unrolled/render 模板渲染

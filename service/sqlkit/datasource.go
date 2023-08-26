@@ -1,6 +1,7 @@
 package sqlkit
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/class/exception"
@@ -175,10 +176,10 @@ func (ds *DataSource) Query(sql string, args []any) *sqlx.Rows {
 	return rows
 }
 
-func (ds *DataSource) Exec(sql string, args []any) {
+func (ds *DataSource) Exec(sql string, args []any) sql.Result {
 	if ds.TX != nil {
-		ds.TX.MustExec(sql, args...)
+		return ds.TX.MustExec(sql, args...)
 	} else {
-		ds.DBPool.MustExec(sql, args...)
+		return ds.DBPool.MustExec(sql, args...)
 	}
 }
