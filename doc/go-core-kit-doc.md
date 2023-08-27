@@ -296,8 +296,8 @@ restkit.Run()
 /// 其中action的初始定义demo，并配合使用swagger
 func Init(router *router.Router) {
 	tag := "user:用户模块"
-	router.Group("/rest/user/loginByUsername").Use(middleware.CreateSession()).Post("", loginByUsername).Swagger.Tag(tag).Summary("登录-用户名").Param(loginByUsernameParam{})
-	router.Group("/rest/user/login").Use(middleware.CreateSession()).Post("", login).Swagger.Tag(tag).Summary("登录").Param(loginParam{})
+	router.Group("/rest/user/loginByUsername").Post("", loginByUsername).Swagger.Tag(tag).Summary("登录-用户名").Param(loginByUsernameParam{})
+	router.Group("/rest/user/login").Post("", login).Swagger.Tag(tag).Summary("登录").Param(loginParam{})
 	router.Group("/rest/user/info").Use(middleware.AuthUsernameAndPwd()).Post("", info).Swagger.Tag(tag).Summary("用户信息")
 	r := router.Group("/rest/user", middleware.AuthUsernameAndPwd())
 	{
@@ -340,13 +340,7 @@ type Context struct {
 - DBTx：当前会话的数据库事务
 - BindForm：对 request 的 form/query/json 的参数解析/校验/打印等，需要用 struct 定义参数
 - Json/JsonSuccess/RawSuccess/Html/File/...：response 输出
-- SessionToken/SessionSetUser/...：session 的支持
-
-### context.session
-
-- 不再支持 cookie，因为有禁用的场景；改用 header 中的token 字段。
-- 在登录拦截的时候会获取 token，然后 context.Set/Get，判断后续逻辑。其他拦截如果需要可以参考`authup.go`。
-- session的存储通过 cachekit，支持 redis 和内存。
+- GetJwt/SetJwtCookie/...：jwt的支持（支持 header 和 cookies）
 
 ### router
 
@@ -549,9 +543,9 @@ context.TransferRestRet = func(ret context.RestRet) any {
 }
 ```
 
-### context.HeaderTokenKey
+### context.HeaderTokenKey/CookieTokenKey
 
-request header 中的 token 字段名，用于 session
+request cookie/header 中的 token 字段名，用于 jwt
 
 # service-third
 

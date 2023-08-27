@@ -129,8 +129,16 @@ func EmbedHtmlHandle(fs embed.FS, root string) func(c *context.Context) {
 		// 解析访问路径
 		var assetPath string
 		pathName := c.Proxy.Param("action")
-		if pathName == "" || pathName == "/" {
-			pathName = "index.html"
+		if root == "./knife-ui" {
+			if pathName == "" || pathName == "/" {
+				pathName = "doc.html"
+			} else {
+				pathName = "/webjars" + pathName
+			}
+		} else {
+			if pathName == "" || pathName == "/" {
+				pathName = "index.html"
+			}
 		}
 		assetPath = path.Join(root, pathName)
 		assets, err := fs.Open(assetPath)
@@ -140,7 +148,7 @@ func EmbedHtmlHandle(fs embed.FS, root string) func(c *context.Context) {
 			return
 		}
 		data := make([]byte, 0, 1024*5)
-		for true {
+		for {
 			temp := make([]byte, 1024)
 			n, _ := assets.Read(temp)
 			if n == 0 {
@@ -160,7 +168,7 @@ func EmbedHtmlHandle(fs embed.FS, root string) func(c *context.Context) {
 }
 
 func (router *Router) RegisterSwagger() {
-	router.Get("/swagger-doc", func(c *context.Context) {
+	router.Get("/v3/api-docs/swagger-config", func(c *context.Context) {
 		c.Proxy.Render(http.StatusOK, render.Data{Data: []byte(swg.Doc.ReadDoc()), ContentType: httpconst.ContentTypeJSON})
 		//c.Proxy.Status(http.StatusOK)
 		//_, _ = c.Proxy.Writer.Write([]byte(swg.Doc.ReadDoc()))
@@ -168,4 +176,6 @@ func (router *Router) RegisterSwagger() {
 	// 第二个path表示匹配路径
 	router.Get("/swagger/*action", EmbedHtmlHandle(swg.UiAssets, "./swagger-ui"))
 	router.Get("/swagger", EmbedHtmlHandle(swg.UiAssets, "./swagger-ui"))
+	router.Get("/doc.html", EmbedHtmlHandle(swg.KUiAssets, "./knife-ui"))
+	router.Get("/webjars/*action", EmbedHtmlHandle(swg.KUiAssets, "./knife-ui"))
 }

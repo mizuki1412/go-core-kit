@@ -8,10 +8,11 @@ import (
 	"github.com/spf13/cast"
 )
 
-// ArrInt 针对PG的array
+// ArrInt 针对PG的array，或 mysql 里用 json
 type ArrInt struct {
-	Array pq.Int64Array
-	Valid bool
+	Array  pq.Int64Array
+	Driver string // 指定数据库型号
+	Valid  bool
 }
 
 func (th *ArrInt) MarshalJSON() ([]byte, error) {

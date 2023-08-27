@@ -13,8 +13,8 @@ toolkit for golang projects
 
 # TODO
 
-- [ ] 测试当 redis 没配置时，session 是否正常; 用jwt替代
 - [ ] class中有些类型是写死pg的，对其他数据库不友好： array，jsonarray
+- [ ] swagger 3.0
 
   later：
 - [ ] https://github.com/unrolled/render 模板渲染

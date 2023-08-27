@@ -140,12 +140,12 @@ func (swagger *SwaggerPath) Response(bean any) *SwaggerPath {
 var Doc SwaggerDoc
 
 type SwaggerDoc struct {
-	Swagger  string         `json:"swagger"`
-	Info     map[string]any `json:"info"`
-	Host     string         `json:"host"`
-	BasePath string         `json:"basePath"`
-	tags     []map[string]any
-	Paths    map[string]map[string]map[string]any `json:"paths"`
+	Openapi string         `json:"openapi"`
+	Info    map[string]any `json:"info"`
+	//Host     string         `json:"host"`
+	//BasePath string         `json:"basePath"`
+	tags  []map[string]any
+	Paths map[string]map[string]map[string]any `json:"paths"`
 }
 
 func init() {
@@ -155,13 +155,12 @@ func init() {
 }
 
 func (s *SwaggerDoc) ReadDoc() string {
-	// match openapi 3.0
-	s.Swagger = "2.0"
+	s.Openapi = "3.0.3"
 	s.Info["description"] = configkit.GetString(configkey.SwaggerDescription)
 	s.Info["title"] = configkit.GetString(configkey.SwaggerTitle)
 	s.Info["version"] = configkit.GetString(configkey.SwaggerVersion)
-	s.Host = configkit.GetString(configkey.SwaggerHost)
+	//s.Host = configkit.GetString(configkey.SwaggerHost)
 	// basePath已经在router中直接加上了，在NewPath中需要额外处理
-	s.BasePath = configkit.GetString(configkey.SwaggerBasePath)
+	//s.BasePath = configkit.GetString(configkey.SwaggerBasePath)
 	return jsonkit.ToString(*s)
 }
