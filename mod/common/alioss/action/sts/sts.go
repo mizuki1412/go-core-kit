@@ -3,7 +3,6 @@ package sts
 import (
 	"github.com/mizuki1412/go-core-kit/cli/configkey"
 	"github.com/mizuki1412/go-core-kit/mod/middleware"
-	"github.com/mizuki1412/go-core-kit/mod/user/model"
 	"github.com/mizuki1412/go-core-kit/service-third/aliosskit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
@@ -20,10 +19,11 @@ func Init(router *router.Router) {
 	}
 }
 
-var AdditionFunc = func(user *model.User, schema string) aliosskit.STSData {
-	return aliosskit.GetSTS("user"+cast.ToString(user.Id), configkit.GetString(configkey.AliOSSBucketName), "*")
+var AdditionFunc = func(uid any, schema string) aliosskit.STSData {
+	return aliosskit.GetSTS("user-"+cast.ToString(uid), configkit.GetString(configkey.AliOSSBucketName), "*")
 }
 
 func get(ctx *context.Context) {
-	ctx.JsonSuccess(AdditionFunc(ctx.SessionGetUser(), ctx.SessionGetSchema()))
+	c := ctx.GetJwt()
+	ctx.JsonSuccess(AdditionFunc(c.Id, c.Ext.GetString("schema")))
 }

@@ -130,6 +130,23 @@ http client
 
 应用于数据流帧的拆包粘包处理。
 
+## jwtkit
+
+```go
+claim := jwtkit.New(user.Id)
+claim.Ext.Put("schema", params.Schema)
+token := claim.Token()
+ret := map[string]any{
+  "user":  user,
+  "token": token,
+}
+ctx.SetJwtCookie(claim, token)
+
+uid := ctx.GetJwt().IdInt32()
+
+ctx.GetJwt().IsValid()
+```
+
 ## stringkit
 
 字符串相关处理

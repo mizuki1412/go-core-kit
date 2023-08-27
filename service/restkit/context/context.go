@@ -51,8 +51,8 @@ func (ctx *Context) BindForm(bean any) {
 		body = body[:1024]
 	}
 	logkit.Info("request-body", logkit.Param{
-		Key: "session",
-		Val: ctx.SessionToken(),
+		Key: "jwt",
+		Val: ctx.Get("jwt-token"),
 	}, logkit.Param{Key: "body", Val: body})
 }
 

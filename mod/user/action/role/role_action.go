@@ -13,7 +13,7 @@ import (
 
 func listAllPrivileges(ctx *context.Context) {
 	dao := privilegedao.New()
-	dao.DataSource().Schema = ctx.SessionGetSchema()
+	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	ctx.JsonSuccess(dao.ListPrivileges())
 }
 
@@ -27,7 +27,7 @@ func create(ctx *context.Context) {
 	params := createParams{}
 	ctx.BindForm(&params)
 	departmentDao := departmentdao.New()
-	departmentDao.DataSource().Schema = ctx.SessionGetSchema()
+	departmentDao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	departmentDao.ResultType = departmentdao.ResultNone
 	department := departmentDao.SelectOneById(params.DepartmentId)
 	if department == nil {
@@ -38,7 +38,7 @@ func create(ctx *context.Context) {
 	role.Privileges = params.PrivilegesJson
 	role.Department = department
 	rdao := roledao.New()
-	rdao.DataSource().Schema = ctx.SessionGetSchema()
+	rdao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	rdao.InsertObj(role)
 	ctx.JsonSuccess(nil)
 }
@@ -54,14 +54,14 @@ func update(ctx *context.Context) {
 	params := updateParams{}
 	ctx.BindForm(&params)
 	dao := roledao.New()
-	dao.DataSource().Schema = ctx.SessionGetSchema()
+	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	role := dao.SelectOneById(params.Id)
 	if role == nil {
 		panic(exception.New("角色不存在"))
 	}
 	if params.DepartmentId.Valid && (role.Department == nil || params.DepartmentId.Int32 != role.Department.Id) {
 		departmentDao := departmentdao.New()
-		departmentDao.DataSource().Schema = ctx.SessionGetSchema()
+		departmentDao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 		departmentDao.ResultType = departmentdao.ResultNone
 		d := departmentDao.SelectOneById(params.DepartmentId.Int32)
 		if d == nil {
@@ -87,7 +87,7 @@ func del(ctx *context.Context) {
 	params := delParams{}
 	ctx.BindForm(&params)
 	dao := roledao.New()
-	dao.DataSource().Schema = ctx.SessionGetSchema()
+	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	dao.ResultType = roledao.ResultNone
 	role := dao.SelectOneById(params.Id)
 	if role == nil {
@@ -97,7 +97,7 @@ func del(ctx *context.Context) {
 		panic(exception.New("该角色不可删除"))
 	}
 	userDao := userdao.New()
-	userDao.DataSource().Schema = ctx.SessionGetSchema()
+	userDao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	userDao.ResultType = userdao.ResultNone
 	us := userDao.List(userdao.ListParam{RoleId: params.Id})
 	if us != nil && len(us) > 0 {
@@ -116,7 +116,7 @@ func listRoles(ctx *context.Context) {
 	ctx.BindForm(&params)
 	var roles []*model.Role
 	dao := roledao.New()
-	dao.DataSource().Schema = ctx.SessionGetSchema()
+	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	if params.Root.Valid {
 		roles = dao.ListFromRootDepart(params.Root.Int32)
 	} else {
@@ -139,10 +139,10 @@ func listRolesWithUser(ctx *context.Context) {
 	params := listByRoleParams{}
 	ctx.BindForm(&params)
 	dao := roledao.New()
-	dao.DataSource().Schema = ctx.SessionGetSchema()
+	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	list := dao.List(roledao.ListParam{})
 	udao := userdao.New()
-	udao.DataSource().Schema = ctx.SessionGetSchema()
+	udao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	for _, r := range list {
 		r.Extend.PutAll(map[string]any{
 			"users": udao.List(userdao.ListParam{RoleId: r.Id}),

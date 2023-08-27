@@ -13,13 +13,9 @@ func (dao Dao[T]) _select(fields ...string) SelectDao[T] {
 	}
 	d := SelectDao[T]{
 		builder: squirrel.Select(fields...),
+		Dao:     dao,
 	}
-	d.meta = dao.meta
-	d.dataSource = dao.dataSource
-	d.modelMeta = dao.modelMeta
 	d.LogicDelVal = ldv
-	d.ResultType = dao.ResultType
-	d.Cascade = dao.Cascade
 	return d
 }
 
@@ -54,13 +50,9 @@ func (dao Dao[T]) Update() UpdateDao[T] {
 	}
 	d := UpdateDao[T]{
 		builder: squirrel.Update(dao.modelMeta.getTable()),
+		Dao:     dao,
 	}
-	d.meta = dao.meta
-	d.dataSource = dao.dataSource
-	d.modelMeta = dao.modelMeta
 	d.LogicDelVal = ldv
-	d.ResultType = dao.ResultType
-	d.Cascade = dao.Cascade
 	return d
 }
 
@@ -70,17 +62,13 @@ func (dao Dao[T]) Delete() DeleteDao[T] {
 	}
 	d := DeleteDao[T]{
 		builder: squirrel.Delete(dao.modelMeta.getTable()),
+		Dao:     dao,
 	}
 	ldv := LogicDelVal
 	if len(dao.LogicDelVal) > 0 {
 		ldv = dao.LogicDelVal
 	}
-	d.meta = dao.meta
-	d.dataSource = dao.dataSource
-	d.modelMeta = dao.modelMeta
 	d.LogicDelVal = ldv
-	d.ResultType = dao.ResultType
-	d.Cascade = dao.Cascade
 	return d
 }
 
@@ -90,17 +78,13 @@ func (dao Dao[T]) Insert() InsertDao[T] {
 	}
 	d := InsertDao[T]{
 		builder: squirrel.Insert(dao.modelMeta.getTable()),
+		Dao:     dao,
 	}
 	ldv := LogicDelVal
 	if len(dao.LogicDelVal) > 0 {
 		ldv = dao.LogicDelVal
 	}
-	d.meta = dao.meta
-	d.dataSource = dao.dataSource
-	d.modelMeta = dao.modelMeta
 	d.LogicDelVal = ldv
-	d.ResultType = dao.ResultType
-	d.Cascade = dao.Cascade
 	return d
 }
 
@@ -110,16 +94,12 @@ func (dao Dao[T]) Replace() InsertDao[T] {
 	}
 	d := InsertDao[T]{
 		builder: squirrel.Replace(dao.modelMeta.getTable()),
+		Dao:     dao,
 	}
 	ldv := LogicDelVal
 	if len(dao.LogicDelVal) > 0 {
 		ldv = dao.LogicDelVal
 	}
-	d.meta = dao.meta
-	d.dataSource = dao.dataSource
-	d.modelMeta = dao.modelMeta
 	d.LogicDelVal = ldv
-	d.ResultType = dao.ResultType
-	d.Cascade = dao.Cascade
 	return d
 }

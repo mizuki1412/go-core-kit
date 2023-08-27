@@ -24,7 +24,7 @@ func listUsers(ctx *context.Context) {
 	params := listUsersParams{}
 	ctx.BindForm(&params)
 	dao := userdao.New()
-	dao.DataSource().Schema = ctx.SessionGetSchema()
+	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	list := dao.ListFromRootDepart(params.DepartmentId)
 	if AdditionUserExAdminFunc != nil {
 		for _, u := range list {
@@ -42,7 +42,7 @@ func listByRole(ctx *context.Context) {
 	params := listByRoleParams{}
 	ctx.BindForm(&params)
 	dao := userdao.New()
-	dao.DataSource().Schema = ctx.SessionGetSchema()
+	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	list := dao.List(userdao.ListParam{RoleId: params.RoleId})
 	if AdditionUserExAdminFunc != nil {
 		for _, u := range list {
@@ -74,7 +74,7 @@ func AddUser(ctx *context.Context) {
 
 func AddUserHandle(ctx *context.Context, params AddUserParams, checkSms bool) *model.User {
 	dao := userdao.New()
-	dao.DataSource().Schema = ctx.SessionGetSchema()
+	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	dao.ResultType = userdao.ResultNone
 	if dao.FindByUsername(params.Username.String) != nil {
 		panic(exception.New("用户名已经存在"))
@@ -86,7 +86,7 @@ func AddUserHandle(ctx *context.Context, params AddUserParams, checkSms bool) *m
 		panic(exception.New("验证码错误"))
 	}
 	roleDao := roledao.New()
-	roleDao.DataSource().Schema = ctx.SessionGetSchema()
+	roleDao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	r := roleDao.SelectOneById(params.Role)
 	if r == nil {
 		panic(exception.New("角色不存在"))
@@ -154,7 +154,7 @@ func UpdateUser(ctx *context.Context) {
 
 func UpdateUserHandle(ctx *context.Context, params UpdateParams) {
 	dao := userdao.New()
-	dao.DataSource().Schema = ctx.SessionGetSchema()
+	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	u := dao.SelectOneById(params.Id)
 	if u == nil || u.Off.Int32 == model.UserOffDelete {
 		panic(exception.New("用户不存在"))
@@ -174,7 +174,7 @@ func UpdateUserHandle(ctx *context.Context, params UpdateParams) {
 	}
 	if params.Role > 0 && (u.Role == nil || params.Role != u.Role.Id) {
 		rdao := roledao.New()
-		rdao.DataSource().Schema = ctx.SessionGetSchema()
+		rdao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 		r := rdao.SelectOneById(params.Role)
 		if r == nil {
 			panic(exception.New("role不存在"))
@@ -214,7 +214,7 @@ func infoAdmin(ctx *context.Context) {
 	params := infoAdminParams{}
 	ctx.BindForm(&params)
 	dao := userdao.New()
-	dao.DataSource().Schema = ctx.SessionGetSchema()
+	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	user := dao.SelectOneById(params.Uid)
 	if user == nil {
 		panic(exception.New("无此用户"))
@@ -230,15 +230,15 @@ type DelParams struct {
 func DelUser(ctx *context.Context) {
 	params := DelParams{}
 	ctx.BindForm(&params)
-	mine := ctx.SessionGetUser()
-	if mine == nil {
+	mine := ctx.GetJwt().IdInt32()
+	if mine == 0 {
 		panic(exception.New("登录的用户错误"))
 	}
-	if mine.Id == params.Id {
+	if mine == params.Id {
 		panic(exception.New("不能操作自己"))
 	}
 	dao := userdao.New()
-	dao.DataSource().Schema = ctx.SessionGetSchema()
+	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	target := dao.SelectOneById(params.Id)
 	if target == nil {
 		panic(exception.New("用户不存在"))

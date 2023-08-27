@@ -15,7 +15,6 @@ toolkit for golang projects
 
 - [ ] 测试当 redis 没配置时，session 是否正常; 用jwt替代
 - [ ] class中有些类型是写死pg的，对其他数据库不友好： array，jsonarray
-- [ ] page()
 
   later：
 - [ ] https://github.com/unrolled/render 模板渲染
@@ -37,3 +36,4 @@ toolkit for golang projects
 - dao 采用链式操作
 - dao 的OrderBy注意，一个字段一个
 - dao 级联时注意是否忽略删除标记获取，因为默认是取未删除的
+- rest 取消 session，全面改用 jwt，见 jwtkit 说明

@@ -55,6 +55,9 @@ func (th ModelMetaKey) val(rv reflect.Value) any {
 
 // InitModelMeta obj should be elem
 func (th ModelMeta) init(obj any) ModelMeta {
+	if obj == nil {
+		return ModelMeta{}
+	}
 	rt := reflect.TypeOf(obj)
 	if rt.Kind() != reflect.Struct {
 		panic(exception.New("dao model must struct"))

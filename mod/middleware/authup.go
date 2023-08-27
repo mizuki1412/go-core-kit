@@ -9,20 +9,14 @@ import (
 // AuthUsernameAndPwd 用户名密码校验
 func AuthUsernameAndPwd() router.Handler {
 	return func(ctx *context.Context) {
-		// 注意另外的token情况是在 create_session
-		token := context.GetTokenFromReq(ctx)
-		if token != "" && ctx.Get("_token") == nil {
-			ctx.Set("_token", token)
-		}
-		user := ctx.SessionGetUserOrigin()
-		if user == nil {
+		// 获取 jwt
+		if !ctx.GetJwt().Valid {
 			ctx.Json(context.RestRet{
 				Result:  context.ResultAuthErr,
 				Message: class.NewString("登录失效"),
 			})
 			ctx.Proxy.Abort()
 		} else {
-			ctx.SessionRenew()
 			ctx.Proxy.Next()
 		}
 	}

@@ -8,6 +8,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/mod/user/dao/userdao"
 	"github.com/mizuki1412/go-core-kit/mod/user/model"
+	"github.com/mizuki1412/go-core-kit/service/jwtkit"
 	"github.com/mizuki1412/go-core-kit/service/rediskit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
 	"github.com/mizuki1412/go-core-kit/service/sqlkit/pghelper"
@@ -38,12 +39,14 @@ func loginByUsername(ctx *context.Context) {
 	if user.Off.Int32 == model.UserOffFreeze {
 		panic(exception.New("账户被冻结"))
 	}
-	ctx.SessionSetUser(user)
-	ctx.SessionSetSchema(params.Schema)
+	claim := jwtkit.New(user.Id)
+	claim.Ext.Put("schema", params.Schema)
+	token := claim.Token()
 	ret := map[string]any{
 		"user":  user,
-		"token": ctx.SessionToken(),
+		"token": token,
 	}
+	ctx.SetJwtCookie(claim, token)
 	if AdditionLoginFunc != nil {
 		AdditionLoginFunc(ctx, ret)
 	}
@@ -80,12 +83,14 @@ func login(ctx *context.Context) {
 	if user.Off.Int32 == model.UserOffFreeze {
 		panic(exception.New("账户被冻结"))
 	}
-	ctx.SessionSetUser(user)
-	ctx.SessionSetSchema(params.Schema)
+	claim := jwtkit.New(user.Id)
+	claim.Ext.Put("schema", params.Schema)
+	token := claim.Token()
 	ret := map[string]any{
 		"user":  user,
-		"token": ctx.SessionToken(),
+		"token": token,
 	}
+	ctx.SetJwtCookie(claim, token)
 	if AdditionLoginFunc != nil {
 		AdditionLoginFunc(ctx, ret)
 	}
@@ -110,9 +115,9 @@ func info(ctx *context.Context) {
 	params := infoParam{}
 	ctx.BindForm(&params)
 	dao := userdao.New()
-	dao.DataSource().Schema = ctx.SessionGetSchema()
+	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	if !params.Id.Valid {
-		if params.Schema.String != "" && params.Schema.String != ctx.SessionGetSchema() {
+		if params.Schema.String != "" && params.Schema.String != ctx.GetJwt().Ext.GetString("schema") {
 			ctx.Json(context.RestRet{
 				Result:  context.ResultAuthErr,
 				Message: class.NewString("schema不匹配"),
@@ -121,17 +126,13 @@ func info(ctx *context.Context) {
 		}
 		// 获取自己的
 		// todo 先走数据库
-		user := ctx.SessionGetUser()
-		user = dao.SelectOneById(user.Id)
+		uid := ctx.GetJwt().IdInt32()
+		user := dao.SelectOneById(uid)
 		// todo user不存在时
 		if AdditionUserExFunc != nil {
 			AdditionUserExFunc(ctx, user)
 		}
-		ctx.JsonSuccess(map[string]any{
-			"user":   user,
-			"token":  ctx.SessionToken(),
-			"schema": ctx.SessionGetSchema(),
-		})
+		ctx.JsonSuccess(user)
 	} else {
 		user := dao.SelectOneById(params.Id.Int32)
 		// todo user不存在时
@@ -144,7 +145,7 @@ func info(ctx *context.Context) {
 }
 
 func logout(ctx *context.Context) {
-	ctx.SessionClear()
+	ctx.SetJwtCookie(jwtkit.Claims{}, "")
 	ctx.JsonSuccess(nil)
 }
 
@@ -156,10 +157,10 @@ type updatePwdParam struct {
 func updatePwd(ctx *context.Context) {
 	params := updatePwdParam{}
 	ctx.BindForm(&params)
-	u := ctx.SessionGetUser()
+	uid := ctx.GetJwt().IdInt32()
 	dao := userdao.New()
-	dao.DataSource().Schema = ctx.SessionGetSchema()
-	user := dao.SelectOneById(u.Id)
+	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
+	user := dao.SelectOneById(uid)
 	if user == nil {
 		panic(exception.New("用户不存在"))
 	}
@@ -168,7 +169,6 @@ func updatePwd(ctx *context.Context) {
 	}
 	user.Pwd.Set(cryptokit.MD5(params.NewPwd))
 	dao.UpdateObj(user)
-	ctx.SessionSetUser(user)
 	ctx.JsonSuccess(nil)
 }
 
@@ -186,12 +186,13 @@ type updateUserInfoParam struct {
 }
 
 func updateUserInfo(ctx *context.Context) {
-	u := ctx.SessionGetUser()
+	uid := ctx.GetJwt().IdInt32()
 	params := updateUserInfoParam{}
 	ctx.BindForm(&params)
 	dao := userdao.New()
-	dao.DataSource().Schema = ctx.SessionGetSchema()
+	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	dao.ResultType = userdao.ResultNone
+	u := dao.SelectOneWithDelById(uid)
 	if params.Phone.Valid && params.Phone.String != "" && params.Phone.String != u.Phone.String {
 		if dao.FindByPhone(params.Phone.String) != nil {
 			panic(exception.New("手机号已被注册"))
