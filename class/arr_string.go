@@ -2,15 +2,19 @@ package class
 
 import (
 	"database/sql/driver"
+	"errors"
 	"github.com/lib/pq"
+	"github.com/mizuki1412/go-core-kit/class/const/sqlconst"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/arraykit"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 )
 
 type ArrString struct {
-	Array pq.StringArray
-	Valid bool
+	Array     []string
+	Valid     bool
+	dbDriver  string // 指定数据库型号
+	forceJson bool   // 考虑到 pg 时可能 array or jsonb，true 则强制 jsonb
 }
 
 func (th ArrString) MarshalJSON() ([]byte, error) {
@@ -37,6 +41,13 @@ func (th ArrString) IsValid() bool {
 	return th.Valid
 }
 
+func (th *ArrString) SetDBDriver(driver string) {
+	th.dbDriver = driver
+}
+func (th *ArrString) SetForceJson(f bool) {
+	th.forceJson = f
+}
+
 // Scan implements the Scanner interface.
 func (th *ArrString) Scan(value any) error {
 	if value == nil {
@@ -44,7 +55,22 @@ func (th *ArrString) Scan(value any) error {
 		return nil
 	}
 	th.Valid = true
-	return th.Array.Scan(value)
+	// 通过首字符判断
+	val := string(value.([]byte))
+	switch val[0] {
+	case '[':
+		return jsonkit.ParseObj(val, &th.Array)
+	case '{':
+		var v pq.StringArray = th.Array
+		err := v.Scan(value)
+		if err != nil {
+			return err
+		}
+		th.Array = v
+		return nil
+	default:
+		return errors.New("scan not support")
+	}
 }
 
 // Value implements the driver Valuer interface.
@@ -52,7 +78,12 @@ func (th ArrString) Value() (driver.Value, error) {
 	if !th.Valid {
 		return nil, nil
 	}
-	return th.Array.Value()
+	if th.dbDriver == sqlconst.Postgres && !th.forceJson {
+		var v pq.StringArray = th.Array
+		return v.Value()
+	} else {
+		return jsonkit.ToString(th.Array), nil
+	}
 }
 
 func NewArrString(val any) ArrString {

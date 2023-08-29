@@ -50,14 +50,14 @@ func (th *MapStringSync) Scan(value any) error {
 }
 
 // Value implements the driver Valuer interface.
-func (th *MapStringSync) Value() (driver.Value, error) {
+func (th MapStringSync) Value() (driver.Value, error) {
 	if !th.Valid || th.Map == nil {
 		return nil, nil
 	}
 	return jsonkit.ToString(th.Map), nil
 }
 
-func (th *MapStringSync) IsValid() bool {
+func (th MapStringSync) IsValid() bool {
 	return th.Valid
 }
 

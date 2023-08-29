@@ -2,6 +2,7 @@ package sqlkit
 
 import (
 	"github.com/Masterminds/squirrel"
+	"github.com/mizuki1412/go-core-kit/class/const/sqlconst"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"reflect"
 )
@@ -12,7 +13,7 @@ func (dao Dao[T]) InsertObj(dest *T) {
 	var vals []any
 	rv := reflect.ValueOf(dest).Elem()
 	for _, e := range dao.modelMeta.allInsertKeys {
-		var val = e.val(rv)
+		var val = e.val(rv, dao.dataSource.Driver)
 		if val == nil {
 			continue
 		}
@@ -31,19 +32,19 @@ func (dao Dao[T]) UpdateObj(dest *T) int64 {
 	builder := dao.Update()
 	rv := reflect.ValueOf(dest).Elem()
 	for _, e := range dao.modelMeta.allUpdateKeys {
-		var val = e.val(rv)
+		var val = e.val(rv, dao.dataSource.Driver)
 		if val == nil {
 			continue
 		}
 		// 针对class.MapString 采用merge方式 todo mysql
-		if (e.RStruct.Type.String() == "class.MapString" || e.RStruct.Type.String() == "class.MapStringSync") && dao.dataSource.Driver == Postgres {
+		if (e.RStruct.Type.String() == "class.MapString" || e.RStruct.Type.String() == "class.MapStringSync") && dao.dataSource.Driver == sqlconst.Postgres {
 			builder = builder.Set(e.OriKey, squirrel.Expr("coalesce("+e.OriKey+",'{}'::jsonb) || ?", val))
 		} else {
 			builder = builder.Set(e.OriKey, val)
 		}
 	}
 	for _, e := range dao.modelMeta.allPKs {
-		v := e.val(rv)
+		v := e.val(rv, dao.dataSource.Driver)
 		if v == nil {
 			panic(exception.New("pk val is nil"))
 		}

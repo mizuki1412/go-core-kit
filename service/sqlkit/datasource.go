@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"github.com/mizuki1412/go-core-kit/class/const/sqlconst"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/cli/configkey"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
@@ -37,25 +38,17 @@ type DataSourceParam struct {
 	MaxLife int
 }
 
-const (
-	Postgres  = "postgres"
-	Mysql     = "mysql"
-	SqlServer = "mssql"
-	Oracle    = "oracle"
-	KingBase  = "kingbase"
-)
-
 func getDataSourceName(p DataSourceParam) (string, string) {
 	if p.Driver == "" || p.Host == "" || p.Port == "" {
 		panic(exception.New("sqlkit: database config error"))
 	}
 	var param string
 	switch p.Driver {
-	case Postgres:
+	case sqlconst.Postgres:
 		param = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", p.Host, p.Port, p.User, p.Pwd, p.Name)
-	case Mysql:
+	case sqlconst.Mysql:
 		param = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=true&loc=%s", p.User, p.Pwd, p.Host, p.Port, p.Name, "Asia%2FShanghai")
-	case SqlServer:
+	case sqlconst.SqlServer:
 		param = fmt.Sprintf("server=%s;user id=%s;password=%s;port=%s;database=%s", p.Host, p.User, p.Pwd, p.Port, p.Name)
 	default:
 		panic(exception.New("driver not supported"))
@@ -70,7 +63,7 @@ func NewDataSource(param DataSourceParam) *DataSource {
 		Driver: param.Driver,
 		DBPool: db,
 	}
-	if param.Driver == Postgres {
+	if param.Driver == sqlconst.Postgres {
 		ds.Schema = "public"
 	}
 	return ds
@@ -111,7 +104,7 @@ func DefaultDataSource() *DataSource {
 		Driver: driver,
 		DBPool: defaultDB,
 	}
-	if driver == Postgres {
+	if driver == sqlconst.Postgres {
 		ds.Schema = "public"
 	}
 	return ds
@@ -122,7 +115,7 @@ func (ds *DataSource) decoTableName(tableName string) string {
 	s := ""
 	if ds.Schema != "" {
 		s = ds.Schema + "."
-	} else if ds.Driver == Postgres {
+	} else if ds.Driver == sqlconst.Postgres {
 		s = "public."
 	}
 	return s + ds.escapeName(tableName)
@@ -131,7 +124,7 @@ func (ds *DataSource) decoTableName(tableName string) string {
 // 表名列名的转义符添加
 func (ds *DataSource) escapeName(name string) string {
 	switch ds.Driver {
-	case Mysql:
+	case sqlconst.Mysql:
 		return "`" + name + "`"
 	default:
 		return "\"" + name + "\""

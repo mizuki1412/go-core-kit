@@ -3,6 +3,7 @@ package sqlkit
 import (
 	"fmt"
 	"github.com/Masterminds/squirrel"
+	"github.com/mizuki1412/go-core-kit/class/const/sqlconst"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 )
@@ -198,7 +199,7 @@ func (dao SelectDao[T]) whereNLogicDel() SelectDao[T] {
 // 注意使用时 args...
 func (dao SelectDao[T]) whereUnnest(arr any, key, flag string) SelectDao[T] {
 	switch dao.dataSource.Driver {
-	case Postgres:
+	case sqlconst.Postgres:
 		s, v := pgArray(arr)
 		return dao.Where(fmt.Sprintf("%s %s (select unnest(%s))", dao.modelMeta.escapeName(key), flag, s), v...)
 	default:

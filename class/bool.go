@@ -31,7 +31,7 @@ func (th *Bool) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (th *Bool) IsValid() bool {
+func (th Bool) IsValid() bool {
 	return th.Valid
 }
 

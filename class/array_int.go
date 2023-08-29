@@ -2,7 +2,9 @@ package class
 
 import (
 	"database/sql/driver"
+	"errors"
 	"github.com/lib/pq"
+	"github.com/mizuki1412/go-core-kit/class/const/sqlconst"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/spf13/cast"
@@ -10,9 +12,10 @@ import (
 
 // ArrInt 针对PG的array，或 mysql 里用 json
 type ArrInt struct {
-	Array  pq.Int64Array
-	Driver string // 指定数据库型号
-	Valid  bool
+	Array     []int64
+	Valid     bool
+	dbDriver  string // 指定数据库型号
+	forceJson bool   // 考虑到 pg 时可能 array or jsonb，true 则强制 jsonb
 }
 
 func (th *ArrInt) MarshalJSON() ([]byte, error) {
@@ -35,25 +38,59 @@ func (th *ArrInt) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (th *ArrInt) SetDBDriver(driver string) {
+	th.dbDriver = driver
+}
+func (th *ArrInt) SetForceJson(f bool) {
+	th.forceJson = f
+}
+
 // Scan implements the Scanner interface.
 func (th *ArrInt) Scan(value any) error {
-	if value == nil {
+	if value == nil || len(value.([]byte)) == 0 {
 		th.Array, th.Valid = nil, false
 		return nil
 	}
 	th.Valid = true
-	return th.Array.Scan(value)
+	// 通过首字符判断
+	val := string(value.([]byte))
+	switch val[0] {
+	case '[':
+		return jsonkit.ParseObj(val, &th.Array)
+	case '{':
+		var v pq.Int64Array = th.Array
+		err := v.Scan(value)
+		if err != nil {
+			return err
+		}
+		th.Array = v
+		return nil
+	default:
+		return errors.New("scan not support")
+	}
 }
 
 // Value implements the driver Valuer interface.
-func (th *ArrInt) Value() (driver.Value, error) {
+func (th ArrInt) Value() (driver.Value, error) {
 	if !th.Valid {
 		return nil, nil
 	}
-	return th.Array.Value()
+	if th.dbDriver == sqlconst.Postgres && !th.forceJson {
+		var v pq.Int64Array = th.Array
+		return v.Value()
+	} else {
+		return jsonkit.ToString(th.Array), nil
+	}
 }
 
-func NewArrInt(val any) *ArrInt {
+func NewArrInt(val any) ArrInt {
+	th := ArrInt{}
+	if val != nil {
+		th.Set(val)
+	}
+	return th
+}
+func NArrInt(val any) *ArrInt {
 	th := &ArrInt{}
 	if val != nil {
 		th.Set(val)
@@ -61,7 +98,7 @@ func NewArrInt(val any) *ArrInt {
 	return th
 }
 
-func (th *ArrInt) IsValid() bool {
+func (th ArrInt) IsValid() bool {
 	return th.Valid
 }
 
@@ -70,7 +107,7 @@ func (th *ArrInt) Set(val any) *ArrInt {
 		th.Array = v
 	} else if v, ok := val.(ArrInt); ok {
 		th.Array = v.Array
-	} else if v, ok := val.(pq.Int64Array); ok {
+	} else if v, ok := val.([]int64); ok {
 		th.Array = v
 	} else if v, ok := val.([]int32); ok {
 		arr := make([]int64, 0, len(v))
