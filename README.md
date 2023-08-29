@@ -13,7 +13,6 @@ toolkit for golang projects
 
 # TODO
 
-- [ ] class中有些类型是写死pg的，对其他数据库不友好： array，jsonarray
 - [ ] swagger 3.0
 
   later：
