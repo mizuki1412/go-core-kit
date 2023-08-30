@@ -28,6 +28,7 @@ func defaultEngine() {
 	router = &router2.Router{
 		Proxy: gin.New(),
 	}
+	router.ProxyGroup = &router.Proxy.RouterGroup
 	//router.Proxy.Use(context.InitSession())
 	router.Use(middleware.Log())
 	router.Use(middleware.Cors())
