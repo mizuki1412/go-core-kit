@@ -21,11 +21,7 @@ func (dao SelectDao[T]) One() *T {
 	rows := d.QueryRows()
 	defer rows.Close()
 	for rows.Next() {
-		m := new(T)
-		err := rows.StructScan(m)
-		if err != nil {
-			panic(exception.New(err.Error()))
-		}
+		m := scanStruct[T](rows, dao.dataSource.Driver)
 		if d.Cascade != nil {
 			d.Cascade(m)
 		}

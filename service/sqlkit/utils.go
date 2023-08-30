@@ -2,8 +2,11 @@ package sqlkit
 
 import (
 	"fmt"
+	"github.com/jmoiron/sqlx"
+	"github.com/mizuki1412/go-core-kit/class/constraints"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
+	"reflect"
 )
 
 func logReqSqlInfo(sql string, args []any) string {
@@ -22,12 +25,7 @@ func scanObjList[T any](dao SelectDao[T]) []*T {
 	list := make([]*T, 0, 5)
 	defer rows.Close()
 	for rows.Next() {
-		m := new(T)
-		err := rows.StructScan(m)
-		if err != nil {
-			panic(exception.New(err.Error()))
-		}
-		list = append(list, m)
+		list = append(list, scanStruct[T](rows, dao.dataSource.Driver))
 	}
 	if dao.Cascade != nil {
 		for i := range list {
@@ -35,4 +33,23 @@ func scanObjList[T any](dao SelectDao[T]) []*T {
 		}
 	}
 	return list
+}
+
+func scanStruct[T any](rows *sqlx.Rows, driver string) *T {
+	m := new(T)
+	// 处理 arr, 只针对 struct; 设置 dbdriver
+	rv := reflect.ValueOf(m).Elem()
+	for i := 0; i < rv.NumField(); i++ {
+		v := rv.Field(i)
+		if v.Kind() == reflect.Struct {
+			if vv, ok := v.Addr().Interface().(constraints.SetDBDriverInterface); ok {
+				vv.SetDBDriver(driver)
+			}
+		}
+	}
+	err := rows.StructScan(m)
+	if err != nil {
+		panic(exception.New(err.Error()))
+	}
+	return m
 }

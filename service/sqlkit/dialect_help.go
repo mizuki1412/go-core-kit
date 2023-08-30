@@ -2,6 +2,7 @@ package sqlkit
 
 import (
 	"github.com/Masterminds/squirrel"
+	"github.com/mizuki1412/go-core-kit/class/const/sqlconst"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"strings"
 )
@@ -93,9 +94,9 @@ func pgArray(arr any) (string, []any) {
 // 占位符
 func placeholder(driver string) squirrel.PlaceholderFormat {
 	switch driver {
-	case Postgres:
+	case sqlconst.Postgres:
 		return squirrel.Dollar
-	case Oracle:
+	case sqlconst.Oracle:
 		return squirrel.Colon
 	default:
 		return squirrel.Question

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/cli"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/mod/common/download"
@@ -25,14 +26,16 @@ func main() {
 	cli.AddChildCMD(&cobra.Command{
 		Use: "test",
 		Run: func(cmd *cobra.Command, args []string) {
-			//testSQL()
-			list, total := userdao.New().Select().OrderBy("id").Page(sqlkit.Page{
-				PageNum: 2, PageSize: 2,
-			})
-			log.Println(jsonkit.ToString(list), total)
+			testArr()
 		},
 	})
 	cli.Execute()
+}
+
+type Bean struct {
+	Id    int32
+	Data  class.ArrInt
+	Data2 *class.ArrInt
 }
 
 func testSQL() {
@@ -45,4 +48,29 @@ func testSQL() {
 	dao.UpdateObj(u)
 	log.Println(jsonkit.ToString(dao.SelectOneById(u.Id)))
 	log.Println(jsonkit.ToString(dao.Select().Where("name=?", u.Name).List()))
+}
+
+func testArr() {
+	dao := New()
+	t := &Test2{}
+	t.Ns.Set([]int64{2, 6, 7})
+	dao.InsertObj(t)
+	log.Println(t)
+	log.Println(jsonkit.ToString(dao.SelectOneById(1)))
+	t.Ns.Set([]int64{4, 5, 3})
+	//dao.UpdateObj(t)
+}
+
+type Test2 struct {
+	Id   int32        `json:"id,omitempty" db:"id" pk:"true" table:"test2" auto:"true"`
+	Name class.String `db:"name"`
+	Ns   class.ArrInt `db:"ns"`
+}
+
+type Dao struct {
+	sqlkit.Dao[Test2]
+}
+
+func New(ds ...*sqlkit.DataSource) Dao {
+	return Dao{sqlkit.New[Test2](ds...)}
 }

@@ -170,28 +170,28 @@ func (ctx *Context) bindStruct(bean any) {
 			if !stringkit.IsNull(val) {
 				var p []int64
 				_ = jsonkit.ParseObj(val, &p)
-				tmp := class.ArrInt{Array: p, Valid: true}
+				tmp := class.NewArrInt(p)
 				fieldV.Set(reflect.ValueOf(tmp))
 			}
 		case "class.ArrString":
 			if !stringkit.IsNull(val) {
 				var p []string
 				_ = jsonkit.ParseObj(val, &p)
-				tmp := class.ArrString{Array: p, Valid: true}
+				tmp := class.NewArrString(p)
 				fieldV.Set(reflect.ValueOf(tmp))
 			}
 		case "class.MapString":
 			if !stringkit.IsNull(val) {
 				var p map[string]any
 				_ = jsonkit.ParseObj(val, &p)
-				tmp := class.MapString{Map: p, Valid: true}
+				tmp := class.NewMapString(p)
 				fieldV.Set(reflect.ValueOf(tmp))
 			}
 		case "class.MapStringArr":
 			if !stringkit.IsNull(val) {
 				var p []map[string]any
 				_ = jsonkit.ParseObj(val, &p)
-				tmp := class.MapStringArr{Arr: p, Valid: true}
+				tmp := class.NewMapStringArr(p)
 				fieldV.Set(reflect.ValueOf(tmp))
 			}
 		case "class.Time":

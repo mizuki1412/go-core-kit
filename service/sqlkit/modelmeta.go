@@ -1,6 +1,7 @@
 package sqlkit
 
 import (
+	"github.com/mizuki1412/go-core-kit/class/constraints"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"reflect"
 	"strings"
@@ -31,7 +32,7 @@ type ModelMetaKey struct {
 	Auto    bool
 }
 
-func (th ModelMetaKey) val(rv reflect.Value) any {
+func (th ModelMetaKey) val(rv reflect.Value, driver string) any {
 	var val any
 	v := rv.FieldByName(th.RStruct.Name)
 	if v.IsValid() {
@@ -40,15 +41,31 @@ func (th ModelMetaKey) val(rv reflect.Value) any {
 	if v.Kind() == reflect.Pointer && v.IsNil() {
 		return nil
 	}
-	// 当非基础类型时，需要判断 Value 来决定是否有值
+	// 改用 isValid() 判断结构体, 为了一致，必须值接收器
 	if val != nil && (v.Kind() == reflect.Struct || v.Kind() == reflect.Pointer) {
-		method := v.MethodByName("Value")
-		if !method.IsValid() {
-			panic(exception.New("must add Value function or use value receiver: " + th.RStruct.Name))
+		if valm, ok := val.(constraints.IsValidInterface); ok {
+			if !valm.IsValid() {
+				return nil
+			}
+			if v.Kind() == reflect.Struct {
+				if vv, ok := v.Addr().Interface().(constraints.SetDBDriverInterface); ok {
+					vv.SetDBDriver(driver)
+					val = vv
+				}
+			} else {
+				if vv, ok := v.Interface().(constraints.SetDBDriverInterface); ok {
+					vv.SetDBDriver(driver)
+					val = vv
+				}
+			}
 		}
-		if method.Call(nil)[0].Interface() == nil {
-			val = nil
-		}
+		//method := v.MethodByName("Value")
+		//if !method.IsValid() {
+		//	panic(exception.New("must add Value function or use value receiver: " + th.RStruct.Name))
+		//}
+		//if method.Call(nil)[0].Interface() == nil {
+		//	val = nil
+		//}
 	}
 	return val
 }

@@ -73,6 +73,10 @@ _ = cmd.MarkFlagRequired("port")
 
 ## 类库
 
+ 注意：
+
+- 约定，函数`IsValid`和 `Value`必须用值接收器
+
 ### 基本类型
 
 Bool, Decimal, Float64, Int32, Int64, String, Time

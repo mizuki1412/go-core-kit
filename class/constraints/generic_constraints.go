@@ -11,3 +11,11 @@ type Integer interface {
 type Float interface {
 	float32 | float64
 }
+
+type IsValidInterface interface {
+	IsValid() bool
+}
+
+type SetDBDriverInterface interface {
+	SetDBDriver(driver string)
+}
