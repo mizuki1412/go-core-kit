@@ -2,24 +2,21 @@ package context
 
 import (
 	"github.com/gin-gonic/gin/render"
-	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/service/storagekit"
 	"net/http"
 	"net/url"
 )
 
 type RestRet struct {
-	Result  int          `json:"result"`
-	Message class.String `json:"message,omitempty"`
-	Data    any          `json:"data,omitempty"`
-	// 分页信息
-	Total class.Int64 `json:"total,omitempty" description:"总数，如果data是列表并且分页"`
+	Result  int    `json:"result"`
+	Message string `json:"message,omitempty"`
+	Data    any    `json:"data,omitempty"`
+	Total   uint64 `json:"total,omitempty" description:"记录总数，如果data是列表并且分页"`
 }
 
-const ResultErr = 0
-const ResultSuccess = 1
-const ResultAuthErr = 2
-const ResultUnauthorized = 403
+const ResultErr = 500
+const ResultSuccess = 0
+const ResultAuthErr = 401
 
 // TransferRestRet 用于自定义返回结构时的转换
 var TransferRestRet = func(ret RestRet) any {
@@ -32,10 +29,10 @@ func (ctx *Context) Json(ret RestRet) {
 	switch ret.Result {
 	case ResultSuccess:
 		code = http.StatusOK
-	case ResultAuthErr, ResultUnauthorized:
+	case ResultAuthErr:
 		code = http.StatusUnauthorized
 	default:
-		code = http.StatusBadRequest
+		code = http.StatusInternalServerError
 	}
 	ctx.Proxy.JSON(code, TransferRestRet(ret))
 }
@@ -60,14 +57,14 @@ func (ctx *Context) JsonSuccessWithPage(data any, total uint64) {
 	ret := RestRet{
 		Result: ResultSuccess,
 		Data:   data,
+		Total:  total,
 	}
-	ret.Total.Set(total)
 	ctx.Json(ret)
 }
 func (ctx *Context) JsonError(msg string) {
 	ctx.Json(RestRet{
 		Result:  ResultErr,
-		Message: class.NewString(msg),
+		Message: msg,
 	})
 }
 
