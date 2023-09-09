@@ -7,25 +7,25 @@ import (
 
 func Init(router *router.Router) {
 	tag := "user:用户模块"
-	router.Group("/rest/user/loginByUsername").Post("", loginByUsername).Swagger.Tag(tag).Summary("登录-用户名").Param(loginByUsernameParam{})
-	router.Group("/rest/user/login").Post("", login).Swagger.Tag(tag).Summary("登录").Param(loginParam{})
-	router.Group("/rest/user/info").Use(middleware.AuthUsernameAndPwd()).Post("", info).Swagger.Tag(tag).Summary("用户信息")
+	router.Group("/rest/user/loginByUsername").Post("", loginByUsername).Openapi.Tag(tag).Summary("登录-用户名").ReqParam(loginByUsernameParam{})
+	router.Group("/rest/user/login").Post("", login).Openapi.Tag(tag).Summary("登录").ReqParam(loginParam{})
+	router.Group("/rest/user/info").Use(middleware.AuthUsernameAndPwd()).Post("", info).Openapi.Tag(tag).Summary("用户信息")
 	r := router.Group("/rest/user", middleware.AuthUsernameAndPwd())
 	{
-		r.Post("/logout", logout).Swagger.Tag(tag).Summary("登出")
-		r.Post("/updatePwd", updatePwd).Swagger.Tag(tag).Summary("密码修改").Param(updatePwdParam{})
-		r.Post("/updateUserInfo", updateUserInfo).Swagger.Tag(tag).Summary("更新用户信息").Param(updateUserInfoParam{})
+		r.Post("/logout", logout).Openapi.Tag(tag).Summary("登出")
+		r.Post("/updatePwd", updatePwd).Openapi.Tag(tag).Summary("密码修改").ReqParam(updatePwdParam{})
+		r.Post("/updateUserInfo", updateUserInfo).Openapi.Tag(tag).Summary("更新用户信息").ReqParam(updateUserInfoParam{})
 	}
 	r1 := router.Group("/rest/user/admin", middleware.AuthUsernameAndPwd())
 	{
-		r1.Post("/list", listUsers).Swagger.Tag(tag).Summary("用户列表").Param(listUsersParams{})
-		r1.Post("/listByRole", listByRole).Swagger.Tag(tag).Summary("用户列表 by role").Param(listByRoleParams{})
-		r1.Post("/info", infoAdmin).Swagger.Tag(tag).Summary("用户信息").Param(infoAdminParams{})
+		r1.Post("/list", listUsers).Openapi.Tag(tag).Summary("用户列表").ReqParam(listUsersParams{})
+		r1.Post("/listByRole", listByRole).Openapi.Tag(tag).Summary("用户列表 by role").ReqParam(listByRoleParams{})
+		r1.Post("/info", infoAdmin).Openapi.Tag(tag).Summary("用户信息").ReqParam(infoAdminParams{})
 	}
 	r2 := router.Group("/rest/user/admin", middleware.AuthUsernameAndPwd())
 	{
-		r2.Post("/add", AddUser).Swagger.Tag(tag).Summary("添加用户").Param(AddUserParams{})
-		r2.Post("/update", UpdateUser).Swagger.Tag(tag).Summary("修改用户").Param(UpdateParams{})
-		r2.Post("/del", DelUser).Swagger.Tag(tag).Summary("删除冻结用户").Param(DelParams{})
+		r2.Post("/add", AddUser).Openapi.Tag(tag).Summary("添加用户").ReqParam(AddUserParams{})
+		r2.Post("/update", UpdateUser).Openapi.Tag(tag).Summary("修改用户").ReqParam(UpdateParams{})
+		r2.Post("/del", DelUser).Openapi.Tag(tag).Summary("删除冻结用户").ReqParam(DelParams{})
 	}
 }

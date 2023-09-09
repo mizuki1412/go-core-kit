@@ -300,21 +300,17 @@ restkit.Run()
 /// 其中action的初始定义demo，并配合使用swagger
 func Init(router *router.Router) {
 	tag := "user:用户模块"
-	router.Group("/rest/user/loginByUsername").Post("", loginByUsername).Swagger.Tag(tag).Summary("登录-用户名").Param(loginByUsernameParam{})
-	router.Group("/rest/user/login").Post("", login).Swagger.Tag(tag).Summary("登录").Param(loginParam{})
-	router.Group("/rest/user/info").Use(middleware.AuthUsernameAndPwd()).Post("", info).Swagger.Tag(tag).Summary("用户信息")
+	router.Group("/rest/user/loginByUsername").Post("", loginByUsername).Openapi.Tag(tag).Summary("登录-用户名").ReqParam(loginByUsernameParam{})
+	router.Group("/rest/user/login").Post("", login).Openapi.Tag(tag).Summary("登录").ReqParam(loginParam{})
+	router.Group("/rest/user/info").Use(middleware.AuthUsernameAndPwd()).Post("", info).Openapi.Tag(tag).Summary("用户信息")
 	r := router.Group("/rest/user", middleware.AuthUsernameAndPwd())
 	{
-		r.Post("/logout", logout).Swagger.Tag(tag).Summary("登出")
-		r.Post("/updatePwd", updatePwd).Swagger.Tag(tag).Summary("密码修改").Param(updatePwdParam{})
-		r.Post("/updateUserInfo", updateUserInfo).Swagger.Tag(tag).Summary("更新用户信息").Param(updateUserInfoParam{})
+		r.Post("/logout", logout).Openapi.Tag(tag).Summary("登出")
+		r.Post("/updatePwd", updatePwd).Openapi.Tag(tag).Summary("密码修改").ReqParam(updatePwdParam{})
+		r.Post("/updateUserInfo", updateUserInfo).Openapi.Tag(tag).Summary("更新用户信息").ReqParam(updateUserInfoParam{})
 	}
-	r1 := router.Group("/rest/user/admin", middleware.AuthUsernameAndPwd())
-	{
-		r1.Post("/list", listUsers).Swagger.Tag(tag).Summary("用户列表").Param(listUsersParams{})
-		r1.Post("/listByRole", listByRole).Swagger.Tag(tag).Summary("用户列表 by role").Param(listByRoleParams{})
-		r1.Post("/info", infoAdmin).Swagger.Tag(tag).Summary("用户信息").Param(infoAdminParams{})
-	}
+  r.Get("/download", download).Openapi.Tag(tag).Summary("私有下载").ReqParam(downloadParams{}).ResponseStream()
+	r.Post("/upload", upload).Openapi.Tag(tag).Summary("私有上传").ReqBody(uploadParams{})
 }
 ```
 
@@ -366,13 +362,15 @@ type Router struct {
 - 和 swagger 绑定配置，通过 Router.Swagger 来配置 swagger 相关参数。
 - RegisterSwagger：将内置的 swagger-ui 注册到路由
 
-### swagger
+### openapi
 
-标准：https://swagger.io/specification/v2/
+标准：https://swagger.io/specification
 
-swagger-ui可以单独部署，后端只提供doc.json
+v3.1.0
 
-需要在实际项目中配合使用swagger-ui，访问地址为 `ip:port/projectName/swagger` 
+内置两种 ui：swagger-ui （`/swagger`）和 knife-ui（`/doc.html`）
+
+
 
 更新swagger-ui：
 
@@ -384,7 +382,7 @@ swagger-ui可以单独部署，后端只提供doc.json
 <script> <style> href/src 加前缀./swagger
 
 // 修改 swagger-initializer.js
-url: "./swagger-doc",
+url: "/v3/api-docs",
 ```
 
 

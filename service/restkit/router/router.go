@@ -4,9 +4,8 @@ import (
 	"embed"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/render"
-	"github.com/mizuki1412/go-core-kit/class/const/httpconst"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
-	swg "github.com/mizuki1412/go-core-kit/service/restkit/swagger"
+	"github.com/mizuki1412/go-core-kit/service/restkit/openapi"
 	"mime"
 	"net/http"
 	"path"
@@ -16,9 +15,8 @@ import (
 // Router router的抽象
 type Router struct {
 	Proxy      *gin.Engine
-	Base       string
 	ProxyGroup *gin.RouterGroup
-	Swagger    *swg.SwaggerPath
+	Openapi    *openapi.Builder
 }
 type Handler func(ctx *context.Context)
 
@@ -50,8 +48,8 @@ func handlerTransOne(handler Handler) gin.HandlerFunc {
 func (router *Router) Group(path string, handlers ...Handler) *Router {
 	r0 := &Router{
 		Proxy:      router.Proxy,
-		ProxyGroup: router.Proxy.Group(router.Base + path),
-		Base:       router.Base + path,
+		ProxyGroup: router.ProxyGroup.Group(path),
+		Openapi:    router.Openapi,
 	}
 	if len(handlers) > 0 {
 		r0.Use(handlers...)
@@ -60,61 +58,35 @@ func (router *Router) Group(path string, handlers ...Handler) *Router {
 }
 
 func (router *Router) Use(handlers ...Handler) *Router {
-	if router.ProxyGroup != nil {
-		for _, v := range handlers {
-			router.ProxyGroup.Use(handlerTransOne(v))
-		}
-	} else {
-		for _, v := range handlers {
-			router.Proxy.Use(handlerTransOne(v))
-		}
+	for _, v := range handlers {
+		router.ProxyGroup.Use(handlerTransOne(v))
 	}
 	return router
 }
 
-//func (router *Router) OnError(handlers ...Handler) {
-//	for _, v := range handlers {
-//		router.Proxy.(handlerTransOne(v))
-//	}
-//}
-
-func (router *Router) setPath4Swagger(path string, method string) {
-	router.Swagger = swg.NewPath(router.Base+path, method)
+func (router *Router) openapiBuilder(path string, method string) {
+	router.Openapi = openapi.NewBuilder(router.ProxyGroup.BasePath()+path, method)
 }
 
 // Post 此处handle不能当成是use
 func (router *Router) Post(path string, handlers ...Handler) *Router {
-	if router.ProxyGroup != nil {
-		router.ProxyGroup.POST(path, handlerTrans(handlers...)...)
-	} else {
-		router.Proxy.POST(router.Base+path, handlerTrans(handlers...)...)
-	}
-	router.setPath4Swagger(path, "post")
+	router.ProxyGroup.POST(path, handlerTrans(handlers...)...)
+	router.openapiBuilder(path, "post")
 	return router
 }
 func (router *Router) Get(path string, handlers ...Handler) *Router {
-	if router.ProxyGroup != nil {
-		router.ProxyGroup.GET(path, handlerTrans(handlers...)...)
-	} else {
-		router.Proxy.GET(router.Base+path, handlerTrans(handlers...)...)
-	}
-	router.setPath4Swagger(path, "get")
+	router.ProxyGroup.GET(path, handlerTrans(handlers...)...)
+	router.openapiBuilder(path, "get")
+	return router
+}
+func (router *Router) getIgnoreOpenapi(path string, handlers ...Handler) *Router {
+	router.ProxyGroup.GET(path, handlerTrans(handlers...)...)
 	return router
 }
 
-// GetOrigin 不附带router.base
-func (router *Router) GetOrigin(path string, handlers ...Handler) *Router {
-	router.Proxy.GET(path, handlerTrans(handlers...)...)
-	return router
-}
-func (router *Router) Any(path string, handlers ...Handler) *Router {
-	if router.ProxyGroup != nil {
-		router.ProxyGroup.Any(path, handlerTrans(handlers...)...)
-	} else {
-		router.Proxy.Any(router.Base+path, handlerTrans(handlers...)...)
-	}
-	// todo any swagger
-	router.setPath4Swagger(path, "get")
+func (router *Router) GetPost(path string, handlers ...Handler) *Router {
+	router.Get(path, handlers...)
+	router.Post(path, handlers...)
 	return router
 }
 
@@ -168,14 +140,16 @@ func EmbedHtmlHandle(fs embed.FS, root string) func(c *context.Context) {
 }
 
 func (router *Router) RegisterSwagger() {
-	router.Get("/v3/api-docs/swagger-config", func(c *context.Context) {
-		c.Proxy.Render(http.StatusOK, render.Data{Data: []byte(swg.Doc.ReadDoc()), ContentType: httpconst.ContentTypeJSON})
-		//c.Proxy.Status(http.StatusOK)
-		//_, _ = c.Proxy.Writer.Write([]byte(swg.Doc.ReadDoc()))
+	router.getIgnoreOpenapi("/v3/api-docs", func(c *context.Context) {
+		//c.Proxy.Render(http.StatusOK, render.Data{Data: []byte(openapi.Doc.ReadDoc()), ContentType: httpconst.ContentTypeJSON})
+		c.Proxy.JSON(http.StatusOK, openapi.Doc.ReadDoc())
+	})
+	router.getIgnoreOpenapi("/v3/api-docs/swagger-config", func(c *context.Context) {
+		c.Proxy.JSON(http.StatusOK, openapi.Doc.SwaggerConfig())
 	})
 	// 第二个path表示匹配路径
-	router.Get("/swagger/*action", EmbedHtmlHandle(swg.UiAssets, "./swagger-ui"))
-	router.Get("/swagger", EmbedHtmlHandle(swg.UiAssets, "./swagger-ui"))
-	router.Get("/doc.html", EmbedHtmlHandle(swg.KUiAssets, "./knife-ui"))
-	router.Get("/webjars/*action", EmbedHtmlHandle(swg.KUiAssets, "./knife-ui"))
+	router.getIgnoreOpenapi("/swagger/*action", EmbedHtmlHandle(openapi.UiAssets, "./swagger-ui"))
+	router.getIgnoreOpenapi("/swagger", EmbedHtmlHandle(openapi.UiAssets, "./swagger-ui"))
+	router.getIgnoreOpenapi("/doc.html", EmbedHtmlHandle(openapi.KUiAssets, "./knife-ui"))
+	router.getIgnoreOpenapi("/webjars/*action", EmbedHtmlHandle(openapi.KUiAssets, "./knife-ui"))
 }

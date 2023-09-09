@@ -67,17 +67,21 @@ func (th *Time) UnmarshalJSON(data []byte) error {
 //	return th.Valid && !th.Time.IsZero()
 //}
 
-func NewTime(val any) Time {
+func NewTime(val ...any) Time {
 	th := Time{}
-	if val != nil {
-		th.Set(val)
+	if len(val) > 0 {
+		th.Set(val[0])
+	} else {
+		th.Set(time.Now())
 	}
 	return th
 }
-func NTime(val any) *Time {
+func NTime(val ...any) *Time {
 	th := &Time{}
-	if val != nil {
-		th.Set(val)
+	if len(val) > 0 {
+		th.Set(val[0])
+	} else {
+		th.Set(time.Now())
 	}
 	return th
 }

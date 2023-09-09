@@ -56,11 +56,14 @@ func (ctx *Context) BindForm(bean any) {
 	}, logkit.Param{Key: "body", Val: body})
 }
 
-// bean:指针
 // 实现form/query/json中的数据合并获取。
 // description:"xxx" default:"" trim:"true"
 func (ctx *Context) bindStruct(bean any) {
-	rt := reflect.TypeOf(bean).Elem()
+	rt0 := reflect.TypeOf(bean)
+	if rt0.Kind() != reflect.Pointer {
+		panic(exception.New("bindStruct need pointer"))
+	}
+	rt := rt0.Elem()
 	rv := reflect.ValueOf(bean).Elem()
 	// 取json和取form只能同时进行一次，取完，流被关闭了。
 	jsonBody := map[string]any{}

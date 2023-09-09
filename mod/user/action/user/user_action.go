@@ -120,7 +120,7 @@ func info(ctx *context.Context) {
 		if params.Schema.String != "" && params.Schema.String != ctx.GetJwt().Ext.GetString("schema") {
 			ctx.Json(context.RestRet{
 				Result:  context.ResultAuthErr,
-				Message: class.NewString("schema不匹配"),
+				Message: "schema不匹配",
 			})
 			return
 		}

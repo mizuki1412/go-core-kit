@@ -13,8 +13,8 @@ func Init(router *router.Router) {
 	r := router.Group("/rest/debug")
 	r.Use(middleware.AuthUsernameAndPwd())
 	{
-		r.Post("/db/stat", db).Swagger.Tag(tag).Summary("db debug").Param(dbParams{})
-		r.Post("/db/ping", dbPing).Swagger.Tag(tag).Summary("db debug ping").Param(dbParams{})
+		r.Post("/db/stat", db).Openapi.Tag(tag).Summary("db debug").ReqParam(dbParams{})
+		r.Post("/db/ping", dbPing).Openapi.Tag(tag).Summary("db debug ping").ReqParam(dbParams{})
 	}
 }
 

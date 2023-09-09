@@ -18,16 +18,16 @@ func Init(router *router.Router) {
 	r := router.Group("/rest")
 	r.Use(middleware.AuthUsernameAndPwd())
 	{
-		r.Post("/download", download).Swagger.Tag(tag).Summary("私有下载").Param(downloadParams{}).ProduceStream()
-		r.Get("/download", download).Swagger.Tag(tag).Summary("私有下载").Param(downloadParams{}).ProduceStream()
-		r.Post("/upload", upload).Swagger.Tag(tag).Summary("私有上传").Param(uploadParams{})
-		r.Post("/file/list", fileList).Swagger.Tag(tag).Summary("文件列表").Param(fileListParams{})
-		r.Post("/file/del", fileDel).Swagger.Tag(tag).Summary("文件删除").Param(fileListParams{})
+		r.Post("/download", download).Openapi.Tag(tag).Summary("私有下载").ReqParam(downloadParams{}).ResponseStream()
+		r.Get("/download", download).Openapi.Tag(tag).Summary("私有下载").ReqParam(downloadParams{}).ResponseStream()
+		r.Post("/upload", upload).Openapi.Tag(tag).Summary("私有上传").ReqBody(uploadParams{})
+		r.Post("/file/list", fileList).Openapi.Tag(tag).Summary("文件列表").ReqParam(fileListParams{})
+		r.Post("/file/del", fileDel).Openapi.Tag(tag).Summary("文件删除").ReqParam(fileListParams{})
 	}
 	r2 := router.Group("/rest/common")
 	{
-		r2.Post("/download", downloadPublic).Swagger.Tag(tag).Summary("公共下载").Param(downloadParams{}).ProduceStream()
-		r2.Get("/download", downloadPublic).Swagger.Tag(tag).Summary("公共下载").Param(downloadParams{}).ProduceStream()
+		r2.Post("/download", downloadPublic).Openapi.Tag(tag).Summary("公共下载").ReqParam(downloadParams{}).ResponseStream()
+		r2.Get("/download", downloadPublic).Openapi.Tag(tag).Summary("公共下载").ReqParam(downloadParams{}).ResponseStream()
 	}
 }
 

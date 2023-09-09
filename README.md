@@ -37,3 +37,4 @@ toolkit for golang projects
 - dao 级联时注意是否忽略删除标记获取，因为默认是取未删除的
 - rest 取消 session，全面改用 jwt，见 jwtkit 说明
 - rest 默认返回值改变：code=0 表示 ok，code=401 表示未认证（也反映到 httpcode 中）
+- rest swagger接口定义方式改变

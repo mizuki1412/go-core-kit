@@ -9,6 +9,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/mod/user/dao/userdao"
 	"github.com/mizuki1412/go-core-kit/mod/user/model"
 	"github.com/mizuki1412/go-core-kit/service/restkit"
+	"github.com/mizuki1412/go-core-kit/service/restkit/openapi"
 	"github.com/mizuki1412/go-core-kit/service/sqlkit"
 	"github.com/spf13/cobra"
 	"log"
@@ -26,7 +27,8 @@ func main() {
 	cli.AddChildCMD(&cobra.Command{
 		Use: "test",
 		Run: func(cmd *cobra.Command, args []string) {
-			testArr()
+			//testArr()
+			log.Println(jsonkit.ToString(openapi.ApiDocV3{}))
 		},
 	})
 	cli.Execute()
@@ -54,11 +56,12 @@ func testArr() {
 	dao := New()
 	t := &Test2{}
 	t.Ns.Set([]int64{2, 6, 7})
-	dao.InsertObj(t)
+	//dao.InsertObj(t)
 	log.Println(t)
 	log.Println(jsonkit.ToString(dao.SelectOneById(1)))
 	t.Ns.Set([]int64{4, 5, 3})
 	//dao.UpdateObj(t)
+	log.Println(jsonkit.ToString(dao.DataSource().DBPool.Stats()))
 }
 
 type Test2 struct {

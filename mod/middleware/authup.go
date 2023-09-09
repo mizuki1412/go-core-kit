@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
 	"github.com/mizuki1412/go-core-kit/service/restkit/router"
 )
@@ -13,7 +12,7 @@ func AuthUsernameAndPwd() router.Handler {
 		if !ctx.GetJwt().Valid {
 			ctx.Json(context.RestRet{
 				Result:  context.ResultAuthErr,
-				Message: class.NewString("登录失效"),
+				Message: "登录失效",
 			})
 			ctx.Proxy.Abort()
 		} else {

@@ -61,13 +61,14 @@ func bindDefaultFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().String(configkey.DBPwd, "", "")
 	cmd.PersistentFlags().Int(configkey.DBMaxOpen, 25, "最大连接")
 	cmd.PersistentFlags().Int(configkey.DBMaxIdle, 5, "最大空闲连接")
-	cmd.PersistentFlags().Int(configkey.DBMaxLife, 20, "单位/分钟")
+	cmd.PersistentFlags().Int(configkey.DBMaxLife, 10, "单位/分钟")
 
-	cmd.PersistentFlags().String(configkey.SwaggerBasePath, "", "/path")
-	cmd.PersistentFlags().String(configkey.SwaggerHost, "", "可选，默认按swagger-ui所在路径")
-	cmd.PersistentFlags().String(configkey.SwaggerDescription, "", "")
-	cmd.PersistentFlags().String(configkey.SwaggerTitle, "", "")
-	cmd.PersistentFlags().String(configkey.SwaggerVersion, "1.0.0", "")
+	cmd.PersistentFlags().String(configkey.OpenApiDescription, "openapi doc", "")
+	cmd.PersistentFlags().String(configkey.OpenApiTitle, "openapi doc", "")
+	cmd.PersistentFlags().String(configkey.OpenApiVersion, "1.0.0", "")
+	cmd.PersistentFlags().String(configkey.OpenApiContactName, "", "")
+	cmd.PersistentFlags().String(configkey.OpenApiContactUrl, "", "")
+	cmd.PersistentFlags().String(configkey.OpenApiContactEmail, "", "")
 
 	cmd.PersistentFlags().String(configkey.AmapKey, "", "高德key")
 

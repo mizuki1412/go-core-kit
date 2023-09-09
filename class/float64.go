@@ -35,17 +35,17 @@ func (th Float64) IsValid() bool {
 	return th.Valid
 }
 
-func NewFloat64(val any) Float64 {
+func NewFloat64(val ...any) Float64 {
 	th := Float64{}
-	if val != nil {
-		th.Set(val)
+	if len(val) > 0 {
+		th.Set(val[0])
 	}
 	return th
 }
-func NFloat64(val any) *Float64 {
+func NFloat64(val ...any) *Float64 {
 	th := &Float64{}
-	if val != nil {
-		th.Set(val)
+	if len(val) > 0 {
+		th.Set(val[0])
 	}
 	return th
 }

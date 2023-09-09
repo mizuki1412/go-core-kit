@@ -2,6 +2,7 @@ package restkit
 
 import (
 	ctx "context"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/cli/configkey"
@@ -28,20 +29,6 @@ func defaultEngine() {
 	router = &router2.Router{
 		Proxy: gin.New(),
 	}
-	router.ProxyGroup = &router.Proxy.RouterGroup
-	//router.Proxy.Use(context.InitSession())
-	router.Use(middleware.Log())
-	router.Use(middleware.Cors())
-	router.Use(middleware.Recover())
-	//router.Use(cors.Default())
-
-	if configkit.GetBool(configkey.RestPPROF) {
-		// todo  p := pprof.New()
-	}
-	// max request size todo
-	//router.Proxy.Use(iris.LimitRequestBodySize(int64(configkit.GetInt(configkey.RestRequestBodySize, 100)) << 20))
-	// 其他错误如404，
-	//router.OnError(middleware.Cors())
 	// add base path
 	base := configkit.GetString(configkey.RestServerBase)
 	if base != "" {
@@ -51,8 +38,20 @@ func defaultEngine() {
 		if base[len(base)-1] == '/' {
 			base = base[:len(base)-1]
 		}
-		router.Base = base
+		router.ProxyGroup = router.Proxy.Group(base)
+	} else {
+		router.ProxyGroup = &router.Proxy.RouterGroup
 	}
+	router.Use(middleware.Log())
+	router.Use(middleware.Cors())
+	router.Use(middleware.Recover())
+	if configkit.GetBool(configkey.RestPPROF) {
+		//  p := pprof.New()
+	}
+	// max request size todo
+	//router.Proxy.Use(iris.LimitRequestBodySize(int64(configkit.GetInt(configkey.RestRequestBodySize, 100)) << 20))
+	// 其他错误如404，
+	//router.OnError(middleware.Cors())
 }
 
 func Run(listeners ...net.Listener) error {
@@ -75,11 +74,11 @@ func Run(listeners ...net.Listener) error {
 	go func() {
 		logkit.Info("Listening and serving HTTP on " + port)
 		if len(listeners) == 0 {
-			if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 				logkit.Fatal(exception.New(err.Error()))
 			}
 		} else {
-			if err := server.Serve(listeners[0]); err != nil && err != http.ErrServerClosed {
+			if err := server.Serve(listeners[0]); err != nil && !errors.Is(err, http.ErrServerClosed) {
 				logkit.Fatal(exception.New(err.Error()))
 			}
 		}

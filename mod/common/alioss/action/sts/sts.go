@@ -15,7 +15,7 @@ func Init(router *router.Router) {
 	r := router.Group("/rest/sts")
 	r.Use(middleware.AuthUsernameAndPwd())
 	{
-		r.Post("/get", get).Swagger.Tag(tag).Summary("ali sts 获取")
+		r.Post("/get", get).Openapi.Tag(tag).Summary("ali sts 获取")
 	}
 }
 

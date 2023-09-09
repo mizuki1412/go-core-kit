@@ -69,18 +69,18 @@ func (th String) IsValid() bool {
 	return th.Valid
 }
 
-func NewString(val any) String {
+func NewString(val ...any) String {
 	th := String{}
-	if val != nil {
-		th.Set(val)
+	if len(val) > 0 {
+		th.Set(val[0])
 	}
 	return th
 }
 
-func NString(val any) *String {
+func NString(val ...any) *String {
 	th := &String{}
-	if val != nil {
-		th.Set(val)
+	if len(val) > 0 {
+		th.Set(val[0])
 	}
 	return th
 }

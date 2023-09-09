@@ -10,7 +10,7 @@ func Init(router *router.Router) {
 	tag := "common:公共模块"
 	r := router.Group("/rest/common")
 	{
-		r.Post("/weather", weatherInfo).Swagger.Tag(tag).Summary("获取天气信息").Param(weatherInfoParams{})
+		r.Post("/weather", weatherInfo).Openapi.Tag(tag).Summary("获取天气信息").ReqParam(weatherInfoParams{})
 	}
 }
 

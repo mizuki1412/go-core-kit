@@ -36,17 +36,17 @@ func (th Int32) IsValid() bool {
 	return th.Valid
 }
 
-func NewInt32(val any) Int32 {
+func NewInt32(val ...any) Int32 {
 	th := Int32{}
-	if val != nil {
-		th.Set(val)
+	if len(val) > 0 {
+		th.Set(val[0])
 	}
 	return th
 }
-func NInt32(val any) *Int32 {
+func NInt32(val ...any) *Int32 {
 	th := &Int32{}
-	if val != nil {
-		th.Set(val)
+	if len(val) > 0 {
+		th.Set(val[0])
 	}
 	return th
 }

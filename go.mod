@@ -17,7 +17,7 @@ require (
 	github.com/googollee/go-socket.io v1.7.0
 	github.com/jlaffaye/ftp v0.2.0
 	github.com/jmoiron/sqlx v1.3.5
-	github.com/lib/pq v1.10.7
+	github.com/lib/pq v1.10.9
 	github.com/mizuki1412/go-webview2 v0.0.0-20211216070425-b98c07fd76eb
 	github.com/panjf2000/gnet/v2 v2.3.1
 	github.com/redis/go-redis/v9 v9.0.5

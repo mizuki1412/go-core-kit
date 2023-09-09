@@ -35,17 +35,17 @@ func (th Int64) IsValid() bool {
 	return th.Valid
 }
 
-func NewInt64(val any) Int64 {
+func NewInt64(val ...any) Int64 {
 	th := Int64{}
-	if val != nil {
-		th.Set(val)
+	if len(val) > 0 {
+		th.Set(val[0])
 	}
 	return th
 }
-func NInt64(val any) *Int64 {
+func NInt64(val ...any) *Int64 {
 	th := &Int64{}
-	if val != nil {
-		th.Set(val)
+	if len(val) > 0 {
+		th.Set(val[0])
 	}
 	return th
 }

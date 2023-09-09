@@ -35,17 +35,17 @@ func (th Bool) IsValid() bool {
 	return th.Valid
 }
 
-func NewBool(val any) Bool {
+func NewBool(val ...any) Bool {
 	th := Bool{}
-	if val != nil {
-		th.Set(val)
+	if len(val) > 0 {
+		th.Set(val[0])
 	}
 	return th
 }
-func NBool(val any) *Bool {
+func NBool(val ...any) *Bool {
 	th := &Bool{}
-	if val != nil {
-		th.Set(val)
+	if len(val) > 0 {
+		th.Set(val[0])
 	}
 	return th
 }

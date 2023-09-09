@@ -10,10 +10,10 @@ type Decimal struct {
 	decimal.NullDecimal
 }
 
-func NewDecimal(val any) Decimal {
+func NewDecimal(val ...any) Decimal {
 	th := Decimal{}
-	if val != nil {
-		th.Set(val)
+	if len(val) > 0 {
+		th.Set(val[0])
 	}
 	return th
 }
