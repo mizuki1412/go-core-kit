@@ -113,11 +113,8 @@ func (b *Builder) ReqBody(param any) *Builder {
 		switch {
 		case tname == "file":
 			key = "multipart/form-data"
-			e.Type = "array"
-			e.Items = &ApiDocV3Schema{
-				Type:   "string",
-				Format: "binary",
-			}
+			e.Type = "string"
+			e.Format = "binary"
 		case strings.Index(tname, "int") == 0:
 			e.Type = "integer"
 		case strings.Index(tname, "float") == 0:
@@ -153,12 +150,7 @@ func (b *Builder) ResponseStream() *Builder {
 		"200": {
 			Description: "ok",
 			Content: map[string]*ApiDocV3SchemaWrapper{
-				"*/*": {
-					Schema: &ApiDocV3Schema{
-						Type:   "string",
-						Format: "binary",
-					},
-				},
+				"application/octet-stream": {},
 			},
 		},
 	}

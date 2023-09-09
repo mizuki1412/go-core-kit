@@ -13,7 +13,7 @@ toolkit for golang projects
 
 # TODO
 
-- [ ] swagger 3.0
+- [ ] swagger 测试文件上传
 
   later：
 - [ ] https://github.com/unrolled/render 模板渲染

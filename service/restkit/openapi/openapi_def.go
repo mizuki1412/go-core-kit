@@ -66,15 +66,16 @@ type ApiDocV3SchemaWrapper struct {
 }
 
 type ApiDocV3Schema struct {
-	Ref         string                     `json:"$ref,omitempty"`   // ref 和其他的字段不共存 eg:#/components/schemas/LoginReq
-	Type        string                     `json:"type,omitempty"`   // integer, string, number, boolean, object, array
-	Format      string                     `json:"format,omitempty"` // int32/int64, float/double, byte/binary/date/date-time/password/或者任意需要客户端解析-email/uuid/...,
-	Default     any                        `json:"default,omitempty"`
-	Title       string                     `json:"title,omitempty"`
-	Properties  map[string]*ApiDocV3Schema `json:"properties,omitempty"` // type=object, key=属性名
-	Items       *ApiDocV3Schema            `json:"items,omitempty"`      // type=array 时
-	Description string                     `json:"description,omitempty"`
-	Required    []string                   `json:"required,omitempty"` // properties中的key
+	Ref              string                     `json:"$ref,omitempty"`   // ref 和其他的字段不共存 eg:#/components/schemas/LoginReq
+	Type             string                     `json:"type,omitempty"`   // integer, string, number, boolean, object, array
+	Format           string                     `json:"format,omitempty"` // int32/int64, float/double, byte/binary/date/date-time/password/或者任意需要客户端解析-email/uuid/...,
+	Default          any                        `json:"default,omitempty"`
+	Title            string                     `json:"title,omitempty"`
+	Properties       map[string]*ApiDocV3Schema `json:"properties,omitempty"` // type=object, key=属性名
+	Items            *ApiDocV3Schema            `json:"items,omitempty"`      // type=array 时
+	Description      string                     `json:"description,omitempty"`
+	Required         []string                   `json:"required,omitempty"` // properties中的key
+	ContentMediaType string                     `json:"contentMediaType,omitempty"`
 }
 
 type ApiDocV3ComponentObj struct {
