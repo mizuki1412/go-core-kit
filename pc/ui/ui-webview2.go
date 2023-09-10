@@ -13,10 +13,8 @@ var w webview2.WebView
 
 // 单独启动ui时，用于重开ui
 func startUI(param *WinParam) {
-	logkit.Info(100)
 	port := cast.ToString(param.Port)
 	w = webview2.New(param.Debug)
-	logkit.Info(101)
 	if w == nil {
 		logkit.Error("Failed to load webview2.")
 		return

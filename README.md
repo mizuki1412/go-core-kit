@@ -14,10 +14,11 @@ toolkit for golang projects
 # TODO
 
 - [ ] swagger 测试文件上传
+- [ ] swagger response 的定义
+- [ ] knife-ui 详情显示不出来
 
   later：
 - [ ] https://github.com/unrolled/render 模板渲染
-- [ ] swagger response 的定义
 - [ ] mqtt subscribe 中如果执行太久，会重复执行subscribe？ 暂时用go fun处理
 - [ ] sql base mapper: 增加多数据库适配
 - [ ] 改进：关于子查询的优化。where in 等
@@ -38,3 +39,4 @@ toolkit for golang projects
 - rest 取消 session，全面改用 jwt，见 jwtkit 说明
 - rest 默认返回值改变：code=0 表示 ok，code=401 表示未认证（也反映到 httpcode 中）
 - rest swagger接口定义方式改变
+- logkit 基于slog

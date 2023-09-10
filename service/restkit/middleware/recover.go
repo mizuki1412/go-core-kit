@@ -20,7 +20,7 @@ func Recover() router.Handler {
 					logkit.Error(e.Error())
 				} else {
 					msg = cast.ToString(err)
-					logkit.Error(exception.New(msg, 3))
+					logkit.ErrorOrigin(exception.New(msg, 3).Error())
 				}
 				if ctx.Proxy.IsAborted() {
 					return

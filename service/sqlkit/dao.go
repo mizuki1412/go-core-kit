@@ -49,12 +49,12 @@ func (dao Dao[T]) DataSource() *DataSource {
 }
 
 func (dao Dao[T]) QueryRaw(sql string, args []any) *sqlx.Rows {
-	logkit.DebugConcat(logReqSqlInfo(sql, args))
+	logkit.Debug(logReqSqlInfo(sql, args))
 	return dao.dataSource.Query(sql, args)
 }
 
 func (dao Dao[T]) ExecRaw(sql string, args []any) sql.Result {
-	logkit.DebugConcat(logReqSqlInfo(sql, args))
+	logkit.Debug(logReqSqlInfo(sql, args))
 	return dao.dataSource.Exec(sql, args)
 }
 

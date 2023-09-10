@@ -77,7 +77,7 @@ func ReadString(fileName string) (string, error) {
 func ReadBytes(fileName string) []byte {
 	f, err := os.ReadFile(fileName)
 	if err != nil {
-		logkit.Error(exception.New(err.Error()))
+		logkit.Error(err.Error())
 	}
 	return f
 }

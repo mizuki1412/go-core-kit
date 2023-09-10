@@ -141,7 +141,6 @@ func EmbedHtmlHandle(fs embed.FS, root string) func(c *context.Context) {
 
 func (router *Router) RegisterSwagger() {
 	router.getIgnoreOpenapi("/v3/api-docs", func(c *context.Context) {
-		//c.Proxy.Render(http.StatusOK, render.Data{Data: []byte(openapi.Doc.ReadDoc()), ContentType: httpconst.ContentTypeJSON})
 		c.Proxy.JSON(http.StatusOK, openapi.Doc.ReadDoc())
 	})
 	router.getIgnoreOpenapi("/v3/api-docs/swagger-config", func(c *context.Context) {

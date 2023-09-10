@@ -3,7 +3,6 @@ package bytekit
 import (
 	"bytes"
 	"encoding/binary"
-	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cast"
 )
@@ -14,7 +13,7 @@ func num2Bytes(i any) []byte {
 	// 数字转 []byte, 网络字节序为大端字节序
 	err := binary.Write(buf, binary.BigEndian, i)
 	if err != nil {
-		logkit.Error(exception.New(err.Error()))
+		logkit.Error(err.Error())
 		return arr
 	}
 	return buf.Bytes()

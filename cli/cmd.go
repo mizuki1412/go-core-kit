@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cobra"
 )
 
@@ -15,6 +16,7 @@ func decoCmd(cmd *cobra.Command) {
 	run := cmd.Run
 	cmd.Run = func(cmd *cobra.Command, args []string) {
 		loadConfig()
+		logkit.Init()
 		run(cmd, args)
 	}
 }

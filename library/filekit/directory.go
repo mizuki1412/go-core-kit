@@ -1,7 +1,6 @@
 package filekit
 
 import (
-	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"io/fs"
 	"path/filepath"
@@ -21,7 +20,7 @@ func ListFileNames(dir string) []string {
 		return nil
 	})
 	if err != nil {
-		logkit.Error(exception.New(err.Error()))
+		logkit.Error(err.Error())
 	}
 	return files
 }

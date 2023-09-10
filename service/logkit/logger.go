@@ -3,66 +3,54 @@ package logkit
 // logger的抽象
 
 import (
+	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/cli/configkey"
-	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/library/timekit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
-	"github.com/spf13/cast"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
-	"os"
-	"strings"
-	"time"
+	"log/slog"
+	"sync"
 )
 
-var Logger *zap.Logger
+var once sync.Once
+var fileLogger *slog.Logger
 
-func Init() *zap.Logger {
-	config := zapcore.EncoderConfig{
-		TimeKey:       "time",
-		LevelKey:      "level",
-		NameKey:       "Logger",
-		MessageKey:    "msg",
-		StacktraceKey: "trace",
-		LineEnding:    zapcore.DefaultLineEnding,
-		EncodeLevel:   zapcore.CapitalLevelEncoder,
-		EncodeTime: func(t time.Time, encoder zapcore.PrimitiveArrayEncoder) {
-			encoder.AppendString(t.Format(timekit.TimeLayoutAll))
-		},
-		EncodeDuration: zapcore.SecondsDurationEncoder,
-		EncodeCaller:   zapcore.ShortCallerEncoder,
-	}
-	var core zapcore.Core
-	level := zap.InfoLevel
-	switch configkit.GetString(configkey.LogLevel) {
-	case "debug":
-		level = zap.DebugLevel
-	case "warn":
-		level = zap.WarnLevel
-	case "error":
-		level = zap.ErrorLevel
-	}
-	if !configkit.Exist(configkey.LogPath) {
-		core = zapcore.NewTee(
-			// console中基本展示
-			zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout)), level),
-		)
-	} else {
-		core = zapcore.NewTee(
-			// 日志中json方式输出
-			zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.AddSync(getWriter2()), level),
-			// console中基本展示
-			zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout)), level),
-		)
-	}
-	Logger = zap.New(core)
-	return Logger
+func Init() {
+	once.Do(func() {
+		var level slog.Level
+		switch configkit.GetString(configkey.LogLevel) {
+		case "debug":
+			level = slog.LevelDebug
+		case "warn":
+			level = slog.LevelWarn
+		case "error":
+			level = slog.LevelError
+		default:
+			level = slog.LevelInfo
+		}
+		option := &slog.HandlerOptions{
+			ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+				if a.Key == slog.TimeKey {
+					a.Value = slog.AnyValue(a.Value.Time().Format(timekit.TimeLayout))
+				}
+				return a
+			},
+			Level: level,
+		}
+		if configkit.Exist(configkey.LogPath) {
+			switch configkit.GetString(configkey.LogType) {
+			case "json":
+				fileLogger = slog.New(slog.NewJSONHandler(getRollWriter(), option))
+			default:
+				fileLogger = slog.New(slog.NewTextHandler(getRollWriter(), option))
+			}
+		}
+	})
 }
 
-func getWriter2() io.Writer {
+func getRollWriter() io.Writer {
 	filename := configkit.GetString(configkey.LogName)
 	filepath := configkit.GetString(configkey.LogPath)
 	if stringkit.IsNull(filepath) {
@@ -80,80 +68,26 @@ func getWriter2() io.Writer {
 	return config
 }
 
-type Param struct {
-	Key string
-	Val any
+func Debug(msg string, args ...any) {
+	slog.Debug(msg, args...)
+	if fileLogger != nil {
+		fileLogger.Debug(msg, args...)
+	}
+}
+func Info(msg string, args ...any) {
+	slog.Info(msg, args...)
+	if fileLogger != nil {
+		fileLogger.Info(msg, args...)
+	}
+}
+func Error(msg string, args ...any) {
+	err := exception.New(msg, 2).Error()
+	ErrorOrigin(err, args...)
 }
 
-func Debug(msg any, params ...Param) {
-	if Logger == nil {
-		Logger = Init()
+func ErrorOrigin(msg string, args ...any) {
+	slog.Error(msg, args...)
+	if fileLogger != nil {
+		fileLogger.Error(msg, args...)
 	}
-	if len(params) > 0 {
-		fields := transfer(params, len(params))
-		Logger.Debug(cast.ToString(msg), fields...)
-	} else {
-		Logger.Debug(cast.ToString(msg))
-	}
-}
-func DebugConcat(msg ...string) {
-	Debug(strings.Join(msg, " "))
-}
-func Info(msg any, params ...Param) {
-	if Logger == nil {
-		Logger = Init()
-	}
-	if len(params) > 0 {
-		fields := transfer(params, len(params))
-		Logger.Info(cast.ToString(msg), fields...)
-	} else {
-		Logger.Info(cast.ToString(msg))
-	}
-}
-func InfoConcat(msg ...string) {
-	Info(strings.Join(msg, " "))
-}
-func Error(msg any, params ...Param) {
-	if Logger == nil {
-		Logger = Init()
-	}
-	if len(params) > 0 {
-		fields := transfer(params, len(params))
-		Logger.Error(cast.ToString(msg), fields...)
-	} else {
-		Logger.Error(cast.ToString(msg))
-	}
-}
-func ErrorConcat(msg ...string) {
-	Error(strings.Join(msg, " "))
-}
-func Fatal(msg any, params ...Param) {
-	if Logger == nil {
-		Logger = Init()
-	}
-	if len(params) > 0 {
-		fields := transfer(params, len(params))
-		Logger.Fatal(cast.ToString(msg), fields...)
-	} else {
-		Logger.Fatal(cast.ToString(msg))
-	}
-}
-
-func transfer(params []Param, length int) []zapcore.Field {
-	fields := make([]zapcore.Field, length)
-	for i, p := range params {
-		switch p.Val.(type) {
-		case string:
-			fields[i] = zap.String(p.Key, p.Val.(string))
-		case int:
-			fields[i] = zap.Int(p.Key, p.Val.(int))
-		case float64:
-			fields[i] = zap.Float64(p.Key, p.Val.(float64))
-		case float32:
-			fields[i] = zap.Float32(p.Key, p.Val.(float32))
-		default:
-			fields[i] = zap.String(p.Key, jsonkit.ToString(p.Val))
-		}
-	}
-	return fields
 }

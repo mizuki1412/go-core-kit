@@ -207,6 +207,10 @@ ip 的处理
 
 日志，包括rolling package。
 
+基于slog。
+
+初始化已经包括在cli中（如果单独使用，需要先Init()），使用时直接用slog将只打印到console，用logkit将写入文件（当然也受配置文件控制）
+
 ## cachekit
 
 缓存服务。包含内存和redis。

@@ -10,26 +10,12 @@ import (
 func Log() router.Handler {
 	return func(ctx *context.Context) {
 		t := time.Now()
-		logkit.Info("request",
-			logkit.Param{
-				Key: "url",
-				Val: ctx.Request.URL.String(),
-			})
+		logkit.Info("request", "url", ctx.Request.URL.String())
 
 		ctx.Proxy.Next()
 
 		latency := time.Since(t).Milliseconds()
 		status := ctx.Proxy.Writer.Status()
-		logkit.Info("response",
-			logkit.Param{
-				Key: "url",
-				Val: ctx.Request.URL.String(),
-			}, logkit.Param{
-				Key: "latency",
-				Val: latency,
-			}, logkit.Param{
-				Key: "status",
-				Val: status,
-			})
+		logkit.Info("response", "url", ctx.Request.URL.String(), "latency", latency, "status", status)
 	}
 }

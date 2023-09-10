@@ -16,3 +16,5 @@ const LogMaxBackups = "logger.max-backups"
 const LogMaxSize = "logger.max-size"
 
 const LogLevel = "logger.level"
+
+const LogType = "logger.type"

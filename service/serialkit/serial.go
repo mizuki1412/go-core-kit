@@ -83,7 +83,7 @@ func Receive(handle func([]byte, []byte) ([]byte, bool), timeoutMill int) chan [
 			}
 			n, err := connect.Read(buff)
 			if err != nil {
-				logkit.Error(exception.New(err.Error()))
+				logkit.Error(err.Error())
 				ch <- nil
 				close(ch)
 				break

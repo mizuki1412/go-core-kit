@@ -44,6 +44,7 @@ func bindDefaultFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().Int(configkey.LogMaxBackups, 0, "最大保留个数")
 	cmd.PersistentFlags().Int(configkey.LogMaxSize, 20, "单文件最大尺寸")
 	cmd.PersistentFlags().String(configkey.LogLevel, "", "日志等级 debug/info/warn/error")
+	cmd.PersistentFlags().String(configkey.LogType, "text", "日志写入时的格式 text/json")
 
 	cmd.PersistentFlags().String(configkey.RestServerBase, "", "rest base url")
 	cmd.PersistentFlags().String(configkey.RestServerPort, "10000", "")

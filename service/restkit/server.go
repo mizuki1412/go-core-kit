@@ -75,11 +75,11 @@ func Run(listeners ...net.Listener) error {
 		logkit.Info("Listening and serving HTTP on " + port)
 		if len(listeners) == 0 {
 			if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-				logkit.Fatal(exception.New(err.Error()))
+				panic(exception.New(err.Error()))
 			}
 		} else {
 			if err := server.Serve(listeners[0]); err != nil && !errors.Is(err, http.ErrServerClosed) {
-				logkit.Fatal(exception.New(err.Error()))
+				panic(exception.New(err.Error()))
 			}
 		}
 	}()
@@ -99,7 +99,7 @@ func Run(listeners ...net.Listener) error {
 	ctxt, cancel := ctx.WithTimeout(ctx.Background(), 5*time.Second)
 	defer cancel()
 	if err := server.Shutdown(ctxt); err != nil {
-		logkit.Error(exception.New(err.Error()))
+		logkit.Error(err.Error())
 		return err
 	}
 	return nil
@@ -110,7 +110,7 @@ func Shutdown() {
 		logkit.Info("Shutting down server...")
 		err := server.Shutdown(ctx.Background())
 		if err != nil {
-			logkit.Error(exception.New(err.Error()))
+			logkit.Error(err.Error())
 		}
 	}
 }

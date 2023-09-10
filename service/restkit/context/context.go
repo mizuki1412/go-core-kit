@@ -50,10 +50,7 @@ func (ctx *Context) BindForm(bean any) {
 	if len(body) > 1024 {
 		body = body[:1024]
 	}
-	logkit.Info("request-body", logkit.Param{
-		Key: "jwt",
-		Val: ctx.Get("jwt-token"),
-	}, logkit.Param{Key: "body", Val: body})
+	logkit.Info("request-body", "jwt", ctx.Get("jwt-token"), "body", body)
 }
 
 // 实现form/query/json中的数据合并获取。
@@ -91,7 +88,7 @@ func (ctx *Context) bindStruct(bean any) {
 						Header: file,
 					}))
 				} else {
-					logkit.Error(exception.New(e.Error()))
+					logkit.Error(e.Error())
 				}
 			}
 			continue
