@@ -73,6 +73,7 @@ func (dao Dao[T]) DeleteById(id ...any) int64 {
 	}
 }
 
+// SelectOneById 根据id获取，计算逻辑删除
 func (dao Dao[T]) SelectOneById(id ...any) *T {
 	builder := dao.Select()
 	if len(id) != len(dao.modelMeta.allPKs) {
@@ -84,6 +85,7 @@ func (dao Dao[T]) SelectOneById(id ...any) *T {
 	return builder.One()
 }
 
+// SelectOneWithDelById 根据id获取，忽略逻辑删除
 func (dao Dao[T]) SelectOneWithDelById(id ...any) *T {
 	builder := dao.Select()
 	if len(id) != len(dao.modelMeta.allPKs) {

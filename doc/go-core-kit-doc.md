@@ -386,7 +386,7 @@ v3.1.0
 <script> <style> href/src 加前缀./swagger
 
 // 修改 swagger-initializer.js
-url: "/v3/api-docs",
+url: "./v3/api-docs",
 ```
 
 

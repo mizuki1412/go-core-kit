@@ -31,9 +31,10 @@ toolkit for golang projects
 - class 基础类重构，推荐用 NewXX() 或 NXX() 新建
 - class.Decimal 指针改为值类型
 - class.time 用回默认的 nullTime，观察 scan 的时区是否有问题
+- model定义时sql的标签注意：table、logicDel
 - sqlkit 重构，参考 `doc/goland-live-templates.md`，重新生成dao模板代码
 - dao 函数中带 args 参数的，都改用[]any，一致性
-- dao 采用链式操作
+- dao 采用链式操作 (参考userdao)
 - dao 的OrderBy注意，一个字段一个
 - dao 级联时注意是否忽略删除标记获取，因为默认是取未删除的
 - rest 取消 session，全面改用 jwt，见 jwtkit 说明
