@@ -29,7 +29,7 @@ func Init(router *router.Router) {
 	r := router.Group("/rest/$tag$")
 	r.Use(middleware.AuthUsernameAndPwd())
 	{
-		r.Post("/$name$", $name$).Swagger.Tag(tag).Summary("$summary$").Param($name$Params{})
+		r.Post("/$name$", $name$).Openapi.Tag(tag).Summary("$summary$").ReqParam($name$Params{})
 	}
 }
 
@@ -53,10 +53,10 @@ func Init(router *router.Router) {
 	r := router.Group("/rest/$tag$")
 	r.Use(middleware.AuthUsernameAndPwd())
 	{
-		r.Post("/update", update).Swagger.Tag(tag).Summary("增加和修改").Param(updateParams{})
-		r.Post("/del", del).Swagger.Tag(tag).Summary("删除").Param(delParams{})
-		r.Post("/list", list).Swagger.Tag(tag).Summary("列表").Param(listParams{})
-		r.Post("/detail", detail).Swagger.Tag(tag).Summary("详情").Param(detailParams{})
+		r.Post("/update", update).Openapi.Tag(tag).Summary("增加和修改").ReqParam(updateParams{})
+		r.Post("/del", del).Openapi.Tag(tag).Summary("删除").ReqParam(delParams{})
+		r.Post("/list", list).Openapi.Tag(tag).Summary("列表").ReqParam(listParams{})
+		r.Post("/detail", detail).Openapi.Tag(tag).Summary("详情").ReqParam(detailParams{})
 	}
 }
 

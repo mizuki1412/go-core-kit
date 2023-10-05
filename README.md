@@ -16,6 +16,7 @@ toolkit for golang projects
 - [ ] swagger 测试文件上传
 - [ ] swagger response 的定义
 - [ ] knife-ui 详情显示不出来
+- [ ] logout：实际client的token还会发过来，此时最好配合cache
 
   later：
 - [ ] https://github.com/unrolled/render 模板渲染

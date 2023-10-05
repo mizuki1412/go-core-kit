@@ -21,7 +21,7 @@ type bean struct {
 func Gen(urlPrefix string) {
 	ret, _ := httpkit.Request(httpkit.Req{
 		Method: "GET",
-		Url:    urlPrefix + "/swagger-doc",
+		Url:    urlPrefix + "/v3/api-docs",
 	})
 	var keys []string
 	all := gjson.Get(ret, "paths").Map()

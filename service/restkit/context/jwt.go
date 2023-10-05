@@ -18,7 +18,9 @@ func (ctx *Context) SetJwtCookie(c jwtkit.Claims, token string) {
 	//if strings.Index(origin, "www") == 0 {
 	//	origin = origin[3:]
 	//}
-	ctx.Proxy.SetCookie("token", token, cast.ToInt(c.ExpiresAt.Unix()-time.Now().Unix()), "/", origin, false, true)
+	if c.ExpiresAt != nil {
+		ctx.Proxy.SetCookie("token", token, cast.ToInt(c.ExpiresAt.Unix()-time.Now().Unix()), "/", origin, false, true)
+	}
 }
 
 func (ctx *Context) GetJwt() jwtkit.Claims {

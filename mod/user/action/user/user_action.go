@@ -145,7 +145,8 @@ func info(ctx *context.Context) {
 }
 
 func logout(ctx *context.Context) {
-	ctx.SetJwtCookie(jwtkit.Claims{}, "")
+	// todo 实际client的token还会发过来，此时最好配合cache
+	//ctx.SetJwtCookie(jwtkit.Claims{}, "")
 	ctx.JsonSuccess(nil)
 }
 

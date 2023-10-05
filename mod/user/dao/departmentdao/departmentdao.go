@@ -45,5 +45,5 @@ func (dao Dao) ListByParent(id int32) []*model.Department {
 }
 
 func (dao Dao) ListAll() []*model.Department {
-	return dao.Select().Where("id>=0").OrderBy("parent").OrderBy("no").OrderBy("id").List()
+	return dao.Select().Where("id>0").OrderBy("parent").OrderBy("no").OrderBy("id").List()
 }

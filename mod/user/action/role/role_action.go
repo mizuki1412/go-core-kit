@@ -9,6 +9,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/mod/user/dao/userdao"
 	"github.com/mizuki1412/go-core-kit/mod/user/model"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
+	"time"
 )
 
 func listAllPrivileges(ctx *context.Context) {
@@ -37,6 +38,7 @@ func create(ctx *context.Context) {
 	role.Name.Set(params.Name)
 	role.Privileges = params.PrivilegesJson
 	role.Department = department
+	role.CreateDt.Set(time.Now())
 	rdao := roledao.New()
 	rdao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	rdao.InsertObj(role)

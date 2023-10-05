@@ -86,6 +86,10 @@ func NTime(val ...any) *Time {
 	return th
 }
 
+func (th Time) IsValid() bool {
+	return th.Valid
+}
+
 func (th *Time) Set(val any) {
 	if v, ok := val.(Time); ok {
 		th.Time = v.Time
