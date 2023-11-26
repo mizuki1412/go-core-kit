@@ -3,13 +3,22 @@ package sqlkit
 import (
 	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/spf13/cast"
 )
 
 // 链式查询的
 
 func (dao SelectDao[T]) QueryRows() *sqlx.Rows {
-	return dao.QueryRaw(dao.Sql())
+	sql, args := dao.Sql()
+	defer func() {
+		if err := recover(); err != nil {
+			logkit.Error("error sql: " + sql)
+			panic(err)
+		}
+	}()
+	rows := dao.QueryRaw(sql, args)
+	return rows
 }
 
 func (dao SelectDao[T]) One() *T {

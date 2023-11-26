@@ -6,6 +6,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/class/const/sqlconst"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
+	"strings"
 )
 
 type SelectDao[T any] struct {
@@ -168,6 +169,9 @@ func (dao SelectDao[T]) GroupByRow(groupBys ...string) SelectDao[T] {
 }
 
 func (dao SelectDao[T]) OrderBy(field string) SelectDao[T] {
+	if strings.Contains(field, " ") {
+		panic(exception.New("order by 不能包含空格"))
+	}
 	dao.builder = dao.builder.OrderBy(dao.modelMeta.escapeName(field))
 	return dao
 }
