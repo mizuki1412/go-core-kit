@@ -29,6 +29,10 @@ func (ctx *Context) GetJwt() jwtkit.Claims {
 	}
 	if c := ctx.Get("jwt"); c != nil {
 		if cc, ok := c.(jwtkit.Claims); ok {
+			// 过期
+			if cc.ExpiresAt.Before(time.Now()) {
+				return jwtkit.Claims{}
+			}
 			return cc
 		}
 	}

@@ -32,7 +32,8 @@ func _getCache() {
 type Param struct {
 	Ttl  time.Duration
 	Cost int64
-	// 如果存在redis配置，将从redis操作
+	// 如果存在redis配置，将从redis操作，本地cache只是第二顺序处理
+	// todo 动态检查redis
 	Redis bool
 }
 
