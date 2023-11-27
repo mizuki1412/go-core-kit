@@ -19,6 +19,7 @@ require (
 	github.com/jlaffaye/ftp v0.2.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/lib/pq v1.10.9
+	github.com/minio/minio-go/v7 v7.0.64
 	github.com/mizuki1412/go-webview2 v0.0.0-20211216070425-b98c07fd76eb
 	github.com/panjf2000/gnet/v2 v2.3.3
 	github.com/redis/go-redis/v9 v9.3.0
@@ -72,7 +73,6 @@ require (
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.0.64 // indirect
 	github.com/minio/sha256-simd v1.0.1 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
