@@ -31,10 +31,10 @@ toolkit for golang projects
 - model定义时sql的标签注意：table、logicDel
 - sqlkit 重构，参考 `doc/goland-live-templates.md`，重新生成dao模板代码
 - dao 函数中带 args 参数的，都改用[]any，一致性
-- dao 采用链式操作 (参考userdao)
+- dao 采用链式操作 (参考userdao)，提供了一些基础的封装函数
 - dao 的OrderBy注意，一个字段一个
 - dao 级联时注意是否忽略删除标记获取，因为默认是取未删除的
-- dao resulttype在new时设置，不再动态指定
+- dao resultType去掉，在new时设置，不再动态指定
 - rest 取消 session，全面改用 jwt，见 jwtkit 说明; 也保留了cookie
 - rest 默认返回值改变：code=0 表示 ok，code=401 表示未认证（也反映到 httpcode 中）
 - rest swagger接口定义方式改变

@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// 生成sql中: sth in (select unnest(Array[?,?,?])) []any
+// GenUnnestString 生成sql中: sth in (select unnest(Array[?,?,?])) []any
 // arr必须不能空
 // 注意使用时 args...
 func GenUnnestString(arr []string) (string, []any) {
@@ -38,7 +38,7 @@ func GenUnnestInt64(arr []int64) (string, []any) {
 	return " (select unnest(Array[" + strings.Join(flags, ", ") + "]::int[]))", args
 }
 
-// 返回 Array[?,?,?]
+// GenArrayFlagString 返回 Array[?,?,?]
 func GenArrayFlagString(arr []string) (string, []any) {
 	flags := make([]string, len(arr))
 	args := make([]any, len(arr))
@@ -59,7 +59,7 @@ func GenArrayFlagInt(arr []int32) (string, []any) {
 	return " Array[" + strings.Join(flags, ", ") + "]::int[]", args
 }
 
-// extend->'key' @> '[3]'::jsonb
+// GenJsonArrayFlagInt extend->'key' @> '[3]'::jsonb
 func GenJsonArrayFlagInt(arr []int32) (string, []any) {
 	flags := make([]string, len(arr))
 	args := make([]any, len(arr))
@@ -70,7 +70,7 @@ func GenJsonArrayFlagInt(arr []int32) (string, []any) {
 	return " @> '" + strings.Join(flags, ", ") + "'::jsonb", args
 }
 
-// 封装到builder
+// WhereUnnestString 封装到builder
 func WhereUnnestString(builder squirrel.SelectBuilder, sqlPrefix string, arr []string) squirrel.SelectBuilder {
 	flag, arg := GenUnnestString(arr)
 	return builder.Where(sqlPrefix+flag, arg...)
@@ -101,7 +101,7 @@ func WhereJsonArrayInt(builder squirrel.SelectBuilder, sqlPrefix string, arr []i
 	return builder.Where(sqlPrefix+flag, arg...)
 }
 
-// update, 封装到builder
+// WhereUnnestStringU update, 封装到builder
 func WhereUnnestStringU(builder squirrel.UpdateBuilder, sqlPrefix string, arr []string) squirrel.UpdateBuilder {
 	flag, arg := GenUnnestString(arr)
 	return builder.Where(sqlPrefix+flag, arg...)
