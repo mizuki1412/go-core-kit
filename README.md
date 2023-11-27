@@ -39,3 +39,4 @@ toolkit for golang projects
 - rest 默认返回值改变：code=0 表示 ok，code=401 表示未认证（也反映到 httpcode 中）
 - rest swagger接口定义方式改变
 - logkit 基于slog
+- 配置参数修改：openapi
