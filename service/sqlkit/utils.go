@@ -10,14 +10,12 @@ import (
 )
 
 func logReqSqlInfo(sql string, args []any) string {
-	return fmt.Sprintf(`
-==> %s
+	return fmt.Sprintf(`==> %s
 ==> %s`, sql, jsonkit.ToString(args))
 }
 
 func logResSqlInfo(rows int64) string {
-	return fmt.Sprintf(`
-<== rows: %d`, rows)
+	return fmt.Sprintf(`<== rows: %d`, rows)
 }
 
 func scanObjList[T any](dao SelectDao[T]) []*T {

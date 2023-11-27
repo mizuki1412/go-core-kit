@@ -11,6 +11,7 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
 	"log/slog"
+	"os"
 	"sync"
 )
 
@@ -39,6 +40,7 @@ func Init() {
 			},
 			Level: level,
 		}
+		slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, option)))
 		if configkit.Exist(configkey.LogPath) {
 			switch configkit.GetString(configkey.LogType) {
 			case "json":
