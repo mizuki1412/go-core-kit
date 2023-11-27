@@ -1,22 +1,11 @@
 package sqlkit
 
 import (
-	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/class/constraints"
 	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"reflect"
 )
-
-func logReqSqlInfo(sql string, args []any) string {
-	return fmt.Sprintf(`==> %s
-==> %s`, sql, jsonkit.ToString(args))
-}
-
-func logResSqlInfo(rows int64) string {
-	return fmt.Sprintf(`<== rows: %d`, rows)
-}
 
 func scanObjList[T any](dao SelectDao[T]) []*T {
 	rows := dao.QueryRows()

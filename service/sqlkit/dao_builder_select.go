@@ -5,6 +5,7 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/mizuki1412/go-core-kit/class/const/sqlconst"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"strings"
 )
@@ -21,7 +22,8 @@ type SubQueryInterface interface {
 }
 
 func (dao SelectDao[T]) Print() {
-	logkit.Info(logReqSqlInfo(dao.Sql()))
+	sql, args := dao.Sql()
+	logkit.Info("sql print", "sql", sql, "args", jsonkit.ToString(args))
 }
 
 // 默认占位符的，一般用于子查询

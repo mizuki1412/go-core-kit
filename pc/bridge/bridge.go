@@ -82,7 +82,7 @@ func Start() {
 		Server.ServeHTTP(w, r)
 	}
 	// 和rest base地址区分开; POST和GET都可能
-	restkit.GetRouter().Any("/socket.io/**", func(ctx *context.Context) {
+	restkit.GetRouter().GetPost("/socket.io/**", func(ctx *context.Context) {
 		socketHandle(ctx.Proxy.Writer, ctx.Proxy.Request)
 	})
 }

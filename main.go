@@ -42,7 +42,7 @@ type Bean struct {
 }
 
 func testSQL() {
-	dao := userdao.New()
+	dao := userdao.New(userdao.ResultDefault)
 	u := &model.User{}
 	u.Name.Set("test33")
 	u.Role = &model.Role{Id: 1}

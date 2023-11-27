@@ -3,6 +3,7 @@ package sqlkit
 import (
 	"database/sql"
 	"github.com/jmoiron/sqlx"
+	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 )
 
@@ -49,12 +50,12 @@ func (dao Dao[T]) DataSource() *DataSource {
 }
 
 func (dao Dao[T]) QueryRaw(sql string, args []any) *sqlx.Rows {
-	logkit.Debug(logReqSqlInfo(sql, args))
+	logkit.Debug("sql req", "sql", sql, "args", jsonkit.ToString(args))
 	return dao.dataSource.Query(sql, args)
 }
 
 func (dao Dao[T]) ExecRaw(sql string, args []any) sql.Result {
-	logkit.Debug(logReqSqlInfo(sql, args))
+	logkit.Debug("sql req", "sql", sql, "args", jsonkit.ToString(args))
 	return dao.dataSource.Exec(sql, args)
 }
 

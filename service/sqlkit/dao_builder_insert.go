@@ -3,6 +3,7 @@ package sqlkit
 import (
 	"github.com/Masterminds/squirrel"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 )
 
@@ -12,13 +13,14 @@ type InsertDao[T any] struct {
 }
 
 func (dao InsertDao[T]) Print() {
-	logkit.Info(logReqSqlInfo(dao.Sql()))
+	sql, args := dao.Sql()
+	logkit.Info("sql print", "sql", sql, "args", jsonkit.ToString(args))
 }
 
 func (dao InsertDao[T]) Exec() int64 {
 	res := dao.ExecRaw(dao.Sql())
 	rn, _ := res.RowsAffected()
-	logkit.Debug(logResSqlInfo(rn))
+	logkit.Debug("sql res", "rows", rn)
 	return rn
 }
 
