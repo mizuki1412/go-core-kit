@@ -20,17 +20,17 @@ const (
 	ResultNone
 )
 
-func New(ds ...*sqlkit.DataSource) Dao {
+func New(cascadeType byte, ds ...*sqlkit.DataSource) Dao {
 	dao := sqlkit.New[model.User](ds...)
 	dao.LogicDelVal = []any{-1, 0}
 	dao.Cascade = func(obj *model.User) {
-		switch dao.ResultType {
+		switch cascadeType {
 		case ResultDefault:
 			if obj.Role != nil {
-				obj.Role = roledao.New(dao.DataSource()).SelectOneWithDelById(obj.Role.Id)
+				obj.Role = roledao.New(roledao.ResultDefault, dao.DataSource()).SelectOneWithDelById(obj.Role.Id)
 			}
 			if obj.Department != nil {
-				obj.Department = departmentdao.New(dao.DataSource()).SelectOneWithDelById(obj.Department.Id)
+				obj.Department = departmentdao.New(departmentdao.ResultDefault, dao.DataSource()).SelectOneWithDelById(obj.Department.Id)
 			}
 		case ResultNone:
 			obj.Role = nil
@@ -79,7 +79,10 @@ func (dao Dao) ListFromRootDepart(departId int) []*model.User {
 off>-1 and role>0 and role in 
   ( select id from %s where department in 
      (with recursive t(id) as( values(%d) union all select d.id from %s d, t where t.id=d.parent) select id from t )
-  )`, roledao.New(dao.DataSource()).Table(), departId, departmentdao.New(dao.DataSource()).Table())
+  )`,
+		roledao.New(roledao.ResultDefault, dao.DataSource()).Table(),
+		departId,
+		departmentdao.New(departmentdao.ResultDefault, dao.DataSource()).Table())
 	return dao.Select().Where(where).OrderBy("name").OrderBy("id").List()
 }
 
@@ -103,7 +106,7 @@ func (dao Dao) List(param ListParam) []*model.User {
 	}
 	// 根据role组筛选
 	if len(param.Departments) > 0 {
-		rb := roledao.New().Select("id").WhereUnnestIn("department", param.Departments)
+		rb := roledao.New(roledao.ResultDefault).Select("id").WhereUnnestIn("department", param.Departments)
 		builder = builder.WhereIn("role", rb)
 	}
 	return builder.List()

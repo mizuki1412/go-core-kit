@@ -22,9 +22,8 @@ func departmentCreate(ctx *context.Context) {
 	params := departmentCreateParams{}
 	ctx.BindForm(&params)
 	department := &model.Department{}
-	dao := departmentdao.New()
+	dao := departmentdao.New(departmentdao.ResultNone)
 	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
-	dao.ResultType = departmentdao.ResultNone
 	if params.ParentId.Valid {
 		parent := dao.SelectOneById(params.ParentId.Int32)
 		if parent == nil {
@@ -55,10 +54,9 @@ type departmentUpdateParams struct {
 func departmentUpdate(ctx *context.Context) {
 	params := departmentUpdateParams{}
 	ctx.BindForm(&params)
-	dao := departmentdao.New()
+	dao := departmentdao.New(departmentdao.ResultNone)
 	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	department := dao.SelectOneById(params.Id)
-	dao.ResultType = departmentdao.ResultNone
 	if department == nil {
 		panic(exception.New("部门不存在"))
 	}
@@ -84,16 +82,14 @@ func departmentUpdate(ctx *context.Context) {
 func departmentDel(ctx *context.Context) {
 	params := delParams{}
 	ctx.BindForm(&params)
-	dao := departmentdao.New()
+	dao := departmentdao.New(departmentdao.ResultNone)
 	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
-	dao.ResultType = departmentdao.ResultNone
 	department := dao.SelectOneById(params.Id)
 	if department == nil {
 		panic(exception.New("部门不存在"))
 	}
-	roleDao := roledao.New()
+	roleDao := roledao.New(userdao.ResultNone)
 	roleDao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
-	roleDao.ResultType = userdao.ResultNone
 	rs := roleDao.ListByDepartment(params.Id)
 	if rs != nil && len(rs) > 0 {
 		panic(exception.New("部门下还有角色,不能删除"))
@@ -106,8 +102,7 @@ func departmentDel(ctx *context.Context) {
 }
 
 func listDepartment(ctx *context.Context) {
-	dao := departmentdao.New()
+	dao := departmentdao.New(departmentdao.ResultAll)
 	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
-	dao.ResultType = departmentdao.ResultAll
 	ctx.JsonSuccess(dao.ListAll())
 }

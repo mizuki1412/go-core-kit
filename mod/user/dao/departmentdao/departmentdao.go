@@ -16,11 +16,11 @@ type Dao struct {
 	sqlkit.Dao[model.Department]
 }
 
-func New(ds ...*sqlkit.DataSource) Dao {
+func New(cascadeType byte, ds ...*sqlkit.DataSource) Dao {
 	d := sqlkit.New[model.Department](ds...)
 	dao := Dao{d}
 	dao.Cascade = func(obj *model.Department) {
-		switch dao.ResultType {
+		switch cascadeType {
 		case ResultChildren:
 			obj.Children = dao.ListByParent(obj.Id)
 			obj.Parent = nil

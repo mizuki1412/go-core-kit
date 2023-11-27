@@ -27,9 +27,8 @@ type createParams struct {
 func create(ctx *context.Context) {
 	params := createParams{}
 	ctx.BindForm(&params)
-	departmentDao := departmentdao.New()
+	departmentDao := departmentdao.New(departmentdao.ResultNone)
 	departmentDao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
-	departmentDao.ResultType = departmentdao.ResultNone
 	department := departmentDao.SelectOneById(params.DepartmentId)
 	if department == nil {
 		panic(exception.New("部门不存在"))
@@ -39,7 +38,7 @@ func create(ctx *context.Context) {
 	role.Privileges = params.PrivilegesJson
 	role.Department = department
 	role.CreateDt.Set(time.Now())
-	rdao := roledao.New()
+	rdao := roledao.New(roledao.ResultDefault)
 	rdao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	rdao.InsertObj(role)
 	ctx.JsonSuccess(nil)
@@ -55,16 +54,15 @@ type updateParams struct {
 func update(ctx *context.Context) {
 	params := updateParams{}
 	ctx.BindForm(&params)
-	dao := roledao.New()
+	dao := roledao.New(roledao.ResultDefault)
 	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	role := dao.SelectOneById(params.Id)
 	if role == nil {
 		panic(exception.New("角色不存在"))
 	}
 	if params.DepartmentId.Valid && (role.Department == nil || params.DepartmentId.Int32 != role.Department.Id) {
-		departmentDao := departmentdao.New()
+		departmentDao := departmentdao.New(departmentdao.ResultNone)
 		departmentDao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
-		departmentDao.ResultType = departmentdao.ResultNone
 		d := departmentDao.SelectOneById(params.DepartmentId.Int32)
 		if d == nil {
 			panic(exception.New("部门不存在"))
@@ -88,9 +86,8 @@ type delParams struct {
 func del(ctx *context.Context) {
 	params := delParams{}
 	ctx.BindForm(&params)
-	dao := roledao.New()
+	dao := roledao.New(roledao.ResultNone)
 	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
-	dao.ResultType = roledao.ResultNone
 	role := dao.SelectOneById(params.Id)
 	if role == nil {
 		panic(exception.New("角色不存在"))
@@ -98,9 +95,8 @@ func del(ctx *context.Context) {
 	if val, ok := role.Extend.Map["immutable"]; ok && val.(bool) {
 		panic(exception.New("该角色不可删除"))
 	}
-	userDao := userdao.New()
+	userDao := userdao.New(userdao.ResultNone)
 	userDao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
-	userDao.ResultType = userdao.ResultNone
 	us := userDao.List(userdao.ListParam{RoleId: params.Id})
 	if us != nil && len(us) > 0 {
 		panic(exception.New("角色下还有用户,不能删除"))
@@ -117,7 +113,7 @@ func listRoles(ctx *context.Context) {
 	params := listRolesParam{}
 	ctx.BindForm(&params)
 	var roles []*model.Role
-	dao := roledao.New()
+	dao := roledao.New(roledao.ResultDefault)
 	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	if params.Root.Valid {
 		roles = dao.ListFromRootDepart(params.Root.Int32)
@@ -140,10 +136,10 @@ type listByRoleParams struct {
 func listRolesWithUser(ctx *context.Context) {
 	params := listByRoleParams{}
 	ctx.BindForm(&params)
-	dao := roledao.New()
+	dao := roledao.New(roledao.ResultDefault)
 	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	list := dao.List(roledao.ListParam{})
-	udao := userdao.New()
+	udao := userdao.New(userdao.ResultDefault)
 	udao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	for _, r := range list {
 		r.Extend.PutAll(map[string]any{

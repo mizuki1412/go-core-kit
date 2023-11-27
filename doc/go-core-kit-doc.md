@@ -403,7 +403,6 @@ router.Use(middleware.Recover())
 - cors：跨域
 - recover：异常捕捉：打印、返回错误信息
 
-
 # service-sqlkit
 
 数据库服务
@@ -415,8 +414,6 @@ type Dao[T any] struct {
 	meta T
 	// 逻辑删除的字段，可替代全局的LogicDelVal
 	LogicDelVal []any
-	// 返回级联的类型
-	ResultType byte
 	// 级联实现的函数
 	Cascade func(*T)
 	// 数据源
@@ -434,13 +431,13 @@ const (
 	ResultNone
 )
 
-func New(ds ...*sqlkit.DataSource) Dao {
-	dao := Dao{}
+func New(cascadeType byte, ds ...*sqlkit.DataSource) *Dao {
+	dao := &Dao{}
 	if len(ds) > 0 {
 		dao.SetDataSource(ds[0])
 	}
 	dao.Cascade = func(obj *$name$) {
-		switch dao.ResultType {
+		switch cascadeType {
 		case ResultDefault:
 		case ResultNone:
 		}
@@ -511,8 +508,6 @@ if len(param.Departments) > 0 {
 }
 ```
 
-
-
 ## 注意
 
 - **注意 commit: 如果事务中第一句是select语句，commit将会出错, 错误提示 parse C 等。**
@@ -520,8 +515,6 @@ if len(param.Departments) > 0 {
 - sqlx的`missing destination name sth in sth`，是查询出来的字段和类字段不符，在select中限定字段即可。
 - update set时：`Set("extend",squirrel.Expr("'{}'::jsonb"))` or `Set("extend","{}")`
 - class.mapString在插入数据库时将用jsonb格式，并且不是完全替换，而是merge的方式(```coalesce(extend, '{}'::jsonb) || '$param'::jsonb```)。如果要删除其中的key，需要设置key为null。 merge时只会merge顶层的keys。
-
-
 
 # 框架内可配置函数或变量
 

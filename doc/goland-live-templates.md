@@ -180,10 +180,10 @@ const (
 	ResultNone
 )
 
-func New(ds ...*sqlkit.DataSource) Dao {
+func New(cascadeType byte, ds ...*sqlkit.DataSource) Dao {
 	dao := Dao{sqlkit.New[$name$](ds...)}
 	dao.Cascade = func(obj *$name$) {
-		switch dao.ResultType {
+		switch cascadeType {
 		case ResultDefault:
 		case ResultNone:
 		}

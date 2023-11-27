@@ -7,10 +7,6 @@ toolkit for golang projects
 
 详细说明见 doc/go-core-kit-doc.md
 
-# 其他
-
-## 可替换的函数
-
 # TODO
 
 - [ ] swagger 测试文件上传
@@ -38,7 +34,8 @@ toolkit for golang projects
 - dao 采用链式操作 (参考userdao)
 - dao 的OrderBy注意，一个字段一个
 - dao 级联时注意是否忽略删除标记获取，因为默认是取未删除的
-- rest 取消 session，全面改用 jwt，见 jwtkit 说明
+- dao resulttype在new时设置，不再动态指定
+- rest 取消 session，全面改用 jwt，见 jwtkit 说明; 也保留了cookie
 - rest 默认返回值改变：code=0 表示 ok，code=401 表示未认证（也反映到 httpcode 中）
 - rest swagger接口定义方式改变
 - logkit 基于slog

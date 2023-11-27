@@ -16,10 +16,10 @@ const (
 	ResultNone
 )
 
-func New(ds ...*sqlkit.DataSource) Dao {
+func New(cascadeType byte, ds ...*sqlkit.DataSource) Dao {
 	dao := Dao{sqlkit.New[model.Province](ds...)}
 	dao.Cascade = func(obj *model.Province) {
-		switch dao.ResultType {
+		switch cascadeType {
 		case ResultDefault:
 			obj.Cities = citydao.New(dao.DataSource()).ListByProvince(obj.Code)
 		}

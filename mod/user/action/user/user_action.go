@@ -30,7 +30,7 @@ func loginByUsername(ctx *context.Context) {
 	}
 	params.Username = strings.TrimSpace(params.Username)
 	params.Pwd = cryptokit.MD5(params.Pwd)
-	dao := userdao.New()
+	dao := userdao.New(userdao.ResultDefault)
 	dao.DataSource().Schema = params.Schema
 	user := dao.Login(params.Pwd, params.Username, "")
 	if user == nil {
@@ -74,7 +74,7 @@ func login(ctx *context.Context) {
 	params.Username = strings.TrimSpace(params.Username)
 	params.Phone = strings.TrimSpace(params.Phone)
 	params.Pwd = cryptokit.MD5(params.Pwd)
-	dao := userdao.New()
+	dao := userdao.New(userdao.ResultDefault)
 	dao.DataSource().Schema = params.Schema
 	user := dao.Login(params.Pwd, params.Username, params.Phone)
 	if user == nil {
@@ -114,7 +114,7 @@ type infoParam struct {
 func info(ctx *context.Context) {
 	params := infoParam{}
 	ctx.BindForm(&params)
-	dao := userdao.New()
+	dao := userdao.New(userdao.ResultDefault)
 	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	if !params.Id.Valid {
 		if params.Schema.String != "" && params.Schema.String != ctx.GetJwt().Ext.GetString("schema") {
@@ -159,7 +159,7 @@ func updatePwd(ctx *context.Context) {
 	params := updatePwdParam{}
 	ctx.BindForm(&params)
 	uid := ctx.GetJwt().IdInt32()
-	dao := userdao.New()
+	dao := userdao.New(userdao.ResultDefault)
 	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	user := dao.SelectOneById(uid)
 	if user == nil {
@@ -190,9 +190,8 @@ func updateUserInfo(ctx *context.Context) {
 	uid := ctx.GetJwt().IdInt32()
 	params := updateUserInfoParam{}
 	ctx.BindForm(&params)
-	dao := userdao.New()
+	dao := userdao.New(userdao.ResultNone)
 	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
-	dao.ResultType = userdao.ResultNone
 	u := dao.SelectOneWithDelById(uid)
 	if params.Phone.Valid && params.Phone.String != "" && params.Phone.String != u.Phone.String {
 		if dao.FindByPhone(params.Phone.String) != nil {

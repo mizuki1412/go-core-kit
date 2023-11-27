@@ -23,7 +23,7 @@ type listUsersParams struct {
 func listUsers(ctx *context.Context) {
 	params := listUsersParams{}
 	ctx.BindForm(&params)
-	dao := userdao.New()
+	dao := userdao.New(userdao.ResultDefault)
 	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	list := dao.ListFromRootDepart(params.DepartmentId)
 	if AdditionUserExAdminFunc != nil {
@@ -41,7 +41,7 @@ type listByRoleParams struct {
 func listByRole(ctx *context.Context) {
 	params := listByRoleParams{}
 	ctx.BindForm(&params)
-	dao := userdao.New()
+	dao := userdao.New(userdao.ResultDefault)
 	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	list := dao.List(userdao.ListParam{RoleId: params.RoleId})
 	if AdditionUserExAdminFunc != nil {
@@ -73,9 +73,8 @@ func AddUser(ctx *context.Context) {
 }
 
 func AddUserHandle(ctx *context.Context, params AddUserParams, checkSms bool) *model.User {
-	dao := userdao.New()
+	dao := userdao.New(userdao.ResultNone)
 	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
-	dao.ResultType = userdao.ResultNone
 	if dao.FindByUsername(params.Username.String) != nil {
 		panic(exception.New("用户名已经存在"))
 	}
@@ -85,7 +84,7 @@ func AddUserHandle(ctx *context.Context, params AddUserParams, checkSms bool) *m
 	if params.Phone.Valid && checkSms && (!params.Sms.Valid || rediskit.Get(context2.Background(), rediskit.GetKeyWithPrefix("sms:"+params.Phone.String), "") != params.Sms.String) {
 		panic(exception.New("验证码错误"))
 	}
-	roleDao := roledao.New()
+	roleDao := roledao.New(roledao.ResultDefault)
 	roleDao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	r := roleDao.SelectOneById(params.Role)
 	if r == nil {
@@ -153,7 +152,7 @@ func UpdateUser(ctx *context.Context) {
 }
 
 func UpdateUserHandle(ctx *context.Context, params UpdateParams) {
-	dao := userdao.New()
+	dao := userdao.New(userdao.ResultDefault)
 	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	u := dao.SelectOneById(params.Id)
 	if u == nil || u.Off.Int32 == model.UserOffDelete {
@@ -173,7 +172,7 @@ func UpdateUserHandle(ctx *context.Context, params UpdateParams) {
 		}
 	}
 	if params.Role > 0 && (u.Role == nil || params.Role != u.Role.Id) {
-		rdao := roledao.New()
+		rdao := roledao.New(roledao.ResultDefault)
 		rdao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 		r := rdao.SelectOneById(params.Role)
 		if r == nil {
@@ -213,7 +212,7 @@ type infoAdminParams struct {
 func infoAdmin(ctx *context.Context) {
 	params := infoAdminParams{}
 	ctx.BindForm(&params)
-	dao := userdao.New()
+	dao := userdao.New(userdao.ResultDefault)
 	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	user := dao.SelectOneById(params.Uid)
 	if user == nil {
@@ -237,7 +236,7 @@ func DelUser(ctx *context.Context) {
 	if mine == params.Id {
 		panic(exception.New("不能操作自己"))
 	}
-	dao := userdao.New()
+	dao := userdao.New(userdao.ResultDefault)
 	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	target := dao.SelectOneById(params.Id)
 	if target == nil {
@@ -250,7 +249,7 @@ func DelUser(ctx *context.Context) {
 		panic(exception.New("该用户不可删除"))
 	}
 	sqlkit.TxArea(func(targetDS *sqlkit.DataSource) {
-		dao := userdao.New(targetDS)
+		dao := userdao.New(userdao.ResultDefault, targetDS)
 		//
 		if params.Off.Int32 == 0 {
 			dao.OffUser(params.Id, model.UserOffDelete)

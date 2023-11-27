@@ -75,6 +75,6 @@ type Dao struct {
 	sqlkit.Dao[Test2]
 }
 
-func New(ds ...*sqlkit.DataSource) Dao {
-	return Dao{sqlkit.New[Test2](ds...)}
+func New(ds ...*sqlkit.DataSource) *Dao {
+	return &Dao{sqlkit.New[Test2](ds...)}
 }

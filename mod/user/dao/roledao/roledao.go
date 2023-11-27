@@ -16,13 +16,13 @@ const (
 	ResultNone
 )
 
-func New(ds ...*sqlkit.DataSource) Dao {
+func New(cascadeType byte, ds ...*sqlkit.DataSource) Dao {
 	dao := sqlkit.New[model.Role](ds...)
 	dao.Cascade = func(obj *model.Role) {
-		switch dao.ResultType {
+		switch cascadeType {
 		case ResultDefault:
 			if obj.Department != nil {
-				obj.Department = departmentdao.New(dao.DataSource()).SelectOneWithDelById(obj.Department.Id)
+				obj.Department = departmentdao.New(departmentdao.ResultDefault, dao.DataSource()).SelectOneWithDelById(obj.Department.Id)
 			}
 		case ResultNone:
 			obj.Department = nil
@@ -35,7 +35,7 @@ func (dao Dao) FindByName(name string) *model.Role {
 	return dao.Select().Where("name=?", name).Limit(1).One()
 }
 func (dao Dao) ListFromRootDepart(id int32) []*model.Role {
-	where := fmt.Sprintf(`id>0 and department in ( with recursive t(id) as( values(%d) union all select d.id from %s d, t where t.id=d.parent) select id from t )`, id, departmentdao.New(dao.DataSource()).Table())
+	where := fmt.Sprintf(`id>0 and department in ( with recursive t(id) as( values(%d) union all select d.id from %s d, t where t.id=d.parent) select id from t )`, id, departmentdao.New(departmentdao.ResultDefault, dao.DataSource()).Table())
 	return dao.Select().Where(where).OrderBy("id").List()
 }
 

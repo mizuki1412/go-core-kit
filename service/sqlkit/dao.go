@@ -14,7 +14,7 @@ type Dao[T any] struct {
 	// 逻辑删除的字段，可替代全局的LogicDelVal
 	LogicDelVal []any
 	// 返回级联的类型
-	ResultType byte
+	//ResultType byte
 	// 级联实现的函数
 	Cascade func(*T)
 	// 数据源

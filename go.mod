@@ -5,16 +5,16 @@ go 1.21
 require (
 	github.com/Depado/bfchroma/v2 v2.0.0
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/SebastiaanKlippert/go-wkhtmltopdf v1.9.1
+	github.com/SebastiaanKlippert/go-wkhtmltopdf v1.9.2
 	github.com/albenik/go-serial/v2 v2.6.0
-	github.com/alecthomas/chroma/v2 v2.9.1
-	github.com/aliyun/alibaba-cloud-sdk-go v1.62.545
-	github.com/bytedance/sonic v1.10.1
+	github.com/alecthomas/chroma/v2 v2.11.1
+	github.com/aliyun/alibaba-cloud-sdk-go v1.62.617
+	github.com/bytedance/sonic v1.10.2
 	github.com/dgraph-io/ristretto v0.1.1
 	github.com/eclipse/paho.mqtt.golang v1.4.3
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-playground/validator/v10 v10.15.4
-	github.com/golang-jwt/jwt/v5 v5.0.0
+	github.com/golang-jwt/jwt/v5 v5.1.0
 	github.com/googollee/go-socket.io v1.7.0
 	github.com/jlaffaye/ftp v0.2.0
 	github.com/jmoiron/sqlx v1.3.5
