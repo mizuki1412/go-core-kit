@@ -38,6 +38,7 @@ type Req struct {
 	Url         string
 	Header      map[string]string
 	ContentType string
+	QueryData   map[string]string
 	FormData    map[string]string
 	JsonData    any
 	BinaryData  []byte
@@ -48,19 +49,27 @@ func Request(reqBean Req) (string, int) {
 	if reqBean.Method == "" {
 		reqBean.Method = http.MethodPost
 	}
+	reqBean.Method = strings.ToUpper(reqBean.Method)
 	var req *http.Request
 	var err error
 	if reqBean.BinaryData != nil {
 		req, err = http.NewRequest(reqBean.Method, reqBean.Url, bytes.NewBuffer(reqBean.BinaryData))
 	} else if reqBean.JsonData != nil {
 		req, err = http.NewRequest(reqBean.Method, reqBean.Url, bytes.NewBuffer([]byte(jsonkit.ToString(reqBean.JsonData))))
-	} else {
+	} else if reqBean.FormData != nil {
 		// 自带urlencode转码
 		data := make(url.Values)
 		for key, val := range reqBean.FormData {
 			data.Add(key, val)
 		}
 		req, err = http.NewRequest(reqBean.Method, reqBean.Url, strings.NewReader(data.Encode()))
+	} else if reqBean.QueryData != nil {
+		req, err = http.NewRequest(reqBean.Method, reqBean.Url, nil)
+		query := req.URL.Query()
+		for key, val := range reqBean.QueryData {
+			query.Add(key, val)
+		}
+		req.URL.RawQuery = query.Encode()
 	}
 	if err != nil {
 		panic(exception.New(err.Error()))
@@ -68,7 +77,7 @@ func Request(reqBean Req) (string, int) {
 	if reqBean.ContentType == "" {
 		if reqBean.JsonData != nil {
 			req.Header.Set("Content-Type", httpconst.ContentTypeJSON)
-		} else {
+		} else if reqBean.FormData != nil {
 			req.Header.Set("Content-Type", httpconst.ContentTypeForm)
 		}
 	} else {
