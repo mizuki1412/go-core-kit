@@ -8,7 +8,6 @@ import (
 	"github.com/mizuki1412/go-core-kit/mod/user"
 	"github.com/mizuki1412/go-core-kit/mod/user/dao/userdao"
 	"github.com/mizuki1412/go-core-kit/mod/user/model"
-	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit"
 	"github.com/mizuki1412/go-core-kit/service/sqlkit"
 	"github.com/spf13/cobra"
@@ -27,9 +26,7 @@ func main() {
 	cli.AddChildCMD(&cobra.Command{
 		Use: "test",
 		Run: func(cmd *cobra.Command, args []string) {
-			//testArr()
-			logkit.Info("asdd", "key1", "99")
-			logkit.Error("asdd", "key1", "99")
+
 		},
 	})
 	cli.Execute()
