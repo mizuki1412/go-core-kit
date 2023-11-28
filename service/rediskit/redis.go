@@ -29,6 +29,11 @@ func Instance() *redis.Client {
 	return client
 }
 
+// HasConfig 是否设置了redis
+func HasConfig() bool {
+	return configkit.Exist(configkey.RedisHost)
+}
+
 func Get(ctx context.Context, key string, defaultVal string) string {
 	client = Instance()
 	val, err := client.Get(ctx, key).Result()
@@ -71,15 +76,6 @@ func GetKeyWithPrefix(key string) string {
 	} else {
 		return p + ":" + key
 	}
-}
-
-// GetDecoratedKey 分层路径按:分隔，会自动加上项目前缀(ConfigKeyRedisPrefix)
-func GetDecoratedKey(subPath string) string {
-	name := configkit.GetString(configkey.RedisPrefix)
-	if name != "" {
-		name += ":"
-	}
-	return name + subPath
 }
 
 func LPush(ctx context.Context, key string, val any) {

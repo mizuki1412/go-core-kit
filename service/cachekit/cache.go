@@ -33,8 +33,8 @@ type Param struct {
 	Ttl  time.Duration
 	Cost int64
 	// 如果存在redis配置，将从redis操作，本地cache只是第二顺序处理
-	// todo 动态检查redis
-	Redis bool
+	// 控制忽略redis
+	IgnoreRedis bool
 }
 
 func _handleParam(ps []*Param) *Param {
@@ -53,9 +53,9 @@ func _handleParam(ps []*Param) *Param {
 
 func Set(key string, value any, ps ...*Param) {
 	p := _handleParam(ps)
-	if p.Redis {
+	if rediskit.HasConfig() && !p.IgnoreRedis {
 		_ = commonkit.RecoverFuncWrapper(func() {
-			rediskit.Set(context.Background(), key, value, p.Ttl)
+			rediskit.Set(context.Background(), rediskit.GetKeyWithPrefix(key), value, p.Ttl)
 		})
 	}
 	// 同时也存入cache
@@ -73,8 +73,8 @@ func Set(key string, value any, ps ...*Param) {
 func Get(key string, ps ...*Param) any {
 	p := _handleParam(ps)
 	var r any = nil
-	if p.Redis {
-		r0 := rediskit.Get(context.Background(), key, "")
+	if rediskit.HasConfig() && !p.IgnoreRedis {
+		r0 := rediskit.Get(context.Background(), rediskit.GetKeyWithPrefix(key), "")
 		if r0 != "" {
 			r = r0
 		}
@@ -87,8 +87,8 @@ func Get(key string, ps ...*Param) any {
 
 func Del(key string, ps ...*Param) {
 	p := _handleParam(ps)
-	if p.Redis {
-		rediskit.Del(context.Background(), key)
+	if rediskit.HasConfig() && !p.IgnoreRedis {
+		rediskit.Del(context.Background(), rediskit.GetKeyWithPrefix(key))
 	}
 	_cache.Del(key)
 }
@@ -98,8 +98,8 @@ func Renew(key string, ps ...*Param) {
 	if p.Ttl <= 0 {
 		return
 	}
-	if p.Redis {
-		rediskit.Expire(context.Background(), key, p.Ttl)
+	if rediskit.HasConfig() && !p.IgnoreRedis {
+		rediskit.Expire(context.Background(), rediskit.GetKeyWithPrefix(key), p.Ttl)
 	}
 	v, ok := _cache.Get(key)
 	if ok {
