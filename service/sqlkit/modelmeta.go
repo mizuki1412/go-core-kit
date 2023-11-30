@@ -70,12 +70,20 @@ func (th ModelMetaKey) val(rv reflect.Value, driver string) any {
 	return val
 }
 
+// 用于存放model的解析数据： key：包路径+类名+驱动类型
+var modelMetaCache = map[string]ModelMeta{}
+
 // InitModelMeta obj should be elem
 func (th ModelMeta) init(obj any) ModelMeta {
+	rt := reflect.TypeOf(obj)
+	// 包路径+类名+驱动类型
+	tk := rt.PkgPath() + "/" + rt.Name() + ":" + th.dateSource.Driver
+	if tv, ok := modelMetaCache[tk]; ok {
+		return tv
+	}
 	if obj == nil {
 		return ModelMeta{}
 	}
-	rt := reflect.TypeOf(obj)
 	if rt.Kind() != reflect.Struct {
 		panic(exception.New("dao model must struct"))
 	}
@@ -133,6 +141,7 @@ func (th ModelMeta) init(obj any) ModelMeta {
 		th.allSelectColumns = append(th.allSelectColumns, th.logicDelKey.Key)
 		th.allUpdateKeys = append(th.allUpdateKeys, th.logicDelKey)
 	}
+	modelMetaCache[tk] = th
 	return th
 }
 
