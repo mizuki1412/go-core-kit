@@ -3,7 +3,7 @@
 
 toolkit for golang projects
 
-`go get github.com/mizuki1412/go-core-kit@v1.5.5`
+`go get github.com/mizuki1412/go-core-kit@v2.0.0`
 
 详细说明见 doc/go-core-kit-doc.md
 
@@ -11,8 +11,8 @@ toolkit for golang projects
 
 - [ ] swagger 测试文件上传
 - [ ] swagger response 的定义
+- [ ] swagger 目前没有区分json和form 因为接口都支持
 - [ ] knife-ui 详情显示不出来
-- [ ] logout：实际client的token还会发过来，此时最好配合cache
 
   later：
 - [ ] https://github.com/unrolled/render 模板渲染
