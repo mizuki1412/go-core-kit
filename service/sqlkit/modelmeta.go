@@ -75,14 +75,14 @@ var modelMetaCache = map[string]ModelMeta{}
 
 // InitModelMeta obj should be elem
 func (th ModelMeta) init(obj any) ModelMeta {
+	if obj == nil {
+		return ModelMeta{}
+	}
 	rt := reflect.TypeOf(obj)
 	// 包路径+类名+驱动类型
 	tk := rt.PkgPath() + "/" + rt.Name() + ":" + th.dateSource.Driver
 	if tv, ok := modelMetaCache[tk]; ok {
 		return tv
-	}
-	if obj == nil {
-		return ModelMeta{}
 	}
 	if rt.Kind() != reflect.Struct {
 		panic(exception.New("dao model must struct"))

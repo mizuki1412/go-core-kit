@@ -15,6 +15,8 @@ toolkit for golang projects
 - [ ] knife-ui 详情显示不出来
 
   later：
+- [ ] 接口加密：rsa+aes对接口加密(前端生成AES密钥，用rsa私钥将AES密钥加密，放在header.encript 传给到后端，后端用rsa公钥解密后获取到AES密钥，解密数据流。
+  对参数值进行加密，同时aes密钥中增加时间变量)
 - [ ] https://github.com/unrolled/render 模板渲染
 - [ ] mqtt subscribe 中如果执行太久，会重复执行subscribe？ 暂时用go fun处理
 - [ ] sql base mapper: 增加多数据库适配
