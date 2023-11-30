@@ -10,7 +10,7 @@ toolkit for golang projects
 # TODO
 
 - [ ] swagger 测试文件上传
-- [ ] swagger response 的定义
+- [ ] swagger response 的定义(float和int64都用string输出)
 - [ ] swagger 目前没有区分json和form 因为接口都支持
 - [ ] knife-ui 详情显示不出来
 
@@ -19,7 +19,7 @@ toolkit for golang projects
 - [ ] mqtt subscribe 中如果执行太久，会重复执行subscribe？ 暂时用go fun处理
 - [ ] sql base mapper: 增加多数据库适配
 - [ ] 改进：关于子查询的优化。where in 等
-- [ ] 性能：每次 dao 都会重新解析 model
+- [x] 性能：每次 dao 都会重新解析 model
 - [ ] 重构：mod user
 
 # 1.0 升级 2.0 指南
