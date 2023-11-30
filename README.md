@@ -10,7 +10,7 @@ toolkit for golang projects
 # TODO
 
 - [ ] swagger 测试文件上传
-- [ ] swagger response 的定义
+- [ ] swagger response 的定义(float和int64都用string输出)
 - [ ] knife-ui 详情显示不出来
 - [ ] logout：实际client的token还会发过来，此时最好配合cache
 

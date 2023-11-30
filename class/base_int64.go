@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/class/utils"
+	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/spf13/cast"
 )
 
@@ -11,9 +12,10 @@ type Int64 struct {
 	sql.NullInt64
 }
 
+// MarshalJSON int64序列化为string，防止js的数值溢出
 func (th Int64) MarshalJSON() ([]byte, error) {
 	if th.Valid {
-		return []byte(cast.ToString(th.Int64)), nil
+		return jsonkit.Marshal(cast.ToString(th.Int64))
 	}
 	return []byte("null"), nil
 }
