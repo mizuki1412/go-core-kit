@@ -223,3 +223,6 @@ func (dao SelectDao[T]) WhereIn(key string, sub SubQueryInterface) SelectDao[T] 
 	sql, args := sub.sqlOriginPlaceholder()
 	return dao.Where(squirrel.Expr(key+" IN ("+sql+")", args...))
 }
+func (dao SelectDao[T]) WhereLike(field string, val string) SelectDao[T] {
+	return dao.Where(field+" LIKE ?", "%"+val+"%")
+}
