@@ -194,6 +194,12 @@ func (dao SelectDao[T]) Offset(offset uint64) SelectDao[T] {
 
 // custom
 
+// 重置select选项
+func (dao SelectDao[T]) resetColumns(fields ...string) SelectDao[T] {
+	dao.builder = dao.builder.RemoveColumns().Columns(fields...)
+	return dao
+}
+
 func (dao SelectDao[T]) whereNLogicDel() SelectDao[T] {
 	if dao.modelMeta.logicDelKey.Key != "" {
 		return dao.Where(dao.modelMeta.logicDelKey.Key+"<>?", dao.LogicDelVal[0])

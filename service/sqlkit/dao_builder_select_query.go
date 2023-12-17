@@ -65,6 +65,7 @@ func (dao SelectDao[T]) OneMap() map[string]any {
 	return nil
 }
 
+// 取一个string值
 func (dao SelectDao[T]) OneString() string {
 	d := dao
 	if !dao.ignoreLogicDel {
@@ -80,6 +81,30 @@ func (dao SelectDao[T]) OneString() string {
 		return cast.ToString(ret[0])
 	}
 	return ""
+}
+
+// 取一个number值
+func (dao SelectDao[T]) OneNumber() int64 {
+	d := dao
+	if !dao.ignoreLogicDel {
+		d = dao.whereNLogicDel()
+	}
+	rows := d.QueryRows()
+	defer rows.Close()
+	for rows.Next() {
+		ret, err := rows.SliceScan()
+		if err != nil {
+			panic(exception.New(err.Error()))
+		}
+		return cast.ToInt64(ret[0])
+	}
+	return 0
+}
+
+// 计数值
+func (dao SelectDao[T]) Count() int64 {
+	d := dao.resetColumns("count(1)")
+	return d.OneNumber()
 }
 
 func (dao SelectDao[T]) ListMap() []map[string]any {

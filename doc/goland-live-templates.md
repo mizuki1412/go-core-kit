@@ -34,7 +34,7 @@ func Init(router *router.Router) {
 }
 
 type $name$Params struct{
-    Phone    string `description:"手机号" default:"" trim:"true"`
+    Phone    string `comment:"手机号" default:"" trim:"true"`
 	Pwd      string `validate:"required"`
 }
 func $name$(ctx *context.Context){
@@ -61,7 +61,7 @@ func Init(router *router.Router) {
 }
 
 type updateParams struct {
-	//Phone    string `description:"手机号" default:"" trim:"true"`
+	//Phone    string `comment:"手机号" default:"" trim:"true"`
 	//Pwd      string `validate:"required"`
 }
 
@@ -107,7 +107,7 @@ func detail(ctx *context.Context) {
 ## action
 ```
 type $name$Params struct{
-    Phone    string `description:"手机号" default:"" trim:"true"`
+    Phone    string `comment:"手机号" default:"" trim:"true"`
 	Pwd      string `validate:"required"`
 }
 func $name$(ctx *context.Context){
