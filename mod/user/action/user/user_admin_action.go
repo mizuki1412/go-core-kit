@@ -223,7 +223,7 @@ func infoAdmin(ctx *context.Context) {
 
 type DelParams struct {
 	Id  int32       `validate:"required"`
-	Off class.Int32 `validate:"required" description:"0-删除，1-冻结，2-解冻"`
+	Off class.Int32 `validate:"required" comment:"0-删除，1-冻结，2-解冻"`
 }
 
 func DelUser(ctx *context.Context) {

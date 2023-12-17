@@ -69,7 +69,7 @@ func downloadPublic(ctx *context.Context) {
 
 type uploadParams struct {
 	File class.File   `validate:"required"`
-	Path class.String `description:"相对项目目录地址"`
+	Path class.String `comment:"相对项目目录地址"`
 }
 
 func upload(ctx *context.Context) {
@@ -86,7 +86,7 @@ func upload(ctx *context.Context) {
 }
 
 type fileListParams struct {
-	Path string `description:"相对项目目录地址" validate:"required"`
+	Path string `comment:"相对项目目录地址" validate:"required"`
 }
 
 func fileList(ctx *context.Context) {

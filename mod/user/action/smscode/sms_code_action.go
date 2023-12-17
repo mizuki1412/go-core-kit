@@ -22,7 +22,7 @@ func Init(router *router.Router) {
 }
 
 type getParams struct {
-	Phone string `description:"手机号" validate:"required" trim:"true"`
+	Phone string `comment:"手机号" validate:"required" trim:"true"`
 }
 
 func get(ctx *context.Context) {

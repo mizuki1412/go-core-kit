@@ -16,7 +16,7 @@ import (
 )
 
 type loginByUsernameParam struct {
-	Username string `description:"用户名" validate:"required"`
+	Username string `comment:"用户名" validate:"required"`
 	Pwd      string `validate:"required"`
 	Schema   string `default:"public"`
 }
@@ -54,8 +54,8 @@ func loginByUsername(ctx *context.Context) {
 }
 
 type loginParam struct {
-	Username string `description:"用户名"`
-	Phone    string `description:"手机号"`
+	Username string `comment:"用户名"`
+	Phone    string `comment:"手机号"`
 	Pwd      string `validate:"required"`
 	Schema   string `default:"public"`
 }
@@ -107,8 +107,8 @@ var AdditionUserInfoWithIdFunc = func(ctx *context.Context, u *model.User) {
 }
 
 type infoParam struct {
-	Id     class.Int32  `description:"不填获取自己，并且返回的是user和token；否则只返回user"`
-	Schema class.String `description:"用于校验当前登录的和需要的是不是一个schema"`
+	Id     class.Int32  `comment:"不填获取自己，并且返回的是user和token；否则只返回user"`
+	Schema class.String `comment:"用于校验当前登录的和需要的是不是一个schema"`
 }
 
 func info(ctx *context.Context) {

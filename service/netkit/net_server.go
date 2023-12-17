@@ -11,7 +11,7 @@ import (
 type NetServer struct {
 	gnet.BuiltinEventEngine
 	eng         gnet.Engine
-	ProtoSchema string `description:"tcp/udp"`
+	ProtoSchema string `comment:"tcp/udp"`
 	Port        int32
 
 	TrafficHandler func(c gnet.Conn)

@@ -54,7 +54,7 @@ func (ctx *Context) BindForm(bean any) {
 }
 
 // 实现form/query/json中的数据合并获取。
-// description:"xxx" default:"" trim:"true"
+// comment:"xxx" default:"" trim:"true"
 func (ctx *Context) bindStruct(bean any) {
 	rt0 := reflect.TypeOf(bean)
 	if rt0.Kind() != reflect.Pointer {

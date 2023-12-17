@@ -20,7 +20,7 @@ func listAllPrivileges(ctx *context.Context) {
 
 type createParams struct {
 	Name           string          `validate:"required"`
-	PrivilegesJson class.ArrString `validate:"required" default:"[]" description:"数组json字符串：[a,b,c]"`
+	PrivilegesJson class.ArrString `validate:"required" default:"[]" comment:"数组json字符串：[a,b,c]"`
 	DepartmentId   int32
 }
 
@@ -47,7 +47,7 @@ func create(ctx *context.Context) {
 type updateParams struct {
 	Id             int32 `validate:"required"`
 	Name           class.String
-	PrivilegesJson class.ArrString `description:"数组json字符串：[a,b,c]"`
+	PrivilegesJson class.ArrString `comment:"数组json字符串：[a,b,c]"`
 	DepartmentId   class.Int32
 }
 
@@ -106,7 +106,7 @@ func del(ctx *context.Context) {
 }
 
 type listRolesParam struct {
-	Root class.Int32 `description:"指定根department"`
+	Root class.Int32 `comment:"指定根department"`
 }
 
 func listRoles(ctx *context.Context) {

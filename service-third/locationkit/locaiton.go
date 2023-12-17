@@ -14,8 +14,8 @@ import (
 )
 
 type Location struct {
-	Lon          class.Decimal `json:"lon" description:"经度"`
-	Lat          class.Decimal `json:"lat" description:"纬度"`
+	Lon          class.Decimal `json:"lon" comment:"经度"`
+	Lat          class.Decimal `json:"lat" comment:"纬度"`
 	ProvinceName string        `json:"provinceName"`
 	CityName     string        `json:"cityName"`
 	AreaName     string        `json:"areaName"`

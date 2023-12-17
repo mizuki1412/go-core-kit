@@ -14,12 +14,12 @@ func (l Int64List) Less(i, j int) bool { return l[i] < l[j] }
 
 // XYDataMapper x,y坐标系的数据集，用于图表数据
 type XYDataMapper struct {
-	Desc      bool                                `description:"表示倒序"`
-	Round     int32                               `description:"保留几位小数"`
-	Cache     map[string]*XYData                  `description:"表示过程中的缓存区"`
-	List      XYDataList                          `description:"表示排序后的最终结果"`
-	HandleY   func(data *XYData) (float64, error) `description:"自定义处理y的函数，data是同一个key的"`
-	HandleAdd func(data *XYData, flags ...any)    `description:"自定义Add函数，也就是y的增减逻辑"`
+	Desc      bool                                `comment:"表示倒序"`
+	Round     int32                               `comment:"保留几位小数"`
+	Cache     map[string]*XYData                  `comment:"表示过程中的缓存区"`
+	List      XYDataList                          `comment:"表示排序后的最终结果"`
+	HandleY   func(data *XYData) (float64, error) `comment:"自定义处理y的函数，data是同一个key的"`
+	HandleAdd func(data *XYData, flags ...any)    `comment:"自定义Add函数，也就是y的增减逻辑"`
 }
 
 func (th *XYDataMapper) Add(key string, x string, flags ...any) {
@@ -67,7 +67,7 @@ func (th *XYDataMapper) Result() XYDataList {
 type XYData struct {
 	X      string         `json:"x"`
 	Y      float64        `json:"y"`
-	Desc   bool           `json:"-" description:"表示是否倒序，用于Less函数"`
+	Desc   bool           `json:"-" comment:"表示是否倒序，用于Less函数"`
 	Extend map[string]any `json:"extend"`
 }
 type XYDataList []*XYData

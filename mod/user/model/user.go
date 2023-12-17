@@ -14,11 +14,11 @@ type User struct {
 	Name       class.String    `json:"name,omitempty" db:"name"`
 	Phone      class.String    `json:"phone,omitempty" db:"phone"`
 	Pwd        class.String    `json:"-" db:"pwd"`
-	Gender     class.Int32     `json:"gender,omitempty" db:"gender" description:"1-nan,2-nv"`
-	Image      class.String    `json:"image,omitempty" db:"image" description:"头像"`
+	Gender     class.Int32     `json:"gender,omitempty" db:"gender" comment:"1-nan,2-nv"`
+	Image      class.String    `json:"image,omitempty" db:"image" comment:"头像"`
 	Address    class.String    `json:"address,omitempty" db:"address"`
-	Off        class.Int32     `json:"off,omitempty" db:"off" logicDel:"true" description:"冻结 1， 删除 -1"`
-	Extend     class.MapString `json:"extend,omitempty" db:"extend" description:"权限剔除privilegeExclude:[], 不可删除immutable:bool"`
+	Off        class.Int32     `json:"off,omitempty" db:"off" logicDel:"true" comment:"冻结 1， 删除 -1"`
+	Extend     class.MapString `json:"extend,omitempty" db:"extend" comment:"权限剔除privilegeExclude:[], 不可删除immutable:bool"`
 	CreateDt   class.Time      `json:"createDt,omitempty" db:"createdt"`
 }
 

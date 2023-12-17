@@ -29,7 +29,7 @@ func db(ctx *context.Context) {
 }
 
 type dbPingParams struct {
-	Phone string `description:"手机号" default:"" trim:"true"`
+	Phone string `comment:"手机号" default:"" trim:"true"`
 	Pwd   string `validate:"required"`
 }
 

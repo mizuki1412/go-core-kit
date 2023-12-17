@@ -99,7 +99,7 @@ func SQL2Struct(sqlFile, destFile string) {
 			if commentIndex > 0 {
 				comment := strings.TrimSpace(val[commentIndex+2:])
 				if comment != "" {
-					f.Tags = append(f.Tags, fmt.Sprintf(`description:"%s"`, comment))
+					f.Tags = append(f.Tags, fmt.Sprintf(`comment:"%s"`, comment))
 				}
 			}
 			fields = append(fields, f)

@@ -11,7 +11,7 @@ type RestRet struct {
 	Result  int    `json:"result"`
 	Message string `json:"message,omitempty"`
 	Data    any    `json:"data,omitempty"`
-	Total   uint64 `json:"total,omitempty" description:"记录总数，如果data是列表并且分页"`
+	Total   uint64 `json:"total,omitempty" comment:"记录总数，如果data是列表并且分页"`
 }
 
 const ResultErr = 500

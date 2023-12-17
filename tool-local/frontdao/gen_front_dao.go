@@ -51,7 +51,7 @@ func Gen(urlPrefix string) {
 			if e.Get("required").Bool() {
 				require = "*"
 			}
-			content += fmt.Sprintf("\n// %s %s : %s : %s", require, e.Get("name").String(), e.Get("type").String(), e.Get("description"))
+			content += fmt.Sprintf("\n// %s %s : %s : %s", require, e.Get("name").String(), e.Get("type").String(), e.Get("comment"))
 		}
 		// 函数内容
 		var k string
