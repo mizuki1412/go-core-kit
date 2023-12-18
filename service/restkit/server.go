@@ -45,7 +45,6 @@ func defaultEngine() {
 	router.Use(middleware.Log())
 	router.Use(middleware.Cors())
 	router.Use(middleware.Recover())
-	router.Use(middleware.AuthJWT())
 	if configkit.GetBool(configkey.RestPPROF) {
 		//  p := pprof.New()
 	}

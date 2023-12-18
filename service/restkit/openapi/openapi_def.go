@@ -33,12 +33,12 @@ type ApiDocV3PathOperation struct {
 	Description string                      `json:"description,omitempty"`
 	OperationId string                      `json:"operationId,omitempty"`
 	Deprecated  bool                        `json:"deprecated,omitempty"`
-	Parameters  []*ApiDocV3Parameter        `json:"parameters,omitempty"`
+	Parameters  []*ApiDocV3ReqParam         `json:"parameters,omitempty"`
 	RequestBody *ApiDocV3ReqBody            `json:"requestBody,omitempty"`
 	Responses   map[string]*ApiDocV3ResBody `json:"responses,omitempty"` // key 为 default 或 具体的http-code
 }
 
-type ApiDocV3Parameter struct {
+type ApiDocV3ReqParam struct {
 	Name        string          `json:"name,omitempty"` // If in is "header" and the name field is "Accept", "Content-Type" or "Authorization"
 	In          string          `json:"in,omitempty"`   // "query", "header", "path" or "cookie".
 	Description string          `json:"description,omitempty"`

@@ -62,7 +62,7 @@ func CamelCase(str string) string {
 	return temp
 }
 
-// 首字母大写
+// UpperFirst 首字母大写
 func UpperFirst(str string) string {
 	bytes := []byte(str)
 	if bytes[0] >= 'a' {
@@ -71,7 +71,7 @@ func UpperFirst(str string) string {
 	return string(bytes)
 }
 
-// 首字母大写
+// LowerFirst 首字母小写
 func LowerFirst(str string) string {
 	bytes := []byte(str)
 	if bytes[0] < 'a' {

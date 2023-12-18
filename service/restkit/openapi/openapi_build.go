@@ -3,6 +3,7 @@ package openapi
 import (
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/cli/configkey"
+	"github.com/mizuki1412/go-core-kit/library/arraykit"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"reflect"
@@ -21,6 +22,19 @@ type Builder struct {
 	Path *ApiDocV3PathOperation
 }
 
+// GenOperationId path转首字母大写后拼接
+func GenOperationId(path, method string) string {
+	res := strings.ToLower(method)
+	arr := strings.Split(path, "/")
+	for _, e := range arr {
+		if e == "" {
+			continue
+		}
+		res += stringkit.UpperFirst(e)
+	}
+	return res
+}
+
 func NewBuilder(path string, method string) *Builder {
 	op := &ApiDocV3PathOperation{}
 	// 初始化response
@@ -36,7 +50,11 @@ func NewBuilder(path string, method string) *Builder {
 			},
 		},
 	}
-	Doc.Paths[path] = map[string]*ApiDocV3PathOperation{}
+	// 生成operationId
+	op.OperationId = GenOperationId(path, method)
+	if _, ok := Doc.Paths[path]; !ok {
+		Doc.Paths[path] = map[string]*ApiDocV3PathOperation{}
+	}
 	Doc.Paths[path][method] = op
 	return &Builder{Path: op}
 }
@@ -57,23 +75,23 @@ func (b *Builder) Tag(title string, description ...string) *Builder {
 	return b
 }
 
-// ReqParam params struct的tags：description，validate:"required"，default
+// ReqParam
+// params struct的tags：
+//
+//	comment: 注释
+//	validate:"required"
+//	default: 默认值
+//	in: query,path,header
 func (b *Builder) ReqParam(param any) *Builder {
 	rt := reflect.TypeOf(param)
 	for i := 0; i < rt.NumField(); i++ {
-		e := &ApiDocV3Parameter{}
+		e := &ApiDocV3ReqParam{}
 		tname := stringkit.LowerFirst(rt.Field(i).Type.Name())
 		//println(tname)
-		e.In = "query"
 		e.Schema = &ApiDocV3Schema{}
 		switch {
 		case tname == "file":
 			panic(exception.New("file类型需要用ReqBody"))
-			//e.Schema.Type = "array"
-			//e.Schema.Items = &ApiDocV3Schema{
-			//	Type:   "string",
-			//	Format: "binary",
-			//}
 		case strings.Index(tname, "int") == 0:
 			e.Schema.Type = "integer"
 		case strings.Index(tname, "float") == 0:
@@ -83,7 +101,7 @@ func (b *Builder) ReqParam(param any) *Builder {
 		default:
 			e.Schema.Type = "string"
 		}
-		e.Description = rt.Field(i).Tag.Get("description")
+		e.Description = rt.Field(i).Tag.Get("comment")
 		if strings.Contains(rt.Field(i).Tag.Get("validate"), "required") {
 			e.Required = true
 		}
@@ -91,6 +109,11 @@ func (b *Builder) ReqParam(param any) *Builder {
 		if v, ok := rt.Field(i).Tag.Lookup("default"); ok {
 			e.Schema.Default = v
 		}
+		in := rt.Field(i).Tag.Get("in")
+		if !arraykit.StringContains([]string{"query", "path", "header", "cookie"}, in) {
+			in = "query"
+		}
+		e.In = in
 		b.Path.Parameters = append(b.Path.Parameters, e)
 	}
 	return b
@@ -157,7 +180,7 @@ func (b *Builder) ResponseStream() *Builder {
 	return b
 }
 
-// ReadDoc 返回 api-doc 结果
+// ReadDoc 返回 api-docs 结果
 func (doc *ApiDocV3) ReadDoc() *ApiDocV3 {
 	doc.Openapi = "3.1.0"
 	if doc.Info == nil {
