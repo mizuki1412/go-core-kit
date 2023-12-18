@@ -40,5 +40,6 @@ toolkit for golang projects
 - rest 取消 session，全面改用 jwt，见 jwtkit 说明; 也保留了cookie
 - rest 默认返回值改变：code=0 表示 ok，code=401 表示未认证（也反映到 httpcode 中）
 - rest swagger接口定义方式改变
+- rest authup改为authjwt
 - logkit 基于slog
 - 配置参数修改：openapi

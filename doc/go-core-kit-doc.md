@@ -374,8 +374,6 @@ v3.1.0
 
 内置两种 ui：swagger-ui （`/swagger`）和 knife-ui（`/doc.html`）
 
-
-
 更新swagger-ui：
 
 ```js
@@ -388,8 +386,6 @@ v3.1.0
 // 修改 swagger-initializer.js
 url: "./v3/api-docs",
 ```
-
-
 
 ## middleware
 

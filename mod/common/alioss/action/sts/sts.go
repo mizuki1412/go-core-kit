@@ -2,10 +2,10 @@ package sts
 
 import (
 	"github.com/mizuki1412/go-core-kit/cli/configkey"
-	"github.com/mizuki1412/go-core-kit/mod/middleware"
 	"github.com/mizuki1412/go-core-kit/service-third/aliosskit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
+	"github.com/mizuki1412/go-core-kit/service/restkit/middleware"
 	"github.com/mizuki1412/go-core-kit/service/restkit/router"
 	"github.com/spf13/cast"
 )
@@ -13,7 +13,7 @@ import (
 func Init(router *router.Router) {
 	tag := "common:公共模块"
 	r := router.Group("/rest/sts")
-	r.Use(middleware.AuthUsernameAndPwd())
+	r.Use(middleware.AuthJWT())
 	{
 		r.Post("/get", get).Openapi.Tag(tag).Summary("ali sts 获取")
 	}

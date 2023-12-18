@@ -7,14 +7,10 @@ import (
 	"time"
 )
 
-// AuthUsernameAndPwd 用户名密码校验
-func AuthUsernameAndPwd() router.Handler {
+// AuthJWT 用户名密码校验
+func AuthJWT() router.Handler {
 	return func(ctx *context.Context) {
 		jwt := ctx.GetJwt()
-		if jwt.IsValid() {
-			println("get cache")
-			println(cachekit.Get("token:" + jwt.Token()))
-		}
 		// 获取 jwt
 		if !jwt.IsValid() || jwt.ExpiresAt.Before(time.Now()) || cachekit.Get("token:"+jwt.Token()) == nil {
 			ctx.Json(context.RestRet{

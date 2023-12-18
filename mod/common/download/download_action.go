@@ -5,9 +5,9 @@ import (
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/cli/configkey"
 	"github.com/mizuki1412/go-core-kit/library/filekit"
-	"github.com/mizuki1412/go-core-kit/mod/middleware"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
+	"github.com/mizuki1412/go-core-kit/service/restkit/middleware"
 	"github.com/mizuki1412/go-core-kit/service/restkit/router"
 	"github.com/mizuki1412/go-core-kit/service/storagekit"
 	"strings"
@@ -16,7 +16,7 @@ import (
 func Init(router *router.Router) {
 	tag := "common:公共模块"
 	r := router.Group("/rest")
-	r.Use(middleware.AuthUsernameAndPwd())
+	r.Use(middleware.AuthJWT())
 	{
 		r.Post("/download", download).Openapi.Tag(tag).Summary("私有下载").ReqParam(downloadParams{}).ResponseStream()
 		r.Get("/download", download).Openapi.Tag(tag).Summary("私有下载").ReqParam(downloadParams{}).ResponseStream()

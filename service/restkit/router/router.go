@@ -79,6 +79,16 @@ func (router *Router) Get(path string, handlers ...Handler) *Router {
 	router.openapiBuilder(path, "get")
 	return router
 }
+func (router *Router) Put(path string, handlers ...Handler) *Router {
+	router.ProxyGroup.PUT(path, handlerTrans(handlers...)...)
+	router.openapiBuilder(path, "put")
+	return router
+}
+func (router *Router) Delete(path string, handlers ...Handler) *Router {
+	router.ProxyGroup.DELETE(path, handlerTrans(handlers...)...)
+	router.openapiBuilder(path, "delete")
+	return router
+}
 func (router *Router) getIgnoreOpenapi(path string, handlers ...Handler) *Router {
 	router.ProxyGroup.GET(path, handlerTrans(handlers...)...)
 	return router

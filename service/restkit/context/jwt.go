@@ -28,7 +28,7 @@ func (ctx *Context) SetJwtCookie(c jwtkit.Claims, token string) {
 	}
 }
 
-// GetJwt 在authup拦截器中进行jwt的过期校验
+// GetJwt 在authjwt拦截器中进行jwt的过期校验
 func (ctx *Context) GetJwt() jwtkit.Claims {
 	if ctx.Get("jwt") == nil {
 		ctx.ReadToken()
