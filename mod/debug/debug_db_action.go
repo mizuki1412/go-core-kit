@@ -4,6 +4,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/logkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
 	"github.com/mizuki1412/go-core-kit/service/restkit/middleware"
+	"github.com/mizuki1412/go-core-kit/service/restkit/openapi"
 	"github.com/mizuki1412/go-core-kit/service/restkit/router"
 	"github.com/mizuki1412/go-core-kit/service/sqlkit"
 )
@@ -12,8 +13,8 @@ func Init(router *router.Router) {
 	tag := "debug:调试模块"
 	r := router.Group("/rest/debug")
 	r.Use(middleware.AuthJWT())
-	r.Post("/db/stat", db).Openapi.Tag(tag).Summary("db debug").ReqParam(dbParams{})
-	r.Post("/db/ping", dbPing).Openapi.Tag(tag).Summary("db debug ping").ReqParam(dbParams{})
+	r.Post("/db/stat", db).Api(openapi.Tag(tag), openapi.Summary("db debug"), openapi.ReqParam(dbParams{}))
+	r.Post("/db/ping", dbPing).Api(openapi.Tag(tag), openapi.Summary("db debug ping"), openapi.ReqParam(dbParams{}))
 }
 
 type dbParams struct {

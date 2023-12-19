@@ -22,6 +22,9 @@ type Builder struct {
 	Path *ApiDocV3PathOperation
 }
 
+// BuildOpt 定义Functional Options
+type BuildOpt func(*Builder)
+
 // GenOperationId path转首字母大写后拼接
 func GenOperationId(path, method string) string {
 	res := strings.ToLower(method)
@@ -59,20 +62,23 @@ func NewBuilder(path string, method string) *Builder {
 	return &Builder{Path: op}
 }
 
-func (b *Builder) Description(val string) *Builder {
-	b.Path.Description = val
-	return b
-}
-func (b *Builder) Summary(val string) *Builder {
-	b.Path.Summary = val
-	return b
-}
-func (b *Builder) Tag(title string, description ...string) *Builder {
-	b.Path.Tags = []string{title}
-	if len(description) > 0 {
-		b.Path.Description = description[0]
+func Description(val string) BuildOpt {
+	return func(b *Builder) {
+		b.Path.Description = val
 	}
-	return b
+}
+func Summary(val string) BuildOpt {
+	return func(b *Builder) {
+		b.Path.Summary = val
+	}
+}
+func Tag(title string, description ...string) BuildOpt {
+	return func(b *Builder) {
+		b.Path.Tags = []string{title}
+		if len(description) > 0 {
+			b.Path.Description = description[0]
+		}
+	}
 }
 
 // ReqParam
@@ -82,102 +88,107 @@ func (b *Builder) Tag(title string, description ...string) *Builder {
 //	validate:"required"
 //	default: 默认值
 //	in: query,path,header
-func (b *Builder) ReqParam(param any) *Builder {
-	rt := reflect.TypeOf(param)
-	for i := 0; i < rt.NumField(); i++ {
-		e := &ApiDocV3ReqParam{}
-		tname := stringkit.LowerFirst(rt.Field(i).Type.Name())
-		//println(tname)
-		e.Schema = &ApiDocV3Schema{}
-		switch {
-		case tname == "file":
-			panic(exception.New("file类型需要用ReqBody"))
-		case strings.Index(tname, "int") == 0:
-			e.Schema.Type = "integer"
-		case strings.Index(tname, "float") == 0:
-			e.Schema.Type = "number"
-		case strings.Index(tname, "bool") == 0:
-			e.Schema.Type = "boolean"
-		default:
-			e.Schema.Type = "string"
+func ReqParam(param any) BuildOpt {
+	return func(b *Builder) {
+		rt := reflect.TypeOf(param)
+		for i := 0; i < rt.NumField(); i++ {
+			e := &ApiDocV3ReqParam{}
+			tname := stringkit.LowerFirst(rt.Field(i).Type.Name())
+			//println(tname)
+			e.Schema = &ApiDocV3Schema{}
+			switch {
+			case tname == "file":
+				panic(exception.New("file类型需要用ReqBody"))
+			case strings.Index(tname, "int") == 0:
+				e.Schema.Type = "integer"
+			case strings.Index(tname, "float") == 0:
+				e.Schema.Type = "number"
+			case strings.Index(tname, "bool") == 0:
+				e.Schema.Type = "boolean"
+			default:
+				e.Schema.Type = "string"
+			}
+			e.Description = rt.Field(i).Tag.Get("comment")
+			if strings.Contains(rt.Field(i).Tag.Get("validate"), "required") {
+				e.Required = true
+			}
+			e.Name = stringkit.LowerFirst(rt.Field(i).Name)
+			if v, ok := rt.Field(i).Tag.Lookup("default"); ok {
+				e.Schema.Default = v
+			}
+			in := rt.Field(i).Tag.Get("in")
+			if !arraykit.StringContains([]string{"query", "path", "header", "cookie"}, in) {
+				in = "query"
+			}
+			e.In = in
+			b.Path.Parameters = append(b.Path.Parameters, e)
 		}
-		e.Description = rt.Field(i).Tag.Get("comment")
-		if strings.Contains(rt.Field(i).Tag.Get("validate"), "required") {
-			e.Required = true
-		}
-		e.Name = stringkit.LowerFirst(rt.Field(i).Name)
-		if v, ok := rt.Field(i).Tag.Lookup("default"); ok {
-			e.Schema.Default = v
-		}
-		in := rt.Field(i).Tag.Get("in")
-		if !arraykit.StringContains([]string{"query", "path", "header", "cookie"}, in) {
-			in = "query"
-		}
-		e.In = in
-		b.Path.Parameters = append(b.Path.Parameters, e)
 	}
-	return b
 }
 
-func (b *Builder) ReqBody(param any) *Builder {
-	b.Path.RequestBody = &ApiDocV3ReqBody{Content: map[string]*ApiDocV3SchemaWrapper{}}
-	// 默认都是json
-	parent := &ApiDocV3SchemaWrapper{
-		Schema: &ApiDocV3Schema{
-			Type:       "object",
-			Properties: map[string]*ApiDocV3Schema{},
-		},
+func ReqBody(param any) BuildOpt {
+	return func(b *Builder) {
+		b.Path.RequestBody = &ApiDocV3ReqBody{Content: map[string]*ApiDocV3SchemaWrapper{}}
+		// 默认都是json
+		parent := &ApiDocV3SchemaWrapper{
+			Schema: &ApiDocV3Schema{
+				Type:       "object",
+				Properties: map[string]*ApiDocV3Schema{},
+			},
+		}
+		key := "application/json"
+		rt := reflect.TypeOf(param)
+		for i := 0; i < rt.NumField(); i++ {
+			e := &ApiDocV3Schema{}
+			tname := stringkit.LowerFirst(rt.Field(i).Type.Name())
+			switch {
+			case tname == "file":
+				key = "multipart/form-data"
+				e.Type = "string"
+				e.Format = "binary"
+			case strings.Index(tname, "int") == 0:
+				e.Type = "integer"
+			case strings.Index(tname, "float") == 0:
+				e.Type = "number"
+			case strings.Index(tname, "bool") == 0:
+				e.Type = "boolean"
+			default:
+				e.Type = "string"
+			}
+			e.Description = rt.Field(i).Tag.Get("description")
+			if v, ok := rt.Field(i).Tag.Lookup("default"); ok {
+				e.Default = v
+			}
+			// 用name做key
+			name := stringkit.LowerFirst(rt.Field(i).Name)
+			if strings.Contains(rt.Field(i).Tag.Get("validate"), "required") {
+				parent.Schema.Required = append(parent.Schema.Required, name)
+			}
+			parent.Schema.Properties[name] = e
+		}
+		b.Path.RequestBody.Content[key] = parent
 	}
-	key := "application/json"
-	rt := reflect.TypeOf(param)
-	for i := 0; i < rt.NumField(); i++ {
-		e := &ApiDocV3Schema{}
-		tname := stringkit.LowerFirst(rt.Field(i).Type.Name())
-		switch {
-		case tname == "file":
-			key = "multipart/form-data"
-			e.Type = "string"
-			e.Format = "binary"
-		case strings.Index(tname, "int") == 0:
-			e.Type = "integer"
-		case strings.Index(tname, "float") == 0:
-			e.Type = "number"
-		case strings.Index(tname, "bool") == 0:
-			e.Type = "boolean"
-		default:
-			e.Type = "string"
-		}
-		e.Description = rt.Field(i).Tag.Get("description")
-		if v, ok := rt.Field(i).Tag.Lookup("default"); ok {
-			e.Default = v
-		}
-		// 用name做key
-		name := stringkit.LowerFirst(rt.Field(i).Name)
-		if strings.Contains(rt.Field(i).Tag.Get("validate"), "required") {
-			parent.Schema.Required = append(parent.Schema.Required, name)
-		}
-		parent.Schema.Properties[name] = e
-	}
-	b.Path.RequestBody.Content[key] = parent
-	return b
 }
 
-func (b *Builder) Response(bean any) *Builder {
+func Response(bean any) BuildOpt {
 	// todo response
-	return b
+	return func(b *Builder) {
+
+	}
 }
 
 // ResponseStream 返回字节流
-func (b *Builder) ResponseStream() *Builder {
-	b.Path.Responses = map[string]*ApiDocV3ResBody{
-		"200": {
-			Description: "ok",
-			Content: map[string]*ApiDocV3SchemaWrapper{
-				"application/octet-stream": {},
+func ResponseStream() BuildOpt {
+	return func(b *Builder) {
+		b.Path.Responses = map[string]*ApiDocV3ResBody{
+			"200": {
+				Description: "ok",
+				Content: map[string]*ApiDocV3SchemaWrapper{
+					"application/octet-stream": {},
+				},
 			},
-		},
+		}
 	}
-	return b
 }
 
 // ReadDoc 返回 api-docs 结果

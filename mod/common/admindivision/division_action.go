@@ -5,6 +5,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/mod/common/admindivision/dao/areadao"
 	"github.com/mizuki1412/go-core-kit/mod/common/admindivision/dao/provincedao"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
+	"github.com/mizuki1412/go-core-kit/service/restkit/openapi"
 	"github.com/mizuki1412/go-core-kit/service/restkit/router"
 )
 
@@ -12,15 +13,15 @@ func Init(router *router.Router) {
 	tag := "common:公共模块"
 	r := router.Group("/rest/common/administrative")
 	{
-		r.Post("/listAllProvinceCity", ListAllProvinceCity).Openapi.Tag(tag).Summary("列表所有的省市")
-		r.Get("/listAllProvinceCity", ListAllProvinceCity).Openapi.Tag(tag).Summary("列表所有的省市")
-		r.Post("/listAreaByCity", listArea).Openapi.Tag(tag).Summary("按市列出区").ReqParam(listAreaParam{})
-		r.Get("/listAreaByCity", listArea).Openapi.Tag(tag).Summary("按市列出区").ReqParam(listAreaParam{})
+		r.Post("/listAllProvinceCity", ListAllProvinceCity).Api(openapi.Tag(tag), openapi.Summary("列表所有的省市"))
+		r.Get("/listAllProvinceCity", ListAllProvinceCity).Api(openapi.Tag(tag), openapi.Summary("列表所有的省市"))
+		r.Post("/listAreaByCity", listArea).Api(openapi.Tag(tag), openapi.Summary("按市列出区"), openapi.ReqParam(listAreaParam{}))
+		r.Get("/listAreaByCity", listArea).Api(openapi.Tag(tag), openapi.Summary("按市列出区"), openapi.ReqParam(listAreaParam{}))
 	}
 }
 
 func ListAllProvinceCity(ctx *context.Context) {
-	ctx.JsonSuccess(provincedao.New().ListAll())
+	ctx.JsonSuccess(provincedao.New(provincedao.ResultDefault).ListAll())
 }
 
 type listAreaParam struct {

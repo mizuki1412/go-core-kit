@@ -6,6 +6,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
 	"github.com/mizuki1412/go-core-kit/service/restkit/middleware"
+	"github.com/mizuki1412/go-core-kit/service/restkit/openapi"
 	"github.com/mizuki1412/go-core-kit/service/restkit/router"
 	"github.com/spf13/cast"
 )
@@ -15,7 +16,7 @@ func Init(router *router.Router) {
 	r := router.Group("/rest/sts")
 	r.Use(middleware.AuthJWT())
 	{
-		r.Post("/get", get).Openapi.Tag(tag).Summary("ali sts 获取")
+		r.Post("/get", get).Api(openapi.Tag(tag), openapi.Summary("ali sts 获取"))
 	}
 }
 

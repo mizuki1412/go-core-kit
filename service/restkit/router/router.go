@@ -4,6 +4,7 @@ import (
 	"embed"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/render"
+	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
 	"github.com/mizuki1412/go-core-kit/service/restkit/openapi"
 	"mime"
@@ -64,10 +65,6 @@ func (router *Router) Use(handlers ...Handler) *Router {
 	return router
 }
 
-func (router *Router) openapiBuilder(path string, method string) {
-	router.Openapi = openapi.NewBuilder(router.ProxyGroup.BasePath()+path, method)
-}
-
 // Post 此处handle不能当成是use
 func (router *Router) Post(path string, handlers ...Handler) *Router {
 	router.ProxyGroup.POST(path, handlerTrans(handlers...)...)
@@ -102,6 +99,21 @@ func (router *Router) GetPost(path string, handlers ...Handler) *Router {
 
 func (router *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	router.Proxy.ServeHTTP(w, req)
+}
+
+func (router *Router) openapiBuilder(path string, method string) {
+	router.Openapi = openapi.NewBuilder(router.ProxyGroup.BasePath()+path, method)
+}
+
+// Api 用Functional Options的方式构建openapi参数
+func (router *Router) Api(options ...func(opt *openapi.Builder)) *Router {
+	if router.Openapi == nil {
+		panic(exception.New("please init openapi first"))
+	}
+	for _, option := range options {
+		option(router.Openapi)
+	}
+	return router
 }
 
 // EmbedHtmlHandle 注意path pattern中加入{path:path}

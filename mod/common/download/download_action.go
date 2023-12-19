@@ -8,6 +8,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
 	"github.com/mizuki1412/go-core-kit/service/restkit/middleware"
+	"github.com/mizuki1412/go-core-kit/service/restkit/openapi"
 	"github.com/mizuki1412/go-core-kit/service/restkit/router"
 	"github.com/mizuki1412/go-core-kit/service/storagekit"
 	"strings"
@@ -18,16 +19,23 @@ func Init(router *router.Router) {
 	r := router.Group("/rest")
 	r.Use(middleware.AuthJWT())
 	{
-		r.Post("/download", download).Openapi.Tag(tag).Summary("私有下载").ReqParam(downloadParams{}).ResponseStream()
-		r.Get("/download", download).Openapi.Tag(tag).Summary("私有下载").ReqParam(downloadParams{}).ResponseStream()
-		r.Post("/upload", upload).Openapi.Tag(tag).Summary("私有上传").ReqBody(uploadParams{})
-		r.Post("/file/list", fileList).Openapi.Tag(tag).Summary("文件列表").ReqParam(fileListParams{})
-		r.Post("/file/del", fileDel).Openapi.Tag(tag).Summary("文件删除").ReqParam(fileListParams{})
+		r.Post("/download", download).Api(openapi.Tag(tag),
+			openapi.Summary("私有下载"), openapi.ReqParam(downloadParams{}), openapi.ResponseStream())
+		r.Get("/download", download).Api(openapi.Tag(tag),
+			openapi.Summary("私有下载"), openapi.ReqParam(downloadParams{}), openapi.ResponseStream())
+		r.Post("/upload", upload).Api(openapi.Tag(tag),
+			openapi.Summary("私有上传"), openapi.ReqBody(uploadParams{}))
+		r.Post("/file/list", fileList).Api(openapi.Tag(tag),
+			openapi.Summary("文件列表"), openapi.ReqParam(fileListParams{}))
+		r.Post("/file/del", fileDel).Api(openapi.Tag(tag),
+			openapi.Summary("文件删除"), openapi.ReqParam(fileListParams{}))
 	}
 	r2 := router.Group("/rest/common")
 	{
-		r2.Post("/download", downloadPublic).Openapi.Tag(tag).Summary("公共下载").ReqParam(downloadParams{}).ResponseStream()
-		r2.Get("/download", downloadPublic).Openapi.Tag(tag).Summary("公共下载").ReqParam(downloadParams{}).ResponseStream()
+		r2.Post("/download", downloadPublic).Api(openapi.Tag(tag),
+			openapi.Summary("公共下载"), openapi.ReqParam(downloadParams{}), openapi.ResponseStream())
+		r2.Get("/download", downloadPublic).Api(openapi.Tag(tag),
+			openapi.Summary("公共下载"), openapi.ReqParam(downloadParams{}), openapi.ResponseStream())
 	}
 }
 

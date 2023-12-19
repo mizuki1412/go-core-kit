@@ -8,6 +8,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/service-third/alismskit"
 	"github.com/mizuki1412/go-core-kit/service/rediskit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
+	"github.com/mizuki1412/go-core-kit/service/restkit/openapi"
 	"github.com/mizuki1412/go-core-kit/service/restkit/router"
 	"github.com/spf13/cast"
 	"time"
@@ -16,7 +17,7 @@ import (
 func Init(router *router.Router) {
 	tag := "user:用户模块"
 	r := router.Group("/rest/user")
-	r.Post("/getVerifyCode", get).Openapi.Tag(tag).Summary("短信验证码获取").ReqParam(getParams{})
+	r.Post("/getVerifyCode", get).Api(openapi.Tag(tag), openapi.Summary("短信验证码获取"), openapi.ReqParam(getParams{}))
 }
 
 type getParams struct {
