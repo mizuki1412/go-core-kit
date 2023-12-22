@@ -132,7 +132,7 @@ func (th *MapString) Put(key string, val any) {
 
 func (th *MapString) Remove() {
 	th.Valid = false
-	th.Map = map[string]any{}
+	clear(th.Map)
 }
 
 func (th MapString) IsEmpty() bool {

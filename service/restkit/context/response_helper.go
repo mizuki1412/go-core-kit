@@ -37,10 +37,14 @@ func (ctx *Context) Json(ret RestRet) {
 	ctx.Proxy.JSON(code, TransferRestRet(ret))
 }
 
-func (ctx *Context) JsonSuccess(data any) {
+func (ctx *Context) JsonSuccess(data ...any) {
+	var d any = nil
+	if len(data) > 1 {
+		d = data[0]
+	}
 	ctx.Json(RestRet{
 		Result: ResultSuccess,
-		Data:   data,
+		Data:   d,
 	})
 }
 

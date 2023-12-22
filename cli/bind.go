@@ -51,7 +51,7 @@ func bindDefaultFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().String(configkey.RestRequestBodySize, "", "限制request最大，单位MB")
 	cmd.PersistentFlags().Bool(configkey.RestPPROF, false, "开启pprof, /debug/pprof")
 
-	cmd.PersistentFlags().Int(configkey.JwtExpire, 6, "jwt 过期时间")
+	cmd.PersistentFlags().Int(configkey.JwtExpire, 6, "jwt 过期时间/小时")
 	cmd.PersistentFlags().String(configkey.JwtSecretKey, "0123456789abcdef", "jwt 密钥")
 
 	cmd.PersistentFlags().String(configkey.DBDriver, "", "postgres/mysql/mssql")

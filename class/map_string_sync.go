@@ -157,7 +157,7 @@ func (th *MapStringSync) Remove() {
 	th.Lock()
 	defer th.Unlock()
 	th.Valid = false
-	th.Map = map[string]any{}
+	clear(th.Map)
 }
 
 func (th *MapStringSync) Delete(key string) {
