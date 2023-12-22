@@ -3,6 +3,7 @@ package openapi
 type ApiDocV3 struct {
 	Openapi    string                                       `json:"openapi,omitempty"`
 	Info       *ApiDocV3Info                                `json:"info,omitempty"`
+	Tags       []*ApiDocV3Tag                               `json:"tags"`
 	Paths      map[string]map[string]*ApiDocV3PathOperation `json:"paths,omitempty"` // path:method:info, 这里只处理 method 对应的 operation
 	Components *ApiDocV3ComponentObj                        `json:"components,omitempty"`
 	Servers    []string                                     `json:"servers,omitempty"` // 目前只要填写 url
@@ -25,6 +26,11 @@ type ApiDocV3InfoContact struct {
 type ApiDocV3InfoLicense struct {
 	Name string `json:"name,omitempty"`
 	Url  string `json:"url,omitempty"`
+}
+
+type ApiDocV3Tag struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 type ApiDocV3PathOperation struct {

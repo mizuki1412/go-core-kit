@@ -11,7 +11,6 @@ toolkit for golang projects
 
 - [ ] swagger 测试文件上传
 - [ ] swagger response 的定义(float和int64都用string输出)
-- [ ] swagger 目前没有区分json和form 因为接口都支持
 - [ ] knife-ui 详情显示不出来
 
   later：

@@ -48,7 +48,7 @@ func Gen(urlPrefix string) {
 			}
 			b := beanMap[name]
 			content := ""
-			operationId := openapi.GenOperationId(key, method)
+			operationId, _ := openapi.GenOperationId(key, method)
 			// 函数描述
 			content += fmt.Sprintf("/// %s: %s", operationId, val.Summary)
 			// 参数

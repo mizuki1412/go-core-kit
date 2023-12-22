@@ -1,9 +1,11 @@
 package user
 
 import (
+	"github.com/mizuki1412/go-core-kit/service/restkit/context"
 	"github.com/mizuki1412/go-core-kit/service/restkit/middleware"
 	"github.com/mizuki1412/go-core-kit/service/restkit/openapi"
 	"github.com/mizuki1412/go-core-kit/service/restkit/router"
+	"log"
 )
 
 func Init(router *router.Router) {
@@ -35,4 +37,18 @@ func Init(router *router.Router) {
 		r2.Post("/update", UpdateUser).Api(openapi.Tag(tag), openapi.Summary("修改用户"), openapi.ReqParam(UpdateParams{}))
 		r2.Post("/del", DelUser).Api(openapi.Tag(tag), openapi.Summary("删除冻结用户"), openapi.ReqParam(DelParams{}))
 	}
+
+	// todo test
+	router.Get("/rest/test2/:id", test2)
+}
+
+type test2Param struct {
+	Id int32
+}
+
+func test2(ctx *context.Context) {
+	params := test2Param{}
+	ctx.BindForm(&params)
+	log.Println(params.Id)
+	ctx.JsonSuccess()
 }
