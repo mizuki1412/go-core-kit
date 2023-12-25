@@ -40,11 +40,14 @@ func GenOperationId(path, method string) (string, string) {
 	res := strings.ToLower(method)
 	arr := strings.Split(path, "/")
 	for _, e := range arr {
+		if e == "" {
+			continue
+		}
 		// 排除gin中路径参数匹配
 		if e[0] == ':' {
 			path = strings.ReplaceAll(path, e, "{"+e[1:]+"}")
 		}
-		if e == "" || e[0] == ':' || e[0] == '{' || e[0] == '*' {
+		if e[0] == ':' || e[0] == '{' || e[0] == '*' {
 			continue
 		}
 		res += stringkit.UpperFirst(e)
@@ -333,5 +336,4 @@ func InitResParentSchema(obj any) {
 	}
 	s, _ := buildObjectSchema(rt, fromResponse)
 	resParentSchema = *s
-	println(123)
 }

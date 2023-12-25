@@ -29,7 +29,7 @@ func Init(router *router.Router) {
 	r := router.Group("/rest/$tag$")
 	r.Use(middleware.AuthUsernameAndPwd())
 	{
-		r.Post("/$name$", $name$).Openapi.Tag(tag).Summary("$summary$").ReqParam($name$Params{})
+		r.Post("/$name$", $name$).Api(openapi.Tag(tag), openapi.Summary("$summary$"), openapi.ReqParam($name$Params{}))
 	}
 }
 
@@ -41,7 +41,7 @@ func $name$(ctx *context.Context){
     params := $name$Params{}
 	ctx.BindForm(&params)
 	
-    ctx.JsonSuccess(nil)
+    ctx.JsonSuccess()
 }
 ```
 
@@ -53,10 +53,10 @@ func Init(router *router.Router) {
 	r := router.Group("/rest/$tag$")
 	r.Use(middleware.AuthUsernameAndPwd())
 	{
-		r.Post("/update", update).Openapi.Tag(tag).Summary("增加和修改").ReqParam(updateParams{})
-		r.Post("/del", del).Openapi.Tag(tag).Summary("删除").ReqParam(delParams{})
-		r.Post("/list", list).Openapi.Tag(tag).Summary("列表").ReqParam(listParams{})
-		r.Post("/detail", detail).Openapi.Tag(tag).Summary("详情").ReqParam(detailParams{})
+		r.Post("/update", update).Api(openapi.Tag(tag), openapi.Summary("增加和修改"), openapi.ReqParam(updateParams{}))
+		r.Post("/del", del).Api(openapi.Tag(tag), openapi.Summary("删除"), openapi.ReqParam(delParams{}))
+		r.Post("/list", list).Api(openapi.Tag(tag), openapi.Summary("列表"), openapi.ReqParam(listParams{}))
+		r.Post("/detail", detail).Api(openapi.Tag(tag), openapi.Summary("详情"), openapi.ReqParam(detailParams{}))
 	}
 }
 
@@ -69,7 +69,7 @@ func update(ctx *context.Context) {
 	params := updateParams{}
 	ctx.BindForm(&params)
 
-	ctx.JsonSuccess(nil)
+	ctx.JsonSuccess()
 }
 
 type delParams struct {
@@ -80,7 +80,7 @@ func del(ctx *context.Context) {
 	params := delParams{}
 	ctx.BindForm(&params)
 
-	ctx.JsonSuccess(nil)
+	ctx.JsonSuccess()
 }
 
 type listParams struct{}
@@ -89,7 +89,7 @@ func list(ctx *context.Context) {
 	params := listParams{}
 	ctx.BindForm(&params)
 
-	ctx.JsonSuccess(nil)
+	ctx.JsonSuccess()
 }
 
 type detailParams struct {
@@ -100,7 +100,7 @@ func detail(ctx *context.Context) {
 	params := detailParams{}
 	ctx.BindForm(&params)
 
-	ctx.JsonSuccess(nil)
+	ctx.JsonSuccess()
 }
 ```
 
@@ -114,7 +114,7 @@ func $name$(ctx *context.Context){
     params := $name$Params{}
 	ctx.BindForm(&params)
 	
-    ctx.JsonSuccess(nil)
+    ctx.JsonSuccess()
 }
 ```
 

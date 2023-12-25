@@ -102,7 +102,11 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func (router *Router) openapiBuilder(path string, method string) {
-	router.Openapi = openapi.NewBuilder(router.ProxyGroup.BasePath()+path, method)
+	base := router.ProxyGroup.BasePath()
+	if base != "" && base[len(base)-1] == '/' && path != "" && path[0] == '/' {
+		path = path[1:]
+	}
+	router.Openapi = openapi.NewBuilder(base+path, method)
 }
 
 // Api 用Functional Options的方式构建openapi参数

@@ -4,8 +4,8 @@ import (
 	"github.com/mizuki1412/go-core-kit/cli"
 	"github.com/mizuki1412/go-core-kit/mod/common/download"
 	"github.com/mizuki1412/go-core-kit/mod/user"
-	"github.com/mizuki1412/go-core-kit/mod/user/model"
 	"github.com/mizuki1412/go-core-kit/service/restkit"
+	"github.com/mizuki1412/go-core-kit/snippet"
 	"github.com/spf13/cobra"
 )
 
@@ -21,11 +21,8 @@ func main() {
 	cli.AddChildCMD(&cobra.Command{
 		Use: "test",
 		Run: func(cmd *cobra.Command, args []string) {
-			a := model.User{}
-			b := a
-			a.Id = 10
-			b.Id = 11
-			println(a.Id, b.Id)
+			restkit.AddActions(snippet.Init)
+			_ = restkit.Run()
 		},
 	})
 	cli.Execute()

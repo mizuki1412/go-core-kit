@@ -9,7 +9,7 @@ toolkit for golang projects
 
 # TODO
 
-- [ ] swagger 测试文件上传
+- [x] swagger 测试文件上传
 - [ ] swagger response 的定义(float和int64都用string输出)
 - test: json param
 - [ ] knife-ui 详情显示不出来
