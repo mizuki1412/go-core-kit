@@ -63,10 +63,11 @@ func (ctx *Context) bindStruct(bean any) {
 	rt := rt0.Elem()
 	rv := reflect.ValueOf(bean).Elem()
 	// 取json和取form只能同时进行一次，取完，流被关闭了。
-	jsonBody := map[string]any{}
 	isJson := strings.Index(ctx.Request.Header.Get("content-type"), "application/json") >= 0
 	if isJson {
-		_ = ctx.Proxy.ShouldBindJSON(&jsonBody)
+		// 直接转为bean
+		_ = ctx.Proxy.ShouldBindJSON(bean)
+		return
 	}
 	for i := 0; i < rt.NumField(); i++ {
 		field := rt.Field(i)
@@ -96,24 +97,14 @@ func (ctx *Context) bindStruct(bean any) {
 		// bind struct key
 		var val string
 		var keyExist bool
-		if isJson {
-			switch jsonBody[key].(type) {
-			case map[string]any:
-				val = jsonkit.ToString(jsonBody[key])
-			default:
-				val = cast.ToString(jsonBody[key])
-			}
-			_, keyExist = jsonBody[key]
-		} else {
-			// 判断是否存在key，用于空字符串和无的区分
-			val, keyExist = ctx.Proxy.GetPostForm(key)
-			if val == "" {
-				val = ctx.Proxy.Query(key)
-			}
-			if val == "" {
-				// todo
-				val = ctx.Proxy.Param(key)
-			}
+		// 判断是否存在key，用于空字符串和无的区分
+		val, keyExist = ctx.Proxy.GetPostForm(key)
+		if val == "" {
+			val = ctx.Proxy.Query(key)
+		}
+		if val == "" {
+			// todo
+			val = ctx.Proxy.Param(key)
 		}
 		// 判断trim
 		if field.Tag.Get("trim") == "true" {

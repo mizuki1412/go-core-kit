@@ -7,7 +7,6 @@ import (
 	"github.com/mizuki1412/go-core-kit/mod/user/model"
 	"github.com/mizuki1412/go-core-kit/service/restkit"
 	"github.com/spf13/cobra"
-	"reflect"
 )
 
 func main() {
@@ -22,12 +21,11 @@ func main() {
 	cli.AddChildCMD(&cobra.Command{
 		Use: "test",
 		Run: func(cmd *cobra.Command, args []string) {
-			user := model.User{}
-			rt := reflect.TypeOf(user)
-			role, _ := rt.FieldByName("Role")
-			println(role.Type.Kind().String())
-			e, _ := role.Type.Elem().FieldByName("Extend")
-			println(e.Tag.Get("comment"))
+			a := model.User{}
+			b := a
+			a.Id = 10
+			b.Id = 11
+			println(a.Id, b.Id)
 		},
 	})
 	cli.Execute()
