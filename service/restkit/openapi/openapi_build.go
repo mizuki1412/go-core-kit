@@ -7,6 +7,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/library/arraykit"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
+	"github.com/mizuki1412/go-core-kit/service/restkit/context"
 	"reflect"
 	"strings"
 )
@@ -21,6 +22,7 @@ func init() {
 			Schemas: map[string]*ApiDocV3Schema{},
 		},
 	}
+	InitResParentSchema(context.RestRet{})
 }
 
 // Builder 单条路径的builder
@@ -285,5 +287,27 @@ func (doc *ApiDocV3) SwaggerConfig() map[string]any {
 		"tagsSorter":           "alpha",
 		"url":                  "/v3/api-docs",
 		"validatorUrl":         "",
+	}
+}
+
+var resParentSchemaProps = map[string]*ApiDocV3Schema{}
+
+// 返回的父类格式的data区域
+var resParentSchemaPropData *ApiDocV3Schema
+
+// InitResParentSchema 定义返回的父类格式，在response的时候绑定外部父类格式，实际格式在data中
+func InitResParentSchema(obj any) {
+	rt := reflect.TypeOf(obj)
+	if rt.Kind() != reflect.Struct {
+		panic(exception.New("InitResParentSchema need struct"))
+	}
+	for i := 0; i < rt.NumField(); i++ {
+		e := &ApiDocV3Schema{}
+		tname := stringkit.LowerFirst(rt.Field(i).Type.Name())
+		reqPropTypeHandle(tname, e, true)
+		e.Description = rt.Field(i).Tag.Get("comment")
+		// 用name做key
+		//name := stringkit.LowerFirst(rt.Field(i).Name)
+		//parent.Schema.Properties[name] = e
 	}
 }
