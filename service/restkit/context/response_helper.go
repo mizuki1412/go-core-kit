@@ -8,9 +8,9 @@ import (
 )
 
 type RestRet struct {
-	Result  int    `json:"result"`
+	Result  int    `json:"result" comment:"成功为0，授权拦截为401，错误为500"`
 	Message string `json:"message,omitempty"`
-	Data    any    `json:"data,omitempty"`
+	Data    any    `json:"data,omitempty" comment:"数据" data:"true"`
 	Total   uint64 `json:"total,omitempty" comment:"记录总数，如果data是列表并且分页"`
 }
 

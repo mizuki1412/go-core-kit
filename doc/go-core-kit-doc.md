@@ -304,17 +304,18 @@ restkit.Run()
 /// 其中action的初始定义demo，并配合使用swagger
 func Init(router *router.Router) {
 	tag := "user:用户模块"
-	router.Group("/rest/user/loginByUsername").Post("", loginByUsername).Openapi.Tag(tag).Summary("登录-用户名").ReqParam(loginByUsernameParam{})
-	router.Group("/rest/user/login").Post("", login).Openapi.Tag(tag).Summary("登录").ReqParam(loginParam{})
-	router.Group("/rest/user/info").Use(middleware.AuthUsernameAndPwd()).Post("", info).Openapi.Tag(tag).Summary("用户信息")
+	router.Group("/rest/user/loginByUsername").Post("", loginByUsername).Api(openapi.Tag(tag), 
+		openapi.Summary("登录-用户名"), openapi.ReqParam(loginByUsernameParam{}))
+	router.Group("/rest/user/login").Post("", login).Api(openapi.Tag(tag),
+	    openapi.Summary("登录"), openapi.ReqParam(loginParam{}))
+	router.Group("/rest/user/info").Use(middleware.AuthUsernameAndPwd()).Post("", info).Api(openapi.Tag(tag), openapi.Summary("用户信息"))
 	r := router.Group("/rest/user", middleware.AuthUsernameAndPwd())
 	{
-		r.Post("/logout", logout).Openapi.Tag(tag).Summary("登出")
-		r.Post("/updatePwd", updatePwd).Openapi.Tag(tag).Summary("密码修改").ReqParam(updatePwdParam{})
-		r.Post("/updateUserInfo", updateUserInfo).Openapi.Tag(tag).Summary("更新用户信息").ReqParam(updateUserInfoParam{})
+		r.Post("/logout", logout).Api(openapi.Tag(tag), openapi.Summary("登出"))
+		r.Post("/updatePwd", updatePwd).Api(openapi.Tag(tag), openapi.Summary("密码修改"), openapi.ReqParam(updatePwdParam{}))
 	}
-  r.Get("/download", download).Openapi.Tag(tag).Summary("私有下载").ReqParam(downloadParams{}).ResponseStream()
-	r.Post("/upload", upload).Openapi.Tag(tag).Summary("私有上传").ReqBody(uploadParams{})
+    r.Get("/download", download).Api(openapi.Tag(tag), openapi.Summary("私有下载"), openapi.ReqParam(downloadParams{})).ResponseStream()
+	r.Post("/upload", upload).Api(openapi.Tag(tag), openapi.Summary("私有上传"), openapi.ReqBody(uploadParams{}))
 }
 ```
 
@@ -386,6 +387,12 @@ v3.1.0
 // 修改 swagger-initializer.js
 url: "./v3/api-docs",
 ```
+
+#### 自定义返回实体的父类
+
+如果需要自定义返回值的父类
+
+`openapi.InitResParentSchema`，参考`RestRet`，其中 `data:"true"` 表示数据值塞入的位置。
 
 ## middleware
 
