@@ -44,7 +44,7 @@ func ConcatIntWith(arr []int32, sep string) string {
 	return fin[:strings.LastIndex(fin, sep)]
 }
 
-// 正则切割
+// Split 正则切割
 func Split(origin, reg string) []string {
 	r, err := regexp.Compile(reg)
 	if err != nil {

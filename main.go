@@ -12,6 +12,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/sqlkit"
 	"github.com/spf13/cobra"
 	"log"
+	"reflect"
 )
 
 func main() {
@@ -26,7 +27,17 @@ func main() {
 	cli.AddChildCMD(&cobra.Command{
 		Use: "test",
 		Run: func(cmd *cobra.Command, args []string) {
-
+			user := model.User{}
+			rt := reflect.TypeOf(user)
+			rv := reflect.ValueOf(user)
+			for i := 0; i < rt.NumField(); i++ {
+				if rt.Field(i).Type.Kind() == reflect.Pointer {
+					println(rv.Field(i).IsZero())
+					println(rv.Field(i).Type().Name())
+					//el := rv.Field(i).Elem()
+					//println(el.IsNil())
+				}
+			}
 		},
 	})
 	cli.Execute()

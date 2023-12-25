@@ -105,38 +105,53 @@ func Tag(tag string) BuildOpt {
 
 // todo 统一封装schema
 // return content-type(如果需要修改)
-func reqPropTypeHandle(fieldType string, schema *ApiDocV3Schema, reqBody bool) string {
+func buildSchemas(obj any, from string, callBack func(s *ApiDocV3Schema, field reflect.StructField)) string {
 	key := ""
-	switch {
-	case fieldType == "file":
-		if reqBody {
-			key = httpconst.MimeMultipartPOSTForm
+	rt := reflect.TypeOf(obj)
+	if rt.Kind() != reflect.Struct {
+		panic(exception.New("buildSchemas need struct type"))
+	}
+	for i := 0; i < rt.NumField(); i++ {
+		schema := &ApiDocV3Schema{}
+		tname := stringkit.LowerFirst(rt.Field(i).Type.Name())
+		switch {
+		case tname == "file":
+			if from == "reqBody" {
+				key = httpconst.MimeMultipartPOSTForm
+				schema.Type = "string"
+				schema.Format = "binary"
+			} else {
+				panic(exception.New("file类型需要用ReqBody"))
+			}
+		case strings.Index(tname, "int") == 0:
+			schema.Type = "integer"
+			if tname == "int64" {
+				schema.Format = "int64"
+			} else {
+				schema.Format = "int32"
+			}
+		case strings.Index(tname, "float") == 0:
+			schema.Type = "number"
+			if tname == "float32" {
+				schema.Format = "float"
+			} else {
+				schema.Format = "double"
+			}
+		case strings.Index(tname, "bool") == 0:
+			schema.Type = "boolean"
+		case strings.Index(tname, "time") >= 0:
 			schema.Type = "string"
-			schema.Format = "binary"
-		} else {
-			panic(exception.New("file类型需要用ReqBody"))
+			schema.Format = "date-time"
+		case rt.Field(i).Type.Kind() == reflect.Pointer:
+			// todo 内嵌对象？
+		default:
+			schema.Type = "string"
 		}
-	case strings.Index(fieldType, "int") == 0:
-		schema.Type = "integer"
-		if fieldType == "int64" {
-			schema.Format = "int64"
-		} else {
-			schema.Format = "int32"
+		schema.Description = rt.Field(i).Tag.Get("comment")
+		if v, ok := rt.Field(i).Tag.Lookup("default"); ok {
+			schema.Default = v
 		}
-	case strings.Index(fieldType, "float") == 0:
-		schema.Type = "number"
-		if fieldType == "float32" {
-			schema.Format = "float"
-		} else {
-			schema.Format = "double"
-		}
-	case strings.Index(fieldType, "bool") == 0:
-		schema.Type = "boolean"
-	case strings.Index(fieldType, "time") >= 0:
-		schema.Type = "string"
-		schema.Format = "date-time"
-	default:
-		schema.Type = "string"
+		callBack(schema, rt.Field(i))
 	}
 	return key
 }
@@ -155,10 +170,10 @@ func ReqParam(param any) BuildOpt {
 		}
 		for i := 0; i < rt.NumField(); i++ {
 			e := &ApiDocV3ReqParam{}
-			tname := stringkit.LowerFirst(rt.Field(i).Type.Name())
+			//tname := stringkit.LowerFirst(rt.Field(i).Type.Name())
 			//println(tname)
 			e.Schema = &ApiDocV3Schema{}
-			reqPropTypeHandle(tname, e.Schema, false)
+			//reqPropTypeHandle(tname, e.Schema, false)
 			e.Description = rt.Field(i).Tag.Get("comment")
 			if strings.Contains(rt.Field(i).Tag.Get("validate"), "required") {
 				e.Required = true
@@ -191,28 +206,15 @@ func ReqBody(param any) BuildOpt {
 			},
 		}
 		key := httpconst.MimeJSON
-		rt := reflect.TypeOf(param)
-		if rt.Kind() != reflect.Struct {
-			panic(exception.New("openapi param need struct"))
-		}
-		for i := 0; i < rt.NumField(); i++ {
-			e := &ApiDocV3Schema{}
-			tname := stringkit.LowerFirst(rt.Field(i).Type.Name())
-			// todo 内嵌对象？
-			key0 := reqPropTypeHandle(tname, e, true)
-			if key0 != "" {
-				key = key0
-			}
-			e.Description = rt.Field(i).Tag.Get("comment")
-			if v, ok := rt.Field(i).Tag.Lookup("default"); ok {
-				e.Default = v
-			}
-			// 用name做key
-			name := stringkit.LowerFirst(rt.Field(i).Name)
-			if strings.Contains(rt.Field(i).Tag.Get("validate"), "required") {
+		key0 := buildSchemas(param, "reqBody", func(s *ApiDocV3Schema, field reflect.StructField) {
+			name := stringkit.LowerFirst(field.Name)
+			if strings.Contains(field.Tag.Get("validate"), "required") {
 				parent.Schema.Required = append(parent.Schema.Required, name)
 			}
-			parent.Schema.Properties[name] = e
+			parent.Schema.Properties[name] = s
+		})
+		if key0 != "" {
+			key = key0
 		}
 		b.Path.RequestBody.Content[key] = parent
 	}
