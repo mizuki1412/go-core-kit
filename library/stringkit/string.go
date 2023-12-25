@@ -54,6 +54,9 @@ func Split(origin, reg string) []string {
 }
 
 func CamelCase(str string) string {
+	if str == "" {
+		return str
+	}
 	strs := strings.Split(str, "_")
 	temp := ""
 	for _, v := range strs {
@@ -64,6 +67,9 @@ func CamelCase(str string) string {
 
 // UpperFirst 首字母大写
 func UpperFirst(str string) string {
+	if str == "" {
+		return str
+	}
 	bytes := []byte(str)
 	if bytes[0] >= 'a' {
 		bytes[0] -= 32
@@ -73,6 +79,9 @@ func UpperFirst(str string) string {
 
 // LowerFirst 首字母小写
 func LowerFirst(str string) string {
+	if str == "" {
+		return str
+	}
 	bytes := []byte(str)
 	if bytes[0] < 'a' {
 		bytes[0] += 32
