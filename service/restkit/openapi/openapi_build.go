@@ -116,12 +116,17 @@ const (
 	fromResponse
 )
 
+// 对一个类型封装为schema
+func buildSchema() {
+
+}
+
 // 统一封装对象的成员变量为schema，并回调处理
 // return content-type(如果需要修改); callback - 回调每个field的处理结果
-func buildSchemas(rt reflect.Type, from int, callBack func(s *ApiDocV3Schema, field reflect.StructField)) string {
+func buildFieldSchemas(rt reflect.Type, from int, callBack func(s *ApiDocV3Schema, field reflect.StructField)) string {
 	key := ""
 	if rt.Kind() != reflect.Struct {
-		panic(exception.New("buildSchemas need struct type"))
+		panic(exception.New("buildFieldSchemas need struct type"))
 	}
 	for i := 0; i < rt.NumField(); i++ {
 		schema := &ApiDocV3Schema{}
@@ -132,43 +137,47 @@ func buildSchemas(rt reflect.Type, from int, callBack func(s *ApiDocV3Schema, fi
 				panic(exception.New("file类型需要用ReqBody"))
 			} else {
 				key = httpconst.MimeMultipartPOSTForm
-				schema.Type = "string"
-				schema.Format = "binary"
+				schema.Type = SchemaTypeString
+				schema.Format = SchemaFormatBinary
 			}
 		case strings.Index(tname, "int") >= 0:
 			if strings.Index(tname, "int64") >= 0 {
-				schema.Format = "int64"
-				schema.Type = "string"
+				schema.Format = SchemaFormatInt64
+				schema.Type = SchemaTypeString
 			} else {
-				schema.Format = "int32"
-				schema.Type = "integer"
+				schema.Format = SchemaFormatInt32
+				schema.Type = SchemaTypeInteger
 			}
-		case strings.Index(tname, "float") == 0:
+		case strings.Index(tname, "float") >= 0:
 			if tname == "float64" {
-				schema.Format = "double"
-				schema.Type = "string"
+				schema.Format = SchemaFormatDouble
+				schema.Type = SchemaTypeString
 			} else {
-				schema.Format = "float"
-				schema.Type = "number"
+				schema.Format = SchemaFormatFloat
+				schema.Type = SchemaTypeNumber
 			}
-		case strings.Index(tname, "bool") == 0:
-			schema.Type = "boolean"
+		case strings.Index(tname, "bool") >= 0:
+			schema.Type = SchemaTypeBool
 		case strings.Index(tname, "time") >= 0:
-			schema.Type = "string"
-			schema.Format = "date-time"
+			schema.Type = SchemaTypeString
+			schema.Format = SchemaFormatDateTime
+		case strings.Index(tname, "string") >= 0:
+			schema.Type = SchemaTypeString
 		case rt.Field(i).Type.Kind() == reflect.Pointer:
-			// 内嵌对象
-			if from == fromResponse {
-				// $ref
-				schema.Ref = buildComponentSchema(rt.Field(i).Type.Elem(), from)
-			} else {
-				schema, key = buildObjectSchema(rt.Field(i).Type.Elem(), from)
+			// field如果是对象，统一ref
+			schema.Ref = buildComponentSchema(rt.Field(i).Type.Elem(), from)
+		case rt.Field(i).Type.Kind() == reflect.Struct:
+			schema.Ref = buildComponentSchema(rt.Field(i).Type, from)
+		case rt.Field(i).Type.Kind() == reflect.Slice:
+			schema.Type = SchemaTypeArray
+			schema.Items = &ApiDocV3Schema{}
+			if rt.Field(i).Type.Elem().Kind() == reflect.Pointer {
+
 			}
-		case tname == "":
-			// any
-			schema.Type = "object"
+			//schema.Items.Ref =
+			// todo
 		default:
-			schema.Type = "string"
+			schema.Type = SchemaTypeString
 		}
 		schema.Description = rt.Field(i).Tag.Get("comment")
 		if v, ok := rt.Field(i).Tag.Lookup("default"); ok {
@@ -182,8 +191,8 @@ func buildSchemas(rt reflect.Type, from int, callBack func(s *ApiDocV3Schema, fi
 // schema封装成一个type=object结构
 func buildObjectSchema(rt reflect.Type, from int) (*ApiDocV3Schema, string) {
 	schema := &ApiDocV3Schema{Properties: map[string]*ApiDocV3Schema{}}
-	schema.Type = "object"
-	key := buildSchemas(rt, from, func(s *ApiDocV3Schema, field reflect.StructField) {
+	schema.Type = SchemaTypeObject
+	key := buildFieldSchemas(rt, from, func(s *ApiDocV3Schema, field reflect.StructField) {
 		name := stringkit.LowerFirst(field.Name)
 		if strings.Contains(field.Tag.Get("validate"), "required") {
 			schema.Required = append(schema.Required, name)
@@ -215,7 +224,7 @@ func buildComponentSchema(rt reflect.Type, from int) string {
 func ReqParam(param any) BuildOpt {
 	return func(b *Builder) {
 		rt := reflect.TypeOf(param)
-		buildSchemas(rt, fromReqParam, func(s *ApiDocV3Schema, field reflect.StructField) {
+		buildFieldSchemas(rt, fromReqParam, func(s *ApiDocV3Schema, field reflect.StructField) {
 			e := &ApiDocV3ReqParam{}
 			e.Schema = s
 			e.Description = field.Tag.Get("comment")
@@ -224,8 +233,8 @@ func ReqParam(param any) BuildOpt {
 			}
 			e.Name = stringkit.LowerFirst(field.Name)
 			in := field.Tag.Get("in")
-			if !arraykit.StringContains([]string{"query", "path", "header", "cookie"}, in) {
-				in = "query"
+			if !arraykit.StringContains([]string{ParamInQuery, ParamInPath, ParamInHeader, ParamInCookie}, in) {
+				in = ParamInQuery
 			}
 			e.In = in
 			b.Path.Parameters = append(b.Path.Parameters, e)
@@ -260,7 +269,7 @@ func Response(bean any) BuildOpt {
 			"200": {
 				Description: "ok",
 				Content: map[string]*ApiDocV3SchemaWrapper{
-					"application/json": {
+					httpconst.MimeJSON: {
 						Schema: &parent,
 					},
 				},
@@ -276,7 +285,7 @@ func ResponseStream() BuildOpt {
 			"200": {
 				Description: "ok",
 				Content: map[string]*ApiDocV3SchemaWrapper{
-					"application/octet-stream": {},
+					httpconst.MimeStream: {},
 				},
 			},
 		}

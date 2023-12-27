@@ -10,9 +10,10 @@ toolkit for golang projects
 # TODO
 
 - [x] swagger 测试文件上传
-- [ ] swagger response 的定义(float和int64都用string输出)
-- test: json param
-- [ ] knife-ui 详情显示不出来
+- [x] swagger response 的定义(float和int64都用string输出)
+- json内嵌对象有问题；path没起效
+- [x] knife-ui 详情显示不出来
+- 判断json是否存在，response时
 
   later：
 - [ ] 接口加密：rsa+aes对接口加密(前端生成AES密钥，用rsa私钥将AES密钥加密，放在header.encript 传给到后端，后端用rsa公钥解密后获取到AES密钥，解密数据流。

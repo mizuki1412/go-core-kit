@@ -319,6 +319,8 @@ func Init(router *router.Router) {
 }
 ```
 
+openapi地址：`/swagger`, `/doc.html`
+
 ## 约定/注意
 
 - action的params tags: `validate:"required" description:"xxx" default:"" trim:"true"`
