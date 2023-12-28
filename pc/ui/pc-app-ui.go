@@ -61,9 +61,10 @@ func startServer(param *WinParam) chan error {
 }
 
 func Run(param *WinParam) {
-	serverCh := startServer(param)
-	if !param.NoUI {
-		startUI(param)
-	}
-	waitClose(param, serverCh)
+	// todo
+	//serverCh := startServer(param)
+	//if !param.NoUI {
+	//	startUI(param)
+	//}
+	//waitClose(param, serverCh)
 }

@@ -5,6 +5,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/mizuki1412/go-core-kit/class"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/cli/tag"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/library/timekit"
@@ -78,7 +79,7 @@ func (ctx *Context) bindStruct(bean any) {
 		if typeString == "class.File" {
 			file, err := ctx.Proxy.FormFile(key)
 			// 如果文件流必须存在则检测
-			if err != nil && strings.Index(field.Tag.Get("validate"), "required") > -1 {
+			if err != nil && tag.Validate.Contain(field.Tag, tag.ValidateRequired) {
 				panic(exception.New(err.Error()))
 			}
 			if err == nil {
@@ -107,13 +108,13 @@ func (ctx *Context) bindStruct(bean any) {
 			val = ctx.Proxy.Param(key)
 		}
 		// 判断trim
-		if field.Tag.Get("trim") == "true" {
+		if tag.Trim.Hit(field.Tag) {
 			val = strings.TrimSpace(val)
 		}
 		if val == "" {
-			if _, tagExist := field.Tag.Lookup("default"); tagExist {
+			if tag.Default.Exist(field.Tag) {
 				// default
-				val = field.Tag.Get("default")
+				val = field.Tag.Get(tag.Default.Name)
 				keyExist = true
 			}
 		}
