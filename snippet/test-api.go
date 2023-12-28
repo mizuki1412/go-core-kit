@@ -38,7 +38,7 @@ type testBodyParam struct {
 	Id        int32        `comment:"标识" validate:"required"`
 	ValStr    class.String `comment:"数值"`
 	ValLong   class.Int64
-	ValDouble class.Float64
+	ValDouble class.Float64 `schema:"ignore"`
 	Param     *testParam
 	User      model.User
 	Params    []testParam

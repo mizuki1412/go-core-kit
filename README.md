@@ -11,7 +11,8 @@ toolkit for golang projects
 
 - [x] swagger 测试文件上传
 - [x] swagger response 的定义(float和int64都用string输出)
-- json内嵌对象有问题；path没起效
+- [x] json内嵌对象有问题；path没起效
+- [ ] map、arrstring、等等class
 - [x] knife-ui 详情显示不出来
 - 判断json是否存在，response时
 
