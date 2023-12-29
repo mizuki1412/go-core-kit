@@ -5,6 +5,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/cli/configkey"
 	"github.com/mizuki1412/go-core-kit/cli/tag"
+	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
@@ -165,15 +166,25 @@ func ReqBody(param any) BuildOpt {
 func Response(bean any) BuildOpt {
 	return func(b *Builder) {
 		rt := reflect.TypeOf(bean)
-		ref := buildComponentSchema(rt)
-		parent := resParentSchema
-		parent.Properties[resParentSchemaDataKey].Ref = ref
+		parent := &ApiDocV3Schema{}
+		err := jsonkit.ParseObj(resParentSchema, parent)
+		if err != nil {
+			panic(exception.New(err.Error()))
+		}
+		if rt.Kind() == reflect.Slice {
+			parent.Properties[resParentSchemaDataKey].Type = SchemaTypeArray
+			parent.Properties[resParentSchemaDataKey].Items = buildSchemaByType(rt.Elem())
+		} else {
+			ref := buildComponentSchema(rt)
+			parent.Properties[resParentSchemaDataKey].Type = SchemaTypeObject
+			parent.Properties[resParentSchemaDataKey].Ref = ref
+		}
 		b.Path.Responses = map[string]*ApiDocV3ResBody{
 			"200": {
 				Description: "ok",
 				Content: map[string]*ApiDocV3SchemaWrapper{
 					httpconst.MimeJSON: {
-						Schema: &parent,
+						Schema: parent,
 					},
 				},
 			},
@@ -189,7 +200,7 @@ func ResponseStream() BuildOpt {
 			"200": {
 				Description: "ok",
 				Content: map[string]*ApiDocV3SchemaWrapper{
-					httpconst.MimeStream: {},
+					httpconst.MimeStream: {Schema: &ApiDocV3Schema{Type: SchemaTypeString, Format: SchemaFormatBinary}},
 				},
 			},
 		}
@@ -232,7 +243,7 @@ func (doc *ApiDocV3) SwaggerConfig() map[string]any {
 	}
 }
 
-var resParentSchema ApiDocV3Schema
+var resParentSchema string
 var resParentSchemaDataKey string
 
 // InitResParentSchema 定义返回的父类格式，在response的时候绑定外部父类格式，实际格式在data中
@@ -240,7 +251,7 @@ func InitResParentSchema(obj any) {
 	rt := reflect.TypeOf(obj)
 	for i := 0; i < rt.NumField(); i++ {
 		if tag.RetData.Hit(rt.Field(i).Tag) {
-			resParentSchemaDataKey = rt.Field(i).Name
+			resParentSchemaDataKey = stringkit.LowerFirst(rt.Field(i).Name)
 			break
 		}
 	}
@@ -248,5 +259,5 @@ func InitResParentSchema(obj any) {
 		panic(exception.New("resParentSchemaDataKey cannot nil"))
 	}
 	s := buildObjectSchema(rt)
-	resParentSchema = *s
+	resParentSchema = jsonkit.ToString(s)
 }

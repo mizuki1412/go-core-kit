@@ -14,11 +14,22 @@ var refPrefix = "#/components/schemas/"
 // 对一个类型封装为schema
 func buildSchemaByType(t reflect.Type) *ApiDocV3Schema {
 	schema := &ApiDocV3Schema{}
-	tname := stringkit.LowerFirst(t.Name())
+	tname := strings.ToLower(t.Name())
 	switch {
 	case tname == "file":
 		schema.Type = SchemaTypeString
 		schema.Format = SchemaFormatBinary
+	case strings.Contains(tname, "arrint"):
+		schema.Type = SchemaTypeArray
+		schema.Items = &ApiDocV3Schema{
+			Type:   SchemaTypeInteger,
+			Format: SchemaFormatInt32,
+		}
+	case strings.Contains(tname, "arrstring"):
+		schema.Type = SchemaTypeArray
+		schema.Items = &ApiDocV3Schema{
+			Type: SchemaTypeString,
+		}
 	case strings.Contains(tname, "int"):
 		if strings.Index(tname, "int64") >= 0 {
 			schema.Format = SchemaFormatInt64
@@ -47,21 +58,12 @@ func buildSchemaByType(t reflect.Type) *ApiDocV3Schema {
 		schema.Type = SchemaTypeString
 	case strings.Contains(tname, "map") || strings.Contains(tname, "set"):
 		schema.Type = SchemaTypeObject
-	case strings.Contains(tname, "arrint"):
-		schema.Type = SchemaTypeArray
-		schema.Items = &ApiDocV3Schema{
-			Type:   SchemaTypeInteger,
-			Format: SchemaFormatInt32,
-		}
-	case strings.Contains(tname, "arrstring"):
-		schema.Type = SchemaTypeArray
-		schema.Items = &ApiDocV3Schema{
-			Type: SchemaTypeString,
-		}
 	case t.Kind() == reflect.Pointer:
+		schema.Type = SchemaTypeObject
 		// field如果是对象，统一ref
 		schema.Ref = buildComponentSchema(t.Elem())
 	case t.Kind() == reflect.Struct:
+		schema.Type = SchemaTypeObject
 		schema.Ref = buildComponentSchema(t)
 	case t.Kind() == reflect.Slice:
 		schema.Type = SchemaTypeArray
@@ -75,8 +77,12 @@ func buildSchemaByType(t reflect.Type) *ApiDocV3Schema {
 // 统一封装对象的成员变量为schema，并回调处理
 // return content-type(如果需要修改); callback - 回调每个field的处理结果
 func buildFieldSchemas(rt reflect.Type, callBack func(s *ApiDocV3Schema, field reflect.StructField)) {
-	if rt.Kind() != reflect.Struct {
-		panic(exception.New("buildFieldSchemas need struct type"))
+	if rt.Kind() == reflect.Pointer || rt.Kind() == reflect.Slice {
+		rt = rt.Elem()
+	}
+	// 针对pointer array
+	if rt.Kind() == reflect.Pointer {
+		rt = rt.Elem()
 	}
 	for i := 0; i < rt.NumField(); i++ {
 		if tag.Schema.Contain(rt.Field(i).Tag, tag.SchemaIgnore) {
