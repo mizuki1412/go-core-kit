@@ -148,7 +148,7 @@ func UpdateUser(ctx *context.Context) {
 	params := UpdateParams{}
 	ctx.BindForm(&params)
 	UpdateUserHandle(ctx, params)
-	ctx.JsonSuccess(nil)
+	ctx.JsonSuccess()
 }
 
 func UpdateUserHandle(ctx *context.Context, params UpdateParams) {
@@ -267,5 +267,5 @@ func DelUser(ctx *context.Context) {
 			//userCenter.add(target);
 		}
 	}, dao.DataSource())
-	ctx.JsonSuccess(nil)
+	ctx.JsonSuccess()
 }

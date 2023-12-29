@@ -40,5 +40,5 @@ func dbPing(ctx *context.Context) {
 	if err != nil {
 		logkit.Error(err.Error())
 	}
-	ctx.JsonSuccess(nil)
+	ctx.JsonSuccess()
 }

@@ -90,7 +90,7 @@ func upload(ctx *context.Context) {
 		params.Path.String += "/"
 	}
 	storagekit.SaveInHome(&params.File, params.Path.String+params.File.Header.Filename)
-	ctx.JsonSuccess(nil)
+	ctx.JsonSuccess()
 }
 
 type fileListParams struct {
@@ -120,5 +120,5 @@ func fileDel(ctx *context.Context) {
 	if err != nil {
 		panic(exception.New(err.Error()))
 	}
-	ctx.JsonSuccess(nil)
+	ctx.JsonSuccess()
 }

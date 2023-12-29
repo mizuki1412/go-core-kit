@@ -36,5 +36,5 @@ func get(ctx *context.Context) {
 	}
 	rediskit.Set(context2.Background(), rediskit.GetKeyWithPrefix("sms:"+params.Phone), sms, time.Duration(10)*time.Minute)
 	alismskit.Send(alismskit.SendParams{Phone: params.Phone, Data: map[string]any{"code": sms}})
-	ctx.JsonSuccess(nil)
+	ctx.JsonSuccess()
 }

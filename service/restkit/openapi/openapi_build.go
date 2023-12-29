@@ -57,14 +57,18 @@ func GenOperationId(path, method string) (string, string) {
 func NewBuilder(path string, method string) *Builder {
 	op := &ApiDocV3PathOperation{}
 	// 初始化response
+	parent := &ApiDocV3Schema{}
+	err := jsonkit.ParseObj(resParentSchema, parent)
+	if err != nil {
+		panic(exception.New(err.Error()))
+	}
+	parent.Properties[resParentSchemaDataKey].Type = SchemaTypeObject
 	op.Responses = map[string]*ApiDocV3ResBody{
 		"200": {
 			Description: "ok",
 			Content: map[string]*ApiDocV3SchemaWrapper{
-				"application/json": {
-					Schema: &ApiDocV3Schema{
-						Type: "string",
-					},
+				httpconst.MimeJSON: {
+					Schema: parent,
 				},
 			},
 		},
