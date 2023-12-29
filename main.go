@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/mizuki1412/go-core-kit/cli"
+	"github.com/mizuki1412/go-core-kit/cmd"
 	"github.com/mizuki1412/go-core-kit/mod/common/admindivision"
 	"github.com/mizuki1412/go-core-kit/mod/common/download"
 	"github.com/mizuki1412/go-core-kit/mod/user"
@@ -27,5 +28,6 @@ func main() {
 			_ = restkit.Run()
 		},
 	})
+	cli.AddChildCMD(cmd.FrontDaoCMDNext("http://localhost:10000/v3/api-docs"))
 	cli.Execute()
 }
