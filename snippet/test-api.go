@@ -20,7 +20,7 @@ func Init(router *router.Router) {
 type testParam struct {
 	Id        int32        `comment:"标识" validate:"required"`
 	ValStr    class.String `comment:"数值"`
-	ValLong   int64
+	ValLong   class.Int64
 	ValDouble class.Float64
 }
 
