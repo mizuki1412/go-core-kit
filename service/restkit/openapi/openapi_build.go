@@ -4,7 +4,8 @@ import (
 	"github.com/mizuki1412/go-core-kit/class/const/httpconst"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/cli/configkey"
-	"github.com/mizuki1412/go-core-kit/library/arraykit"
+	"github.com/mizuki1412/go-core-kit/cli/tag"
+	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/service/configkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/context"
@@ -13,8 +14,6 @@ import (
 )
 
 var Doc *ApiDocV3
-
-var refPrefix = "#/components/schemas/"
 
 func init() {
 	Doc = &ApiDocV3{
@@ -58,14 +57,18 @@ func GenOperationId(path, method string) (string, string) {
 func NewBuilder(path string, method string) *Builder {
 	op := &ApiDocV3PathOperation{}
 	// 初始化response
+	parent := &ApiDocV3Schema{}
+	err := jsonkit.ParseObj(resParentSchema, parent)
+	if err != nil {
+		panic(exception.New(err.Error()))
+	}
+	parent.Properties[resParentSchemaDataKey].Type = SchemaTypeObject
 	op.Responses = map[string]*ApiDocV3ResBody{
 		"200": {
 			Description: "ok",
 			Content: map[string]*ApiDocV3SchemaWrapper{
-				"application/json": {
-					Schema: &ApiDocV3Schema{
-						Type: "string",
-					},
+				httpconst.MimeJSON: {
+					Schema: parent,
 				},
 			},
 		},
@@ -110,142 +113,56 @@ func Tag(tag string) BuildOpt {
 	}
 }
 
-const (
-	fromReqParam int = iota
-	fromReqBody
-	fromResponse
-)
-
-// 统一封装对象的成员变量为schema，并回调处理
-// return content-type(如果需要修改); callback - 回调每个field的处理结果
-func buildSchemas(rt reflect.Type, from int, callBack func(s *ApiDocV3Schema, field reflect.StructField)) string {
-	key := ""
-	if rt.Kind() != reflect.Struct {
-		panic(exception.New("buildSchemas need struct type"))
-	}
-	for i := 0; i < rt.NumField(); i++ {
-		schema := &ApiDocV3Schema{}
-		tname := stringkit.LowerFirst(rt.Field(i).Type.Name())
-		switch {
-		case tname == "file":
-			if from == fromReqParam {
-				panic(exception.New("file类型需要用ReqBody"))
-			} else {
-				key = httpconst.MimeMultipartPOSTForm
-				schema.Type = "string"
-				schema.Format = "binary"
-			}
-		case strings.Index(tname, "int") >= 0:
-			if strings.Index(tname, "int64") >= 0 {
-				schema.Format = "int64"
-				schema.Type = "string"
-			} else {
-				schema.Format = "int32"
-				schema.Type = "integer"
-			}
-		case strings.Index(tname, "float") == 0:
-			if tname == "float64" {
-				schema.Format = "double"
-				schema.Type = "string"
-			} else {
-				schema.Format = "float"
-				schema.Type = "number"
-			}
-		case strings.Index(tname, "bool") == 0:
-			schema.Type = "boolean"
-		case strings.Index(tname, "time") >= 0:
-			schema.Type = "string"
-			schema.Format = "date-time"
-		case rt.Field(i).Type.Kind() == reflect.Pointer:
-			// 内嵌对象
-			if from == fromResponse {
-				// $ref
-				schema.Ref = buildComponentSchema(rt.Field(i).Type.Elem(), from)
-			} else {
-				schema, key = buildObjectSchema(rt.Field(i).Type.Elem(), from)
-			}
-		case tname == "":
-			// any
-			schema.Type = "object"
-		default:
-			schema.Type = "string"
-		}
-		schema.Description = rt.Field(i).Tag.Get("comment")
-		if v, ok := rt.Field(i).Tag.Lookup("default"); ok {
-			schema.Default = v
-		}
-		callBack(schema, rt.Field(i))
-	}
-	return key
-}
-
-// schema封装成一个type=object结构
-func buildObjectSchema(rt reflect.Type, from int) (*ApiDocV3Schema, string) {
-	schema := &ApiDocV3Schema{Properties: map[string]*ApiDocV3Schema{}}
-	schema.Type = "object"
-	key := buildSchemas(rt, from, func(s *ApiDocV3Schema, field reflect.StructField) {
-		name := stringkit.LowerFirst(field.Name)
-		if strings.Contains(field.Tag.Get("validate"), "required") {
-			schema.Required = append(schema.Required, name)
-		}
-		schema.Properties[name] = s
-	})
-	return schema, key
-}
-
-// 将对象写入到components
-func buildComponentSchema(rt reflect.Type, from int) string {
-	if rt.Name() == "" {
-		panic(exception.New("openapi components schema name is nil"))
-	}
-	if _, ok := Doc.Components.Schemas[rt.Name()]; ok {
-		return refPrefix + rt.Name()
-	}
-	schema, _ := buildObjectSchema(rt, from)
-	Doc.Components.Schemas[rt.Name()] = schema
-	return refPrefix + rt.Name()
-}
-
 // ReqParam
 // params struct的tags：
 //   - comment: 注释
 //   - validate:"required"
 //   - default: 默认值
 //   - in: query,path,header
+//   - schema: ignore
 func ReqParam(param any) BuildOpt {
 	return func(b *Builder) {
 		rt := reflect.TypeOf(param)
-		buildSchemas(rt, fromReqParam, func(s *ApiDocV3Schema, field reflect.StructField) {
-			e := &ApiDocV3ReqParam{}
-			e.Schema = s
-			e.Description = field.Tag.Get("comment")
-			if strings.Contains(field.Tag.Get("validate"), "required") {
-				e.Required = true
+		buildFieldSchemas(rt, func(s *ApiDocV3Schema, field reflect.StructField) {
+			if s.Format == SchemaFormatBinary {
+				panic(exception.New("file请使用reqBody"))
 			}
-			e.Name = stringkit.LowerFirst(field.Name)
-			in := field.Tag.Get("in")
-			if !arraykit.StringContains([]string{"query", "path", "header", "cookie"}, in) {
-				in = "query"
-			}
-			e.In = in
-			b.Path.Parameters = append(b.Path.Parameters, e)
+			b.Path.Parameters = append(b.Path.Parameters, buildReqParamElement(s, field))
 		})
+		handleComponentsTodo()
 	}
 }
 
 // ReqBody
 // 关于schema：因为是请求，schema重复不多，所以就包含在path中，而不用ref。
 // 使用body-json，schema统一type为object
+// 支持 body json和form-data
 func ReqBody(param any) BuildOpt {
 	return func(b *Builder) {
 		b.Path.RequestBody = &ApiDocV3ReqBody{Content: map[string]*ApiDocV3SchemaWrapper{}}
-		key := httpconst.MimeJSON
+		keyList := []string{httpconst.MimeJSON}
 		rt := reflect.TypeOf(param)
-		schema, key0 := buildObjectSchema(rt, fromReqBody)
-		if key0 != "" {
-			key = key0
-		}
-		b.Path.RequestBody.Content[key] = &ApiDocV3SchemaWrapper{Schema: schema}
+		// 逻辑同buildObjectSchema，但需要加上parameter的判断
+		schema := &ApiDocV3Schema{Properties: map[string]*ApiDocV3Schema{}}
+		schema.Type = SchemaTypeObject
+		buildFieldSchemas(rt, func(s *ApiDocV3Schema, field reflect.StructField) {
+			// 对file类型处理
+			if s.Format == SchemaFormatBinary {
+				keyList[0] = httpconst.MimeMultipartPOSTForm
+			}
+			// 如果存在in，则需要加入params
+			if tag.ParamIn.Exist(field.Tag) {
+				b.Path.Parameters = append(b.Path.Parameters, buildReqParamElement(s, field))
+			} else {
+				name := stringkit.LowerFirst(field.Name)
+				if tag.Validate.Contain(field.Tag, tag.ValidateRequired) {
+					schema.Required = append(schema.Required, name)
+				}
+				schema.Properties[name] = s
+			}
+		})
+		b.Path.RequestBody.Content[keyList[0]] = &ApiDocV3SchemaWrapper{Schema: schema}
+		handleComponentsTodo()
 	}
 }
 
@@ -253,19 +170,30 @@ func ReqBody(param any) BuildOpt {
 func Response(bean any) BuildOpt {
 	return func(b *Builder) {
 		rt := reflect.TypeOf(bean)
-		ref := buildComponentSchema(rt, fromResponse)
-		parent := resParentSchema
-		parent.Properties[resParentSchemaDataKey].Ref = ref
+		parent := &ApiDocV3Schema{}
+		err := jsonkit.ParseObj(resParentSchema, parent)
+		if err != nil {
+			panic(exception.New(err.Error()))
+		}
+		if rt.Kind() == reflect.Slice {
+			parent.Properties[resParentSchemaDataKey].Type = SchemaTypeArray
+			parent.Properties[resParentSchemaDataKey].Items = buildSchemaByType(rt.Elem())
+		} else {
+			ref := buildComponentSchema(rt)
+			parent.Properties[resParentSchemaDataKey].Type = SchemaTypeObject
+			parent.Properties[resParentSchemaDataKey].Ref = ref
+		}
 		b.Path.Responses = map[string]*ApiDocV3ResBody{
 			"200": {
 				Description: "ok",
 				Content: map[string]*ApiDocV3SchemaWrapper{
-					"application/json": {
-						Schema: &parent,
+					httpconst.MimeJSON: {
+						Schema: parent,
 					},
 				},
 			},
 		}
+		handleComponentsTodo()
 	}
 }
 
@@ -276,7 +204,7 @@ func ResponseStream() BuildOpt {
 			"200": {
 				Description: "ok",
 				Content: map[string]*ApiDocV3SchemaWrapper{
-					"application/octet-stream": {},
+					httpconst.MimeStream: {Schema: &ApiDocV3Schema{Type: SchemaTypeString, Format: SchemaFormatBinary}},
 				},
 			},
 		}
@@ -319,21 +247,21 @@ func (doc *ApiDocV3) SwaggerConfig() map[string]any {
 	}
 }
 
-var resParentSchema ApiDocV3Schema
+var resParentSchema string
 var resParentSchemaDataKey string
 
 // InitResParentSchema 定义返回的父类格式，在response的时候绑定外部父类格式，实际格式在data中
 func InitResParentSchema(obj any) {
 	rt := reflect.TypeOf(obj)
 	for i := 0; i < rt.NumField(); i++ {
-		if rt.Field(i).Tag.Get("data") == "true" {
-			resParentSchemaDataKey = rt.Field(i).Name
+		if tag.RetData.Hit(rt.Field(i).Tag) {
+			resParentSchemaDataKey = stringkit.LowerFirst(rt.Field(i).Name)
 			break
 		}
 	}
 	if resParentSchemaDataKey == "" {
 		panic(exception.New("resParentSchemaDataKey cannot nil"))
 	}
-	s, _ := buildObjectSchema(rt, fromResponse)
-	resParentSchema = *s
+	s := buildObjectSchema(rt)
+	resParentSchema = jsonkit.ToString(s)
 }

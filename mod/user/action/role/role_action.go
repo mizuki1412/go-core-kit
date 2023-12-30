@@ -41,7 +41,7 @@ func create(ctx *context.Context) {
 	rdao := roledao.New(roledao.ResultDefault)
 	rdao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	rdao.InsertObj(role)
-	ctx.JsonSuccess(nil)
+	ctx.JsonSuccess()
 }
 
 type updateParams struct {
@@ -76,7 +76,7 @@ func update(ctx *context.Context) {
 		role.Privileges = params.PrivilegesJson
 	}
 	dao.UpdateObj(role)
-	ctx.JsonSuccess(nil)
+	ctx.JsonSuccess()
 }
 
 type delParams struct {
@@ -102,7 +102,7 @@ func del(ctx *context.Context) {
 		panic(exception.New("角色下还有用户,不能删除"))
 	}
 	dao.DeleteById(role.Id)
-	ctx.JsonSuccess(nil)
+	ctx.JsonSuccess()
 }
 
 type listRolesParam struct {

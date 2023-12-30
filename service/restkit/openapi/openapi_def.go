@@ -88,3 +88,26 @@ type ApiDocV3ComponentObj struct {
 	Schemas map[string]*ApiDocV3Schema `json:"schemas,omitempty"` // key = 名称
 	// SecuritySchemes
 }
+
+const (
+	SchemaTypeInteger string = "integer"
+	SchemaTypeString         = "string"
+	SchemaTypeNumber         = "number"
+	SchemaTypeBool           = "boolean"
+	SchemaTypeObject         = "object"
+	SchemaTypeArray          = "array"
+
+	SchemaFormatInt32    = "int32"
+	SchemaFormatInt64    = "int64"
+	SchemaFormatFloat    = "float"
+	SchemaFormatDouble   = "double"
+	SchemaFormatByte     = "byte"
+	SchemaFormatBinary   = "binary"
+	SchemaFormatDate     = "date"
+	SchemaFormatDateTime = "date-time"
+
+	ParamInQuery  = "query"
+	ParamInHeader = "header"
+	ParamInPath   = "path"
+	ParamInCookie = "cookie"
+)

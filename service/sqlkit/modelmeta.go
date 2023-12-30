@@ -3,6 +3,7 @@ package sqlkit
 import (
 	"github.com/mizuki1412/go-core-kit/class/constraints"
 	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/cli/tag"
 	"reflect"
 	"strings"
 )
@@ -88,7 +89,7 @@ func (th ModelMeta) init(obj any) ModelMeta {
 		panic(exception.New("dao model must struct"))
 	}
 	for i := 0; i < rt.NumField(); i++ {
-		name := rt.Field(i).Tag.Get("db")
+		name := rt.Field(i).Tag.Get(tag.DBField.Name)
 		if name == "" {
 			continue
 		}
@@ -97,26 +98,22 @@ func (th ModelMeta) init(obj any) ModelMeta {
 		key := ModelMetaKey{Key: name, OriKey: oriKey, RStruct: rt.Field(i)}
 		// tableName; fetch once
 		if th.tableName == "" {
-			if t, ok := rt.Field(i).Tag.Lookup("table"); ok {
+			if t, ok := rt.Field(i).Tag.Lookup(tag.DBTable.Name); ok {
 				th.tableName = t
 			} else if t, ok := rt.Field(i).Tag.Lookup("tablename"); ok {
 				// Deprecated
 				th.tableName = t
 			}
 		}
-		if t, ok := rt.Field(i).Tag.Lookup("logicDel"); ok && t == "true" {
+		if tag.DBColumnLogicDel.Hit(rt.Field(i).Tag) {
 			th.logicDelKey = key
 			continue
 		}
 		// pk
-		if t, ok := rt.Field(i).Tag.Lookup("pk"); ok && t == "true" {
+		if tag.DBPk.Hit(rt.Field(i).Tag) {
 			key.Primary = true
 		}
-		if t, ok := rt.Field(i).Tag.Lookup("auto"); ok && t == "true" {
-			key.Auto = true
-		}
-		// Deprecated
-		if t, ok := rt.Field(i).Tag.Lookup("autoincrement"); ok && t == "true" {
+		if tag.DBPkAuto.Hit(rt.Field(i).Tag) {
 			key.Auto = true
 		}
 		th.keys = append(th.keys, key)

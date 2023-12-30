@@ -40,7 +40,7 @@ func departmentCreate(ctx *context.Context) {
 	}
 	department.CreateDt.Set(time.Now())
 	dao.InsertObj(department)
-	ctx.JsonSuccess(nil)
+	ctx.JsonSuccess()
 }
 
 type departmentUpdateParams struct {
@@ -77,7 +77,7 @@ func departmentUpdate(ctx *context.Context) {
 		department.Parent = parent
 	}
 	dao.UpdateObj(department)
-	ctx.JsonSuccess(nil)
+	ctx.JsonSuccess()
 }
 func departmentDel(ctx *context.Context) {
 	params := delParams{}
@@ -98,7 +98,7 @@ func departmentDel(ctx *context.Context) {
 		panic(exception.New("该部门不可删除"))
 	}
 	dao.DeleteById(department.Id)
-	ctx.JsonSuccess(nil)
+	ctx.JsonSuccess()
 }
 
 func listDepartment(ctx *context.Context) {

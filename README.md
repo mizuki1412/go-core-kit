@@ -9,11 +9,6 @@ toolkit for golang projects
 
 # TODO
 
-- [x] swagger 测试文件上传
-- [ ] swagger response 的定义(float和int64都用string输出)
-- test: json param
-- [ ] knife-ui 详情显示不出来
-
   later：
 - [ ] 接口加密：rsa+aes对接口加密(前端生成AES密钥，用rsa私钥将AES密钥加密，放在header.encript 传给到后端，后端用rsa公钥解密后获取到AES密钥，解密数据流。
   对参数值进行加密，同时aes密钥中增加时间变量)
@@ -39,8 +34,7 @@ toolkit for golang projects
 - dao resultType去掉，在new时设置，不再动态指定
 - rest 取消 session，全面改用 jwt，见 jwtkit 说明; 也保留了cookie
 - rest 默认返回值改变：code=0 表示 ok，code=401 表示未认证（也反映到 httpcode 中）
-- rest swagger接口定义方式改变
+- rest swagger接口定义方式改变, 配置方式改为functional options
 - rest authup改为authjwt
-- rest openapi的配置方式改为functional options
 - logkit 基于slog
 - 配置参数修改：openapi

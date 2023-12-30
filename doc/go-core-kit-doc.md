@@ -319,14 +319,13 @@ func Init(router *router.Router) {
 }
 ```
 
+openapi地址：`/swagger`, `/doc.html`
+
 ## 约定/注意
 
-- action的params tags: `validate:"required" description:"xxx" default:"" trim:"true"`
-- bean struct tags: `json:"" db:"db-field-name" pk:"true" table:"x" auto:"true"`
 - context BindForm: 将会先trim，空字符串当做nil。
 - context BindForm: 支持在params中直接指定基本类型和class包中的类型。
 - 在action中，处理bean中的field时，注意field的valid属性，class中的类可以用Set方法来作为参数设置；自定义的field struct用指针。
-- iris.Context.next() 之后的代码逻辑是在response发出之后的，不能再修改response
 - router.use在使用时，多拦截器放一个use。
 
 ## 抽象层设计

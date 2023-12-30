@@ -1,6 +1,7 @@
 package user
 
 import (
+	"github.com/mizuki1412/go-core-kit/mod/user/model"
 	"github.com/mizuki1412/go-core-kit/service/restkit/middleware"
 	"github.com/mizuki1412/go-core-kit/service/restkit/openapi"
 	"github.com/mizuki1412/go-core-kit/service/restkit/router"
@@ -9,11 +10,13 @@ import (
 func Init(router *router.Router) {
 	tag := "user:用户模块"
 	router.Group("/rest/user/loginByUsername").Post("", loginByUsername).Api(openapi.Tag(tag),
-		openapi.Summary("登录-用户名"), openapi.ReqParam(loginByUsernameParam{}))
+		openapi.Summary("登录-用户名"),
+		openapi.ReqParam(loginByUsernameParam{}), openapi.Response(ResLogin{}))
 	router.Group("/rest/user/login").Post("", login).Api(openapi.Tag(tag),
-		openapi.Summary("登录"), openapi.ReqParam(loginParam{}))
+		openapi.Summary("登录"),
+		openapi.ReqParam(loginParam{}), openapi.Response(ResLogin{}))
 	router.Group("/rest/user/info").Use(middleware.AuthJWT()).Post("", info).Api(openapi.Tag(tag),
-		openapi.Summary("用户信息"))
+		openapi.Summary("用户信息"), openapi.Response(model.User{}))
 	r := router.Group("/rest/user", middleware.AuthJWT())
 	{
 		r.Post("/logout", logout).Api(openapi.Tag(tag), openapi.Summary("登出"))
@@ -23,11 +26,11 @@ func Init(router *router.Router) {
 	r1 := router.Group("/rest/user/admin", middleware.AuthJWT())
 	{
 		r1.Post("/list", listUsers).Api(openapi.Tag(tag),
-			openapi.Summary("用户列表"), openapi.ReqParam(listUsersParams{}))
+			openapi.Summary("用户列表"), openapi.ReqParam(listUsersParams{}), openapi.Response([]*model.User{}))
 		r1.Post("/listByRole", listByRole).Api(openapi.Tag(tag),
-			openapi.Summary("用户列表 by role"), openapi.ReqParam(listByRoleParams{}))
+			openapi.Summary("用户列表 by role"), openapi.ReqParam(listByRoleParams{}), openapi.Response([]*model.User{}))
 		r1.Post("/info", infoAdmin).Api(openapi.Tag(tag),
-			openapi.Summary("用户信息"), openapi.ReqParam(infoAdminParams{}))
+			openapi.Summary("用户信息"), openapi.ReqParam(infoAdminParams{}), openapi.Response(model.User{}))
 	}
 	r2 := router.Group("/rest/user/admin", middleware.AuthJWT())
 	{

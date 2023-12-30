@@ -2,6 +2,8 @@ package frontdao
 
 import (
 	"fmt"
+	"github.com/mizuki1412/go-core-kit/class/const/httpconst"
+	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/arraykit"
 	"github.com/mizuki1412/go-core-kit/library/filekit"
 	"github.com/mizuki1412/go-core-kit/library/httpkit"
@@ -9,37 +11,31 @@ import (
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/openapi"
 	"log"
-	"sort"
 	"strings"
 )
 
 type bean struct {
-	Name     string
-	Imports  []string
-	Contents []string
+	Name     string   // 模块名称
+	Imports  []string // 导入
+	Contents []string // 描述
 }
 
-func Gen(urlPrefix string) {
+func Gen(url string) {
 	ret, _ := httpkit.Request(httpkit.Req{
 		Method: "GET",
-		Url:    urlPrefix + "/v3/api-docs",
+		Url:    url,
 	})
-	var keys []string
 	doc := &openapi.ApiDocV3{}
 	err := jsonkit.ParseObj(ret, doc)
 	if err != nil {
-		panic(err)
+		panic(exception.New(err.Error()))
 	}
-	for key := range doc.Paths {
-		keys = append(keys, key)
-	}
-	sort.Strings(keys)
 	beanMap := map[string]*bean{}
-	for _, key := range keys {
-		// path存在get/post
-		for method, val := range doc.Paths[key] {
+	for pathKey, pathVal := range doc.Paths {
+		// 一个请求，path存在get/post
+		for method, val := range pathVal {
 			if len(val.Tags) == 0 {
-				log.Println("warning: path.tags is null", key)
+				log.Println("warning: path.tags is null", pathKey, method)
 				continue
 			}
 			name := stringkit.Split(val.Tags[0], ":")[0]
@@ -48,7 +44,7 @@ func Gen(urlPrefix string) {
 			}
 			b := beanMap[name]
 			content := ""
-			operationId, _ := openapi.GenOperationId(key, method)
+			operationId, _ := openapi.GenOperationId(pathKey, method)
 			// 函数描述
 			content += fmt.Sprintf("/// %s: %s", operationId, val.Summary)
 			// 参数
@@ -57,9 +53,10 @@ func Gen(urlPrefix string) {
 				if e.Required {
 					require = "*"
 				}
-				// todo reqParam,  reqBody
+				// todo in
 				content += fmt.Sprintf("\n// %s %s : %s : %s", require, e.Name, e.Schema.Type, e.Description)
 			}
+
 			// 函数内容
 			param1 := ""
 			param2 := ""
@@ -70,19 +67,15 @@ func Gen(urlPrefix string) {
 			}
 			// 区分函数
 			funcName := "request"
-			// todo upload, download
-			//for _, ee := range all[key].Get("post.consumes").Array() {
-			//	if ee.String() == httpconst.MimeMultipartPOSTForm {
-			//		funcName = "upload"
-			//		break
-			//	}
-			//}
-			//for _, ee := range all[key].Get("post.produces").Array() {
-			//	if ee.String() == httpconst.MimeStream {
-			//		funcName = "download"
-			//		break
-			//	}
-			//}
+			if _, ok := val.RequestBody.Content[httpconst.MimeMultipartPOSTForm]; ok {
+				funcName = "upload"
+			}
+			for _, body := range val.Responses {
+				if _, ok := body.Content[httpconst.MimeStream]; ok {
+					funcName = "download"
+					break
+				}
+			}
 			switch funcName {
 			case "request":
 				content += fmt.Sprintf(`
@@ -90,19 +83,19 @@ export async function %s(%s){
 	const {data} = await request('%s'%s)
 	return data.data
 }
-`, operationId, param1, key, param2)
+`, operationId, param1, pathKey, param2)
 			case "upload":
 				content += fmt.Sprintf(`
 export async function %s(%s){
 	await upload('%s'%s)
 }
-`, operationId, param1, key, param2)
+`, operationId, param1, pathKey, param2)
 			case "download":
 				content += fmt.Sprintf(`
 export async function %s(%s){
 	await download('%s'%s)
 }
-`, operationId, param1, key, param2)
+`, operationId, param1, pathKey, param2)
 			}
 			if !arraykit.StringContains(b.Imports, funcName) {
 				b.Imports = append(b.Imports, funcName)

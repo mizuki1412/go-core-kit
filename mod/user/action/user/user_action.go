@@ -21,6 +21,11 @@ type loginByUsernameParam struct {
 	Schema   string `default:"public"`
 }
 
+type ResLogin struct {
+	User  *model.User
+	Token string
+}
+
 func loginByUsername(ctx *context.Context) {
 	//session := ctx.RenewSession()
 	params := loginByUsernameParam{}
@@ -42,9 +47,9 @@ func loginByUsername(ctx *context.Context) {
 	claim := jwtkit.New(user.Id)
 	claim.Ext.Put("schema", params.Schema)
 	token := claim.Token()
-	ret := map[string]any{
-		"user":  user,
-		"token": token,
+	ret := ResLogin{
+		User:  user,
+		Token: token,
 	}
 	ctx.SetJwtCookie(claim, token)
 	if AdditionLoginFunc != nil {
@@ -86,9 +91,9 @@ func login(ctx *context.Context) {
 	claim := jwtkit.New(user.Id)
 	claim.Ext.Put("schema", params.Schema)
 	token := claim.Token()
-	ret := map[string]any{
-		"user":  user,
-		"token": token,
+	ret := ResLogin{
+		User:  user,
+		Token: token,
 	}
 	ctx.SetJwtCookie(claim, token)
 	if AdditionLoginFunc != nil {
@@ -97,7 +102,7 @@ func login(ctx *context.Context) {
 	ctx.JsonSuccess(ret)
 }
 
-var AdditionLoginFunc func(ctx *context.Context, ret map[string]any)
+var AdditionLoginFunc func(ctx *context.Context, ret ResLogin)
 
 var AdditionUserExFunc func(ctx *context.Context, u *model.User)
 
@@ -146,7 +151,7 @@ func info(ctx *context.Context) {
 
 func logout(ctx *context.Context) {
 	ctx.DestroyJwt()
-	ctx.JsonSuccess(nil)
+	ctx.JsonSuccess()
 }
 
 type updatePwdParam struct {
@@ -169,7 +174,7 @@ func updatePwd(ctx *context.Context) {
 	}
 	user.Pwd.Set(cryptokit.MD5(params.NewPwd))
 	dao.UpdateObj(user)
-	ctx.JsonSuccess(nil)
+	ctx.JsonSuccess()
 }
 
 type updateUserInfoParam struct {
@@ -234,5 +239,5 @@ func updateUserInfo(ctx *context.Context) {
 	}
 	//todo usercenter
 	dao.UpdateObj(u)
-	ctx.JsonSuccess(nil)
+	ctx.JsonSuccess()
 }
