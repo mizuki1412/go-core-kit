@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/dgraph-io/ristretto"
 	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/library/commonkit"
+	"github.com/mizuki1412/go-core-kit/library/c"
 	"github.com/mizuki1412/go-core-kit/service/rediskit"
 	"sync"
 	"time"
@@ -54,7 +54,7 @@ func _handleParam(ps []*Param) *Param {
 func Set(key string, value any, ps ...*Param) {
 	p := _handleParam(ps)
 	if rediskit.HasConfig() && !p.IgnoreRedis {
-		_ = commonkit.RecoverFuncWrapper(func() {
+		_ = c.RecoverFuncWrapper(func() {
 			rediskit.Set(context.Background(), rediskit.GetKeyWithPrefix(key), value, p.Ttl)
 		})
 	}

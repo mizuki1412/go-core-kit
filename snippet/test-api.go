@@ -10,7 +10,7 @@ import (
 )
 
 func Init(router *router.Router) {
-	tag := "user:用户模块"
+	tag := "demo:demo模块"
 	router.Get("/param", test).Api(openapi.Tag(tag), openapi.Summary("test1"), openapi.ReqParam(testParam{}))
 	router.Post("/param", test).Api(openapi.Tag(tag), openapi.Summary("test2"), openapi.ReqBody(testParam{}))
 	router.Post("/path/:id", testPath).Api(openapi.Tag(tag), openapi.Summary("test path"), openapi.ReqBody(testPathParam{}))

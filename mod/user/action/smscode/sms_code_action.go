@@ -16,7 +16,7 @@ import (
 
 func Init(router *router.Router) {
 	tag := "user:用户模块"
-	r := router.Group("/rest/user")
+	r := router.Group("/user")
 	r.Post("/getVerifyCode", get).Api(openapi.Tag(tag), openapi.Summary("短信验证码获取"), openapi.ReqParam(getParams{}))
 }
 

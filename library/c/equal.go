@@ -1,4 +1,4 @@
-package commonkit
+package c
 
 import "github.com/spf13/cast"
 

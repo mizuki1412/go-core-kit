@@ -1,7 +1,7 @@
 package concurrentkit
 
 import (
-	"github.com/mizuki1412/go-core-kit/library/commonkit"
+	"github.com/mizuki1412/go-core-kit/library/c"
 	"sync"
 )
 
@@ -20,7 +20,7 @@ func (g *Group) Add(f func(), shouldPanic bool) {
 		if shouldPanic {
 			f()
 		} else {
-			_ = commonkit.RecoverFuncWrapper(f)
+			_ = c.RecoverFuncWrapper(f)
 		}
 	}()
 }

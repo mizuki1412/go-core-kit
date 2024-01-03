@@ -9,33 +9,33 @@ import (
 
 func Init(router *router.Router) {
 	tag := "user:用户模块"
-	router.Group("/rest/user/loginByUsername").Post("", loginByUsername).Api(openapi.Tag(tag),
+	router.Group("/user/loginByUsername").Post("", loginByUsername).Api(openapi.Tag(tag),
 		openapi.Summary("登录-用户名"),
 		openapi.ReqParam(loginByUsernameParam{}), openapi.Response(ResLogin{}))
-	router.Group("/rest/user/login").Post("", login).Api(openapi.Tag(tag),
+	router.Group("/user/login").Post("", login).Api(openapi.Tag(tag),
 		openapi.Summary("登录"),
 		openapi.ReqParam(loginParam{}), openapi.Response(ResLogin{}))
-	router.Group("/rest/user/info").Use(middleware.AuthJWT()).Post("", info).Api(openapi.Tag(tag),
+	router.Group("/user/info").Use(middleware.AuthJWT()).Get("", info).Api(openapi.Tag(tag),
 		openapi.Summary("用户信息"), openapi.Response(model.User{}))
-	r := router.Group("/rest/user", middleware.AuthJWT())
+	r := router.Group("/user", middleware.AuthJWT())
 	{
-		r.Post("/logout", logout).Api(openapi.Tag(tag), openapi.Summary("登出"))
+		r.Get("/logout", logout).Api(openapi.Tag(tag), openapi.Summary("登出"))
 		r.Post("/updatePwd", updatePwd).Api(openapi.Tag(tag), openapi.Summary("密码修改"), openapi.ReqParam(updatePwdParam{}))
-		r.Post("/updateUserInfo", updateUserInfo).Api(openapi.Tag(tag), openapi.Summary("更新用户信息"), openapi.ReqParam(updateUserInfoParam{}))
+		r.Post("/updateUserInfo", updateUserInfo).Api(openapi.Tag(tag), openapi.Summary("更新用户信息"), openapi.ReqBody(updateUserInfoParam{}))
 	}
-	r1 := router.Group("/rest/user/admin", middleware.AuthJWT())
+	r1 := router.Group("/user/admin", middleware.AuthJWT())
 	{
-		r1.Post("/list", listUsers).Api(openapi.Tag(tag),
+		r1.Get("/list", listUsers).Api(openapi.Tag(tag),
 			openapi.Summary("用户列表"), openapi.ReqParam(listUsersParams{}), openapi.Response([]*model.User{}))
-		r1.Post("/listByRole", listByRole).Api(openapi.Tag(tag),
+		r1.Get("/listByRole", listByRole).Api(openapi.Tag(tag),
 			openapi.Summary("用户列表 by role"), openapi.ReqParam(listByRoleParams{}), openapi.Response([]*model.User{}))
-		r1.Post("/info", infoAdmin).Api(openapi.Tag(tag),
+		r1.Get("/info", infoAdmin).Api(openapi.Tag(tag),
 			openapi.Summary("用户信息"), openapi.ReqParam(infoAdminParams{}), openapi.Response(model.User{}))
 	}
-	r2 := router.Group("/rest/user/admin", middleware.AuthJWT())
+	r2 := router.Group("/user/admin", middleware.AuthJWT())
 	{
-		r2.Post("/add", AddUser).Api(openapi.Tag(tag), openapi.Summary("添加用户"), openapi.ReqParam(AddUserParams{}))
-		r2.Post("/update", UpdateUser).Api(openapi.Tag(tag), openapi.Summary("修改用户"), openapi.ReqParam(UpdateParams{}))
-		r2.Post("/del", DelUser).Api(openapi.Tag(tag), openapi.Summary("删除冻结用户"), openapi.ReqParam(DelParams{}))
+		r2.Post("/add", AddUser).Api(openapi.Tag(tag), openapi.Summary("添加用户"), openapi.ReqBody(AddUserParams{}))
+		r2.Post("/update", UpdateUser).Api(openapi.Tag(tag), openapi.Summary("修改用户"), openapi.ReqBody(UpdateParams{}))
+		r2.Get("/del", DelUser).Api(openapi.Tag(tag), openapi.Summary("删除冻结用户"), openapi.ReqParam(DelParams{}))
 	}
 }

@@ -12,10 +12,10 @@ import (
 
 func Init(router *router.Router) {
 	tag := "common:公共模块"
-	r := router.Group("/rest/common/administrative")
+	r := router.Group("/common/administrative")
 	{
-		r.GetPost("/listAllProvinceCity", ListAllProvinceCity).Api(openapi.Tag(tag), openapi.Summary("列表所有的省市"), openapi.Response([]*model.Province{}))
-		r.GetPost("/listAreaByCity", listArea).Api(openapi.Tag(tag), openapi.Summary("按市列出区"),
+		r.Get("/listAllProvinceCity", ListAllProvinceCity).Api(openapi.Tag(tag), openapi.Summary("列表所有的省市"), openapi.Response([]*model.Province{}))
+		r.Get("/listAreaByCity", listArea).Api(openapi.Tag(tag), openapi.Summary("按市列出区"),
 			openapi.ReqParam(listAreaParam{}), openapi.Response([]*model.Area{}))
 	}
 }

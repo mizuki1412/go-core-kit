@@ -1,4 +1,4 @@
-package commonkit
+package c
 
 import (
 	"github.com/mizuki1412/go-core-kit/class/exception"

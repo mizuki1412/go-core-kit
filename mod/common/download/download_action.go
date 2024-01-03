@@ -16,24 +16,20 @@ import (
 
 func Init(router *router.Router) {
 	tag := "common:公共模块"
-	r := router.Group("/rest")
+	r := router.Group("/common")
 	r.Use(middleware.AuthJWT())
 	{
-		r.Post("/download", download).Api(openapi.Tag(tag),
+		r.Get("/download/private", download).Api(openapi.Tag(tag),
 			openapi.Summary("私有下载"), openapi.ReqParam(downloadParams{}), openapi.ResponseStream())
-		r.Get("/download", download).Api(openapi.Tag(tag),
-			openapi.Summary("私有下载"), openapi.ReqParam(downloadParams{}), openapi.ResponseStream())
-		r.Post("/upload", upload).Api(openapi.Tag(tag),
+		r.Post("/upload/private", upload).Api(openapi.Tag(tag),
 			openapi.Summary("私有上传"), openapi.ReqBody(uploadParams{}))
 		r.Post("/file/list", fileList).Api(openapi.Tag(tag),
 			openapi.Summary("文件列表"), openapi.ReqParam(fileListParams{}))
 		r.Post("/file/del", fileDel).Api(openapi.Tag(tag),
 			openapi.Summary("文件删除"), openapi.ReqParam(fileListParams{}))
 	}
-	r2 := router.Group("/rest/common")
+	r2 := router.Group("/common")
 	{
-		r2.Post("/download", downloadPublic).Api(openapi.Tag(tag),
-			openapi.Summary("公共下载"), openapi.ReqParam(downloadParams{}), openapi.ResponseStream())
 		r2.Get("/download", downloadPublic).Api(openapi.Tag(tag),
 			openapi.Summary("公共下载"), openapi.ReqParam(downloadParams{}), openapi.ResponseStream())
 	}

@@ -1,6 +1,6 @@
 package sqlkit
 
-import "github.com/mizuki1412/go-core-kit/library/commonkit"
+import "github.com/mizuki1412/go-core-kit/library/c"
 
 // TxArea 事务物理代码块，不指定datasource时，用defaultDataSource
 func TxArea(f func(targetDS *DataSource), dataSources ...*DataSource) {
@@ -10,7 +10,7 @@ func TxArea(f func(targetDS *DataSource), dataSources ...*DataSource) {
 	} else {
 		ds = dataSources[0]
 	}
-	ex := commonkit.RecoverFuncWrapper(func() {
+	ex := c.RecoverFuncWrapper(func() {
 		ds.BeginTX()
 		// 传入带tx的datasource，内部代码用这个ds
 		f(ds)

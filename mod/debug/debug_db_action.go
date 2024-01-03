@@ -11,7 +11,7 @@ import (
 
 func Init(router *router.Router) {
 	tag := "debug:调试模块"
-	r := router.Group("/rest/debug")
+	r := router.Group("/debug")
 	r.Use(middleware.AuthJWT())
 	r.Post("/db/stat", db).Api(openapi.Tag(tag), openapi.Summary("db debug"), openapi.ReqParam(dbParams{}))
 	r.Post("/db/ping", dbPing).Api(openapi.Tag(tag), openapi.Summary("db debug ping"), openapi.ReqParam(dbParams{}))

@@ -4,20 +4,45 @@ import (
 	"fmt"
 	"github.com/mizuki1412/go-core-kit/class/const/httpconst"
 	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/library/arraykit"
+	"github.com/mizuki1412/go-core-kit/library/c"
 	"github.com/mizuki1412/go-core-kit/library/filekit"
 	"github.com/mizuki1412/go-core-kit/library/httpkit"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/service/restkit/openapi"
+	"github.com/spf13/cast"
 	"log"
+	"slices"
 	"strings"
 )
 
-type bean struct {
-	Name     string   // 模块名称
-	Imports  []string // 导入
-	Contents []string // 描述
+// Dao 一个模块
+type Dao struct {
+	Name string // 模块名称
+	Func []*DaoFunc
+	// 标记
+	FlagRequest  bool
+	FlagUpload   bool
+	FlagDownload bool
+}
+
+// DaoFunc 模块中的函数
+type DaoFunc struct {
+	OperationId string
+	Summary     string
+	Params      []*DaoFuncParam
+	Url         string
+	Method      string
+	// 函数名
+	FName string
+}
+type DaoFuncParam struct {
+	Name        string
+	In          string
+	Require     bool
+	Default     string
+	Type        string
+	Description string
 }
 
 func Gen(url string) {
@@ -30,7 +55,8 @@ func Gen(url string) {
 	if err != nil {
 		panic(exception.New(err.Error()))
 	}
-	beanMap := map[string]*bean{}
+	beanMap := map[string]*Dao{}
+	// 解析
 	for pathKey, pathVal := range doc.Paths {
 		// 一个请求，path存在get/post
 		for method, val := range pathVal {
@@ -40,74 +66,111 @@ func Gen(url string) {
 			}
 			name := stringkit.Split(val.Tags[0], ":")[0]
 			if beanMap[name] == nil {
-				beanMap[name] = &bean{Name: name}
+				beanMap[name] = &Dao{Name: name}
 			}
 			b := beanMap[name]
-			content := ""
+			f := &DaoFunc{}
 			operationId, _ := openapi.GenOperationId(pathKey, method)
-			// 函数描述
-			content += fmt.Sprintf("/// %s: %s", operationId, val.Summary)
-			// 参数
+			f.OperationId = operationId
+			f.Summary = val.Summary
+			f.Url = pathKey
+			f.Method = method
+			b.Func = append(b.Func, f)
+			// param参数；不支持type=object
 			for _, e := range val.Parameters {
-				require := ""
-				if e.Required {
-					require = "*"
+				p := &DaoFuncParam{}
+				p.Require = e.Required
+				p.In = e.In
+				p.Type = e.Schema.Type
+				p.Description = e.Description
+				p.Name = e.Name
+				p.Default = cast.ToString(e.Schema.Default)
+				f.Params = append(f.Params, p)
+				if p.In == openapi.ParamInPath {
+					f.Url = strings.ReplaceAll(f.Url, "{"+p.Name+"}", "${params."+p.Name+"}")
 				}
-				// todo in
-				content += fmt.Sprintf("\n// %s %s : %s : %s", require, e.Name, e.Schema.Type, e.Description)
 			}
-
-			// 函数内容
-			param1 := ""
-			param2 := ""
-			// todo reqParam,  reqBody
-			if len(val.Parameters) > 0 {
-				param1 = "params"
-				param2 = ", params"
+			// body 参数: 目前只支持type=object，从properties中读取
+			// property中的type=object暂不支持
+			if val.RequestBody != nil && val.RequestBody.Content != nil {
+				for _, body := range val.RequestBody.Content {
+					for eName, e := range body.Schema.Properties {
+						p := &DaoFuncParam{}
+						p.Require = slices.Contains(body.Schema.Required, eName)
+						p.Type = e.Type
+						p.Description = e.Description
+						p.Name = eName
+						p.Default = cast.ToString(e.Default)
+						f.Params = append(f.Params, p)
+					}
+				}
 			}
 			// 区分函数
 			funcName := "request"
-			if _, ok := val.RequestBody.Content[httpconst.MimeMultipartPOSTForm]; ok {
-				funcName = "upload"
-			}
-			for _, body := range val.Responses {
-				if _, ok := body.Content[httpconst.MimeStream]; ok {
-					funcName = "download"
-					break
+			if val.RequestBody != nil && val.RequestBody.Content != nil {
+				if _, ok := val.RequestBody.Content[httpconst.MimeMultipartPOSTForm]; ok {
+					funcName = "upload"
+					b.FlagUpload = true
 				}
 			}
-			switch funcName {
-			case "request":
-				content += fmt.Sprintf(`
-export async function %s(%s){
-	const {data} = await request('%s'%s)
-	return data.data
-}
-`, operationId, param1, pathKey, param2)
-			case "upload":
-				content += fmt.Sprintf(`
-export async function %s(%s){
-	await upload('%s'%s)
-}
-`, operationId, param1, pathKey, param2)
-			case "download":
-				content += fmt.Sprintf(`
-export async function %s(%s){
-	await download('%s'%s)
-}
-`, operationId, param1, pathKey, param2)
+			if val.Responses != nil {
+				for _, body := range val.Responses {
+					if _, ok := body.Content[httpconst.MimeStream]; ok {
+						funcName = "download"
+						b.FlagDownload = true
+						break
+					}
+				}
 			}
-			if !arraykit.StringContains(b.Imports, funcName) {
-				b.Imports = append(b.Imports, funcName)
+			if funcName == "request" {
+				b.FlagRequest = true
 			}
-			b.Contents = append(b.Contents, content)
+			f.FName = funcName
 		}
 	}
 	// 生成
-	for _, e := range beanMap {
-		final := fmt.Sprintf("import {%s} from '/lib/request'\n\n", strings.Join(e.Imports, ","))
-		final += strings.Join(e.Contents, "\n")
-		_ = filekit.WriteFile("./gen-front-dao/"+e.Name+".js", []byte(final))
+	for _, b := range beanMap {
+		var imports []string
+		var contents []string
+		if b.FlagRequest {
+			imports = append(imports, "request")
+		}
+		if b.FlagUpload {
+			imports = append(imports, "upload")
+		}
+		if b.FlagDownload {
+			imports = append(imports, "download")
+		}
+		final := fmt.Sprintf("import {%s} from '/lib/request'\n", strings.Join(imports, ","))
+		for _, f := range b.Func {
+			content := fmt.Sprintf("\n/// %s: %s", f.OperationId, f.Summary)
+			paramStr := "params = {"
+			var paramStrs []string
+			//var inPathVals []string
+			for _, p := range f.Params {
+				require := c.If[string](p.Require, "*", "")
+				content += fmt.Sprintf("\n// %s %s : %s : %s", require, p.Name, p.Type, p.Description)
+				paramStrs = append(paramStrs, p.Name+": "+c.If[string](p.Default == "", "null", "\""+p.Default+"\""))
+				//if p.In == openapi.ParamInPath {
+				//	inPathVals = append(inPathVals, p.Name)
+				//}
+			}
+			paramStr += strings.Join(paramStrs, ", ") + "}"
+			// 是否存在in-path
+			//inPathStr := ""
+			//if len(inPathVals) > 0 {
+			//	inPathStr = "\n\t"
+			//}
+			// 函数体
+			content += fmt.Sprintf("\nexport async function %s(%s){"+
+				c.If[string](f.FName == "request", "\n\tconst {data} = await %s(`%s`, params, {method: '%s'})", "\n\tawait %s(`%s`, params, {method: '%s'})")+
+				c.If[string](f.FName == "request", "\n\treturn data.data", "")+
+				"\n}",
+				f.OperationId, paramStr, f.FName, f.Url, f.Method)
+			contents = append(contents, content)
+		}
+		final += strings.Join(contents, "\n")
+		_ = filekit.WriteFile("./gen-front-dao/"+b.Name+".js", []byte(final))
 	}
 
 }
