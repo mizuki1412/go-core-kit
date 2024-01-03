@@ -70,6 +70,8 @@ func Request(reqBean Req) (string, int) {
 			query.Add(key, val)
 		}
 		req.URL.RawQuery = query.Encode()
+	} else {
+		req, err = http.NewRequest(reqBean.Method, reqBean.Url, nil)
 	}
 	if err != nil {
 		panic(exception.New(err.Error()))
