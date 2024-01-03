@@ -9,7 +9,7 @@ import (
 
 func Init(router *router.Router) {
 	tag := "common:公共模块"
-	r := router.Group("/rest/common")
+	r := router.Group("/common")
 	{
 		r.Post("/weather", weatherInfo).Api(openapi.Tag(tag), openapi.Summary("获取天气信息"), openapi.ReqParam(weatherInfoParams{}))
 	}

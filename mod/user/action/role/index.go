@@ -9,7 +9,7 @@ import (
 
 func Init(router *router.Router) {
 	tag := "role:用户模块-角色部门管理"
-	r := router.Group("/rest/role").Use(middleware.AuthJWT())
+	r := router.Group("/role").Use(middleware.AuthJWT())
 	r.Post("/privilege/list", listAllPrivileges).Api(openapi.Tag(tag), openapi.Summary("所有权限列表"),
 		openapi.Response([]*model.PrivilegeConstant{}))
 	r.Post("/list", listRoles).Api(openapi.Tag(tag), openapi.Summary("role列表"),

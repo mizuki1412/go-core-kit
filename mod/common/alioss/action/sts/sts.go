@@ -13,7 +13,7 @@ import (
 
 func Init(router *router.Router) {
 	tag := "common:公共模块"
-	r := router.Group("/rest/sts")
+	r := router.Group("/common/sts")
 	r.Use(middleware.AuthJWT())
 	{
 		r.Post("/get", get).Api(openapi.Tag(tag), openapi.Summary("ali sts 获取"))

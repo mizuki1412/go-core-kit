@@ -3,11 +3,9 @@ package httpkit
 import (
 	"bytes"
 	"crypto/tls"
-	"fmt"
 	"github.com/mizuki1412/go-core-kit/class/const/httpconst"
 	"github.com/mizuki1412/go-core-kit/class/exception"
 	"github.com/mizuki1412/go-core-kit/library/jsonkit"
-	"github.com/tidwall/gjson"
 	"io"
 	"net/http"
 	"net/http/cookiejar"
@@ -124,20 +122,4 @@ func DownloadToFile(url string, filePath string) {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func Demo() {
-	ret, _ := Request(Req{
-		Url: "https://www.machplat.com/roms-rest-cnc/rest/user/login",
-		FormData: map[string]string{
-			"username": "admin",
-			"pwd":      "123",
-		},
-	})
-	fmt.Println(gjson.Get(ret, "data.user"))
-	fmt.Println(gjson.Parse(ret).Value().(map[string]any))
-	fmt.Println("----")
-	ret, _ = Request(Req{
-		Url: "https://www.machplat.com/roms-rest-cnc/rest/user/info",
-	})
 }
