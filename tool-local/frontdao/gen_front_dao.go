@@ -12,6 +12,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/service/restkit/openapi"
 	"github.com/spf13/cast"
 	"log"
+	"slices"
 	"strings"
 )
 
@@ -75,7 +76,7 @@ func Gen(url string) {
 			f.Url = pathKey
 			f.Method = method
 			b.Func = append(b.Func, f)
-			// 参数
+			// param参数；不支持type=object
 			for _, e := range val.Parameters {
 				p := &DaoFuncParam{}
 				p.Require = e.Required
@@ -87,6 +88,21 @@ func Gen(url string) {
 				f.Params = append(f.Params, p)
 				if p.In == openapi.ParamInPath {
 					f.Url = strings.ReplaceAll(f.Url, "{"+p.Name+"}", "${params."+p.Name+"}")
+				}
+			}
+			// body 参数: 目前只支持type=object，从properties中读取
+			// property中的type=object暂不支持
+			if val.RequestBody != nil && val.RequestBody.Content != nil {
+				for _, body := range val.RequestBody.Content {
+					for eName, e := range body.Schema.Properties {
+						p := &DaoFuncParam{}
+						p.Require = slices.Contains(body.Schema.Required, eName)
+						p.Type = e.Type
+						p.Description = e.Description
+						p.Name = eName
+						p.Default = cast.ToString(e.Default)
+						f.Params = append(f.Params, p)
+					}
 				}
 			}
 			// 区分函数
@@ -134,7 +150,7 @@ func Gen(url string) {
 			for _, p := range f.Params {
 				require := c.If[string](p.Require, "*", "")
 				content += fmt.Sprintf("\n// %s %s : %s : %s", require, p.Name, p.Type, p.Description)
-				paramStrs = append(paramStrs, p.Name+": "+c.If[string](p.Default == "", "null", p.Default))
+				paramStrs = append(paramStrs, p.Name+": "+c.If[string](p.Default == "", "null", "\""+p.Default+"\""))
 				//if p.In == openapi.ParamInPath {
 				//	inPathVals = append(inPathVals, p.Name)
 				//}
