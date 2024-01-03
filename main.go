@@ -24,6 +24,9 @@ func main() {
 	cli.AddChildCMD(&cobra.Command{
 		Use: "test",
 		Run: func(cmd *cobra.Command, args []string) {
+			restkit.AddActions(user.All()...)
+			restkit.AddActions(download.Init)
+			restkit.AddActions(admindivision.Init)
 			restkit.AddActions(snippet.Init)
 			_ = restkit.Run()
 		},
