@@ -34,7 +34,8 @@ type DaoFunc struct {
 	Url         string
 	Method      string
 	// 函数名
-	FName string
+	FName           string
+	FlagRequestBody bool
 }
 type DaoFuncParam struct {
 	Name        string
@@ -93,6 +94,9 @@ func Gen(url string) {
 			// body 参数: 目前只支持type=object，从properties中读取
 			// property中的type=object暂不支持
 			if val.RequestBody != nil && val.RequestBody.Content != nil {
+				if _, ok := val.RequestBody.Content[httpconst.MimeJSON]; ok {
+					f.FlagRequestBody = true
+				}
 				for _, body := range val.RequestBody.Content {
 					for eName, e := range body.Schema.Properties {
 						p := &DaoFuncParam{}
@@ -161,12 +165,16 @@ func Gen(url string) {
 			//if len(inPathVals) > 0 {
 			//	inPathStr = "\n\t"
 			//}
+			contentType := "application/x-www-form-urlencoded"
+			if f.FlagRequestBody {
+				contentType = "application/json"
+			}
 			// 函数体
 			content += fmt.Sprintf("\nexport async function %s(%s){"+
-				c.If[string](f.FName == "request", "\n\tconst {data} = await %s(`%s`, params, {method: '%s'})", "\n\tawait %s(`%s`, params, {method: '%s'})")+
+				c.If[string](f.FName == "request", "\n\tconst {data} = await %s(`%s`, params, {method: '%s', headers:{'Content-Type': '%s'}})", "\n\tawait %s(`%s`, params, {method: '%s', headers:{'Content-Type': '%s'}})")+
 				c.If[string](f.FName == "request", "\n\treturn data.data", "")+
 				"\n}",
-				f.OperationId, paramStr, f.FName, f.Url, f.Method)
+				f.OperationId, paramStr, f.FName, f.Url, f.Method, contentType)
 			contents = append(contents, content)
 		}
 		final += strings.Join(contents, "\n")
