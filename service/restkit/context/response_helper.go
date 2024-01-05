@@ -39,7 +39,7 @@ func (ctx *Context) Json(ret RestRet) {
 
 func (ctx *Context) JsonSuccess(data ...any) {
 	var d any = nil
-	if len(data) > 1 {
+	if len(data) > 0 {
 		d = data[0]
 	}
 	ctx.Json(RestRet{

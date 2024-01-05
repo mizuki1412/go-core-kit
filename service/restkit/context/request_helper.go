@@ -10,11 +10,11 @@ var CookieTokenKey = "token"
 
 func (ctx *Context) ReadToken() {
 	token := ctx.Request.Header.Get(HeaderTokenKey)
-	if token == "" {
+	if token == "" || token == "undefined" {
 		// 从cookie中获取
 		token, _ = ctx.Proxy.Cookie(CookieTokenKey)
 	}
-	if token != "" {
+	if token != "" && token != "undefined" {
 		_ = c.RecoverFuncWrapper(func() {
 			code := jwtkit.Parse(token)
 			ctx.Set("jwt", code)

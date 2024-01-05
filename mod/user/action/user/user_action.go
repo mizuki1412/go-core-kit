@@ -22,8 +22,8 @@ type loginByUsernameParam struct {
 }
 
 type ResLogin struct {
-	User  *model.User
-	Token string
+	User  *model.User `json:"user"`
+	Token string      `json:"token"`
 }
 
 func loginByUsername(ctx *context.Context) {
