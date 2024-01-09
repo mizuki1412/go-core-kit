@@ -145,7 +145,7 @@ func Gen(url string) {
 		if b.FlagDownload {
 			imports = append(imports, "download")
 		}
-		final := fmt.Sprintf("import {%s} from '/lib/request'\n", strings.Join(imports, ","))
+		final := fmt.Sprintf("import {%s} from '/lib/request'\nimport {HttpHeader} from '/lib/request/const'\n", strings.Join(imports, ","))
 		for _, f := range b.Func {
 			content := fmt.Sprintf("\n/// %s: %s", f.OperationId, f.Summary)
 			paramStr := "params = {"
@@ -165,13 +165,13 @@ func Gen(url string) {
 			//if len(inPathVals) > 0 {
 			//	inPathStr = "\n\t"
 			//}
-			contentType := "application/x-www-form-urlencoded"
+			contentType := "HttpHeader.contentTypeForm"
 			if f.FlagRequestBody {
-				contentType = "application/json"
+				contentType = "HttpHeader.contentTypeJson"
 			}
 			// 函数体
 			content += fmt.Sprintf("\nexport async function %s(%s){"+
-				c.If[string](f.FName == "request", "\n\tconst {data} = await %s(`%s`, params, {method: '%s', headers:{'Content-Type': '%s'}})", "\n\tawait %s(`%s`, params, {method: '%s', headers:{'Content-Type': '%s'}})")+
+				c.If[string](f.FName == "request", "\n\tconst {data} = await %s(`%s`, params, {method: '%s', headers:{'Content-Type': %s}})", "\n\tawait %s(`%s`, params, {method: '%s', headers:{'Content-Type': '%s'}})")+
 				c.If[string](f.FName == "request", "\n\treturn data.data", "")+
 				"\n}",
 				f.OperationId, paramStr, f.FName, f.Url, f.Method, contentType)
