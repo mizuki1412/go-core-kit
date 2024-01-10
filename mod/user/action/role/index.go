@@ -1,10 +1,10 @@
 package role
 
 import (
-	"github.com/mizuki1412/go-core-kit/mod/user/model"
-	"github.com/mizuki1412/go-core-kit/service/restkit/middleware"
-	"github.com/mizuki1412/go-core-kit/service/restkit/openapi"
-	"github.com/mizuki1412/go-core-kit/service/restkit/router"
+	"github.com/mizuki1412/go-core-kit/v2/mod/user/model"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/middleware"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/openapi"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/router"
 )
 
 func Init(router *router.Router) {

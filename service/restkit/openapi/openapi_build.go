@@ -1,14 +1,14 @@
 package openapi
 
 import (
-	"github.com/mizuki1412/go-core-kit/class/const/httpconst"
-	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/cli/configkey"
-	"github.com/mizuki1412/go-core-kit/cli/tag"
-	"github.com/mizuki1412/go-core-kit/library/jsonkit"
-	"github.com/mizuki1412/go-core-kit/library/stringkit"
-	"github.com/mizuki1412/go-core-kit/service/configkit"
-	"github.com/mizuki1412/go-core-kit/service/restkit/context"
+	"github.com/mizuki1412/go-core-kit/v2/class/const/httpconst"
+	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/cli/configkey"
+	"github.com/mizuki1412/go-core-kit/v2/cli/tag"
+	"github.com/mizuki1412/go-core-kit/v2/library/jsonkit"
+	"github.com/mizuki1412/go-core-kit/v2/library/stringkit"
+	"github.com/mizuki1412/go-core-kit/v2/service/configkit"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/context"
 	"reflect"
 	"strings"
 )

@@ -1,8 +1,8 @@
 package settingservice
 
 import (
-	"github.com/mizuki1412/go-core-kit/class"
-	"github.com/mizuki1412/go-core-kit/mod/setting/dao/settingdao"
+	"github.com/mizuki1412/go-core-kit/v2/class"
+	"github.com/mizuki1412/go-core-kit/v2/mod/setting/dao/settingdao"
 	"sync"
 )
 

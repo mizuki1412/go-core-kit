@@ -2,7 +2,7 @@ package model
 
 import (
 	"database/sql/driver"
-	"github.com/mizuki1412/go-core-kit/class"
+	"github.com/mizuki1412/go-core-kit/v2/class"
 	"github.com/spf13/cast"
 )
 

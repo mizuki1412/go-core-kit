@@ -2,7 +2,7 @@ package cryptokit
 
 import (
 	"fmt"
-	"github.com/mizuki1412/go-core-kit/library/mathkit"
+	"github.com/mizuki1412/go-core-kit/v2/library/mathkit"
 	"github.com/rs/xid"
 	"strings"
 )

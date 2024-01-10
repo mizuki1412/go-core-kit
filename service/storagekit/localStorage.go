@@ -1,10 +1,10 @@
 package storagekit
 
 import (
-	"github.com/mizuki1412/go-core-kit/class"
-	"github.com/mizuki1412/go-core-kit/cli/configkey"
-	"github.com/mizuki1412/go-core-kit/library/filekit"
-	"github.com/mizuki1412/go-core-kit/service/configkit"
+	"github.com/mizuki1412/go-core-kit/v2/class"
+	"github.com/mizuki1412/go-core-kit/v2/cli/configkey"
+	"github.com/mizuki1412/go-core-kit/v2/library/filekit"
+	"github.com/mizuki1412/go-core-kit/v2/service/configkit"
 )
 
 // GetFullPath 将path或filename用项目目录包裹

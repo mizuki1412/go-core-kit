@@ -3,8 +3,8 @@
 package ui
 
 import (
-	"github.com/mizuki1412/go-core-kit/service/logkit"
-	"github.com/mizuki1412/go-core-kit/service/restkit"
+	"github.com/mizuki1412/go-core-kit/v2/service/logkit"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit"
 	"github.com/mizuki1412/go-webview2"
 	"github.com/spf13/cast"
 )

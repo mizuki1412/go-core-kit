@@ -2,12 +2,12 @@ package locationkit
 
 import (
 	"fmt"
-	"github.com/mizuki1412/go-core-kit/class"
-	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/cli/configkey"
-	"github.com/mizuki1412/go-core-kit/library/httpkit"
-	"github.com/mizuki1412/go-core-kit/library/stringkit"
-	"github.com/mizuki1412/go-core-kit/service/configkit"
+	"github.com/mizuki1412/go-core-kit/v2/class"
+	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/cli/configkey"
+	"github.com/mizuki1412/go-core-kit/v2/library/httpkit"
+	"github.com/mizuki1412/go-core-kit/v2/library/stringkit"
+	"github.com/mizuki1412/go-core-kit/v2/service/configkit"
 	"github.com/tidwall/gjson"
 	"net/http"
 	"strings"

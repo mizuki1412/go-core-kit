@@ -3,7 +3,7 @@ package context
 import (
 	"database/sql/driver"
 	"github.com/go-playground/validator/v10"
-	"github.com/mizuki1412/go-core-kit/class"
+	"github.com/mizuki1412/go-core-kit/v2/class"
 	"reflect"
 )
 

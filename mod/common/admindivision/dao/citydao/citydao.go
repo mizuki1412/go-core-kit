@@ -1,10 +1,10 @@
 package citydao
 
 import (
-	"github.com/mizuki1412/go-core-kit/class"
-	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/mod/common/admindivision/model"
-	"github.com/mizuki1412/go-core-kit/service/sqlkit"
+	"github.com/mizuki1412/go-core-kit/v2/class"
+	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/mod/common/admindivision/model"
+	"github.com/mizuki1412/go-core-kit/v2/service/sqlkit"
 )
 
 type Dao struct {

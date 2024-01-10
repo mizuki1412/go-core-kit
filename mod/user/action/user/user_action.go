@@ -2,16 +2,16 @@ package user
 
 import (
 	context2 "context"
-	"github.com/mizuki1412/go-core-kit/class"
-	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/library/cryptokit"
-	"github.com/mizuki1412/go-core-kit/library/stringkit"
-	"github.com/mizuki1412/go-core-kit/mod/user/dao/userdao"
-	"github.com/mizuki1412/go-core-kit/mod/user/model"
-	"github.com/mizuki1412/go-core-kit/service/jwtkit"
-	"github.com/mizuki1412/go-core-kit/service/rediskit"
-	"github.com/mizuki1412/go-core-kit/service/restkit/context"
-	"github.com/mizuki1412/go-core-kit/service/sqlkit/pghelper"
+	"github.com/mizuki1412/go-core-kit/v2/class"
+	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/library/cryptokit"
+	"github.com/mizuki1412/go-core-kit/v2/library/stringkit"
+	"github.com/mizuki1412/go-core-kit/v2/mod/user/dao/userdao"
+	"github.com/mizuki1412/go-core-kit/v2/mod/user/model"
+	"github.com/mizuki1412/go-core-kit/v2/service/jwtkit"
+	"github.com/mizuki1412/go-core-kit/v2/service/rediskit"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/context"
+	"github.com/mizuki1412/go-core-kit/v2/service/sqlkit/pghelper"
 	"strings"
 )
 

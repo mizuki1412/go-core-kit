@@ -1,16 +1,16 @@
 package download
 
 import (
-	"github.com/mizuki1412/go-core-kit/class"
-	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/cli/configkey"
-	"github.com/mizuki1412/go-core-kit/library/filekit"
-	"github.com/mizuki1412/go-core-kit/service/configkit"
-	"github.com/mizuki1412/go-core-kit/service/restkit/context"
-	"github.com/mizuki1412/go-core-kit/service/restkit/middleware"
-	"github.com/mizuki1412/go-core-kit/service/restkit/openapi"
-	"github.com/mizuki1412/go-core-kit/service/restkit/router"
-	"github.com/mizuki1412/go-core-kit/service/storagekit"
+	"github.com/mizuki1412/go-core-kit/v2/class"
+	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/cli/configkey"
+	"github.com/mizuki1412/go-core-kit/v2/library/filekit"
+	"github.com/mizuki1412/go-core-kit/v2/service/configkit"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/context"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/middleware"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/openapi"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/router"
+	"github.com/mizuki1412/go-core-kit/v2/service/storagekit"
 	"strings"
 )
 

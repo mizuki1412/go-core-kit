@@ -1,10 +1,10 @@
 package excelkit
 
 import (
-	"github.com/mizuki1412/go-core-kit/class"
-	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/library/stringkit"
-	"github.com/mizuki1412/go-core-kit/service/restkit/context"
+	"github.com/mizuki1412/go-core-kit/v2/class"
+	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/library/stringkit"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/context"
 	"github.com/spf13/cast"
 	"github.com/xuri/excelize/v2"
 )

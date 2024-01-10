@@ -2,7 +2,7 @@ package beankit
 
 import (
 	"encoding/json"
-	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/class/exception"
 	"github.com/spf13/cast"
 	"reflect"
 	"strings"

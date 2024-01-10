@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/mizuki1412/go-core-kit/service/configkit"
+	"github.com/mizuki1412/go-core-kit/v2/service/configkit"
 	"github.com/spf13/cobra"
 	"net/http"
 )

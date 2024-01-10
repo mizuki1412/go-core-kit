@@ -1,14 +1,14 @@
 package main
 
 import (
-	"github.com/mizuki1412/go-core-kit/cli"
-	"github.com/mizuki1412/go-core-kit/cmd"
-	"github.com/mizuki1412/go-core-kit/mod/common/admindivision"
-	"github.com/mizuki1412/go-core-kit/mod/common/alioss/action/sts"
-	"github.com/mizuki1412/go-core-kit/mod/common/download"
-	"github.com/mizuki1412/go-core-kit/mod/user"
-	"github.com/mizuki1412/go-core-kit/service/restkit"
-	"github.com/mizuki1412/go-core-kit/snippet"
+	"github.com/mizuki1412/go-core-kit/v2/cli"
+	"github.com/mizuki1412/go-core-kit/v2/cmd"
+	"github.com/mizuki1412/go-core-kit/v2/mod/common/admindivision"
+	"github.com/mizuki1412/go-core-kit/v2/mod/common/alioss/action/sts"
+	"github.com/mizuki1412/go-core-kit/v2/mod/common/download"
+	"github.com/mizuki1412/go-core-kit/v2/mod/user"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit"
+	"github.com/mizuki1412/go-core-kit/v2/snippet"
 	"github.com/spf13/cobra"
 )
 

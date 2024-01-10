@@ -5,12 +5,12 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/mizuki1412/go-core-kit/service-third/softether/pkg"
+	"github.com/mizuki1412/go-core-kit/v2/service-third/softether/pkg"
 	"io/ioutil"
 	"net/http"
 )
 
-//to handle softether vpn server json-rpc api
+// to handle softether vpn server json-rpc api
 type Api struct {
 	Host     string
 	Port     int

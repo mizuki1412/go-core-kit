@@ -1,7 +1,7 @@
 package filekit
 
 import (
-	"github.com/mizuki1412/go-core-kit/service/logkit"
+	"github.com/mizuki1412/go-core-kit/v2/service/logkit"
 	"io/fs"
 	"path/filepath"
 )

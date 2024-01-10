@@ -2,9 +2,9 @@ package pgsql
 
 import (
 	"fmt"
-	"github.com/mizuki1412/go-core-kit/library/arraykit"
-	"github.com/mizuki1412/go-core-kit/library/filekit"
-	"github.com/mizuki1412/go-core-kit/library/stringkit"
+	"github.com/mizuki1412/go-core-kit/v2/library/arraykit"
+	"github.com/mizuki1412/go-core-kit/v2/library/filekit"
+	"github.com/mizuki1412/go-core-kit/v2/library/stringkit"
 	"strings"
 )
 

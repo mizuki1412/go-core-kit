@@ -1,8 +1,8 @@
 package context
 
 import (
-	"github.com/mizuki1412/go-core-kit/service/cachekit"
-	"github.com/mizuki1412/go-core-kit/service/jwtkit"
+	"github.com/mizuki1412/go-core-kit/v2/service/cachekit"
+	"github.com/mizuki1412/go-core-kit/v2/service/jwtkit"
 	"github.com/spf13/cast"
 	"strings"
 	"time"

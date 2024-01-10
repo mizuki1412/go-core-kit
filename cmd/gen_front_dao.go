@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/mizuki1412/go-core-kit/tool-local/frontdao"
+	"github.com/mizuki1412/go-core-kit/v2/tool-local/frontdao"
 	"github.com/spf13/cobra"
 )
 

@@ -1,9 +1,9 @@
 package ipkit
 
 import (
-	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/library/bytekit"
-	"github.com/mizuki1412/go-core-kit/library/regexkit"
+	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/library/bytekit"
+	"github.com/mizuki1412/go-core-kit/v2/library/regexkit"
 	"github.com/spf13/cast"
 	"strings"
 )

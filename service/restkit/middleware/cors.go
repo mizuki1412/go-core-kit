@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"github.com/mizuki1412/go-core-kit/service/restkit/context"
-	"github.com/mizuki1412/go-core-kit/service/restkit/router"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/context"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/router"
 	"net/http"
 )
 

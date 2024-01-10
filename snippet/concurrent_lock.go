@@ -2,8 +2,8 @@ package snippet
 
 import (
 	"fmt"
-	"github.com/mizuki1412/go-core-kit/library/concurrentkit"
-	"github.com/mizuki1412/go-core-kit/library/timekit"
+	"github.com/mizuki1412/go-core-kit/v2/library/concurrentkit"
+	"github.com/mizuki1412/go-core-kit/v2/library/timekit"
 	"sync"
 )
 

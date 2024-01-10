@@ -1,10 +1,11 @@
 package bridge
 
 import (
-	"github.com/mizuki1412/go-core-kit/library/jsonkit"
+	"github.com/mizuki1412/go-core-kit/v2/library/jsonkit"
 )
 
-/***
+/*
+**
 消息格式：
 -> code:string, data:map
 <- result:boolean, data:map, message:string

@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"github.com/mizuki1412/go-core-kit/cli/configkey"
+	"github.com/mizuki1412/go-core-kit/v2/cli/configkey"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

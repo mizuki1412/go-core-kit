@@ -1,12 +1,12 @@
 package debug
 
 import (
-	"github.com/mizuki1412/go-core-kit/service/logkit"
-	"github.com/mizuki1412/go-core-kit/service/restkit/context"
-	"github.com/mizuki1412/go-core-kit/service/restkit/middleware"
-	"github.com/mizuki1412/go-core-kit/service/restkit/openapi"
-	"github.com/mizuki1412/go-core-kit/service/restkit/router"
-	"github.com/mizuki1412/go-core-kit/service/sqlkit"
+	"github.com/mizuki1412/go-core-kit/v2/service/logkit"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/context"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/middleware"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/openapi"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/router"
+	"github.com/mizuki1412/go-core-kit/v2/service/sqlkit"
 )
 
 func Init(router *router.Router) {

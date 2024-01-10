@@ -2,8 +2,8 @@ package pghelper
 
 import (
 	"fmt"
-	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/service/sqlkit"
+	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/service/sqlkit"
 	"github.com/spf13/cast"
 )
 

@@ -3,9 +3,9 @@ package miniokit
 import (
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
-	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/cli/configkey"
-	"github.com/mizuki1412/go-core-kit/service/configkit"
+	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/cli/configkey"
+	"github.com/mizuki1412/go-core-kit/v2/service/configkit"
 )
 
 func NewClient() *minio.Client {

@@ -1,10 +1,10 @@
 package weather
 
 import (
-	"github.com/mizuki1412/go-core-kit/service-third/locationkit"
-	"github.com/mizuki1412/go-core-kit/service/restkit/context"
-	"github.com/mizuki1412/go-core-kit/service/restkit/openapi"
-	"github.com/mizuki1412/go-core-kit/service/restkit/router"
+	"github.com/mizuki1412/go-core-kit/v2/service-third/locationkit"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/context"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/openapi"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/router"
 )
 
 func Init(router *router.Router) {

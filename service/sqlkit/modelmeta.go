@@ -1,9 +1,9 @@
 package sqlkit
 
 import (
-	"github.com/mizuki1412/go-core-kit/class/constraints"
-	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/cli/tag"
+	"github.com/mizuki1412/go-core-kit/v2/class/constraints"
+	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/cli/tag"
 	"reflect"
 	"strings"
 )

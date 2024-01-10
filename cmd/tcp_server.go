@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/mizuki1412/go-core-kit/library/bytekit"
-	"github.com/mizuki1412/go-core-kit/service/configkit"
-	"github.com/mizuki1412/go-core-kit/service/netkit"
+	"github.com/mizuki1412/go-core-kit/v2/library/bytekit"
+	"github.com/mizuki1412/go-core-kit/v2/service/configkit"
+	"github.com/mizuki1412/go-core-kit/v2/service/netkit"
 	"github.com/panjf2000/gnet/v2"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"

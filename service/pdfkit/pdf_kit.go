@@ -2,7 +2,7 @@ package pdfkit
 
 import (
 	"github.com/SebastiaanKlippert/go-wkhtmltopdf"
-	"github.com/mizuki1412/go-core-kit/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/class/exception"
 	"strings"
 )
 

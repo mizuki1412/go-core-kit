@@ -2,11 +2,11 @@ package bridge
 
 import (
 	socketio "github.com/googollee/go-socket.io"
-	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/library/jsonkit"
-	"github.com/mizuki1412/go-core-kit/service/logkit"
-	"github.com/mizuki1412/go-core-kit/service/restkit"
-	"github.com/mizuki1412/go-core-kit/service/restkit/context"
+	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/library/jsonkit"
+	"github.com/mizuki1412/go-core-kit/v2/service/logkit"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/context"
 	"github.com/spf13/cast"
 	"net/http"
 )

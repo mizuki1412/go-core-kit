@@ -1,4 +1,4 @@
-module github.com/mizuki1412/go-core-kit
+module github.com/mizuki1412/go-core-kit/v2
 
 go 1.21
 

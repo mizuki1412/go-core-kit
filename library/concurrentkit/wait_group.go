@@ -1,7 +1,7 @@
 package concurrentkit
 
 import (
-	"github.com/mizuki1412/go-core-kit/library/c"
+	"github.com/mizuki1412/go-core-kit/v2/library/c"
 	"sync"
 )
 

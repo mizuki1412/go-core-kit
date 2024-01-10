@@ -3,9 +3,9 @@ package cachekit
 import (
 	"context"
 	"github.com/dgraph-io/ristretto"
-	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/library/c"
-	"github.com/mizuki1412/go-core-kit/service/rediskit"
+	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/library/c"
+	"github.com/mizuki1412/go-core-kit/v2/service/rediskit"
 	"sync"
 	"time"
 )

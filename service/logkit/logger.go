@@ -3,11 +3,11 @@ package logkit
 // logger的抽象
 
 import (
-	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/cli/configkey"
-	"github.com/mizuki1412/go-core-kit/library/stringkit"
-	"github.com/mizuki1412/go-core-kit/library/timekit"
-	"github.com/mizuki1412/go-core-kit/service/configkit"
+	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/cli/configkey"
+	"github.com/mizuki1412/go-core-kit/v2/library/stringkit"
+	"github.com/mizuki1412/go-core-kit/v2/library/timekit"
+	"github.com/mizuki1412/go-core-kit/v2/service/configkit"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
 	"log/slog"

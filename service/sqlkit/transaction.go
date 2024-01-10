@@ -1,6 +1,6 @@
 package sqlkit
 
-import "github.com/mizuki1412/go-core-kit/library/c"
+import "github.com/mizuki1412/go-core-kit/v2/library/c"
 
 // TxArea 事务物理代码块，不指定datasource时，用defaultDataSource
 func TxArea(f func(targetDS *DataSource), dataSources ...*DataSource) {

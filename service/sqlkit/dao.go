@@ -3,8 +3,8 @@ package sqlkit
 import (
 	"database/sql"
 	"github.com/jmoiron/sqlx"
-	"github.com/mizuki1412/go-core-kit/library/jsonkit"
-	"github.com/mizuki1412/go-core-kit/service/logkit"
+	"github.com/mizuki1412/go-core-kit/v2/library/jsonkit"
+	"github.com/mizuki1412/go-core-kit/v2/service/logkit"
 )
 
 // LogicDelVal 全局逻辑删除的 value

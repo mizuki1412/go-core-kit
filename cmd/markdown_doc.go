@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/mizuki1412/go-core-kit/service/configkit"
-	"github.com/mizuki1412/go-core-kit/tool-local/markdown"
+	"github.com/mizuki1412/go-core-kit/v2/service/configkit"
+	"github.com/mizuki1412/go-core-kit/v2/tool-local/markdown"
 	"github.com/spf13/cobra"
 )
 

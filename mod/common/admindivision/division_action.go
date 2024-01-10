@@ -1,13 +1,13 @@
 package admindivision
 
 import (
-	"github.com/mizuki1412/go-core-kit/class"
-	"github.com/mizuki1412/go-core-kit/mod/common/admindivision/dao/areadao"
-	"github.com/mizuki1412/go-core-kit/mod/common/admindivision/dao/provincedao"
-	"github.com/mizuki1412/go-core-kit/mod/common/admindivision/model"
-	"github.com/mizuki1412/go-core-kit/service/restkit/context"
-	"github.com/mizuki1412/go-core-kit/service/restkit/openapi"
-	"github.com/mizuki1412/go-core-kit/service/restkit/router"
+	"github.com/mizuki1412/go-core-kit/v2/class"
+	"github.com/mizuki1412/go-core-kit/v2/mod/common/admindivision/dao/areadao"
+	"github.com/mizuki1412/go-core-kit/v2/mod/common/admindivision/dao/provincedao"
+	"github.com/mizuki1412/go-core-kit/v2/mod/common/admindivision/model"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/context"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/openapi"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/router"
 )
 
 func Init(router *router.Router) {

@@ -2,10 +2,10 @@ package ui
 
 import (
 	"embed"
-	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/cli/configkey"
-	"github.com/mizuki1412/go-core-kit/service/restkit"
-	"github.com/mizuki1412/go-core-kit/service/restkit/router"
+	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/cli/configkey"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/router"
 	"github.com/spf13/cast"
 	"github.com/spf13/viper"
 	"net"

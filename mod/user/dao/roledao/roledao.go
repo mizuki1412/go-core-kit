@@ -2,9 +2,9 @@ package roledao
 
 import (
 	"fmt"
-	"github.com/mizuki1412/go-core-kit/mod/user/dao/departmentdao"
-	"github.com/mizuki1412/go-core-kit/mod/user/model"
-	"github.com/mizuki1412/go-core-kit/service/sqlkit"
+	"github.com/mizuki1412/go-core-kit/v2/mod/user/dao/departmentdao"
+	"github.com/mizuki1412/go-core-kit/v2/mod/user/model"
+	"github.com/mizuki1412/go-core-kit/v2/service/sqlkit"
 )
 
 type Dao struct {

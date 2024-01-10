@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"reflect"
 
-	"github.com/mizuki1412/go-core-kit/service-third/softether/pkg"
+	"github.com/mizuki1412/go-core-kit/v2/service-third/softether/pkg"
 )
 
 type CreateLink struct {

@@ -4,10 +4,10 @@ import (
 	"database/sql/driver"
 	"errors"
 	"github.com/lib/pq"
-	"github.com/mizuki1412/go-core-kit/class/const/sqlconst"
-	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/library/arraykit"
-	"github.com/mizuki1412/go-core-kit/library/jsonkit"
+	"github.com/mizuki1412/go-core-kit/v2/class/const/sqlconst"
+	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/library/arraykit"
+	"github.com/mizuki1412/go-core-kit/v2/library/jsonkit"
 )
 
 type ArrString struct {

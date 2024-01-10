@@ -3,11 +3,11 @@ package userdao
 import (
 	"fmt"
 	"github.com/Masterminds/squirrel"
-	"github.com/mizuki1412/go-core-kit/library/stringkit"
-	"github.com/mizuki1412/go-core-kit/mod/user/dao/departmentdao"
-	"github.com/mizuki1412/go-core-kit/mod/user/dao/roledao"
-	"github.com/mizuki1412/go-core-kit/mod/user/model"
-	"github.com/mizuki1412/go-core-kit/service/sqlkit"
+	"github.com/mizuki1412/go-core-kit/v2/library/stringkit"
+	"github.com/mizuki1412/go-core-kit/v2/mod/user/dao/departmentdao"
+	"github.com/mizuki1412/go-core-kit/v2/mod/user/dao/roledao"
+	"github.com/mizuki1412/go-core-kit/v2/mod/user/model"
+	"github.com/mizuki1412/go-core-kit/v2/service/sqlkit"
 	"github.com/spf13/cast"
 )
 

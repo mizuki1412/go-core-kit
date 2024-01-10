@@ -2,9 +2,9 @@ package serialkit
 
 import (
 	"github.com/albenik/go-serial/v2"
-	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/library/timekit"
-	"github.com/mizuki1412/go-core-kit/service/logkit"
+	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/library/timekit"
+	"github.com/mizuki1412/go-core-kit/v2/service/logkit"
 	"time"
 )
 

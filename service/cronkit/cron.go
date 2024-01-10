@@ -1,9 +1,9 @@
 package cronkit
 
 import (
-	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/library/c"
-	"github.com/mizuki1412/go-core-kit/library/timekit"
+	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/library/c"
+	"github.com/mizuki1412/go-core-kit/v2/library/timekit"
 	"github.com/robfig/cron/v3"
 )
 

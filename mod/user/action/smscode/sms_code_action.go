@@ -2,14 +2,14 @@ package smscode
 
 import (
 	context2 "context"
-	"github.com/mizuki1412/go-core-kit/class/exception"
-	"github.com/mizuki1412/go-core-kit/library/mathkit"
-	"github.com/mizuki1412/go-core-kit/library/regexkit"
-	"github.com/mizuki1412/go-core-kit/service-third/alismskit"
-	"github.com/mizuki1412/go-core-kit/service/rediskit"
-	"github.com/mizuki1412/go-core-kit/service/restkit/context"
-	"github.com/mizuki1412/go-core-kit/service/restkit/openapi"
-	"github.com/mizuki1412/go-core-kit/service/restkit/router"
+	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/library/mathkit"
+	"github.com/mizuki1412/go-core-kit/v2/library/regexkit"
+	"github.com/mizuki1412/go-core-kit/v2/service-third/alismskit"
+	"github.com/mizuki1412/go-core-kit/v2/service/rediskit"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/context"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/openapi"
+	"github.com/mizuki1412/go-core-kit/v2/service/restkit/router"
 	"github.com/spf13/cast"
 	"time"
 )

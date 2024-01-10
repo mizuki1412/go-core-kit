@@ -2,7 +2,7 @@ package context
 
 import (
 	"github.com/gin-gonic/gin/render"
-	"github.com/mizuki1412/go-core-kit/service/storagekit"
+	"github.com/mizuki1412/go-core-kit/v2/service/storagekit"
 	"net/http"
 	"net/url"
 )
