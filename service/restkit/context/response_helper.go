@@ -3,6 +3,7 @@ package context
 import (
 	"fmt"
 	"github.com/gin-gonic/gin/render"
+	"github.com/mizuki1412/go-core-kit/v2/service/logkit"
 	"github.com/mizuki1412/go-core-kit/v2/service/storagekit"
 	"net/http"
 	"net/url"
@@ -107,8 +108,10 @@ func (ctx *Context) SendSSE(msg string) {
 	ctx.Proxy.Header("Content-Type", "text/event-stream")
 	ctx.Proxy.Header("Cache-Control", "no-cache")
 	ctx.Proxy.Header("Connection", "keep-alive")
-	_, err := ctx.Proxy.Writer.WriteString(fmt.Sprintf("event: message\ndata: %s\n\n", "abv"))
+	_, err := ctx.Proxy.Writer.WriteString(fmt.Sprintf("event: message\ndata: %s\n\n", msg))
 	if err != nil {
+		logkit.Error(err.Error())
 		return
 	}
+	ctx.Proxy.Writer.Flush()
 }
