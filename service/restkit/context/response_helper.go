@@ -1,6 +1,7 @@
 package context
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin/render"
 	"github.com/mizuki1412/go-core-kit/v2/service/storagekit"
 	"net/http"
@@ -83,6 +84,7 @@ func (ctx *Context) SetFileHeader(filename string) {
 func (ctx *Context) SetJsonHeader() {
 	ctx.Proxy.Header("Content-Type", "application/json")
 }
+
 func (ctx *Context) FileRaw(data []byte, name string) {
 	ctx.SetFileHeader(name)
 	ctx.RawSuccess(data)
@@ -98,4 +100,15 @@ func (ctx *Context) File2(relativePathName string) {
 
 func (ctx *Context) FileDirect(obsolutePath, name string) {
 	ctx.Proxy.File(obsolutePath + name)
+}
+
+// SendSSE 发送sse消息
+func (ctx *Context) SendSSE(msg string) {
+	ctx.Proxy.Header("Content-Type", "text/event-stream")
+	ctx.Proxy.Header("Cache-Control", "no-cache")
+	ctx.Proxy.Header("Connection", "keep-alive")
+	_, err := ctx.Proxy.Writer.WriteString(fmt.Sprintf("event: message\ndata: %s\n\n", "abv"))
+	if err != nil {
+		return
+	}
 }
