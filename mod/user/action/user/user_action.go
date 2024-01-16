@@ -30,9 +30,9 @@ func loginByUsername(ctx *context.Context) {
 	//session := ctx.RenewSession()
 	params := loginByUsernameParam{}
 	ctx.BindForm(&params)
-	if !pghelper.CheckSchemaExist(params.Schema) {
-		panic(exception.New("schema不存在"))
-	}
+	//if !pghelper.CheckSchemaExist(params.Schema) {
+	//	panic(exception.New("schema不存在"))
+	//}
 	params.Username = strings.TrimSpace(params.Username)
 	params.Pwd = cryptokit.MD5(params.Pwd)
 	dao := userdao.New(userdao.ResultDefault)
