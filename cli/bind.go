@@ -27,6 +27,8 @@ func bindDefaultFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().Bool(configkey.ProfileDev, false, "开发模式 default:false")
 	cmd.PersistentFlags().String(configkey.TimeLocation, "Asia/Shanghai", "项目中用到的时区")
 
+	cmd.PersistentFlags().Int(configkey.CacheWrapperTTL, 1, "wrapper ttl 默认1s")
+
 	cmd.PersistentFlags().String(configkey.RedisPrefix, "", "redis key的前缀")
 	cmd.PersistentFlags().String(configkey.RedisHost, "", "redis host")
 	cmd.PersistentFlags().String(configkey.RedisPort, "", "")
