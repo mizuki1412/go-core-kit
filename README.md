@@ -3,7 +3,7 @@
 
 toolkit for golang projects
 
-`go get github.com/mizuki1412/go-core-kit@v2.0.0`
+`go get github.com/mizuki1412/go-core-kit/v2`
 
 详细说明见 doc/go-core-kit-doc.md
 
