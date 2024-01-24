@@ -26,8 +26,7 @@ func main() {
 	cli.AddChildCMD(&cobra.Command{
 		Use: "test",
 		Run: func(cmd *cobra.Command, args []string) {
-			//restkit.AddActions(user.All()...)
-			//_ = restkit.Run()
+			//snippet.RESPTest()
 		},
 	})
 	cli.AddChildCMD(cmd.FrontDaoCMDNext("http://localhost:10000/v3/api-docs"))
