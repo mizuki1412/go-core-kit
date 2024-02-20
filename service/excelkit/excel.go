@@ -173,10 +173,11 @@ func Load(param Param) []map[string]string {
 	var names []string
 	for rows.Next() {
 		if index == 2 {
-			names, _ = rows.Columns(excelize.Options{RawCellValue: true})
+			names, _ = rows.Columns()
 		} else if index > 2 {
 			m := map[string]string{}
-			values, _ := rows.Columns(excelize.Options{RawCellValue: true})
+			// excelize.Options{RawCellValue: true}
+			values, _ := rows.Columns()
 			for i, v := range values {
 				if names != nil && len(names) > i && nameMap[names[i]] != "" {
 					m[nameMap[names[i]]] = v
