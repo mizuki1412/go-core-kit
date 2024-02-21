@@ -48,15 +48,19 @@ func SQL2Struct(sqlFile, destFile string) {
 				continue
 			}
 			f := Field{Name: es[0]}
+			// 删除标记
+			if es[0] == "deleted" || es[0] == "off" {
+				f.Tags = append(f.Tags, "logicDel:\"true\"")
+			}
 			switch es[1] {
 			case "varchar", "text":
 				f.Type = "class.String"
 			case "serial":
 				f.Type = "int32"
-				f.Tags = append(f.Tags, "autoincrement:\"true\"")
+				f.Tags = append(f.Tags, "auto:\"true\"")
 			case "bigserial":
 				f.Type = "int64"
-				f.Tags = append(f.Tags, "autoincrement:\"true\"")
+				f.Tags = append(f.Tags, "auto:\"true\"")
 			case "int", "smallint":
 				f.Type = "class.Int32"
 				if arraykit.StringContains(es, "primary") {
