@@ -26,8 +26,7 @@ cli.Execute()
 ```
 func Init(router *router.Router) {
 	tag := "$tag$:$tname$"
-	r := router.Group("/$tag$")
-	r.Use(middleware.AuthJWT())
+	r := router.Group("/$tag$", middleware.AuthJWT())
 	{
 		r.Post("/$name$", $name$).Api(openapi.Tag(tag), openapi.Summary("$summary$"), openapi.ReqParam($name$Params{}))
 	}
@@ -50,8 +49,7 @@ func $name$(ctx *context.Context){
 ```
 func Init(router *router.Router) {
 	tag := "$tag$:$tname$"
-	r := router.Group("/$tag$")
-	r.Use(middleware.AuthJWT())
+	r := router.Group("/$tag$", middleware.AuthJWT())
 	{
 		r.Post("/update", update).Api(openapi.Tag(tag), openapi.Summary("增加和修改"), openapi.ReqParam(updateParams{}))
 		r.Post("/del", del).Api(openapi.Tag(tag), openapi.Summary("删除"), openapi.ReqParam(delParams{}))
