@@ -27,7 +27,7 @@ cli.Execute()
 func Init(router *router.Router) {
 	tag := "$tag$:$tname$"
 	r := router.Group("/$tag$")
-	r.Use(middleware.AuthUsernameAndPwd())
+	r.Use(middleware.AuthJWT())
 	{
 		r.Post("/$name$", $name$).Api(openapi.Tag(tag), openapi.Summary("$summary$"), openapi.ReqParam($name$Params{}))
 	}

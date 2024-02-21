@@ -308,8 +308,8 @@ func Init(router *router.Router) {
 		openapi.Summary("登录-用户名"), openapi.ReqParam(loginByUsernameParam{}))
 	router.Group("/rest/user/login").Post("", login).Api(openapi.Tag(tag),
 	    openapi.Summary("登录"), openapi.ReqParam(loginParam{}))
-	router.Group("/rest/user/info").Use(middleware.AuthUsernameAndPwd()).Post("", info).Api(openapi.Tag(tag), openapi.Summary("用户信息"))
-	r := router.Group("/rest/user", middleware.AuthUsernameAndPwd())
+	router.Group("/rest/user/info").Use(middleware.AuthJWT()).Post("", info).Api(openapi.Tag(tag), openapi.Summary("用户信息"))
+	r := router.Group("/rest/user", middleware.AuthJWT())
 	{
 		r.Post("/logout", logout).Api(openapi.Tag(tag), openapi.Summary("登出"))
 		r.Post("/updatePwd", updatePwd).Api(openapi.Tag(tag), openapi.Summary("密码修改"), openapi.ReqParam(updatePwdParam{}))
