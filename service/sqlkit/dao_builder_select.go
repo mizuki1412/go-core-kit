@@ -202,7 +202,7 @@ func (dao SelectDao[T]) resetColumns(fields ...string) SelectDao[T] {
 
 func (dao SelectDao[T]) whereNLogicDel() SelectDao[T] {
 	if dao.modelMeta.logicDelKey.Key != "" {
-		return dao.Where(dao.modelMeta.logicDelKey.Key+"<>?", dao.LogicDelVal[0])
+		return dao.Where(squirrel.NotEq{dao.modelMeta.logicDelKey.Key: dao.LogicDelVal[0]})
 	}
 	return dao
 }
@@ -225,10 +225,30 @@ func (dao SelectDao[T]) WhereUnnestNotIn(key string, arr any) SelectDao[T] {
 	return dao.whereUnnest(arr, key, "NOT IN")
 }
 
+// WherePGArrayIn 用于PG中array类型数据的包含比较
+func (dao SelectDao[T]) WherePGArrayIn(key string, arr any) SelectDao[T] {
+	switch dao.dataSource.Driver {
+	case sqlconst.Postgres:
+		s, v := pgArray(arr)
+		return dao.Where(fmt.Sprintf("%s @> %s", dao.modelMeta.escapeName(key), s), v...)
+	default:
+		panic(exception.New("WherePGArrayIn not supported"))
+	}
+}
+func (dao SelectDao[T]) WherePGArrayNotIn(key string, arr any) SelectDao[T] {
+	switch dao.dataSource.Driver {
+	case sqlconst.Postgres:
+		s, v := pgArray(arr)
+		return dao.Where(fmt.Sprintf("not (%s @> %s)", dao.modelMeta.escapeName(key), s), v...)
+	default:
+		panic(exception.New("WherePGArrayNotIn not supported"))
+	}
+}
+
 func (dao SelectDao[T]) WhereIn(key string, sub SubQueryInterface) SelectDao[T] {
 	sql, args := sub.sqlOriginPlaceholder()
 	return dao.Where(squirrel.Expr(key+" IN ("+sql+")", args...))
 }
 func (dao SelectDao[T]) WhereLike(field string, val string) SelectDao[T] {
-	return dao.Where(field+" LIKE ?", "%"+val+"%")
+	return dao.Where(squirrel.Like{field: "%" + val + "%"})
 }

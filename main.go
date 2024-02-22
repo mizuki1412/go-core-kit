@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Masterminds/squirrel"
 	"github.com/mizuki1412/go-core-kit/v2/cli"
 	"github.com/mizuki1412/go-core-kit/v2/cmd"
 	"github.com/mizuki1412/go-core-kit/v2/mod/common/admindivision"
@@ -27,6 +28,12 @@ func main() {
 		Use: "test",
 		Run: func(cmd *cobra.Command, args []string) {
 			//snippet.RESPTest()
+			f := "bb"
+			s, _, _ := squirrel.Select("*").Where(squirrel.GtOrEq{"a": 1}).Where(squirrel.Or{
+				squirrel.NotEq{"b": "abc"},
+				squirrel.Like{f: "%abc"},
+			}).ToSql()
+			println(s)
 		},
 	})
 	cli.AddChildCMD(cmd.FrontDaoCMDNext("http://localhost:10000/v3/api-docs"))

@@ -1,6 +1,7 @@
 package departmentdao
 
 import (
+	"github.com/Masterminds/squirrel"
 	"github.com/mizuki1412/go-core-kit/v2/mod/user/model"
 	"github.com/mizuki1412/go-core-kit/v2/service/sqlkit"
 )
@@ -41,9 +42,9 @@ func New(cascadeType byte, ds ...*sqlkit.DataSource) Dao {
 }
 
 func (dao Dao) ListByParent(id int32) []*model.Department {
-	return dao.Select().Where("parent=?", id).OrderBy("no").OrderBy("id").List()
+	return dao.Select().Where(squirrel.Eq{"parent": id}).OrderBy("no").OrderBy("id").List()
 }
 
 func (dao Dao) ListAll() []*model.Department {
-	return dao.Select().Where("id>0").OrderBy("parent").OrderBy("no").OrderBy("id").List()
+	return dao.Select().Where(squirrel.Gt{"id": 0}).OrderBy("parent").OrderBy("no").OrderBy("id").List()
 }

@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// 生成pg的array表达式
 func pgArray(arr any) (string, []any) {
 	var suffix string
 	var args []any

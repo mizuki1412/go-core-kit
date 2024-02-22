@@ -518,6 +518,31 @@ if len(param.Departments) > 0 {
 - update set时：`Set("extend",squirrel.Expr("'{}'::jsonb"))` or `Set("extend","{}")`
 - class.mapString在插入数据库时将用jsonb格式，并且不是完全替换，而是merge的方式(```coalesce(extend, '{}'::jsonb) || '$param'::jsonb```)。如果要删除其中的key，需要设置key为null。 merge时只会merge顶层的keys。
 
+## code demo
+
+```go
+builder := dao.Select().OrderByDesc("dt")
+if len(param.Tags) > 0 {
+    builder = builder.WherePGArrayIn("tags", param.Tags)
+}
+if !param.Start.IsZero() {
+    builder = builder.Where("dt>=?", param.Start)
+}
+if !param.End.IsZero() {
+    builder = builder.Where(squirrel.Lt{"dt": param.End})
+}
+if param.Search != "" {
+    builder = builder.Where(squirrel.Or{
+        squirrel.Like{"content": "%" + param.Search + "%"},
+        squirrel.Like{"remark": "%" + param.Search + "%"},
+    })
+}
+
+// set expr
+dao.Update().Set("phone", squirrel.Expr("null")).Set("username", squirrel.Expr("null")).Where("id=?", id).Exec()
+
+```
+
 # 框架内可配置函数或变量
 
 ## restkit
