@@ -15,8 +15,7 @@ func Init(router *router.Router) {
 	router.Group("/user/login").Post("", login).Api(openapi.Tag(tag),
 		openapi.Summary("登录"),
 		openapi.ReqParam(loginParam{}), openapi.Response(ResLogin{}))
-	router.Group("/user/info").Use(middleware.AuthJWT()).Get("", info).Api(openapi.Tag(tag),
-		openapi.Summary("用户信息"), openapi.Response(model.User{}))
+	router.Group("/user/info").Use(middleware.AuthJWT()).Get("", info).Api(openapi.Tag(tag), openapi.Summary("用户信息，刷新jwt"))
 	r := router.Group("/user", middleware.AuthJWT())
 	{
 		r.Get("/logout", logout).Api(openapi.Tag(tag), openapi.Summary("登出"))

@@ -47,11 +47,11 @@ func loginByUsername(ctx *context.Context) {
 	claim := jwtkit.New(user.Id)
 	claim.Ext.Put("schema", params.Schema)
 	token := claim.Token()
+	ctx.SetJwtCookie(claim, token)
 	ret := ResLogin{
 		User:  user,
 		Token: token,
 	}
-	ctx.SetJwtCookie(claim, token)
 	if AdditionLoginFunc != nil {
 		AdditionLoginFunc(ctx, ret)
 	}
@@ -120,9 +120,10 @@ func info(ctx *context.Context) {
 	params := infoParam{}
 	ctx.BindForm(&params)
 	dao := userdao.New(userdao.ResultDefault)
-	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
+	schema0 := ctx.GetJwt().Ext.GetString("schema")
+	dao.DataSource().Schema = schema0
 	if !params.Id.Valid {
-		if params.Schema.String != "" && params.Schema.String != ctx.GetJwt().Ext.GetString("schema") {
+		if params.Schema.String != "" && params.Schema.String != schema0 {
 			ctx.Json(context.RestRet{
 				Result:  context.ResultAuthErr,
 				Message: "schema不匹配",
@@ -133,11 +134,19 @@ func info(ctx *context.Context) {
 		// todo 先走数据库
 		uid := ctx.GetJwt().IdInt32()
 		user := dao.SelectOneById(uid)
+		claim := jwtkit.New(user.Id)
+		claim.Ext.Put("schema", schema0)
+		token := claim.Token()
+		ret := ResLogin{
+			User:  user,
+			Token: token,
+		}
+		ctx.SetJwtCookie(claim, token)
 		// todo user不存在时
 		if AdditionUserExFunc != nil {
 			AdditionUserExFunc(ctx, user)
 		}
-		ctx.JsonSuccess(user)
+		ctx.JsonSuccess(ret)
 	} else {
 		user := dao.SelectOneById(params.Id.Int32)
 		// todo user不存在时
