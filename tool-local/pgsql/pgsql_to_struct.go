@@ -87,13 +87,13 @@ func SQL2Struct(sqlFile, destFile string) {
 				}
 			}
 			if f.Type == "class.Int64" {
-				f.Tags = append(f.Tags, fmt.Sprintf("json:\"%s,omitempty,string\" db:\"%s\"", es[0], strings.ToLower(es[0])))
+				f.Tags = append(f.Tags, fmt.Sprintf("json:\"%s,omitempty,string\" db:\"%s\"", stringkit.LowerFirst(stringkit.CamelCase(es[0])), strings.ToLower(es[0])))
 			} else if f.Type == "int64" {
-				f.Tags = append(f.Tags, fmt.Sprintf("json:\"%s,string\" db:\"%s\"", es[0], strings.ToLower(es[0])))
+				f.Tags = append(f.Tags, fmt.Sprintf("json:\"%s,string\" db:\"%s\"", stringkit.LowerFirst(stringkit.CamelCase(es[0])), strings.ToLower(es[0])))
 			} else if strings.Index(f.Type, "class") >= 0 || strings.Index(f.Type, "*") >= 0 {
-				f.Tags = append(f.Tags, fmt.Sprintf("json:\"%s,omitempty\" db:\"%s\"", es[0], strings.ToLower(es[0])))
+				f.Tags = append(f.Tags, fmt.Sprintf("json:\"%s,omitempty\" db:\"%s\"", stringkit.LowerFirst(stringkit.CamelCase(es[0])), strings.ToLower(es[0])))
 			} else {
-				f.Tags = append(f.Tags, fmt.Sprintf("json:\"%s\" db:\"%s\"", es[0], strings.ToLower(es[0])))
+				f.Tags = append(f.Tags, fmt.Sprintf("json:\"%s\" db:\"%s\"", stringkit.LowerFirst(stringkit.CamelCase(es[0])), strings.ToLower(es[0])))
 			}
 			if arraykit.StringContains(es, "primary") {
 				f.Tags = append(f.Tags, fmt.Sprintf("pk:\"true\" table:\"%s\"", table))
