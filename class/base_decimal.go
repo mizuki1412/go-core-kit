@@ -31,6 +31,27 @@ func (th *Decimal) Set(val any) {
 		v := val.(*Decimal)
 		th.Valid = v.Valid
 		th.Decimal = v.Decimal
+	case Int32:
+		v := val.(Int32)
+		if v.Valid {
+			th.Set(v.Int32)
+		} else {
+			th.Valid = false
+		}
+	case Int64:
+		v := val.(Int64)
+		if v.Valid {
+			th.Set(v.Int64)
+		} else {
+			th.Valid = false
+		}
+	case Float64:
+		v := val.(Float64)
+		if v.Valid {
+			th.Set(v.Float64)
+		} else {
+			th.Valid = false
+		}
 	default:
 		v, err := decimal.NewFromString(cast.ToString(val))
 		if err == nil {
