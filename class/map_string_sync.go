@@ -61,19 +61,19 @@ func (th MapStringSync) IsValid() bool {
 	return th.Valid
 }
 
-func NewMapStringSync(val any) MapStringSync {
+func NewMapStringSync(val ...any) MapStringSync {
 	th := MapStringSync{}
-	if val != nil {
-		th.Set(val)
+	if len(val) > 0 {
+		th.Set(val[0])
 	} else {
 		th.Set(map[string]any{})
 	}
 	return th
 }
-func NMapStringSync(val any) *MapStringSync {
+func NMapStringSync(val ...any) *MapStringSync {
 	th := &MapStringSync{}
-	if val != nil {
-		th.Set(val)
+	if len(val) > 0 {
+		th.Set(val[0])
 	} else {
 		th.Set(map[string]any{})
 	}

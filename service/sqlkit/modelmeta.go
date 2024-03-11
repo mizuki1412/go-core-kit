@@ -1,6 +1,7 @@
 package sqlkit
 
 import (
+	"github.com/mizuki1412/go-core-kit/v2/class"
 	"github.com/mizuki1412/go-core-kit/v2/class/constraints"
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
 	"github.com/mizuki1412/go-core-kit/v2/cli/tag"
@@ -72,7 +73,7 @@ func (th ModelMetaKey) val(rv reflect.Value, driver string) any {
 }
 
 // 用于存放model的解析数据： key：包路径+类名+驱动类型
-var modelMetaCache = map[string]ModelMeta{}
+var modelMetaCache = class.NMapStringSync()
 
 // InitModelMeta obj should be elem
 func (th ModelMeta) init(obj any) ModelMeta {
@@ -82,8 +83,8 @@ func (th ModelMeta) init(obj any) ModelMeta {
 	rt := reflect.TypeOf(obj)
 	// 包路径+类名+驱动类型
 	tk := rt.PkgPath() + "/" + rt.Name() + ":" + th.dateSource.Driver
-	if tv, ok := modelMetaCache[tk]; ok {
-		return tv
+	if modelMetaCache.Contains(tk) {
+		return modelMetaCache.Get(tk).(ModelMeta)
 	}
 	if rt.Kind() != reflect.Struct {
 		panic(exception.New("dao model must struct"))
@@ -138,7 +139,7 @@ func (th ModelMeta) init(obj any) ModelMeta {
 		th.allSelectColumns = append(th.allSelectColumns, th.logicDelKey.Key)
 		th.allUpdateKeys = append(th.allUpdateKeys, th.logicDelKey)
 	}
-	modelMetaCache[tk] = th
+	modelMetaCache.PutIfAbsent(tk, th)
 	return th
 }
 

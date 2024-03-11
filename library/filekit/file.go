@@ -120,7 +120,7 @@ func SplitFilePath(path string) (string, string) {
 func Exists(fileName string) bool {
 	fi, err := os.Stat(fileName)
 	if err != nil {
-		panic(exception.New(err.Error()))
+		return false
 	}
 	return fi != nil
 }
