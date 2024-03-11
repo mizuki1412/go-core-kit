@@ -116,3 +116,18 @@ func SplitFilePath(path string) (string, string) {
 	}
 	return path[0:i], path[i+1:]
 }
+
+func Exists(fileName string) bool {
+	fi, err := os.Stat(fileName)
+	if err != nil {
+		panic(exception.New(err.Error()))
+	}
+	return fi != nil
+}
+
+func RemoveFile(fileName string) {
+	err := os.Remove(fileName)
+	if err != nil {
+		panic(exception.New(err.Error()))
+	}
+}
