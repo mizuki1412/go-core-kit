@@ -39,6 +39,10 @@ func bindDefaultFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().String(configkey.InfluxUser, "", "")
 	cmd.PersistentFlags().String(configkey.InfluxPwd, "", "")
 	cmd.PersistentFlags().String(configkey.InfluxDBName, "", "默认的数据库")
+	cmd.PersistentFlags().String(configkey.InfluxToken, "", "influx v2")
+	cmd.PersistentFlags().String(configkey.InfluxOrg, "", "influx v2")
+	cmd.PersistentFlags().String(configkey.InfluxBucket, "", "influx v2")
+	cmd.PersistentFlags().String(configkey.InfluxReqTimeout, "1800", "s")
 
 	cmd.PersistentFlags().String(configkey.LogPath, "", "日志目录；空则表示在project.dir/log下；不填不开启文件日志")
 	cmd.PersistentFlags().String(configkey.LogName, "main", "日志文件名，无后缀")
