@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/Masterminds/squirrel"
 	"github.com/mizuki1412/go-core-kit/v2/cli"
 	"github.com/mizuki1412/go-core-kit/v2/cmd"
 	"github.com/mizuki1412/go-core-kit/v2/mod/common/admindivision"
@@ -10,6 +9,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/v2/mod/user/dao/userdao"
 	"github.com/mizuki1412/go-core-kit/v2/mod/user/model"
 	"github.com/mizuki1412/go-core-kit/v2/service/cachekit"
+	"github.com/mizuki1412/go-core-kit/v2/service/configkit"
 	"github.com/mizuki1412/go-core-kit/v2/service/restkit"
 	"github.com/spf13/cobra"
 )
@@ -24,18 +24,17 @@ func main() {
 			_ = restkit.Run()
 		},
 	})
-	cli.AddChildCMD(&cobra.Command{
-		Use: "test",
+	c1 := &cobra.Command{
+		Use: "test1",
 		Run: func(cmd *cobra.Command, args []string) {
-			//snippet.RESPTest()
-			f := "bb"
-			s, _, _ := squirrel.Select("*").Where(squirrel.GtOrEq{"a": 1}).Where(squirrel.Or{
-				squirrel.NotEq{"b": "abc"},
-				squirrel.Like{f: "%abc"},
-			}).ToSql()
-			println(s)
+			println(configkit.GetString("test"))
+			println(configkit.GetString("test1"))
 		},
-	})
+	}
+	c1.Flags().String("test", "", "")
+	c1.Flags().String("test1", "", "")
+	cli.AddChildCMD(c1)
+
 	cli.AddChildCMD(cmd.FrontDaoCMDNext("http://localhost:10000/v3/api-docs"))
 	cli.Execute()
 }

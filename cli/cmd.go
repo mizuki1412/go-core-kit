@@ -17,6 +17,8 @@ var rootCmd *CMD
 func decoCmd(cmd *cobra.Command) {
 	run := cmd.Run
 	cmd.Run = func(cmd *cobra.Command, args []string) {
+		// viper的bind必须放这里，放外面会导致多个cmd的flag覆盖
+		bind(cmd)
 		loadConfig()
 		logkit.Init()
 		run(cmd, args)
@@ -35,7 +37,6 @@ func AddChildCMD(command *cobra.Command) {
 	}
 	decoCmd(command)
 	rootCmd.Root.AddCommand(command)
-	bind(command)
 }
 
 func Execute() {

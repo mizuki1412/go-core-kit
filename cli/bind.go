@@ -105,16 +105,11 @@ func bindDefaultFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().String(configkey.MinioEndpoint, "127.0.0.1:9000", "")
 	cmd.PersistentFlags().String(configkey.MinioAccessKey, "", "")
 	cmd.PersistentFlags().String(configkey.MinioSecret, "", "")
-
-	bind(cmd)
 }
 
 func bind(cmd *cobra.Command) {
-	err := viper.BindPFlags(cmd.PersistentFlags())
-	if err != nil {
-		panic(err)
-	}
-	err = viper.BindPFlags(cmd.Flags())
+	// 所有类型flag
+	err := viper.BindPFlags(cmd.Flags())
 	if err != nil {
 		panic(err)
 	}
