@@ -12,11 +12,9 @@ import (
 
 type SelectDao[T any] struct {
 	Dao[T]
-	builder squirrel.SelectBuilder
-	// from用默认的
-	fromAs string
-	// fromAs无效
-	form           string
+	builder        squirrel.SelectBuilder
+	fromAs         string // 别名 from用默认的
+	from           string // fromAs无效
 	ignoreLogicDel bool
 }
 
@@ -97,7 +95,7 @@ func (dao SelectDao[T]) RemoveColumns() SelectDao[T] {
 	return dao
 }
 func (dao SelectDao[T]) From(from string) SelectDao[T] {
-	dao.form = from
+	dao.from = from
 	return dao
 }
 func (dao SelectDao[T]) FromAs(alias string) SelectDao[T] {
