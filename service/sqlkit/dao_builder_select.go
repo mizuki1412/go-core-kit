@@ -12,12 +12,16 @@ import (
 
 type SelectDao[T any] struct {
 	Dao[T]
-	builder        squirrel.SelectBuilder
-	fromAs         string
+	builder squirrel.SelectBuilder
+	// from用默认的
+	fromAs string
+	// fromAs无效
+	form           string
 	ignoreLogicDel bool
 }
 
 type SubQueryInterface interface {
+	// 默认占位符的，一般用于子查询
 	sqlOriginPlaceholder() (string, []any)
 }
 
@@ -26,7 +30,6 @@ func (dao SelectDao[T]) Print() {
 	logkit.Info("sql print", "sql", sql, "args", jsonkit.ToString(args))
 }
 
-// 默认占位符的，一般用于子查询
 func (dao SelectDao[T]) sqlOriginPlaceholder() (string, []any) {
 	if dao.fromAs == "" {
 		dao.builder = dao.builder.From(dao.modelMeta.getTable())
@@ -45,10 +48,14 @@ func (dao SelectDao[T]) Sql() (string, []any) {
 	return sqls, args
 }
 func (dao SelectDao[T]) ToSql() (string, []any, error) {
-	if dao.fromAs == "" {
-		dao.builder = dao.builder.From(dao.modelMeta.getTable())
+	if dao.from != "" {
+		dao.builder = dao.builder.From(dao.from)
 	} else {
-		dao.builder = dao.builder.From(dao.modelMeta.getTable(dao.fromAs))
+		if dao.fromAs == "" {
+			dao.builder = dao.builder.From(dao.modelMeta.getTable())
+		} else {
+			dao.builder = dao.builder.From(dao.modelMeta.getTable(dao.fromAs))
+		}
 	}
 	dao.builder = dao.builder.PlaceholderFormat(placeholder(dao.dataSource.Driver))
 	return dao.builder.ToSql()
@@ -89,7 +96,10 @@ func (dao SelectDao[T]) RemoveColumns() SelectDao[T] {
 	dao.builder = dao.builder.RemoveColumns()
 	return dao
 }
-
+func (dao SelectDao[T]) From(from string) SelectDao[T] {
+	dao.form = from
+	return dao
+}
 func (dao SelectDao[T]) FromAs(alias string) SelectDao[T] {
 	dao.fromAs = alias
 	return dao
