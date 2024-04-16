@@ -543,6 +543,27 @@ dao.Update().Set("phone", squirrel.Expr("null")).Set("username", squirrel.Expr("
 
 ```
 
+自由模式：
+
+```go
+func (dao Dao) insertBatch(list []*model.AisHistory) {
+    builder := squirrel.Insert("ship.history").Columns("time", "mmsi", "lon", "lat", "course", "speed")
+    for _, e := range list {
+        builder = builder.Values(e.Time, e.Mmsi.Int64, e.Lon.Float64, e.Lat.Float64, e.Course.String, e.Speed.String)
+    }
+    sql, args,_:=builder.ToSql()
+    dao.ExecRaw(sql, args)
+}
+```
+
+其他：
+```go
+
+// 插入null
+dao.Values(squirrel.Expr("null"))
+
+```
+
 # 框架内可配置函数或变量
 
 ## restkit
