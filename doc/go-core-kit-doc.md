@@ -554,9 +554,30 @@ func (dao Dao) insertBatch(list []*model.AisHistory) {
     sql, args,_:=builder.ToSql()
     dao.ExecRaw(sql, args)
 }
+
+// 自由sql查询
+
+type Dao struct {
+    sqlkit.Dao[model.User]
+}
+
+func New(cascadeType byte, ds ...*sqlkit.DataSource) Dao {
+    dao := sqlkit.New[model.User](ds...)
+    dao.Cascade = func(obj *model.User) {
+        switch cascadeType {}
+    }
+    return Dao{dao}
+}
+
+func (dao Dao) test() []*model.User{
+	builder := squirrel.Select("id,name").From("table")
+    sql, args,_:=builder.ToSql()
+	return dao.QueryRawRows(sql, args)
+}
 ```
 
 其他：
+
 ```go
 
 // 插入null
