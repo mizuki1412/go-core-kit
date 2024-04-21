@@ -20,8 +20,8 @@ func GZipBytes(data []byte) []byte {
 	return input.Bytes()
 }
 
-// UGZipBytes 解压
-func UGZipBytes(data []byte) []byte {
+// UnGZipBytes 解压
+func UnGZipBytes(data []byte) []byte {
 	var in bytes.Buffer
 	in.Write(data)
 	r, _ := gzip.NewReader(&in)

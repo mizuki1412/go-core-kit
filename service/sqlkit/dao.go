@@ -54,6 +54,22 @@ func (dao Dao[T]) QueryRaw(sql string, args []any) *sqlx.Rows {
 	return dao.dataSource.Query(sql, args)
 }
 
+// QueryRawRows 默认返回 T list，可用于自由sql时，自定义返回值
+func (dao Dao[T]) QueryRawRows(sql string, args []any) []*T {
+	rows := dao.QueryRaw(sql, args)
+	list := make([]*T, 0, 5)
+	defer rows.Close()
+	for rows.Next() {
+		list = append(list, scanStruct[T](rows, dao.dataSource.Driver))
+	}
+	if dao.Cascade != nil {
+		for i := range list {
+			dao.Cascade(list[i])
+		}
+	}
+	return list
+}
+
 func (dao Dao[T]) ExecRaw(sql string, args []any) sql.Result {
 	logkit.Debug("sql req", "sql", sql, "args", jsonkit.ToString(args))
 	return dao.dataSource.Exec(sql, args)

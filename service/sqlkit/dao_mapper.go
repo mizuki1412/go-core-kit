@@ -28,6 +28,37 @@ func (dao Dao[T]) InsertObj(dest *T) {
 	builder.ReturnOne(dest)
 }
 
+func (dao Dao[T]) InsertBatch(dest []*T) {
+	if len(dest) == 0 {
+		panic(exception.New("insert batch need dest"))
+	}
+	builder := dao.Insert()
+	var columns []string
+	var vals []any
+	for i, e := range dest {
+		rv := reflect.ValueOf(e).Elem()
+		for _, e := range dao.modelMeta.allInsertKeys {
+			var val = e.val(rv, dao.dataSource.Driver)
+			if val == nil {
+				continue
+			}
+			if i == 0 {
+				columns = append(columns, e.OriKey)
+			}
+			vals = append(vals, val)
+		}
+		if i == 0 {
+			if len(columns) == 0 {
+				panic(exception.New("no fields", 2))
+			}
+			builder = builder.Columns(columns...).Values(vals...)
+		} else {
+			builder = builder.Values(vals...)
+		}
+	}
+	builder.Exec()
+}
+
 func (dao Dao[T]) UpdateObj(dest *T) int64 {
 	builder := dao.Update()
 	rv := reflect.ValueOf(dest).Elem()
