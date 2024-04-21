@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/Masterminds/squirrel"
 	"github.com/mizuki1412/go-core-kit/v2/cli"
 	"github.com/mizuki1412/go-core-kit/v2/cmd"
 	"github.com/mizuki1412/go-core-kit/v2/mod/common/admindivision"
@@ -27,8 +26,7 @@ func main() {
 	c1 := &cobra.Command{
 		Use: "test",
 		Run: func(cmd *cobra.Command, args []string) {
-			a, _, _ := squirrel.Insert("abc").Values(1, 2, 3).Values(nil, squirrel.Expr("null"), 3).ToSql()
-			println(a)
+
 		},
 	}
 	c1.Flags().String("test", "", "")
