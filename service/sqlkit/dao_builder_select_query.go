@@ -140,7 +140,7 @@ func (dao SelectDao[T]) ListString() []string {
 		if err != nil {
 			panic(exception.New(err.Error()))
 		}
-		list = append(list, ret[0].(string))
+		list = append(list, cast.ToString(ret[0]))
 	}
 	return list
 }

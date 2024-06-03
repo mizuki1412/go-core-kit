@@ -118,24 +118,24 @@ func (dao SelectDao[T]) Options(options ...string) SelectDao[T] {
 	return dao
 }
 
-func (dao SelectDao[T]) Join(dm DaoModelMeta, as string, rest ...any) SelectDao[T] {
-	dao.builder = dao.builder.Join(dm.getModelMeta().getTable(as), rest...)
+func (dao SelectDao[T]) Join(dm DaoModelMeta, as string, on string, rest ...any) SelectDao[T] {
+	dao.builder = dao.builder.Join(dm.getModelMeta().getTable(as)+" on "+on, rest...)
 	return dao
 }
-func (dao SelectDao[T]) LeftJoin(dm DaoModelMeta, as string, rest ...any) SelectDao[T] {
-	dao.builder = dao.builder.LeftJoin(dm.getModelMeta().getTable(as), rest...)
+func (dao SelectDao[T]) LeftJoin(dm DaoModelMeta, as string, on string, rest ...any) SelectDao[T] {
+	dao.builder = dao.builder.LeftJoin(dm.getModelMeta().getTable(as)+" on "+on, rest...)
 	return dao
 }
-func (dao SelectDao[T]) RightJoin(dm DaoModelMeta, as string, rest ...any) SelectDao[T] {
-	dao.builder = dao.builder.RightJoin(dm.getModelMeta().getTable(as), rest...)
+func (dao SelectDao[T]) RightJoin(dm DaoModelMeta, as string, on string, rest ...any) SelectDao[T] {
+	dao.builder = dao.builder.RightJoin(dm.getModelMeta().getTable(as)+" on "+on, rest...)
 	return dao
 }
-func (dao SelectDao[T]) InnerJoin(dm DaoModelMeta, as string, rest ...any) SelectDao[T] {
-	dao.builder = dao.builder.InnerJoin(dm.getModelMeta().getTable(as), rest...)
+func (dao SelectDao[T]) InnerJoin(dm DaoModelMeta, as string, on string, rest ...any) SelectDao[T] {
+	dao.builder = dao.builder.InnerJoin(dm.getModelMeta().getTable(as)+" on "+on, rest...)
 	return dao
 }
-func (dao SelectDao[T]) CrossJoin(dm DaoModelMeta, as string, rest ...any) SelectDao[T] {
-	dao.builder = dao.builder.CrossJoin(dm.getModelMeta().getTable(as), rest...)
+func (dao SelectDao[T]) CrossJoin(dm DaoModelMeta, as string, on string, rest ...any) SelectDao[T] {
+	dao.builder = dao.builder.CrossJoin(dm.getModelMeta().getTable(as)+" on "+on, rest...)
 	return dao
 }
 
@@ -210,7 +210,11 @@ func (dao SelectDao[T]) resetColumns(fields ...string) SelectDao[T] {
 
 func (dao SelectDao[T]) whereNLogicDel() SelectDao[T] {
 	if dao.modelMeta.logicDelKey.Key != "" {
-		return dao.Where(squirrel.NotEq{dao.modelMeta.logicDelKey.Key: dao.LogicDelVal[0]})
+		logicDelKey := dao.modelMeta.logicDelKey.Key
+		if dao.fromAs != "" {
+			logicDelKey = dao.fromAs + "." + logicDelKey
+		}
+		return dao.Where(squirrel.NotEq{logicDelKey: dao.LogicDelVal[0]})
 	}
 	return dao
 }
