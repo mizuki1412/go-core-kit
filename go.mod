@@ -5,39 +5,39 @@ go 1.22
 require (
 	github.com/Depado/bfchroma/v2 v2.0.0
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/SebastiaanKlippert/go-wkhtmltopdf v1.9.2
+	github.com/SebastiaanKlippert/go-wkhtmltopdf v1.9.3
 	github.com/albenik/go-serial/v2 v2.6.1
 	github.com/alecthomas/chroma/v2 v2.14.0
-	github.com/aliyun/alibaba-cloud-sdk-go v1.62.754
-	github.com/bytedance/sonic v1.11.8
+	github.com/aliyun/alibaba-cloud-sdk-go v1.62.784
+	github.com/bytedance/sonic v1.11.9
 	github.com/dgraph-io/ristretto v0.1.1
 	github.com/eclipse/paho.mqtt.golang v1.4.3
 	github.com/gin-gonic/gin v1.10.0
-	github.com/go-playground/validator/v10 v10.21.0
+	github.com/go-playground/validator/v10 v10.22.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/googollee/go-socket.io v1.7.0
 	github.com/influxdata/influxdb-client-go/v2 v2.13.0
 	github.com/jlaffaye/ftp v0.2.0
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/lib/pq v1.10.9
-	github.com/minio/minio-go/v7 v7.0.70
+	github.com/minio/minio-go/v7 v7.0.73
 	github.com/mizuki1412/go-webview2 v0.0.0-20211216070425-b98c07fd76eb
-	github.com/panjf2000/gnet/v2 v2.5.3
-	github.com/redis/go-redis/v9 v9.5.2
+	github.com/panjf2000/gnet/v2 v2.5.7
+	github.com/redis/go-redis/v9 v9.5.3
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/xid v1.5.0
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/shopspring/decimal v1.4.0
 	github.com/spf13/afero v1.11.0
 	github.com/spf13/cast v1.6.0
-	github.com/spf13/cobra v1.8.0
+	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
 	github.com/tidwall/gjson v1.17.1
 	github.com/tidwall/redcon v1.6.2
 	github.com/xuri/excelize/v2 v2.8.1
 	github.com/zserge/lorca v0.1.10
 	go.uber.org/automaxprocs v1.5.3
-	golang.org/x/text v0.15.0
+	golang.org/x/text v0.16.0
 	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
@@ -55,9 +55,10 @@ require (
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
+	github.com/go-ini/ini v1.67.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/goccy/go-json v0.10.2 // indirect
+	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/gomodule/redigo v1.8.9 // indirect
@@ -71,8 +72,8 @@ require (
 	github.com/jchv/go-winloader v0.0.0-20200815041850-dec1ee9a7fd5 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/klauspost/compress v1.17.6 // indirect
-	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
+	github.com/klauspost/compress v1.17.9 // indirect
+	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
 	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
 	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
@@ -106,11 +107,11 @@ require (
 	go.uber.org/multierr v1.10.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/crypto v0.23.0 // indirect
+	golang.org/x/crypto v0.24.0 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
-	golang.org/x/net v0.25.0 // indirect
+	golang.org/x/net v0.26.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/sys v0.21.0 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

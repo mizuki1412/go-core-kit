@@ -77,6 +77,9 @@ var modelMetaCache = class.NMapStringSync()
 
 // InitModelMeta obj should be elem
 func (th ModelMeta) init(obj any) ModelMeta {
+	if th.dateSource == nil {
+		panic(exception.New("dataSource is nil"))
+	}
 	if obj == nil {
 		return ModelMeta{}
 	}
