@@ -3,6 +3,7 @@ package userdao
 import (
 	"fmt"
 	"github.com/Masterminds/squirrel"
+	"github.com/mizuki1412/go-core-kit/v2/class"
 	"github.com/mizuki1412/go-core-kit/v2/library/stringkit"
 	"github.com/mizuki1412/go-core-kit/v2/mod/user/dao/departmentdao"
 	"github.com/mizuki1412/go-core-kit/v2/mod/user/dao/roledao"
@@ -22,7 +23,7 @@ const (
 
 func New(cascadeType byte, ds ...*sqlkit.DataSource) Dao {
 	dao := sqlkit.New[model.User](ds...)
-	dao.LogicDelVal = []any{-1, 0}
+	//dao.LogicDelVal = []any{-1, 0}
 	dao.Cascade = func(obj *model.User) {
 		switch cascadeType {
 		case ResultDefault:
@@ -58,7 +59,7 @@ func (dao Dao) FindByUsername(username string) *model.User {
 	return dao.Select().Where("username=?", username).One()
 }
 func (dao Dao) FindByUsernameDeleted(username string) *model.User {
-	return dao.Select().Where("username=?", username).Where("off=-1").One()
+	return dao.Select().Where("username=?", username).One()
 }
 
 // FindParam 可以通过extend的值来find
@@ -74,28 +75,37 @@ func (dao Dao) Find(param FindParam) *model.User {
 	return builder.One()
 }
 
-func (dao Dao) ListFromRootDepart(departId int) []*model.User {
-	where := fmt.Sprintf(`
-off>-1 and role>0 and role in 
-  ( select id from %s where department in 
-     (with recursive t(id) as( values(%d) union all select d.id from %s d, t where t.id=d.parent) select id from t )
-  )`,
-		roledao.New(roledao.ResultDefault, dao.DataSource()).Table(),
+func (dao Dao) ListFromRootDepart(departId int64) []*model.User {
+	builder := dao.Select()
+	//if len(roleIds) > 0 {
+	//	builder = builder.WhereUnnestIn("role", roleIds)
+	//}
+	where := fmt.Sprintf(`department in(with recursive t(id) as( values(%d) union all select d.id from %s d, t where t.id=d.parent) select id from t )`,
 		departId,
 		departmentdao.New(departmentdao.ResultDefault, dao.DataSource()).Table())
-	return dao.Select().Where(where).OrderBy("name").OrderBy("id").List()
+	builder = builder.Where(where)
+	return builder.OrderBy("name").OrderBy("id").List()
+}
+
+func (dao Dao) CountFromRootDepart(departId int64) int64 {
+	builder := dao.Select()
+	where := fmt.Sprintf(`department in(with recursive t(id) as( values(%d) union all select d.id from %s d, t where t.id=d.parent) select id from t )`,
+		departId,
+		departmentdao.New(departmentdao.ResultDefault, dao.DataSource()).Table())
+	builder = builder.Where(where)
+	return builder.Count()
 }
 
 type ListParam struct {
-	RoleId      int32
-	Roles       []int32
-	Departments []int32
-	IdList      []int32
+	RoleId      class.Int64
+	Roles       []int64
+	Departments []int64
+	IdList      []int64
 }
 
 func (dao Dao) List(param ListParam) []*model.User {
 	builder := dao.Select()
-	if param.RoleId != 0 {
+	if param.RoleId.IsValid() {
 		builder = builder.Where("role=?", param.RoleId)
 	}
 	if len(param.IdList) > 0 {
@@ -104,17 +114,17 @@ func (dao Dao) List(param ListParam) []*model.User {
 	if len(param.Roles) > 0 {
 		builder = builder.WhereUnnestIn("role", param.Roles)
 	}
-	// 根据role组筛选
 	if len(param.Departments) > 0 {
-		rb := roledao.New(roledao.ResultDefault).Select("id").WhereUnnestIn("department", param.Departments)
-		builder = builder.WhereIn("role", rb)
+		//rb := roledao.New(roledao.ResultDefault).Select("id").WhereUnnestIn("department", param.Departments)
+		//builder = builder.WhereIn("role", rb)
+		builder = builder.WhereUnnestIn("department", param.Departments)
 	}
 	return builder.List()
 }
 
-func (dao Dao) OffUser(uid int32, off int32) {
-	dao.Update().Set("off", off).Where("id=?", uid).Exec()
+func (dao Dao) FreezeUser(uid int64, status int32) {
+	dao.Update().Set("status", status).Where("id=?", uid).Exec()
 }
-func (dao Dao) SetNull(id int32) {
+func (dao Dao) SetNull(id int64) {
 	dao.Update().Set("phone", squirrel.Expr("null")).Set("username", squirrel.Expr("null")).Where("id=?", id).Exec()
 }

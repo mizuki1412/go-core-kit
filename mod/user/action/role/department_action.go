@@ -15,7 +15,7 @@ type departmentCreateParams struct {
 	No          class.String
 	Name        string `validate:"required"`
 	Description class.String
-	ParentId    class.Int32
+	ParentId    class.Int64
 }
 
 func departmentCreate(ctx *context.Context) {
@@ -25,7 +25,7 @@ func departmentCreate(ctx *context.Context) {
 	dao := departmentdao.New(departmentdao.ResultNone)
 	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	if params.ParentId.Valid {
-		parent := dao.SelectOneById(params.ParentId.Int32)
+		parent := dao.SelectOneById(params.ParentId.Int64)
 		if parent == nil {
 			panic(exception.New("父级部门不存在"))
 		}
@@ -44,11 +44,11 @@ func departmentCreate(ctx *context.Context) {
 }
 
 type departmentUpdateParams struct {
-	Id          int32 `validate:"required"`
+	Id          int64 `validate:"required"`
 	No          class.String
 	Name        class.String
 	Description class.String
-	ParentId    class.Int32
+	ParentId    class.Int64
 }
 
 func departmentUpdate(ctx *context.Context) {
@@ -69,8 +69,8 @@ func departmentUpdate(ctx *context.Context) {
 	if params.Description.Valid {
 		department.Descr.Set(params.Description.String)
 	}
-	if params.ParentId.Valid && (department.Parent == nil || params.ParentId.Int32 != department.Parent.Id) {
-		parent := dao.SelectOneById(params.ParentId.Int32)
+	if params.ParentId.Valid && (department.Parent == nil || params.ParentId.Int64 != department.Parent.Id) {
+		parent := dao.SelectOneById(params.ParentId.Int64)
 		if parent == nil {
 			panic(exception.New("父级部门不存在"))
 		}
@@ -88,15 +88,24 @@ func departmentDel(ctx *context.Context) {
 	if department == nil {
 		panic(exception.New("部门不存在"))
 	}
-	roleDao := roledao.New(userdao.ResultNone)
-	roleDao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
-	rs := roleDao.ListByDepartment(params.Id)
-	if rs != nil && len(rs) > 0 {
-		panic(exception.New("部门下还有角色,不能删除"))
-	}
 	if val, ok := department.Extend.Map["immutable"]; ok && val.(bool) {
 		panic(exception.New("该部门不可删除"))
 	}
+	// 判断是否有角色
+	roleDao := roledao.New(userdao.ResultNone)
+	roleDao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
+	rNum := roleDao.CountFromRootDepart(department.Id)
+	if rNum > 0 {
+		panic(exception.New("部门下还有角色,不能删除"))
+	}
+	// 判断是否有用户
+	userDao := userdao.New(userdao.ResultNone)
+	userDao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
+	uNum := userDao.CountFromRootDepart(department.Id)
+	if uNum > 0 {
+		panic(exception.New("部门下还有用户,不能删除"))
+	}
+
 	dao.DeleteById(department.Id)
 	ctx.JsonSuccess()
 }

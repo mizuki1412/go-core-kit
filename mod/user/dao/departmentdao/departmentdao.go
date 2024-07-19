@@ -41,7 +41,7 @@ func New(cascadeType byte, ds ...*sqlkit.DataSource) Dao {
 	return dao
 }
 
-func (dao Dao) ListByParent(id int32) []*model.Department {
+func (dao Dao) ListByParent(id int64) []*model.Department {
 	return dao.Select().Where(squirrel.Eq{"parent": id}).OrderBy("no").OrderBy("id").List()
 }
 

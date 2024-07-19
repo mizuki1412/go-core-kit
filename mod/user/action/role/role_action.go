@@ -21,22 +21,24 @@ func listAllPrivileges(ctx *context.Context) {
 type createParams struct {
 	Name           string          `validate:"required"`
 	PrivilegesJson class.ArrString `validate:"required" default:"[]" comment:"数组json字符串：[a,b,c]"`
-	DepartmentId   int32
+	DepartmentId   class.Int64
 }
 
 func create(ctx *context.Context) {
 	params := createParams{}
 	ctx.BindForm(&params)
-	departmentDao := departmentdao.New(departmentdao.ResultNone)
-	departmentDao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
-	department := departmentDao.SelectOneById(params.DepartmentId)
-	if department == nil {
-		panic(exception.New("部门不存在"))
-	}
 	role := &model.Role{}
+	if params.DepartmentId.Valid {
+		departmentDao := departmentdao.New(departmentdao.ResultNone)
+		departmentDao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
+		department := departmentDao.SelectOneById(params.DepartmentId)
+		if department == nil {
+			panic(exception.New("部门不存在"))
+		}
+		role.Department = department
+	}
 	role.Name.Set(params.Name)
 	role.Privileges = params.PrivilegesJson
-	role.Department = department
 	role.CreateDt.Set(time.Now())
 	rdao := roledao.New(roledao.ResultDefault)
 	rdao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
@@ -45,10 +47,10 @@ func create(ctx *context.Context) {
 }
 
 type updateParams struct {
-	Id             int32 `validate:"required"`
+	Id             int64 `validate:"required"`
 	Name           class.String
 	PrivilegesJson class.ArrString `comment:"数组json字符串：[a,b,c]"`
-	DepartmentId   class.Int32
+	DepartmentId   class.Int64
 }
 
 func update(ctx *context.Context) {
@@ -60,10 +62,10 @@ func update(ctx *context.Context) {
 	if role == nil {
 		panic(exception.New("角色不存在"))
 	}
-	if params.DepartmentId.Valid && (role.Department == nil || params.DepartmentId.Int32 != role.Department.Id) {
+	if params.DepartmentId.Valid && (role.Department == nil || params.DepartmentId.Int64 != role.Department.Id) {
 		departmentDao := departmentdao.New(departmentdao.ResultNone)
 		departmentDao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
-		d := departmentDao.SelectOneById(params.DepartmentId.Int32)
+		d := departmentDao.SelectOneById(params.DepartmentId.Int64)
 		if d == nil {
 			panic(exception.New("部门不存在"))
 		}
@@ -80,7 +82,7 @@ func update(ctx *context.Context) {
 }
 
 type delParams struct {
-	Id int32 `validate:"required"`
+	Id int64 `validate:"required"`
 }
 
 func del(ctx *context.Context) {
@@ -97,7 +99,9 @@ func del(ctx *context.Context) {
 	}
 	userDao := userdao.New(userdao.ResultNone)
 	userDao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
-	us := userDao.List(userdao.ListParam{RoleId: params.Id})
+	rid := class.Int64{}
+	rid.Set(params.Id)
+	us := userDao.List(userdao.ListParam{RoleId: rid})
 	if us != nil && len(us) > 0 {
 		panic(exception.New("角色下还有用户,不能删除"))
 	}
@@ -106,7 +110,7 @@ func del(ctx *context.Context) {
 }
 
 type listRolesParam struct {
-	Root class.Int32 `comment:"指定根department"`
+	Root class.Int64 `comment:"指定根department"`
 }
 
 func listRoles(ctx *context.Context) {
@@ -116,7 +120,7 @@ func listRoles(ctx *context.Context) {
 	dao := roledao.New(roledao.ResultDefault)
 	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	if params.Root.Valid {
-		roles = dao.ListFromRootDepart(params.Root.Int32)
+		roles = dao.ListFromRootDepart(params.Root.Int64)
 	} else {
 		roles = dao.List(roledao.ListParam{})
 	}
@@ -130,7 +134,7 @@ func listRoles(ctx *context.Context) {
 }
 
 type listByRoleParams struct {
-	RoleId int32 `validate:"required"`
+	RoleId int64 `validate:"required"`
 }
 
 func listRolesWithUser(ctx *context.Context) {
@@ -143,7 +147,7 @@ func listRolesWithUser(ctx *context.Context) {
 	udao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	for _, r := range list {
 		r.Extend.PutAll(map[string]any{
-			"users": udao.List(userdao.ListParam{RoleId: r.Id}),
+			"users": udao.List(userdao.ListParam{Roles: []int64{params.RoleId}}),
 		})
 	}
 	ctx.JsonSuccess(list)
