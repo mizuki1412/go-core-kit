@@ -104,7 +104,7 @@ type ListParam struct {
 }
 
 func (dao Dao) List(param ListParam) []*model.User {
-	builder := dao.Select()
+	builder := dao.Select().OrderBy("name").OrderBy("id")
 	if param.RoleId.IsValid() {
 		builder = builder.Where("role=?", param.RoleId)
 	}
