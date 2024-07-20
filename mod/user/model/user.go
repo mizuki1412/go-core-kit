@@ -7,7 +7,7 @@ import (
 )
 
 type User struct {
-	Id         int32           `json:"id,omitempty" db:"id" pk:"true" table:"admin_user" auto:"true"`
+	Id         int64           `json:"id,omitempty" db:"id" pk:"true" table:"sys_user" auto:"true"`
 	Role       *Role           `json:"role,omitempty" db:"role"`
 	Department *Department     `json:"department,omitempty" db:"department"`
 	Username   class.String    `json:"username,omitempty" db:"username"`
@@ -17,30 +17,30 @@ type User struct {
 	Gender     class.Int32     `json:"gender,omitempty" db:"gender" comment:"1-nan,2-nv"`
 	Image      class.String    `json:"image,omitempty" db:"image" comment:"头像"`
 	Address    class.String    `json:"address,omitempty" db:"address"`
-	Off        class.Int32     `json:"off,omitempty" db:"off" logicDel:"true" comment:"冻结 1， 删除 -1"`
+	Status     class.Int32     `json:"status,omitempty" db:"status" comment:"冻结 1"`
+	Deleted    class.Bool      `json:"-" db:"deleted" logicDel:"true"`
 	Extend     class.MapString `json:"extend,omitempty" db:"extend" comment:"权限剔除privilegeExclude:[], 不可删除immutable:bool"`
 	CreateDt   class.Time      `json:"createDt,omitempty" db:"createdt"`
 }
 
-const UserOffOK = 0
-const UserOffFreeze = 1
-const UserOffDelete = -1
+const UserStatusOK = 0
+const UserStatusFreeze = 1
 
 func (th *User) Scan(value any) error {
 	if value == nil {
 		return nil
 	}
-	id := cast.ToInt32(value)
+	id := cast.ToInt64(value)
 	th.Id = id
 	return nil
 }
 
 func (th *User) Value() (driver.Value, error) {
-	return int64(th.Id), nil
+	return th.Id, nil
 }
 
 // BelongDepartment 判断属于某个部门
-func (th *User) BelongDepartment(department int32) bool {
+func (th *User) BelongDepartment(department int64) bool {
 	return th != nil && th.Role != nil && th.Role.Department != nil && th.Role.Department.Id == department
 }
 

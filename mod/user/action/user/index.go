@@ -26,8 +26,6 @@ func Init(router *router.Router) {
 	{
 		r1.Get("/list", listUsers).Api(openapi.Tag(tag),
 			openapi.Summary("用户列表"), openapi.ReqParam(listUsersParams{}), openapi.Response([]*model.User{}))
-		r1.Get("/listByRole", listByRole).Api(openapi.Tag(tag),
-			openapi.Summary("用户列表 by role"), openapi.ReqParam(listByRoleParams{}), openapi.Response([]*model.User{}))
 		r1.Get("/info", infoAdmin).Api(openapi.Tag(tag),
 			openapi.Summary("用户信息"), openapi.ReqParam(infoAdminParams{}), openapi.Response(model.User{}))
 	}

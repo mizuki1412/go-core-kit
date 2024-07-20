@@ -5,6 +5,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/v2/class"
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
 	"github.com/mizuki1412/go-core-kit/v2/library/cryptokit"
+	"github.com/mizuki1412/go-core-kit/v2/mod/user/dao/departmentdao"
 	"github.com/mizuki1412/go-core-kit/v2/mod/user/dao/roledao"
 	"github.com/mizuki1412/go-core-kit/v2/mod/user/dao/userdao"
 	"github.com/mizuki1412/go-core-kit/v2/mod/user/model"
@@ -17,7 +18,8 @@ import (
 var AdditionUserExAdminFunc func(ctx *context.Context, u *model.User)
 
 type listUsersParams struct {
-	DepartmentId int
+	DepartmentIds []int64
+	RoleIds       []int64
 }
 
 func listUsers(ctx *context.Context) {
@@ -25,25 +27,7 @@ func listUsers(ctx *context.Context) {
 	ctx.BindForm(&params)
 	dao := userdao.New(userdao.ResultDefault)
 	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
-	list := dao.ListFromRootDepart(params.DepartmentId)
-	if AdditionUserExAdminFunc != nil {
-		for _, u := range list {
-			AdditionUserExAdminFunc(ctx, u)
-		}
-	}
-	ctx.JsonSuccess(list)
-}
-
-type listByRoleParams struct {
-	RoleId int32 `validate:"required"`
-}
-
-func listByRole(ctx *context.Context) {
-	params := listByRoleParams{}
-	ctx.BindForm(&params)
-	dao := userdao.New(userdao.ResultDefault)
-	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
-	list := dao.List(userdao.ListParam{RoleId: params.RoleId})
+	list := dao.List(userdao.ListParam{Roles: params.RoleIds, Departments: params.DepartmentIds})
 	if AdditionUserExAdminFunc != nil {
 		for _, u := range list {
 			AdditionUserExAdminFunc(ctx, u)
@@ -55,7 +39,8 @@ func listByRole(ctx *context.Context) {
 type AddUserParams struct {
 	Username   class.String `validate:"required"`
 	Pwd        class.String `validate:"required"`
-	Role       int32        `validate:"required"`
+	Role       class.Int64
+	Department class.Int64
 	Name       class.String
 	Phone      class.String
 	Sms        class.String
@@ -84,12 +69,6 @@ func AddUserHandle(ctx *context.Context, params AddUserParams, checkSms bool) *m
 	if params.Phone.Valid && checkSms && (!params.Sms.Valid || rediskit.Get(context2.Background(), rediskit.GetKeyWithPrefix("sms:"+params.Phone.String), "") != params.Sms.String) {
 		panic(exception.New("验证码错误"))
 	}
-	roleDao := roledao.New(roledao.ResultDefault)
-	roleDao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
-	r := roleDao.SelectOneById(params.Role)
-	if r == nil {
-		panic(exception.New("角色不存在"))
-	}
 	var u *model.User
 	// 复用username存在的用户
 	u = dao.FindByUsernameDeleted(params.Username.String)
@@ -97,14 +76,33 @@ func AddUserHandle(ctx *context.Context, params AddUserParams, checkSms bool) *m
 		u = &model.User{}
 		u.CreateDt.Set(time.Now())
 	}
+	if params.Role.IsValid() {
+		roleDao := roledao.New(roledao.ResultDefault)
+		roleDao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
+		r := roleDao.SelectOneById(params.Role)
+		if r == nil {
+			panic(exception.New("角色不存在"))
+		}
+		u.Role = r
+		if !params.Department.IsValid() {
+			u.Department = r.Department
+		}
+	}
+	if params.Department.IsValid() {
+		deptDao := departmentdao.New(departmentdao.ResultNone)
+		deptDao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
+		dept := deptDao.SelectOneById(params.Department.Int64)
+		if dept == nil {
+			panic(exception.New("部门不存在"))
+		}
+		u.Department = dept
+	}
 	if params.Username.Valid {
 		u.Username.Set(params.Username)
 	}
 	if params.Pwd.Valid {
 		u.Pwd.Set(cryptokit.MD5(params.Pwd.String))
 	}
-	u.Role = r
-	u.Department = r.Department
 	if params.Name.Valid {
 		u.Name.Set(params.Name)
 	}
@@ -132,7 +130,7 @@ func AddUserHandle(ctx *context.Context, params AddUserParams, checkSms bool) *m
 }
 
 type UpdateParams struct {
-	Id         int32 `validate:"required"`
+	Id         int64 `validate:"required"`
 	Username   class.String
 	Name       class.String
 	Phone      class.String
@@ -140,7 +138,8 @@ type UpdateParams struct {
 	Image      class.String
 	Address    class.String
 	Pwd        class.String
-	Role       int32
+	Role       class.Int64
+	Department class.Int64
 	ExtendJson class.MapString
 }
 
@@ -155,7 +154,7 @@ func UpdateUserHandle(ctx *context.Context, params UpdateParams) {
 	dao := userdao.New(userdao.ResultDefault)
 	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	u := dao.SelectOneById(params.Id)
-	if u == nil || u.Off.Int32 == model.UserOffDelete {
+	if u == nil {
 		panic(exception.New("用户不存在"))
 	}
 	if u.Role != nil && u.Role.Id == 0 {
@@ -171,7 +170,7 @@ func UpdateUserHandle(ctx *context.Context, params UpdateParams) {
 			u.Username.Set(params.Username.String)
 		}
 	}
-	if params.Role > 0 && (u.Role == nil || params.Role != u.Role.Id) {
+	if params.Role.Int64 > 0 && (u.Role == nil || params.Role.Int64 != u.Role.Id) {
 		rdao := roledao.New(roledao.ResultDefault)
 		rdao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 		r := rdao.SelectOneById(params.Role)
@@ -179,7 +178,18 @@ func UpdateUserHandle(ctx *context.Context, params UpdateParams) {
 			panic(exception.New("role不存在"))
 		}
 		u.Role = r
-		u.Department = r.Department
+		if !params.Department.IsValid() {
+			u.Department = r.Department
+		}
+	}
+	if params.Department.IsValid() && (u.Department == nil || params.Department.Int64 != u.Department.Id) {
+		deptDao := departmentdao.New(departmentdao.ResultNone)
+		deptDao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
+		dept := deptDao.SelectOneById(params.Department.Int64)
+		if dept == nil {
+			panic(exception.New("部门不存在"))
+		}
+		u.Department = dept
 	}
 	if params.Name.Valid {
 		u.Name.Set(params.Name.String)
@@ -206,7 +216,7 @@ func UpdateUserHandle(ctx *context.Context, params UpdateParams) {
 }
 
 type infoAdminParams struct {
-	Uid int32 `validate:"required"`
+	Uid int64 `validate:"required"`
 }
 
 func infoAdmin(ctx *context.Context) {
@@ -222,14 +232,14 @@ func infoAdmin(ctx *context.Context) {
 }
 
 type DelParams struct {
-	Id  int32       `validate:"required"`
+	Id  int64       `validate:"required"`
 	Off class.Int32 `validate:"required" comment:"0-删除，1-冻结，2-解冻"`
 }
 
 func DelUser(ctx *context.Context) {
 	params := DelParams{}
 	ctx.BindForm(&params)
-	mine := ctx.GetJwt().IdInt32()
+	mine := ctx.GetJwt().IdInt64()
 	if mine == 0 {
 		panic(exception.New("登录的用户错误"))
 	}
@@ -249,21 +259,16 @@ func DelUser(ctx *context.Context) {
 		panic(exception.New("该用户不可删除"))
 	}
 	sqlkit.TxArea(func(targetDS *sqlkit.DataSource) {
-		dao := userdao.New(userdao.ResultDefault, targetDS)
-		//
+		dao1 := userdao.New(userdao.ResultDefault, targetDS)
 		if params.Off.Int32 == 0 {
-			dao.OffUser(params.Id, model.UserOffDelete)
-			dao.SetNull(params.Id)
-			//target.setOff(User.OFF_DEL);
-			// todo
+			dao1.SetNull(params.Id)
+			dao1.DeleteById(params.Id)
 			//userCenter.add(target);
 		} else if params.Off.Int32 == 1 {
-			dao.OffUser(params.Id, model.UserOffFreeze)
-			//target.setOff(User.OFF_FREEZE);
+			dao1.FreezeUser(params.Id, model.UserStatusFreeze)
 			//userCenter.add(target);
 		} else if params.Off.Int32 == 2 {
-			dao.OffUser(params.Id, model.UserOffOK)
-			//target.setOff(User.OFF_OK);
+			dao1.FreezeUser(params.Id, model.UserStatusOK)
 			//userCenter.add(target);
 		}
 	}, dao.DataSource())

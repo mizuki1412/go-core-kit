@@ -41,7 +41,7 @@ func loginByUsername(ctx *context.Context) {
 	if user == nil {
 		panic(exception.New("用户名或密码错误"))
 	}
-	if user.Off.Int32 == model.UserOffFreeze {
+	if user.Status.Int32 == model.UserStatusFreeze {
 		panic(exception.New("账户被冻结"))
 	}
 	claim := jwtkit.New(user.Id)
@@ -85,7 +85,7 @@ func login(ctx *context.Context) {
 	if user == nil {
 		panic(exception.New("账号和密码不匹配"))
 	}
-	if user.Off.Int32 == model.UserOffFreeze {
+	if user.Status.Int32 == model.UserStatusFreeze {
 		panic(exception.New("账户被冻结"))
 	}
 	claim := jwtkit.New(user.Id)
@@ -112,7 +112,7 @@ var AdditionUserInfoWithIdFunc = func(ctx *context.Context, u *model.User) {
 }
 
 type infoParam struct {
-	Id     class.Int32  `comment:"不填获取自己，并且返回的是user和token；否则只返回user"`
+	Id     class.Int64  `comment:"不填获取自己，并且返回的是user和token；否则只返回user"`
 	Schema class.String `comment:"用于校验当前登录的和需要的是不是一个schema"`
 }
 
@@ -132,7 +132,7 @@ func info(ctx *context.Context) {
 		}
 		// 获取自己的
 		// todo 先走数据库
-		uid := ctx.GetJwt().IdInt32()
+		uid := ctx.GetJwt().IdInt64()
 		user := dao.SelectOneById(uid)
 		claim := jwtkit.New(user.Id)
 		claim.Ext.Put("schema", schema0)
@@ -148,7 +148,7 @@ func info(ctx *context.Context) {
 		}
 		ctx.JsonSuccess(ret)
 	} else {
-		user := dao.SelectOneById(params.Id.Int32)
+		user := dao.SelectOneById(params.Id.Int64)
 		// todo user不存在时
 		if AdditionUserExFunc != nil {
 			AdditionUserExFunc(ctx, user)
@@ -171,7 +171,7 @@ type updatePwdParam struct {
 func updatePwd(ctx *context.Context) {
 	params := updatePwdParam{}
 	ctx.BindForm(&params)
-	uid := ctx.GetJwt().IdInt32()
+	uid := ctx.GetJwt().IdInt64()
 	dao := userdao.New(userdao.ResultDefault)
 	dao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	user := dao.SelectOneById(uid)
@@ -200,7 +200,7 @@ type updateUserInfoParam struct {
 }
 
 func updateUserInfo(ctx *context.Context) {
-	uid := ctx.GetJwt().IdInt32()
+	uid := ctx.GetJwt().IdInt64()
 	params := updateUserInfoParam{}
 	ctx.BindForm(&params)
 	dao := userdao.New(userdao.ResultNone)
