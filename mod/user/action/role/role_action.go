@@ -20,8 +20,9 @@ func listAllPrivileges(ctx *context.Context) {
 
 type createParams struct {
 	Name           string          `validate:"required"`
-	PrivilegesJson class.ArrString `validate:"required" default:"[]" comment:"数组json字符串：[a,b,c]"`
+	PrivilegesJson class.ArrString `validate:"required" default:"[]" comment:"[a,b,c]"`
 	DepartmentId   class.Int64
+	Extend         class.MapString
 }
 
 func create(ctx *context.Context) {
@@ -40,6 +41,7 @@ func create(ctx *context.Context) {
 	role.Name.Set(params.Name)
 	role.Privileges = params.PrivilegesJson
 	role.CreateDt.Set(time.Now())
+	role.Extend.Set(params.Extend)
 	rdao := roledao.New(roledao.ResultDefault)
 	rdao.DataSource().Schema = ctx.GetJwt().Ext.GetString("schema")
 	rdao.InsertObj(role)
@@ -51,6 +53,7 @@ type updateParams struct {
 	Name           class.String
 	PrivilegesJson class.ArrString `comment:"数组json字符串：[a,b,c]"`
 	DepartmentId   class.Int64
+	Extend         class.MapString
 }
 
 func update(ctx *context.Context) {
@@ -76,6 +79,9 @@ func update(ctx *context.Context) {
 	}
 	if params.PrivilegesJson.Valid {
 		role.Privileges = params.PrivilegesJson
+	}
+	if params.Extend.IsValid() {
+		role.Extend.PutAll(params.Extend.Map)
 	}
 	dao.UpdateObj(role)
 	ctx.JsonSuccess()
