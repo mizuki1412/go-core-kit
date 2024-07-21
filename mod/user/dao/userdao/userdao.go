@@ -80,7 +80,7 @@ func (dao Dao) ListFromRootDepart(departId int64) []*model.User {
 	//if len(roleIds) > 0 {
 	//	builder = builder.WhereUnnestIn("role", roleIds)
 	//}
-	where := fmt.Sprintf(`department in(with recursive t(id) as( values(%d) union all select d.id from %s d, t where t.id=d.parent) select id from t )`,
+	where := fmt.Sprintf(`department in(with recursive t(id) as( values(%d::bigint) union all select d.id from %s d, t where t.id=d.parent) select id from t )`,
 		departId,
 		departmentdao.New(departmentdao.ResultDefault, dao.DataSource()).Table())
 	builder = builder.Where(where)
@@ -89,7 +89,7 @@ func (dao Dao) ListFromRootDepart(departId int64) []*model.User {
 
 func (dao Dao) CountFromRootDepart(departId int64) int64 {
 	builder := dao.Select()
-	where := fmt.Sprintf(`department in(with recursive t(id) as( values(%d) union all select d.id from %s d, t where t.id=d.parent) select id from t )`,
+	where := fmt.Sprintf(`department in(with recursive t(id) as( values(%d::bigint) union all select d.id from %s d, t where t.id=d.parent) select id from t )`,
 		departId,
 		departmentdao.New(departmentdao.ResultDefault, dao.DataSource()).Table())
 	builder = builder.Where(where)

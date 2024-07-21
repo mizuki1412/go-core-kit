@@ -16,6 +16,7 @@ type departmentCreateParams struct {
 	Name        string `validate:"required"`
 	Description class.String
 	ParentId    class.Int64
+	Extend      class.MapString
 }
 
 func departmentCreate(ctx *context.Context) {
@@ -39,6 +40,7 @@ func departmentCreate(ctx *context.Context) {
 		department.Descr.Set(params.Description.String)
 	}
 	department.CreateDt.Set(time.Now())
+	department.Extend.Set(params.Extend)
 	dao.InsertObj(department)
 	ctx.JsonSuccess()
 }
@@ -49,6 +51,7 @@ type departmentUpdateParams struct {
 	Name        class.String
 	Description class.String
 	ParentId    class.Int64
+	Extend      class.MapString
 }
 
 func departmentUpdate(ctx *context.Context) {
@@ -75,6 +78,9 @@ func departmentUpdate(ctx *context.Context) {
 			panic(exception.New("父级部门不存在"))
 		}
 		department.Parent = parent
+	}
+	if params.Extend.Valid {
+		department.Extend.PutAll(params.Extend.Map)
 	}
 	dao.UpdateObj(department)
 	ctx.JsonSuccess()

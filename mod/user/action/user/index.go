@@ -24,8 +24,8 @@ func Init(router *router.Router) {
 	}
 	r1 := router.Group("/user/admin", middleware.AuthJWT())
 	{
-		r1.Get("/list", listUsers).Api(openapi.Tag(tag),
-			openapi.Summary("用户列表"), openapi.ReqParam(listUsersParams{}), openapi.Response([]*model.User{}))
+		r1.Post("/list", listUsers).Api(openapi.Tag(tag),
+			openapi.Summary("用户列表"), openapi.ReqBody(listUsersParams{}), openapi.Response([]*model.User{}))
 		r1.Get("/info", infoAdmin).Api(openapi.Tag(tag),
 			openapi.Summary("用户信息"), openapi.ReqParam(infoAdminParams{}), openapi.Response(model.User{}))
 	}

@@ -36,12 +36,12 @@ func (dao Dao) FindByName(name string) *model.Role {
 	return dao.Select().Where(squirrel.Eq{"name": name}).Limit(1).One()
 }
 func (dao Dao) ListFromRootDepart(id int64) []*model.Role {
-	where := fmt.Sprintf(`id>0 and department in ( with recursive t(id) as( values(%d) union all select d.id from %s d, t where t.id=d.parent) select id from t )`, id, departmentdao.New(departmentdao.ResultDefault, dao.DataSource()).Table())
+	where := fmt.Sprintf(`id>0 and department in ( with recursive t(id) as( values(%d::bigint) union all select d.id from %s d, t where t.id=d.parent) select id from t )`, id, departmentdao.New(departmentdao.ResultDefault, dao.DataSource()).Table())
 	return dao.Select().Where(where).OrderBy("id").List()
 }
 
 func (dao Dao) CountFromRootDepart(id int64) int64 {
-	where := fmt.Sprintf(`department in ( with recursive t(id) as( values(%d) union all select d.id from %s d, t where t.id=d.parent) select id from t )`, id, departmentdao.New(departmentdao.ResultDefault, dao.DataSource()).Table())
+	where := fmt.Sprintf(`department in ( with recursive t(id) as( values(%d::bigint) union all select d.id from %s d, t where t.id=d.parent) select id from t )`, id, departmentdao.New(departmentdao.ResultDefault, dao.DataSource()).Table())
 	return dao.Select().Where(where).Count()
 }
 

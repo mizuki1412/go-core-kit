@@ -12,7 +12,7 @@ func Init(router *router.Router) {
 	r := router.Group("/role").Use(middleware.AuthJWT())
 	r.Get("/privilege/list", listAllPrivileges).Api(openapi.Tag(tag), openapi.Summary("所有权限列表"),
 		openapi.Response([]*model.PrivilegeConstant{}))
-	r.Get("/list", listRoles).Api(openapi.Tag(tag), openapi.Summary("role列表"),
+	r.Post("/list", listRoles).Api(openapi.Tag(tag), openapi.Summary("role列表"),
 		openapi.ReqParam(listRolesParam{}), openapi.Response([]*model.Role{}))
 	r.Post("/create", create).Api(openapi.Tag(tag), openapi.Summary("role新增"), openapi.ReqBody(createParams{}))
 	r.Post("/update", update).Api(openapi.Tag(tag), openapi.Summary("role修改"), openapi.ReqBody(updateParams{}))
@@ -21,9 +21,9 @@ func Init(router *router.Router) {
 		openapi.Summary("列出所有角色，附带所属users"),
 		openapi.ReqParam(listByRoleParams{}), openapi.Response([]*model.Role{}))
 	r.Post("/department/create", departmentCreate).Api(openapi.Tag(tag),
-		openapi.Summary("部门新增"), openapi.ReqParam(departmentCreateParams{}))
+		openapi.Summary("部门新增"), openapi.ReqBody(departmentCreateParams{}))
 	r.Post("/department/update", departmentUpdate).Api(openapi.Tag(tag),
-		openapi.Summary("部门修改"), openapi.ReqParam(departmentUpdateParams{}))
+		openapi.Summary("部门修改"), openapi.ReqBody(departmentUpdateParams{}))
 	r.Post("/department/del", departmentDel).Api(openapi.Tag(tag),
 		openapi.Summary("部门删除"), openapi.ReqParam(delParams{}))
 	r.Post("/department/list", listDepartment).Api(openapi.Tag(tag),

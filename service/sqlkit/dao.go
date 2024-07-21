@@ -71,7 +71,7 @@ func (dao Dao[T]) QueryRawRows(sql string, args []any) []*T {
 }
 
 func (dao Dao[T]) ExecRaw(sql string, args []any) sql.Result {
-	logkit.Debug("sql req", "sql", sql, "args", jsonkit.ToString(args))
+	logkit.Debug("sql exec", "sql", sql, "args", jsonkit.ToString(args))
 	return dao.dataSource.Exec(sql, args)
 }
 
