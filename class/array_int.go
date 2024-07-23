@@ -132,6 +132,17 @@ func (th *ArrInt) Remove() *ArrInt {
 	return th
 }
 
+func (th *ArrInt) Delete(elem int64) {
+	j := 0
+	for _, v := range th.Array {
+		if v != elem {
+			th.Array[j] = v
+			j++
+		}
+	}
+	th.Array = th.Array[:j]
+}
+
 func (th *ArrInt) ToInt32Slice() []int32 {
 	list := make([]int32, 0, len(th.Array))
 	for _, e := range th.Array {
