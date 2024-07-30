@@ -170,8 +170,10 @@ func Gen(url string) {
 				contentType = "HttpHeader.contentTypeJson"
 			}
 			// 函数体
+			// todo upload contentTypeMultipart
+			// todo download
 			content += fmt.Sprintf("\nexport async function %s(%s){"+
-				c.If[string](f.FName == "request", "\n\tconst {data} = await %s(`%s`, params, {method: '%s', headers:{'Content-Type': %s}})", "\n\tawait %s(`%s`, params, {method: '%s', headers:{'Content-Type': '%s'}})")+
+				c.If[string](f.FName == "request", "\n\tconst {data} = await %s(`%s`, params, {method: '%s', headers:{'Content-Type': %s}})", "\n\tawait %s(`%s`, params, {method: '%s', headers:{'Content-Type': %s}})")+
 				c.If[string](f.FName == "request", "\n\treturn data.data", "")+
 				"\n}",
 				f.OperationId, paramStr, f.FName, f.Url, f.Method, contentType)

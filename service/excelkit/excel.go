@@ -7,6 +7,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/v2/service/restkit/context"
 	"github.com/spf13/cast"
 	"github.com/xuri/excelize/v2"
+	"strings"
 )
 
 // Param 注意，excel的格式必须是第一行title，后面k-v结构
@@ -180,7 +181,7 @@ func Load(param Param) []map[string]string {
 			values, _ := rows.Columns()
 			for i, v := range values {
 				if names != nil && len(names) > i && nameMap[names[i]] != "" {
-					m[nameMap[names[i]]] = v
+					m[nameMap[names[i]]] = strings.TrimSpace(v)
 				}
 			}
 			if len(m) > 0 {

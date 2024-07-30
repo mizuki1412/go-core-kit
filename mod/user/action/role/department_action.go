@@ -12,8 +12,8 @@ import (
 )
 
 type departmentCreateParams struct {
-	No          class.String
-	Name        string `validate:"required"`
+	No          class.String `validate:"required"`
+	Name        string       `validate:"required"`
 	Description class.String
 	ParentId    class.Int64
 	Extend      class.MapString
@@ -34,6 +34,9 @@ func departmentCreate(ctx *context.Context) {
 	}
 	department.Name.Set(params.Name)
 	if params.No.Valid {
+		if dao.FindByNo(params.No.String) != nil {
+			panic(exception.New("当前编号已被占用"))
+		}
 		department.No.Set(params.No.String)
 	}
 	if params.Description.Valid {
@@ -63,7 +66,10 @@ func departmentUpdate(ctx *context.Context) {
 	if department == nil {
 		panic(exception.New("部门不存在"))
 	}
-	if params.No.Valid {
+	if params.No.Valid && params.No.String != department.No.String {
+		if dao.FindByNo(params.No.String) != nil {
+			panic(exception.New("当前编号已被占用"))
+		}
 		department.No.Set(params.No.String)
 	}
 	if params.Name.Valid {

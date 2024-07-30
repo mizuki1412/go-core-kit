@@ -29,3 +29,33 @@ func (th *Department) Scan(value any) error {
 func (th *Department) Value() (driver.Value, error) {
 	return th.Id, nil
 }
+
+type DeptList []*Department
+
+func (l DeptList) Len() int           { return len(l) }
+func (l DeptList) Swap(i, j int)      { l[i], l[j] = l[j], l[i] }
+func (l DeptList) Less(i, j int) bool { return l[i].Id < l[j].Id }
+func (l DeptList) Filter(fun func(ele *Department) bool) DeptList {
+	arr := make(DeptList, 0, len(l))
+	for _, e := range l {
+		if fun(e) {
+			arr = append(arr, e)
+		}
+	}
+	return arr
+}
+func (l DeptList) Find(fun func(ele *Department) bool) *Department {
+	for _, e := range l {
+		if fun(e) {
+			return e
+		}
+	}
+	return nil
+}
+func (l DeptList) MapReduce(fun func(ele *Department) any) []any {
+	var results []any
+	for _, e := range l {
+		results = append(results, fun(e))
+	}
+	return results
+}

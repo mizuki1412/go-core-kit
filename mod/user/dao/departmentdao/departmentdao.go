@@ -41,10 +41,18 @@ func New(cascadeType byte, ds ...*sqlkit.DataSource) Dao {
 	return dao
 }
 
-func (dao Dao) ListByParent(id int64) []*model.Department {
+func (dao Dao) ListByParent(id int64) model.DeptList {
 	return dao.Select().Where(squirrel.Eq{"parent": id}).OrderBy("no").OrderBy("id").List()
 }
 
-func (dao Dao) ListAll() []*model.Department {
+func (dao Dao) ListAll() model.DeptList {
 	return dao.Select().Where(squirrel.Gt{"id": 0}).OrderBy("parent").OrderBy("no").OrderBy("id").List()
+}
+
+func (dao Dao) FindByName(name string) *model.Department {
+	return dao.Select().Where(squirrel.Eq{"name": name}).Limit(1).One()
+}
+
+func (dao Dao) FindByNo(no string) *model.Department {
+	return dao.Select().Where(squirrel.Eq{"no": no}).Limit(1).One()
 }

@@ -103,7 +103,7 @@ type ListParam struct {
 	IdList      []int64
 }
 
-func (dao Dao) List(param ListParam) []*model.User {
+func (dao Dao) List(param ListParam) model.UserList {
 	builder := dao.Select().OrderBy("name").OrderBy("id")
 	if param.RoleId.IsValid() {
 		builder = builder.Where("role=?", param.RoleId)
