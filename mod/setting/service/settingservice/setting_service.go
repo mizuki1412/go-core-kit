@@ -9,10 +9,12 @@ import (
 var cache = &class.MapStringSync{}
 var _once sync.Once
 
-func Get(schema string) *class.MapStringSync {
+func Get(schema ...string) *class.MapStringSync {
 	_once.Do(func() {
 		dao := settingdao.New()
-		dao.DataSource().Schema = schema
+		if len(schema) > 0 {
+			dao.DataSource().Schema = schema[0]
+		}
 		_cache := dao.Get()
 		cache.Set(_cache)
 	})
@@ -20,8 +22,10 @@ func Get(schema string) *class.MapStringSync {
 }
 
 // Sync 先get后set
-func Sync(schema string) {
+func Sync(schema ...string) {
 	dao := settingdao.New()
-	dao.DataSource().Schema = schema
-	dao.Set(cache.Map)
+	if len(schema) > 0 {
+		dao.DataSource().Schema = schema[0]
+	}
+	dao.Set(Get(schema...).Map)
 }
