@@ -15,6 +15,9 @@ type RunParams struct {
 	Async   bool `comment:"异步处理返回值"`
 }
 
+// Run
+// example: []string{"/bin/bash", "-c", "xxx xxx"}, []string{"/bin/sh", "-c", "xxx.sh xxx"}, []string{"xxx","-h"}
+// example: []string{"cmd", "/C", "xxx xxx"},
 func Run(command []string, params ...RunParams) (string, error) {
 	if len(command) == 0 {
 		panic(exception.New("cmd need command"))

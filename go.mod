@@ -10,7 +10,7 @@ require (
 	github.com/alecthomas/chroma/v2 v2.14.0
 	github.com/aliyun/alibaba-cloud-sdk-go v1.62.784
 	github.com/bytedance/sonic v1.12.3
-	github.com/dgraph-io/ristretto v1.0.0
+	github.com/dgraph-io/ristretto v0.2.0
 	github.com/eclipse/paho.mqtt.golang v1.5.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-playground/validator/v10 v10.22.1
@@ -60,7 +60,6 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/gofrs/uuid v4.4.0+incompatible // indirect
-	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/gomodule/redigo v1.8.9 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
