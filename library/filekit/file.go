@@ -126,6 +126,9 @@ func Exists(fileName string) bool {
 }
 
 func RemoveFile(fileName string) {
+	if !Exists(fileName) {
+		return
+	}
 	err := os.Remove(fileName)
 	if err != nil {
 		panic(exception.New(err.Error()))
