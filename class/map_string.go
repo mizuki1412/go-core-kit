@@ -3,6 +3,7 @@ package class
 import (
 	"database/sql/driver"
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/class/utils"
 	"github.com/mizuki1412/go-core-kit/v2/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/v2/library/mapkit"
 	"github.com/spf13/cast"
@@ -41,7 +42,7 @@ func (th *MapString) Scan(value any) error {
 		return nil
 	}
 	th.Valid = true
-	th.Map = jsonkit.ParseMap(string(value.([]byte)))
+	th.Map = jsonkit.ParseMap(utils.TransScanValue2String(value))
 	// todo no error
 	return nil
 }

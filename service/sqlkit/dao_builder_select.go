@@ -56,7 +56,8 @@ func (dao SelectDao[T]) ToSql() (string, []any, error) {
 		}
 	}
 	dao.builder = dao.builder.PlaceholderFormat(placeholder(dao.dataSource.Driver))
-	return dao.builder.ToSql()
+	sqls, args, err := dao.builder.ToSql()
+	return sqls, argsWrap(dao.dataSource.Driver, args), err
 }
 
 func (dao SelectDao[T]) IgnoreLogicDel() SelectDao[T] {
@@ -227,7 +228,8 @@ func (dao SelectDao[T]) whereUnnest(arr any, key, flag string) SelectDao[T] {
 		s, v := pgArray(arr)
 		return dao.Where(fmt.Sprintf("%s %s (select unnest(%s))", dao.modelMeta.escapeName(key), flag, s), v...)
 	default:
-		panic(exception.New("whereUnnest not supported"))
+		s, v := normalArray(arr)
+		return dao.Where(fmt.Sprintf("%s %s %s", dao.modelMeta.escapeName(key), flag, s), v...)
 	}
 }
 func (dao SelectDao[T]) WhereUnnestIn(key string, arr any) SelectDao[T] {
@@ -237,23 +239,23 @@ func (dao SelectDao[T]) WhereUnnestNotIn(key string, arr any) SelectDao[T] {
 	return dao.whereUnnest(arr, key, "NOT IN")
 }
 
-// WherePGArrayIn 用于PG中array类型数据的包含比较
-func (dao SelectDao[T]) WherePGArrayIn(key string, arr any) SelectDao[T] {
+// WhereArrayIn 用于PG中array类型数据的包含比较
+func (dao SelectDao[T]) WhereArrayIn(key string, arr any) SelectDao[T] {
 	switch dao.dataSource.Driver {
 	case sqlconst.Postgres:
 		s, v := pgArray(arr)
 		return dao.Where(fmt.Sprintf("%s @> %s", dao.modelMeta.escapeName(key), s), v...)
 	default:
-		panic(exception.New("WherePGArrayIn not supported"))
+		panic(exception.New("WhereArrayIn not supported"))
 	}
 }
-func (dao SelectDao[T]) WherePGArrayNotIn(key string, arr any) SelectDao[T] {
+func (dao SelectDao[T]) WhereArrayNotIn(key string, arr any) SelectDao[T] {
 	switch dao.dataSource.Driver {
 	case sqlconst.Postgres:
 		s, v := pgArray(arr)
 		return dao.Where(fmt.Sprintf("not (%s @> %s)", dao.modelMeta.escapeName(key), s), v...)
 	default:
-		panic(exception.New("WherePGArrayNotIn not supported"))
+		panic(exception.New("WhereArrayNotIn not supported"))
 	}
 }
 

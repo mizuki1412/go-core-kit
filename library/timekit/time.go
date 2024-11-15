@@ -8,27 +8,27 @@ func Sleep(millisecond int64) {
 	time.Sleep(time.Duration(millisecond) * time.Millisecond)
 }
 
-// 修整为当日开始时间
+// TrimDayStart 修整为当日开始时间
 func TrimDayStart(t time.Time) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
 }
 
-// 修整为当月开始时间
+// TrimMonthStart 修整为当月开始时间
 func TrimMonthStart(t time.Time) time.Time {
 	return time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, t.Location())
 }
 
-// 修整为下一日开始时间
+// TrimDayNext 修整为下一日开始时间
 func TrimDayNext(t time.Time) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day()+1, 0, 0, 0, 0, t.Location())
 }
 
-// 修整为下月开始时间
+// TrimMonthNext 修整为下月开始时间
 func TrimMonthNext(t time.Time) time.Time {
 	return time.Date(t.Year(), t.Month()+1, 1, 0, 0, 0, 0, t.Location())
 }
 
-// 计算一个月的最大天数
+// CountDaysInMonth 计算一个月的最大天数
 func CountDaysInMonth(year int, month time.Month) (days int) {
 	if month != time.February {
 		if month == time.April || month == time.June || month == time.September || month == time.November {
@@ -45,7 +45,7 @@ func CountDaysInMonth(year int, month time.Month) (days int) {
 	}
 }
 
-// 相差月份数, 不算day
+// MonthInterval 相差月份数, 不算day
 func MonthInterval(t1 time.Time, t2 time.Time) int {
 	yearInterval := t1.Year() - t2.Year()
 	if yearInterval > 0 {

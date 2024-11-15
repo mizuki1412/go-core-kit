@@ -39,17 +39,28 @@ type DataSourceParam struct {
 }
 
 func getDataSourceName(p DataSourceParam) (string, string) {
-	if p.Driver == "" || p.Host == "" || p.Port == "" {
-		panic(exception.New("sqlkit: database config error"))
-	}
 	var param string
 	switch p.Driver {
 	case sqlconst.Postgres:
 		param = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", p.Host, p.Port, p.User, p.Pwd, p.Name)
+		if p.Host == "" || p.Port == "" {
+			panic(exception.New("sqlkit: database config error"))
+		}
 	case sqlconst.Mysql:
 		param = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=true&loc=%s", p.User, p.Pwd, p.Host, p.Port, p.Name, "Asia%2FShanghai")
+		if p.Host == "" || p.Port == "" {
+			panic(exception.New("sqlkit: database config error"))
+		}
 	case sqlconst.SqlServer:
 		param = fmt.Sprintf("server=%s;user id=%s;password=%s;port=%s;database=%s", p.Host, p.User, p.Pwd, p.Port, p.Name)
+		if p.Host == "" || p.Port == "" {
+			panic(exception.New("sqlkit: database config error"))
+		}
+	case sqlconst.Sqlite3:
+		param = p.Name
+		if p.Name == "" {
+			panic(exception.New("sqlkit: dbName error"))
+		}
 	default:
 		panic(exception.New("driver not supported"))
 	}
@@ -70,15 +81,20 @@ func NewDataSource(param DataSourceParam) *DataSource {
 }
 
 func getDB(param DataSourceParam) *sqlx.DB {
-	db := sqlx.MustConnect(getDataSourceName(param))
-	if param.MaxLife > 0 {
-		db.SetConnMaxLifetime(time.Duration(param.MaxLife) * time.Minute)
-	}
-	if param.MaxOpen > 0 {
-		db.SetMaxOpenConns(param.MaxOpen)
-	}
-	if param.MaxIdle > 0 {
-		db.SetMaxIdleConns(param.MaxIdle)
+	var db *sqlx.DB
+	if param.Driver == sqlconst.Sqlite3 {
+		db = sqlx.MustOpen(getDataSourceName(param))
+	} else {
+		db = sqlx.MustConnect(getDataSourceName(param))
+		if param.MaxLife > 0 {
+			db.SetConnMaxLifetime(time.Duration(param.MaxLife) * time.Minute)
+		}
+		if param.MaxOpen > 0 {
+			db.SetMaxOpenConns(param.MaxOpen)
+		}
+		if param.MaxIdle > 0 {
+			db.SetMaxIdleConns(param.MaxIdle)
+		}
 	}
 	return db
 }
@@ -113,10 +129,12 @@ func DefaultDataSource() *DataSource {
 // 获取 schema 修饰的转义的tableName
 func (ds *DataSource) decoTableName(tableName string) string {
 	s := ""
-	if ds.Schema != "" {
-		s = ds.Schema + "."
-	} else if ds.Driver == sqlconst.Postgres {
-		s = "public."
+	if ds.Driver == sqlconst.Postgres {
+		if ds.Schema != "" {
+			s = ds.Schema + "."
+		} else {
+			s = "public."
+		}
 	}
 	return s + ds.escapeName(tableName)
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/v2/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/v2/library/timekit"
 	"github.com/spf13/cast"
+	"regexp"
 	"time"
 )
 
@@ -37,6 +38,22 @@ func (th *Time) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (th *Time) Scan(value any) error {
+	val := utils.TransScanValue2String(value)
+	if ok, _ := regexp.Match("^[\\d]+$", []byte(val)); ok {
+		// 纯数字，用时间戳解析，ms
+		t, e := timekit.Parse(val)
+		if e != nil {
+			th.Time, th.Valid = time.Time{}, false
+			return e
+		}
+		th.Time, th.Valid = t, true
+		return nil
+	} else {
+		return th.NullTime.Scan(value)
+	}
+}
+
 // todo 默认实现对时区没控制?
 //func (th *Time) Scan(value any) error {
 //	if value == nil {
@@ -61,10 +78,6 @@ func (th *Time) UnmarshalJSON(data []byte) error {
 //	th.Valid = true
 //	th.Time = s
 //	return err
-//}
-
-//func (th Time) IsValid() bool {
-//	return th.Valid && !th.Time.IsZero()
 //}
 
 func NewTime(val ...any) Time {

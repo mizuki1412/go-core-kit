@@ -6,6 +6,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/mizuki1412/go-core-kit/v2/class/const/sqlconst"
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/class/utils"
 	"github.com/mizuki1412/go-core-kit/v2/library/jsonkit"
 	"github.com/spf13/cast"
 )
@@ -47,13 +48,17 @@ func (th *ArrInt) SetForceJson(f bool) {
 
 // Scan implements the Scanner interface.
 func (th *ArrInt) Scan(value any) error {
-	if value == nil || len(value.([]byte)) == 0 {
+	if value == nil {
 		th.Array, th.Valid = nil, false
 		return nil
 	}
 	th.Valid = true
 	// 通过首字符判断
-	val := string(value.([]byte))
+	val := utils.TransScanValue2String(value)
+	if len(val) == 0 {
+		th.Array, th.Valid = nil, false
+		return nil
+	}
 	switch val[0] {
 	case '[':
 		return jsonkit.ParseObj(val, &th.Array)

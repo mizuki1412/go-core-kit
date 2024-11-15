@@ -6,6 +6,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/mizuki1412/go-core-kit/v2/class/const/sqlconst"
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/class/utils"
 	"github.com/mizuki1412/go-core-kit/v2/library/arraykit"
 	"github.com/mizuki1412/go-core-kit/v2/library/jsonkit"
 )
@@ -56,7 +57,7 @@ func (th *ArrString) Scan(value any) error {
 	}
 	th.Valid = true
 	// 通过首字符判断
-	val := string(value.([]byte))
+	val := utils.TransScanValue2String(value)
 	switch val[0] {
 	case '[':
 		return jsonkit.ParseObj(val, &th.Array)

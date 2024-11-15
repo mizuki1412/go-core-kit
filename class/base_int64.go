@@ -6,6 +6,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/v2/class/utils"
 	"github.com/mizuki1412/go-core-kit/v2/library/jsonkit"
 	"github.com/spf13/cast"
+	"time"
 )
 
 type Int64 struct {
@@ -62,6 +63,14 @@ func (th *Int64) Set(val any) {
 		v := val.(*Int64)
 		th.Int64 = v.Int64
 		th.Valid = v.Valid
+	case Time:
+		v := val.(Time)
+		th.Int64 = v.UnixMill()
+		th.Valid = v.Valid
+	case time.Time:
+		v := val.(time.Time)
+		th.Int64 = v.UnixMilli()
+		th.Valid = !v.IsZero()
 	default:
 		i, err := cast.ToInt64E(val)
 		if err == nil {

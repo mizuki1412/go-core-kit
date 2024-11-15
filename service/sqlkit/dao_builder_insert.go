@@ -46,7 +46,8 @@ func (dao InsertDao[T]) Sql() (string, []any) {
 }
 func (dao InsertDao[T]) ToSql() (string, []any, error) {
 	dao.builder = dao.builder.PlaceholderFormat(placeholder(dao.dataSource.Driver))
-	return dao.builder.ToSql()
+	sqls, args, err := dao.builder.ToSql()
+	return sqls, argsWrap(dao.dataSource.Driver, args), err
 }
 
 // SQL methods

@@ -11,7 +11,6 @@ import (
 	"github.com/mizuki1412/go-core-kit/v2/service/jwtkit"
 	"github.com/mizuki1412/go-core-kit/v2/service/rediskit"
 	"github.com/mizuki1412/go-core-kit/v2/service/restkit/context"
-	"github.com/mizuki1412/go-core-kit/v2/service/sqlkit/pghelper"
 	"strings"
 )
 
@@ -73,9 +72,9 @@ func login(ctx *context.Context) {
 	if stringkit.IsNull(params.Username) && stringkit.IsNull(params.Phone) {
 		panic(exception.New("用户名或手机号缺失"))
 	}
-	if !pghelper.CheckSchemaExist(params.Schema) {
-		panic(exception.New("schema不存在"))
-	}
+	//if !pghelper.CheckSchemaExist(params.Schema) {
+	//	panic(exception.New("schema不存在"))
+	//}
 	params.Username = strings.TrimSpace(params.Username)
 	params.Phone = strings.TrimSpace(params.Phone)
 	params.Pwd = cryptokit.MD5(params.Pwd)

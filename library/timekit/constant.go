@@ -5,7 +5,7 @@ const TimeLayout2 = "2006/01/02 15:04:05"
 const TimeLayoutYMDHMS = "20060102150405"
 const TimeLayoutWithMill = "2006-01-02 15:04:05.999"
 
-// safari需要这种格式 兼容safari
+// TimeLayoutAll safari需要这种格式 兼容safari
 const TimeLayoutAll = "2006-01-02T15:04:05.999-0700"
 const TimeLayoutYMDHm = "2006-01-02 15:04"
 const TimeLayoutYMD = "2006-01-02"

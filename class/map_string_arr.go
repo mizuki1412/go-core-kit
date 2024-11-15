@@ -3,6 +3,7 @@ package class
 import (
 	"database/sql/driver"
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/mizuki1412/go-core-kit/v2/class/utils"
 	"github.com/mizuki1412/go-core-kit/v2/library/jsonkit"
 )
 
@@ -41,7 +42,8 @@ func (th *MapStringArr) Scan(value any) error {
 	}
 	th.Valid = true
 	var s []map[string]any
-	err := jsonkit.ParseObj(string(value.([]byte)), &s)
+	val := utils.TransScanValue2String(value)
+	err := jsonkit.ParseObj(val, &s)
 	th.Arr = s
 	return err
 }

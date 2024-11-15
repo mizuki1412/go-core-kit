@@ -35,7 +35,8 @@ func (dao DeleteDao[T]) Sql() (string, []any) {
 }
 func (dao DeleteDao[T]) ToSql() (string, []any, error) {
 	dao.builder = dao.builder.PlaceholderFormat(placeholder(dao.dataSource.Driver))
-	return dao.builder.ToSql()
+	sqls, args, err := dao.builder.ToSql()
+	return sqls, argsWrap(dao.dataSource.Driver, args), err
 }
 
 // SQL methods
@@ -81,23 +82,23 @@ func (dao DeleteDao[T]) WhereUnnestNotIn(key string, arr any) DeleteDao[T] {
 	return dao.whereUnnest(arr, key, "NOT IN")
 }
 
-// WherePGArrayIn 用于PG中array类型数据的包含比较
-func (dao DeleteDao[T]) WherePGArrayIn(key string, arr any) DeleteDao[T] {
+// WhereArrayIn 用于PG中array类型数据的包含比较
+func (dao DeleteDao[T]) WhereArrayIn(key string, arr any) DeleteDao[T] {
 	switch dao.dataSource.Driver {
 	case sqlconst.Postgres:
 		s, v := pgArray(arr)
 		return dao.Where(fmt.Sprintf("%s @> %s", dao.modelMeta.escapeName(key), s), v...)
 	default:
-		panic(exception.New("WherePGArrayIn not supported"))
+		panic(exception.New("WhereArrayIn not supported"))
 	}
 }
-func (dao DeleteDao[T]) WherePGArrayNotIn(key string, arr any) DeleteDao[T] {
+func (dao DeleteDao[T]) WhereArrayNotIn(key string, arr any) DeleteDao[T] {
 	switch dao.dataSource.Driver {
 	case sqlconst.Postgres:
 		s, v := pgArray(arr)
 		return dao.Where(fmt.Sprintf("not (%s @> %s)", dao.modelMeta.escapeName(key), s), v...)
 	default:
-		panic(exception.New("WherePGArrayNotIn not supported"))
+		panic(exception.New("WhereArrayNotIn not supported"))
 	}
 }
 
