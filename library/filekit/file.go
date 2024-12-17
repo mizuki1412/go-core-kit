@@ -42,7 +42,7 @@ func DelFile(fileName string) error {
 	if err != nil {
 		return err
 	}
-	return os.Remove(fileName)
+	return os.RemoveAll(fileName)
 }
 
 func CheckFilePath(fileName string) error {

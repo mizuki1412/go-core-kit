@@ -17,7 +17,7 @@ type RunParams struct {
 
 // Run
 // example: []string{"/bin/bash", "-c", "xxx xxx"}, []string{"/bin/sh", "-c", "xxx.sh xxx"}, []string{"xxx","-h"}
-// example: []string{"cmd", "/C", "xxx xxx"},
+// example: []string{"cmd", "/C", "xxx xxx"}, []string{"xxx.bat"}
 func Run(command []string, params ...RunParams) (string, error) {
 	if len(command) == 0 {
 		panic(exception.New("cmd need command"))
