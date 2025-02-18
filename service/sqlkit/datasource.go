@@ -27,15 +27,15 @@ var defaultDB *sqlx.DB
 
 // DataSourceParam 创建数据源的参数
 type DataSourceParam struct {
-	Driver  string
-	Host    string
-	Port    string
-	User    string
-	Pwd     string
-	Name    string // dbName
-	MaxOpen int
-	MaxIdle int
-	MaxLife int
+	Driver  string `json:"driver"`
+	Host    string `json:"host"`
+	Port    string `json:"port"`
+	User    string `json:"username"`
+	Pwd     string `json:"pwd"`
+	Name    string `json:"db"`
+	MaxOpen int    `json:"maxOpen"`
+	MaxIdle int    `json:"maxIdle"`
+	MaxLife int    `json:"maxLife"`
 }
 
 func getDataSourceName(p DataSourceParam) (string, string) {

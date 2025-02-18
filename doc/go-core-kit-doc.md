@@ -464,7 +464,7 @@ func New(cascadeType byte, ds ...*sqlkit.DataSource) *Dao {
 - mysql： `"github.com/go-sql-driver/mysql"`
 - mssql: todo
 - oracle: todo
-- kingbase: todo
+- sqlite: `"github.com/mattn/go-sqlite3"`
 
 ## model 标签定义
 
