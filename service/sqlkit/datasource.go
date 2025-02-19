@@ -126,8 +126,8 @@ func DefaultDataSource() *DataSource {
 	return ds
 }
 
-// 获取 schema 修饰的转义的tableName
-func (ds *DataSource) decoTableName(tableName string) string {
+// DecoTableName 获取 schema 修饰的转义的tableName
+func (ds *DataSource) DecoTableName(tableName string) string {
 	s := ""
 	if ds.Driver == sqlconst.Postgres {
 		if ds.Schema != "" {
@@ -136,11 +136,11 @@ func (ds *DataSource) decoTableName(tableName string) string {
 			s = "public."
 		}
 	}
-	return s + ds.escapeName(tableName)
+	return s + ds.EscapeName(tableName)
 }
 
-// 表名列名的转义符添加
-func (ds *DataSource) escapeName(name string) string {
+// EscapeName 表名列名的转义符添加
+func (ds *DataSource) EscapeName(name string) string {
 	switch ds.Driver {
 	case sqlconst.Mysql:
 		return "`" + name + "`"

@@ -181,9 +181,9 @@ func (th ModelMeta) getSelectColumnsWithPrefix(prefix string, excludes ...string
 // getTable alias 可以包括table别名
 func (th ModelMeta) getTable(alias ...string) string {
 	if len(alias) > 0 {
-		return th.dateSource.decoTableName(th.tableName) + " AS " + alias[0]
+		return th.dateSource.DecoTableName(th.tableName) + " AS " + alias[0]
 	} else {
-		return th.dateSource.decoTableName(th.tableName)
+		return th.dateSource.DecoTableName(th.tableName)
 	}
 }
 
@@ -193,10 +193,10 @@ func (th ModelMeta) escapeNames(name []string) []string {
 	}
 	ret := make([]string, len(name))
 	for i := 0; i < len(name); i++ {
-		ret[i] = th.dateSource.escapeName(name[i])
+		ret[i] = th.dateSource.EscapeName(name[i])
 	}
 	return ret
 }
 func (th ModelMeta) escapeName(name string) string {
-	return th.dateSource.escapeName(name)
+	return th.dateSource.EscapeName(name)
 }
