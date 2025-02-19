@@ -4,44 +4,44 @@ import "sync"
 
 type (
 	//Queue 队列
-	Queue struct {
-		top    *node
-		rear   *node
+	Queue[T any] struct {
+		top    *node[T]
+		rear   *node[T]
 		length int
 		lock1  sync.Mutex
 		lock2  sync.Mutex
 	}
 	//双向链表节点
-	node struct {
-		pre   *node
-		next  *node
-		value any
+	node[T any] struct {
+		pre   *node[T]
+		next  *node[T]
+		value T
 	}
 )
 
 // NewQueue Create a new queue
-func NewQueue() *Queue {
-	return &Queue{}
+func NewQueue[T any]() *Queue[T] {
+	return &Queue[T]{}
 }
 
 // Len 获取队列长度
-func (th *Queue) Len() int {
+func (th *Queue[T]) Len() int {
 	return th.length
 }
 
 // Peek 返回队列顶端元素
-func (th *Queue) Peek() any {
+func (th *Queue[T]) Peek() *T {
 	if th.top == nil {
 		return nil
 	}
-	return th.top.value
+	return &th.top.value
 }
 
 // Push 入队操作
-func (th *Queue) Push(v any) {
+func (th *Queue[T]) Push(v T) {
 	th.lock1.Lock()
 	defer th.lock1.Unlock()
-	n := &node{nil, nil, v}
+	n := &node[T]{nil, nil, v}
 	if th.length == 0 {
 		th.top = n
 		th.rear = th.top
@@ -54,7 +54,7 @@ func (th *Queue) Push(v any) {
 }
 
 // Pop 出队操作
-func (th *Queue) Pop() any {
+func (th *Queue[T]) Pop() *T {
 	th.lock1.Lock()
 	defer th.lock1.Unlock()
 	if th.length == 0 {
@@ -69,5 +69,5 @@ func (th *Queue) Pop() any {
 		th.top.pre = nil
 	}
 	th.length--
-	return n.value
+	return &n.value
 }
