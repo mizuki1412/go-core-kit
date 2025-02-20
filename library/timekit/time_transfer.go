@@ -9,7 +9,7 @@ import (
 
 // ParseString cast.StringToDate 不能设置时区
 func ParseString(dtString string, layout string) (time.Time, error) {
-	return time.ParseInLocation(layout, dtString, time.Local)
+	return time.ParseInLocation(layout, dtString, GetLocation())
 }
 
 func Parse(dt string) (time.Time, error) {
@@ -51,7 +51,7 @@ func Parse(dt string) (time.Time, error) {
 			time.StampNano,
 		} {
 			// ParseInLocation 在已有时区偏移时不会使用given location
-			if t, e := time.ParseInLocation(dateType, dt, time.Local); e == nil {
+			if t, e := time.ParseInLocation(dateType, dt, GetLocation()); e == nil {
 				return t, e
 			}
 		}

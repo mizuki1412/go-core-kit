@@ -55,8 +55,8 @@ func (th *Queue[T]) Push(v T) {
 
 // Pop 出队操作
 func (th *Queue[T]) Pop() *T {
-	th.lock1.Lock()
-	defer th.lock1.Unlock()
+	th.lock2.Lock()
+	defer th.lock2.Unlock()
 	if th.length == 0 {
 		return nil
 	}
