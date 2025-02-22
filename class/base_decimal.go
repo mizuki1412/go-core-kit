@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cast"
 )
 
+// 对tag:precision 响应: 在controller param和bean sql scan
 type Decimal struct {
 	decimal.NullDecimal
 }

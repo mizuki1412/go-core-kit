@@ -200,6 +200,10 @@ func (ctx *Context) bindStruct(bean any) {
 			if !stringkit.IsNull(val) {
 				tmp := class.Decimal{}
 				tmp.Set(val)
+				precision := cast.ToInt32(field.Tag.Get(tag.DecimalPrecision.Name))
+				if precision > 0 {
+					tmp.Set(tmp.Round(precision))
+				}
 				fieldV.Set(reflect.ValueOf(tmp))
 			}
 		}
