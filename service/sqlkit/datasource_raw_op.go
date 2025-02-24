@@ -1,6 +1,7 @@
 package sqlkit
 
 import (
+	"fmt"
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
 	"github.com/mizuki1412/go-core-kit/v2/library/timekit"
 	"github.com/spf13/cast"
@@ -127,4 +128,9 @@ func (ds *DataSource) FormatRawValue(val any) string {
 		return "'" + t.In(timekit.GetLocation()).Format(timekit.TimeLayout) + "'"
 	}
 	return "'" + cast.ToString(val) + "'"
+}
+
+// QueryColumnDef 获取表的列结构
+func (ds *DataSource) QueryColumnDef(table string) []map[string]any {
+	return ds.QueryListMap(fmt.Sprintf("SELECT column_name, data_type FROM information_schema.columns WHERE TABLE_NAME = '%s'", table))
 }
