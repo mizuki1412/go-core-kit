@@ -3,7 +3,6 @@ package sqlkit
 import (
 	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
-	"github.com/mizuki1412/go-core-kit/v2/service/logkit"
 	"github.com/spf13/cast"
 )
 
@@ -11,12 +10,12 @@ import (
 
 func (dao SelectDao[T]) QueryRows() *sqlx.Rows {
 	sql, args := dao.Sql()
-	defer func() {
-		if err := recover(); err != nil {
-			logkit.Error("error sql: " + sql)
-			panic(err)
-		}
-	}()
+	//defer func() {
+	//	if err := recover(); err != nil {
+	//		logkit.Error("error sql: " + sql)
+	//		panic(err)
+	//	}
+	//}()
 	rows := dao.QueryRaw(sql, args)
 	return rows
 }

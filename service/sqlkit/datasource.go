@@ -8,12 +8,13 @@ import (
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
 	"github.com/mizuki1412/go-core-kit/v2/cli/configkey"
 	"github.com/mizuki1412/go-core-kit/v2/service/configkit"
+	"strings"
 	"sync"
 	"time"
 )
 
 type DataSource struct {
-	// 用于postgres
+	// 用于postgres, 或oracle/dm
 	Schema string
 	// 数据源（事务时使用）
 	TX *sqlx.Tx
@@ -21,6 +22,14 @@ type DataSource struct {
 	DBPool *sqlx.DB
 	// 连接时的driver
 	Driver string
+}
+
+// ColumnSchema 表结构字段
+type ColumnSchema struct {
+	Name     string `json:"name"`
+	Type     string `json:"type"`
+	Nullable bool   `json:"nullable"`
+	Comment  string `json:"comment"`
 }
 
 var defaultDB *sqlx.DB
@@ -61,6 +70,12 @@ func getDataSourceName(p DataSourceParam) (string, string) {
 		if p.Name == "" {
 			panic(exception.New("sqlkit: dbName error"))
 		}
+	case sqlconst.DM:
+		// https://eco.dameng.com/document/dm/zh-cn/pm/go-rogramming-guide.html
+		param = fmt.Sprintf("dm://%s:%s@%s:%s", p.User, p.Pwd, p.Host, p.Port)
+		if p.Host == "" || p.Port == "" {
+			panic(exception.New("sqlkit: database config error"))
+		}
 	default:
 		panic(exception.New("driver not supported"))
 	}
@@ -76,6 +91,8 @@ func NewDataSource(param DataSourceParam) *DataSource {
 	}
 	if param.Driver == sqlconst.Postgres {
 		ds.Schema = "public"
+	} else {
+		ds.Schema = param.Name
 	}
 	return ds
 }
@@ -122,6 +139,8 @@ func DefaultDataSource() *DataSource {
 	}
 	if driver == sqlconst.Postgres {
 		ds.Schema = "public"
+	} else {
+		ds.Schema = configkit.GetString(configkey.DBName)
 	}
 	return ds
 }
@@ -131,10 +150,12 @@ func (ds *DataSource) DecoTableName(tableName string) string {
 	s := ""
 	if ds.Driver == sqlconst.Postgres {
 		if ds.Schema != "" {
-			s = ds.Schema + "."
+			s = ds.EscapeName(ds.Schema) + "."
 		} else {
 			s = "public."
 		}
+	} else if ds.Schema != "" {
+		s = ds.EscapeName(ds.Schema) + "."
 	}
 	return s + ds.EscapeName(tableName)
 }
@@ -144,6 +165,9 @@ func (ds *DataSource) EscapeName(name string) string {
 	switch ds.Driver {
 	case sqlconst.Mysql:
 		return "`" + name + "`"
+	case sqlconst.DM, sqlconst.Oracle:
+		// 注意大写了
+		return "\"" + strings.ToUpper(name) + "\""
 	default:
 		return "\"" + name + "\""
 	}
@@ -182,7 +206,7 @@ func (ds *DataSource) Query(sql string, args []any) *sqlx.Rows {
 		rows, err = ds.DBPool.Queryx(sql, args...)
 	}
 	if err != nil {
-		panic(exception.New(err.Error(), 2))
+		panic(exception.New(err.Error()+" ["+sql+"]", 2))
 	}
 	return rows
 }

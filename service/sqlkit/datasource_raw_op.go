@@ -2,9 +2,11 @@ package sqlkit
 
 import (
 	"fmt"
+	"github.com/mizuki1412/go-core-kit/v2/class/const/sqlconst"
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
 	"github.com/mizuki1412/go-core-kit/v2/library/timekit"
 	"github.com/spf13/cast"
+	"strings"
 	"time"
 )
 
@@ -131,6 +133,29 @@ func (ds *DataSource) FormatRawValue(val any) string {
 }
 
 // QueryColumnDef 获取表的列结构
-func (ds *DataSource) QueryColumnDef(table string) []map[string]any {
-	return ds.QueryListMap(fmt.Sprintf("SELECT column_name, data_type FROM information_schema.columns WHERE TABLE_NAME = '%s'", table))
+func (ds *DataSource) QueryColumnDef(table string) []ColumnSchema {
+	var maps []map[string]any
+	switch ds.Driver {
+	case sqlconst.DM, sqlconst.Oracle:
+		// todo select * from user_col_comments where TABLE_NAME='某表名称'；
+		maps = ds.QueryListMap(fmt.Sprintf("SELECT COLUMN_NAME as name, DATA_TYPE as type, NULLABLE as nullable FROM ALL_TAB_COLUMNS WHERE TABLE_NAME = '%s' and OWNER='%s'",
+			table, ds.Schema))
+	default:
+		// pg: pg_description
+		maps = ds.QueryListMap(fmt.Sprintf("SELECT column_name as name, data_type as type, is_nullable as nullable FROM information_schema.columns WHERE TABLE_NAME = '%s' and table_schema='%s'",
+			table, ds.Schema))
+	}
+	res := make([]ColumnSchema, 0, len(maps))
+	for _, m := range maps {
+		m0 := map[string]any{}
+		for k, v := range m {
+			m0[strings.ToLower(k)] = v
+		}
+		res = append(res, ColumnSchema{
+			Name:     cast.ToString(m0["name"]),
+			Type:     cast.ToString(m0["type"]),
+			Nullable: cast.ToBool(m0["nullable"]),
+		})
+	}
+	return res
 }
