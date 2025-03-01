@@ -7,6 +7,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/v2/class/const/sqlconst"
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
 	"github.com/mizuki1412/go-core-kit/v2/cli/configkey"
+	"github.com/mizuki1412/go-core-kit/v2/library/arraykit"
 	"github.com/mizuki1412/go-core-kit/v2/service/configkit"
 	"strings"
 	"sync"
@@ -91,7 +92,7 @@ func NewDataSource(param DataSourceParam) *DataSource {
 	}
 	if param.Driver == sqlconst.Postgres {
 		ds.Schema = "public"
-	} else {
+	} else if arraykit.StringContains([]string{sqlconst.DM, sqlconst.Oracle, sqlconst.Mysql}, param.Driver) {
 		ds.Schema = param.Name
 	}
 	return ds
@@ -154,7 +155,8 @@ func (ds *DataSource) DecoTableName(tableName string) string {
 		} else {
 			s = "public."
 		}
-	} else if ds.Schema != "" {
+	} else if ds.Schema != "" &&
+		arraykit.StringContains([]string{sqlconst.DM, sqlconst.Oracle, sqlconst.Mysql}, ds.Driver) {
 		s = ds.EscapeName(ds.Schema) + "."
 	}
 	return s + ds.EscapeName(tableName)
