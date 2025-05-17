@@ -261,10 +261,6 @@ excel表格处理
 
 https://xuri.me/excelize/zh-hans
 
-## influxkit
-
-influx1
-
 ## mqttkit
 
 mqtt服务
