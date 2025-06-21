@@ -24,3 +24,14 @@ func Wrapper(wp WrapParam, f func() any) any {
 	}
 	return value
 }
+
+/**
+ sample:
+	cachekit.Wrapper(cachekit.WrapParam{
+		Key: "abc",
+		Ttl: 0,
+	}, func() any {
+		dao := userdao.New(userdao.ResultDefault)
+		return dao.List(userdao.ListParam{})
+	}).([]*model.User)
+*/
