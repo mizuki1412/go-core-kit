@@ -1,6 +1,7 @@
 package mqttkit
 
 import (
+	"crypto/tls"
 	"errors"
 	"fmt"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
@@ -9,6 +10,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/v2/library/cryptokit"
 	"github.com/mizuki1412/go-core-kit/v2/service/logkit"
 	"github.com/spf13/cast"
+	"strings"
 	"sync"
 	"time"
 )
@@ -61,6 +63,11 @@ func NewClient(param ConnectParam) *Client {
 		}
 	}
 	opts.SetOnConnectHandler(lostHan)
+	if strings.Index(param.Broker, "ssl:") == 0 {
+		opts.SetTLSConfig(&tls.Config{
+			InsecureSkipVerify: true, // 跳过证书验证
+		})
+	}
 	newClient.C = MQTT.NewClient(opts)
 	if token := newClient.C.Connect(); token.Wait() && token.Error() != nil {
 		panic(exception.New(token.Error().Error()))
