@@ -1,10 +1,11 @@
 package jsonkit
 
 import (
+	"log"
+
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
 	"github.com/bytedance/sonic/decoder"
-	"log"
 )
 
 func Marshal(obj any) ([]byte, error) {

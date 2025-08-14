@@ -3,8 +3,6 @@ package cli
 import (
 	"github.com/mizuki1412/go-core-kit/v2/service/logkit"
 	"github.com/spf13/cobra"
-	"go.uber.org/automaxprocs/maxprocs"
-	"log"
 )
 
 type CMD struct {
@@ -40,11 +38,8 @@ func AddChildCMD(command *cobra.Command) {
 }
 
 func Execute() {
-	// 自动设置cpu配额
-	_, err := maxprocs.Set()
-	if err != nil {
-		log.Println(err.Error())
-	}
+	// 自动设置cpu配额。 Go1.25版本已支持
+	//_, err := maxprocs.Set()
 	if rootCmd.Root == nil {
 		panic("root cmd not config")
 	}

@@ -3,12 +3,13 @@ package snippet
 import (
 	"context"
 	"errors"
-	"github.com/mizuki1412/go-core-kit/v2/library/timekit"
 	"io"
 	"log"
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/mizuki1412/go-core-kit/v2/library/timekit"
 )
 
 func ContextCancelDemo() {

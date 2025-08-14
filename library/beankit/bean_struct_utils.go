@@ -2,10 +2,11 @@ package beankit
 
 import (
 	"encoding/json"
-	"github.com/mizuki1412/go-core-kit/v2/class/exception"
-	"github.com/spf13/cast"
 	"reflect"
 	"strings"
+
+	"github.com/mizuki1412/go-core-kit/v2/class/exception"
+	"github.com/spf13/cast"
 )
 
 // Struct2Map 用标签中的json来指定map的key值, 保持原有对象中的数据类型

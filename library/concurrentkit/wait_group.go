@@ -1,8 +1,9 @@
 package concurrentkit
 
 import (
-	"github.com/mizuki1412/go-core-kit/v2/library/c"
 	"sync"
+
+	"github.com/mizuki1412/go-core-kit/v2/library/c"
 )
 
 type Group struct {
@@ -14,15 +15,13 @@ func NewGroup() *Group {
 }
 
 func (g *Group) Add(f func(), shouldPanic bool) {
-	g.wg.Add(1)
-	go func() {
-		defer g.wg.Done()
+	g.wg.Go(func() {
 		if shouldPanic {
 			f()
 		} else {
 			_ = c.RecoverFuncWrapper(f)
 		}
-	}()
+	})
 }
 
 func (g *Group) Process() {

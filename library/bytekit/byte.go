@@ -3,6 +3,7 @@ package bytekit
 import (
 	"bytes"
 	"encoding/binary"
+
 	"github.com/mizuki1412/go-core-kit/v2/service/logkit"
 	"github.com/spf13/cast"
 )
