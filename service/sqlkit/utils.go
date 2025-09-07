@@ -1,13 +1,14 @@
 package sqlkit
 
 import (
+	"reflect"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/v2/class"
 	"github.com/mizuki1412/go-core-kit/v2/class/constraints"
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
 	"github.com/mizuki1412/go-core-kit/v2/cli/tag"
 	"github.com/spf13/cast"
-	"reflect"
 )
 
 func scanObjList[T any](dao SelectDao[T]) []*T {

@@ -2,14 +2,15 @@ package cmd
 
 import (
 	"fmt"
+	"log"
+	"net"
+
 	"github.com/mizuki1412/go-core-kit/v2/library/bytekit"
 	"github.com/mizuki1412/go-core-kit/v2/service/configkit"
 	"github.com/mizuki1412/go-core-kit/v2/service/netkit"
 	"github.com/panjf2000/gnet/v2"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
-	"log"
-	"net"
 )
 
 func TCPServerCMD() *cobra.Command {

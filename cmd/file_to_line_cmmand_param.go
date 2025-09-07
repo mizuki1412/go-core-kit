@@ -2,10 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"strings"
 )
 
 func File2LineCli() *cobra.Command {

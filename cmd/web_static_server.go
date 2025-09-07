@@ -1,9 +1,10 @@
 package cmd
 
 import (
+	"net/http"
+
 	"github.com/mizuki1412/go-core-kit/v2/service/configkit"
 	"github.com/spf13/cobra"
-	"net/http"
 )
 
 func WebStaticServerCMD() *cobra.Command {

@@ -1,13 +1,14 @@
 package cmd
 
 import (
+	"log"
+
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/mizuki1412/go-core-kit/v2/library/timekit"
 	"github.com/mizuki1412/go-core-kit/v2/service/configkit"
 	"github.com/mizuki1412/go-core-kit/v2/service/mqttkit"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
-	"log"
 )
 
 func MQTTTestCMD() *cobra.Command {
