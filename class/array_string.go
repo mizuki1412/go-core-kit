@@ -3,6 +3,7 @@ package class
 import (
 	"database/sql/driver"
 	"errors"
+
 	"github.com/lib/pq"
 	"github.com/mizuki1412/go-core-kit/v2/class/const/sqlconst"
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
@@ -79,7 +80,7 @@ func (th ArrString) Value() (driver.Value, error) {
 	if !th.Valid {
 		return nil, nil
 	}
-	if th.dbDriver == sqlconst.Postgres && !th.forceJson {
+	if sqlconst.IsPostgresType(th.dbDriver) && !th.forceJson {
 		var v pq.StringArray = th.Array
 		return v.Value()
 	} else {

@@ -3,15 +3,15 @@ package sqlkit
 import (
 	"database/sql"
 	"fmt"
+	"strings"
+	"sync"
+	"time"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/v2/class/const/sqlconst"
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
 	"github.com/mizuki1412/go-core-kit/v2/cli/configkey"
-	"github.com/mizuki1412/go-core-kit/v2/library/arraykit"
 	"github.com/mizuki1412/go-core-kit/v2/service/configkit"
-	"strings"
-	"sync"
-	"time"
 )
 
 type DataSource struct {
@@ -51,7 +51,7 @@ type DataSourceParam struct {
 func getDataSourceName(p DataSourceParam) (string, string) {
 	var param string
 	switch p.Driver {
-	case sqlconst.Postgres:
+	case sqlconst.Postgres, sqlconst.Kingbase:
 		param = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", p.Host, p.Port, p.User, p.Pwd, p.Name)
 		if p.Host == "" || p.Port == "" {
 			panic(exception.New("sqlkit: database config error"))
@@ -77,6 +77,16 @@ func getDataSourceName(p DataSourceParam) (string, string) {
 		if p.Host == "" || p.Port == "" {
 			panic(exception.New("sqlkit: database config error"))
 		}
+	case sqlconst.TaosSql:
+		param = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", p.User, p.Pwd, p.Host, p.Port, p.Name)
+		if p.Host == "" || p.Port == "" {
+			panic(exception.New("sqlkit: database config error"))
+		}
+	case sqlconst.TaosWS:
+		param = fmt.Sprintf("%s:%s@ws(%s:%s)/%s", p.User, p.Pwd, p.Host, p.Port, p.Name)
+		if p.Host == "" || p.Port == "" {
+			panic(exception.New("sqlkit: database config error"))
+		}
 	default:
 		panic(exception.New("driver not supported"))
 	}
@@ -90,9 +100,9 @@ func NewDataSource(param DataSourceParam) *DataSource {
 		Driver: param.Driver,
 		DBPool: db,
 	}
-	if param.Driver == sqlconst.Postgres {
+	if sqlconst.IsPostgresType(param.Driver) {
 		ds.Schema = "public"
-	} else if arraykit.StringContains([]string{sqlconst.DM, sqlconst.Oracle, sqlconst.Mysql}, param.Driver) {
+	} else if sqlconst.IsSingleDBSchema(param.Driver) {
 		ds.Schema = param.Name
 	}
 	return ds
@@ -138,7 +148,7 @@ func DefaultDataSource() *DataSource {
 		Driver: driver,
 		DBPool: defaultDB,
 	}
-	if driver == sqlconst.Postgres {
+	if sqlconst.IsPostgresType(driver) {
 		ds.Schema = "public"
 	} else {
 		ds.Schema = configkit.GetString(configkey.DBName)
@@ -149,14 +159,13 @@ func DefaultDataSource() *DataSource {
 // DecoTableName 获取 schema 修饰的转义的tableName
 func (ds *DataSource) DecoTableName(tableName string) string {
 	s := ""
-	if ds.Driver == sqlconst.Postgres {
+	if sqlconst.IsPostgresType(ds.Driver) {
 		if ds.Schema != "" {
 			s = ds.EscapeName(ds.Schema) + "."
 		} else {
 			s = "public."
 		}
-	} else if ds.Schema != "" &&
-		arraykit.StringContains([]string{sqlconst.DM, sqlconst.Oracle, sqlconst.Mysql}, ds.Driver) {
+	} else if ds.Schema != "" && sqlconst.IsSingleDBSchema(ds.Driver) {
 		s = ds.EscapeName(ds.Schema) + "."
 	}
 	return s + ds.EscapeName(tableName)
@@ -166,6 +175,12 @@ func (ds *DataSource) DecoTableName(tableName string) string {
 func (ds *DataSource) EscapeName(name string) string {
 	switch ds.Driver {
 	case sqlconst.Mysql:
+		return "`" + name + "`"
+	case sqlconst.TaosWS, sqlconst.TaosSql:
+		// key=tabname时，特殊处理，不加``，如果加了就代表是自定义表字段
+		if name == "tbname" {
+			return name
+		}
 		return "`" + name + "`"
 	case sqlconst.DM, sqlconst.Oracle:
 		// 注意大写了

@@ -2,6 +2,7 @@ package sqlkit
 
 import (
 	"database/sql"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/mizuki1412/go-core-kit/v2/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/v2/service/logkit"

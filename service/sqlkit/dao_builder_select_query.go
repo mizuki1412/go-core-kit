@@ -16,6 +16,7 @@ func (dao SelectDao[T]) QueryRows() *sqlx.Rows {
 	//		panic(err)
 	//	}
 	//}()
+	//println(sql)
 	rows := dao.QueryRaw(sql, args)
 	return rows
 }

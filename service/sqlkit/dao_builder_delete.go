@@ -2,6 +2,7 @@ package sqlkit
 
 import (
 	"fmt"
+
 	"github.com/Masterminds/squirrel"
 	"github.com/mizuki1412/go-core-kit/v2/class/const/sqlconst"
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
@@ -60,7 +61,7 @@ func (dao DeleteDao[T]) SuffixExpr(expr squirrel.Sqlizer) DeleteDao[T] {
 }
 
 func (dao DeleteDao[T]) Where(pred any, args ...any) DeleteDao[T] {
-	dao.builder = dao.builder.Where(pred, args...)
+	dao.builder = dao.builder.Where(handlePlaceholderInWhere(dao.dataSource.Driver, pred, args...), args...)
 	return dao
 }
 
@@ -68,7 +69,7 @@ func (dao DeleteDao[T]) Where(pred any, args ...any) DeleteDao[T] {
 
 func (dao DeleteDao[T]) whereUnnest(arr any, key, flag string) DeleteDao[T] {
 	switch dao.dataSource.Driver {
-	case sqlconst.Postgres:
+	case sqlconst.Postgres, sqlconst.Kingbase:
 		s, v := pgArray(arr)
 		return dao.Where(fmt.Sprintf("%s %s (select unnest(%s))", dao.modelMeta.escapeName(key), flag, s), v...)
 	default:
@@ -85,7 +86,7 @@ func (dao DeleteDao[T]) WhereUnnestNotIn(key string, arr any) DeleteDao[T] {
 // WhereArrayIn 用于PG中array类型数据的包含比较
 func (dao DeleteDao[T]) WhereArrayIn(key string, arr any) DeleteDao[T] {
 	switch dao.dataSource.Driver {
-	case sqlconst.Postgres:
+	case sqlconst.Postgres, sqlconst.Kingbase:
 		s, v := pgArray(arr)
 		return dao.Where(fmt.Sprintf("%s @> %s", dao.modelMeta.escapeName(key), s), v...)
 	default:
@@ -94,7 +95,7 @@ func (dao DeleteDao[T]) WhereArrayIn(key string, arr any) DeleteDao[T] {
 }
 func (dao DeleteDao[T]) WhereArrayNotIn(key string, arr any) DeleteDao[T] {
 	switch dao.dataSource.Driver {
-	case sqlconst.Postgres:
+	case sqlconst.Postgres, sqlconst.Kingbase:
 		s, v := pgArray(arr)
 		return dao.Where(fmt.Sprintf("not (%s @> %s)", dao.modelMeta.escapeName(key), s), v...)
 	default:

@@ -2,6 +2,7 @@ package sqlkit
 
 import (
 	"fmt"
+
 	"github.com/Masterminds/squirrel"
 	"github.com/mizuki1412/go-core-kit/v2/class/const/sqlconst"
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
@@ -64,7 +65,7 @@ func (dao UpdateDao[T]) Set(column string, value interface{}) UpdateDao[T] {
 	return dao
 }
 func (dao UpdateDao[T]) Where(pred interface{}, args ...interface{}) UpdateDao[T] {
-	dao.builder = dao.builder.Where(pred, args...)
+	dao.builder = dao.builder.Where(handlePlaceholderInWhere(dao.dataSource.Driver, pred, args...), args...)
 	return dao
 }
 func (dao UpdateDao[T]) FromSelect(from SelectDao[T], alias string) UpdateDao[T] {
@@ -76,7 +77,7 @@ func (dao UpdateDao[T]) FromSelect(from SelectDao[T], alias string) UpdateDao[T]
 
 func (dao UpdateDao[T]) whereUnnest(arr any, key, flag string) UpdateDao[T] {
 	switch dao.dataSource.Driver {
-	case sqlconst.Postgres:
+	case sqlconst.Postgres, sqlconst.Kingbase:
 		s, v := pgArray(arr)
 		return dao.Where(fmt.Sprintf("%s %s (select unnest(%s))", dao.modelMeta.escapeName(key), flag, s), v...)
 	default:
@@ -93,7 +94,7 @@ func (dao UpdateDao[T]) WhereUnnestNotIn(key string, arr any) UpdateDao[T] {
 // WhereArrayIn 用于PG中array类型数据的包含比较
 func (dao UpdateDao[T]) WhereArrayIn(key string, arr any) UpdateDao[T] {
 	switch dao.dataSource.Driver {
-	case sqlconst.Postgres:
+	case sqlconst.Postgres, sqlconst.Kingbase:
 		s, v := pgArray(arr)
 		return dao.Where(fmt.Sprintf("%s @> %s", dao.modelMeta.escapeName(key), s), v...)
 	default:
@@ -102,7 +103,7 @@ func (dao UpdateDao[T]) WhereArrayIn(key string, arr any) UpdateDao[T] {
 }
 func (dao UpdateDao[T]) WhereArrayNotIn(key string, arr any) UpdateDao[T] {
 	switch dao.dataSource.Driver {
-	case sqlconst.Postgres:
+	case sqlconst.Postgres, sqlconst.Kingbase:
 		s, v := pgArray(arr)
 		return dao.Where(fmt.Sprintf("not (%s @> %s)", dao.modelMeta.escapeName(key), s), v...)
 	default:

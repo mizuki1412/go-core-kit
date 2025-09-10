@@ -1,14 +1,18 @@
 package sqlkit
 
 import (
+	"fmt"
+	"reflect"
+	"strings"
+
 	"github.com/Masterminds/squirrel"
+	"github.com/mizuki1412/go-core-kit/v2/class"
 	"github.com/mizuki1412/go-core-kit/v2/class/const/sqlconst"
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
-	"reflect"
+	"github.com/mizuki1412/go-core-kit/v2/service/logkit"
 )
 
 func (dao Dao[T]) InsertObj(dest *T) {
-	builder := dao.Insert()
 	var columns []string
 	var vals []any
 	rv := reflect.ValueOf(dest).Elem()
@@ -17,15 +21,39 @@ func (dao Dao[T]) InsertObj(dest *T) {
 		if val == nil {
 			continue
 		}
-		columns = append(columns, e.OriKey)
+		if sqlconst.IsTaos(dao.dataSource.Driver) {
+			columns = append(columns, dao.dataSource.EscapeName(e.OriKey))
+		} else {
+			columns = append(columns, e.OriKey)
+		}
 		vals = append(vals, val)
 	}
 	if len(columns) == 0 {
 		panic(exception.New("no fields", 2))
 	}
-	builder = builder.Columns(columns...).Values(vals...)
-	builder = builder.Suffix("returning *")
-	builder.ReturnOne(dest)
+	if sqlconst.IsTaos(dao.dataSource.Driver) {
+		// 针对taos重写
+		vals = argsWrap(dao.dataSource.Driver, vals)
+		valPlaceholders := make([]string, 0, len(vals))
+		for _, e := range vals {
+			switch e.(type) {
+			case string, class.String:
+				valPlaceholders = append(valPlaceholders, "'?'")
+			default:
+				valPlaceholders = append(valPlaceholders, "?")
+			}
+		}
+		ss := fmt.Sprintf("insert into %s(%s) values(%s)",
+			dao.modelMeta.getTable(), strings.Join(columns, ", "), strings.Join(valPlaceholders, ", "))
+		res := dao.ExecRaw(ss, vals)
+		rn, _ := res.RowsAffected()
+		logkit.Debug("sql res", "rows", rn)
+	} else {
+		builder := dao.Insert()
+		builder = builder.Columns(columns...).Values(vals...)
+		builder = builder.Suffix("returning *")
+		builder.ReturnOne(dest)
+	}
 }
 
 func (dao Dao[T]) InsertBatch(dest []*T) {
@@ -34,8 +62,9 @@ func (dao Dao[T]) InsertBatch(dest []*T) {
 	}
 	builder := dao.Insert()
 	var columns []string
-	var vals []any
+	var valsArr [][]any
 	for i, e := range dest {
+		var vals []any
 		rv := reflect.ValueOf(e).Elem()
 		for _, e := range dao.modelMeta.allInsertKeys {
 			var val = e.val(rv, dao.dataSource.Driver)
@@ -43,20 +72,54 @@ func (dao Dao[T]) InsertBatch(dest []*T) {
 				continue
 			}
 			if i == 0 {
-				columns = append(columns, e.OriKey)
+				if sqlconst.IsTaos(dao.dataSource.Driver) {
+					columns = append(columns, dao.dataSource.EscapeName(e.OriKey))
+				} else {
+					columns = append(columns, e.OriKey)
+				}
 			}
 			vals = append(vals, val)
 		}
-		if i == 0 {
-			if len(columns) == 0 {
-				panic(exception.New("no fields", 2))
-			}
-			builder = builder.Columns(columns...).Values(vals...)
-		} else {
-			builder = builder.Values(vals...)
-		}
+		valsArr = append(valsArr, vals)
 	}
-	builder.Exec()
+	if len(columns) == 0 {
+		panic(exception.New("no fields", 2))
+	}
+	if sqlconst.IsTaos(dao.dataSource.Driver) {
+		sql := ""
+		var allVals []any
+		for i := 0; i < len(valsArr); i++ {
+			vals := argsWrap(dao.dataSource.Driver, valsArr[i])
+			valPlaceholders := make([]string, 0, len(vals))
+			for _, e := range vals {
+				switch e.(type) {
+				case string, class.String:
+					valPlaceholders = append(valPlaceholders, "'?'")
+				default:
+					valPlaceholders = append(valPlaceholders, "?")
+				}
+			}
+			if i == 0 {
+				sql += fmt.Sprintf("insert into %s(%s) values", dao.modelMeta.getTable(), strings.Join(columns, ", "))
+			}
+			sql += fmt.Sprintf("(%s)", strings.Join(valPlaceholders, ", "))
+			if i < len(valsArr)-1 {
+				sql += ", "
+			}
+			allVals = append(allVals, vals...)
+		}
+		res := dao.ExecRaw(sql, allVals)
+		rn, _ := res.RowsAffected()
+		logkit.Debug("sql res", "rows", rn)
+	} else {
+		for i := 0; i < len(valsArr); i++ {
+			if i == 0 {
+				builder = builder.Columns(columns...)
+			}
+			builder = builder.Values(valsArr[i]...)
+		}
+		builder.Exec()
+	}
 }
 
 func (dao Dao[T]) UpdateObj(dest *T) int64 {
@@ -68,7 +131,7 @@ func (dao Dao[T]) UpdateObj(dest *T) int64 {
 			continue
 		}
 		// 针对class.MapString 采用merge方式 todo mysql
-		if (e.RStruct.Type.String() == "class.MapString" || e.RStruct.Type.String() == "class.MapStringSync") && dao.dataSource.Driver == sqlconst.Postgres {
+		if (e.RStruct.Type.String() == "class.MapString" || e.RStruct.Type.String() == "class.MapStringSync") && sqlconst.IsPostgresType(dao.dataSource.Driver) {
 			builder = builder.Set(e.OriKey, squirrel.Expr("coalesce("+e.OriKey+",'{}'::jsonb) || ?", val))
 		} else {
 			builder = builder.Set(e.OriKey, val)

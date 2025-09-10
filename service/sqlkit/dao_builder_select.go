@@ -2,12 +2,13 @@ package sqlkit
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/Masterminds/squirrel"
 	"github.com/mizuki1412/go-core-kit/v2/class/const/sqlconst"
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
 	"github.com/mizuki1412/go-core-kit/v2/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/v2/service/logkit"
-	"strings"
 )
 
 type SelectDao[T any] struct {
@@ -162,11 +163,11 @@ func (dao SelectDao[T]) CrossJoinRaw(join string, rest ...any) SelectDao[T] {
 }
 
 func (dao SelectDao[T]) Where(pred any, args ...any) SelectDao[T] {
-	dao.builder = dao.builder.Where(pred, args...)
+	dao.builder = dao.builder.Where(handlePlaceholderInWhere(dao.dataSource.Driver, pred, args...), args...)
 	return dao
 }
-func (dao SelectDao[T]) Having(pred any, rest ...any) SelectDao[T] {
-	dao.builder = dao.builder.Where(pred, rest...)
+func (dao SelectDao[T]) Having(pred any, args ...any) SelectDao[T] {
+	dao.builder = dao.builder.Where(handlePlaceholderInWhere(dao.dataSource.Driver, pred, args...), args...)
 	return dao
 }
 
@@ -224,7 +225,7 @@ func (dao SelectDao[T]) whereNLogicDel() SelectDao[T] {
 // 注意使用时 args...
 func (dao SelectDao[T]) whereUnnest(arr any, key, flag string) SelectDao[T] {
 	switch dao.dataSource.Driver {
-	case sqlconst.Postgres:
+	case sqlconst.Postgres, sqlconst.Kingbase:
 		s, v := pgArray(arr)
 		return dao.Where(fmt.Sprintf("%s %s (select unnest(%s))", dao.modelMeta.escapeName(key), flag, s), v...)
 	default:
@@ -242,7 +243,7 @@ func (dao SelectDao[T]) WhereUnnestNotIn(key string, arr any) SelectDao[T] {
 // WhereArrayIn 用于PG中array类型数据的包含比较
 func (dao SelectDao[T]) WhereArrayIn(key string, arr any) SelectDao[T] {
 	switch dao.dataSource.Driver {
-	case sqlconst.Postgres:
+	case sqlconst.Postgres, sqlconst.Kingbase:
 		s, v := pgArray(arr)
 		return dao.Where(fmt.Sprintf("%s @> %s", dao.modelMeta.escapeName(key), s), v...)
 	default:
@@ -251,7 +252,7 @@ func (dao SelectDao[T]) WhereArrayIn(key string, arr any) SelectDao[T] {
 }
 func (dao SelectDao[T]) WhereArrayNotIn(key string, arr any) SelectDao[T] {
 	switch dao.dataSource.Driver {
-	case sqlconst.Postgres:
+	case sqlconst.Postgres, sqlconst.Kingbase:
 		s, v := pgArray(arr)
 		return dao.Where(fmt.Sprintf("not (%s @> %s)", dao.modelMeta.escapeName(key), s), v...)
 	default:

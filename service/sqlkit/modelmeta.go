@@ -1,12 +1,13 @@
 package sqlkit
 
 import (
+	"reflect"
+	"strings"
+
 	"github.com/mizuki1412/go-core-kit/v2/class"
 	"github.com/mizuki1412/go-core-kit/v2/class/constraints"
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
 	"github.com/mizuki1412/go-core-kit/v2/cli/tag"
-	"reflect"
-	"strings"
 )
 
 // ModelMeta 获取model中的tablename和db fields
