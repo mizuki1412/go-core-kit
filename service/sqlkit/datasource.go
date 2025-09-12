@@ -12,6 +12,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
 	"github.com/mizuki1412/go-core-kit/v2/cli/configkey"
 	"github.com/mizuki1412/go-core-kit/v2/service/configkit"
+	"github.com/mizuki1412/go-core-kit/v2/service/logkit"
 )
 
 type DataSource struct {
@@ -123,6 +124,12 @@ func getDB(param DataSourceParam) *sqlx.DB {
 		if param.MaxIdle > 0 {
 			db.SetMaxIdleConns(param.MaxIdle)
 		}
+	}
+	err := db.Ping()
+	if err != nil {
+		logkit.Info("db: " + param.Name + " ping success")
+	} else {
+		logkit.Error("db: " + param.Name + " ping failed")
 	}
 	return db
 }
