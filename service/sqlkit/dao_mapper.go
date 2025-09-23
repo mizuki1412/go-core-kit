@@ -10,6 +10,7 @@ import (
 	"github.com/mizuki1412/go-core-kit/v2/class/const/sqlconst"
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
 	"github.com/mizuki1412/go-core-kit/v2/service/logkit"
+	"github.com/spf13/cast"
 )
 
 func (dao Dao[T]) InsertObj(dest *T) {
@@ -189,4 +190,39 @@ func (dao Dao[T]) SelectOneWithDelById(id ...any) *T {
 		builder = builder.Where(dao.modelMeta.allPKs[i].Key+"=?", id[i])
 	}
 	return builder.IgnoreLogicDel().One()
+}
+
+// CheckSchemaExist schema是否存在
+func (dao Dao[T]) CheckSchemaExist(schema string) bool {
+	if dao.dataSource.Driver == sqlconst.Postgres {
+		rows := dao.QueryRaw(fmt.Sprintf("SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = '%s')", schema), nil)
+		defer rows.Close()
+		for rows.Next() {
+			ret, err := rows.SliceScan()
+			if err != nil {
+				panic(exception.New(err.Error()))
+			}
+			return len(ret) > 0 && cast.ToBool(ret[0])
+		}
+	}
+	return false
+}
+
+// CheckTableExist 检查表是否存在
+func (dao Dao[T]) CheckTableExist(t string) bool {
+	if dao.dataSource.Driver == sqlconst.Sqlite3 {
+		rows := dao.QueryRaw(fmt.Sprintf("SELECT COUNT(1) FROM sqlite_master WHERE type='table' AND name='%s'", t), nil)
+		defer rows.Close()
+		for rows.Next() {
+			ret, err := rows.SliceScan()
+			if err != nil {
+				panic(exception.New(err.Error()))
+			}
+			return len(ret) > 0 && cast.ToInt32(ret[0]) >= 1
+		}
+	} else {
+		// todo other db
+		panic(exception.New("CheckTableExist在此数据库未实现"))
+	}
+	return false
 }

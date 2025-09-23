@@ -1,8 +1,9 @@
 package pghelper
 
 import (
-	"github.com/Masterminds/squirrel"
 	"strings"
+
+	"github.com/Masterminds/squirrel"
 )
 
 // GenUnnestString 生成sql中: sth in (select unnest(Array[?,?,?])) []any
