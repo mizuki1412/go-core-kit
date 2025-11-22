@@ -92,10 +92,10 @@ func bindDefaultFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().String(configkey.SoftEtherPwd, "", "")
 	cmd.PersistentFlags().String(configkey.SoftEtherOpenVpnPort, "", "")
 
-	// minio
-	cmd.PersistentFlags().String(configkey.MinioEndpoint, "127.0.0.1:9000", "")
-	cmd.PersistentFlags().String(configkey.MinioAccessKey, "", "")
-	cmd.PersistentFlags().String(configkey.MinioSecret, "", "")
+	// rustfs/aws s3
+	cmd.PersistentFlags().String(configkey.FSEndpoint, "127.0.0.1:9000", "")
+	cmd.PersistentFlags().String(configkey.FSAccessKey, "", "")
+	cmd.PersistentFlags().String(configkey.FSSecret, "", "")
 }
 
 func bind(cmd *cobra.Command) {

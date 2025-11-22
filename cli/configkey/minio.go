@@ -1,5 +1,5 @@
 package configkey
 
-const MinioEndpoint = "minio.endpoint"
-const MinioAccessKey = "minio.accessKey"
-const MinioSecret = "minio.secret"
+const FSEndpoint = "fs.endpoint"
+const FSAccessKey = "fs.accessKey"
+const FSSecret = "fs.secret"
