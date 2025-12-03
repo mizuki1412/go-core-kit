@@ -39,6 +39,7 @@ func getStackInfo(file string, line int) string {
 	return file + ":" + strconv.Itoa(line)
 }
 
+// Deprecated: 旧的错误日志信息
 func (th Exception) Error() string {
 	ret := fmt.Sprintf(`%s
 Exception StackTrace: 

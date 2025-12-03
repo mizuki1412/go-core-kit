@@ -21,7 +21,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/mizuki1412/go-webview2 v0.0.0-20211216070425-b98c07fd76eb
 	github.com/panjf2000/gnet/v2 v2.9.5
-	github.com/redis/go-redis/v9 v9.17.0
+	github.com/redis/go-redis/v9 v9.17.2
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/xid v1.6.0
 	github.com/russross/blackfriday/v2 v2.1.0

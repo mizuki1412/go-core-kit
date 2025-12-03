@@ -84,8 +84,12 @@ func Info(msg string, args ...any) {
 	}
 }
 func Error(msg string, args ...any) {
-	err := exception.New(msg, 2).Error()
-	ErrorOrigin(err, args...)
+	ErrorException(exception.New(msg, 2), args...)
+}
+
+func ErrorException(ex exception.Exception, args ...any) {
+	args = append(args, "stackTrace", ex.Stack)
+	ErrorOrigin(ex.Msg, args...)
 }
 
 func ErrorOrigin(msg string, args ...any) {

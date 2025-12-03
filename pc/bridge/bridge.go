@@ -1,6 +1,8 @@
 package bridge
 
 import (
+	"net/http"
+
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
 	"github.com/mizuki1412/go-core-kit/v2/library/jsonkit"
@@ -8,7 +10,6 @@ import (
 	"github.com/mizuki1412/go-core-kit/v2/service/restkit"
 	"github.com/mizuki1412/go-core-kit/v2/service/restkit/context"
 	"github.com/spf13/cast"
-	"net/http"
 )
 
 const EventPublic = "event:public"
@@ -51,8 +52,8 @@ func SetEventPublicHandle(fun func(req *MsgReq) string) *socketio.Server {
 				if e, ok := err.(exception.Exception); ok {
 					msg = e.Msg
 					// 带代码位置信息
-					logkit.Error(e.Error())
-					ret = RetErr(e.Error())
+					logkit.ErrorException(e)
+					ret = RetErr(msg)
 				} else {
 					msg = cast.ToString(err)
 					logkit.Error(msg)

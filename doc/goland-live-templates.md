@@ -214,7 +214,7 @@ defer func() {
         if e, ok := err.(exception.Exception); ok {
             msg = e.Msg
             // 带代码位置信息
-            logkit.Error(e.Error())
+            logkit.ErrorException(e)
         } else {
             msg = cast.ToString(err)
             logkit.Error(msg)

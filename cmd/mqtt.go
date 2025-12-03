@@ -6,6 +6,7 @@ import (
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/mizuki1412/go-core-kit/v2/library/timekit"
 	"github.com/mizuki1412/go-core-kit/v2/service/configkit"
+	"github.com/mizuki1412/go-core-kit/v2/service/logkit"
 	"github.com/mizuki1412/go-core-kit/v2/service/mqttkit"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
@@ -24,7 +25,7 @@ func MQTTTestCMD() *cobra.Command {
 				for {
 					err := mqttkit.Publish(configkit.GetString("topic.pub"), 2, false, configkit.GetString("send"))
 					if err != nil {
-						log.Println(err.Error())
+						logkit.Error(err.Error())
 					}
 					if configkit.GetInt("freq", 0) > 0 {
 						timekit.Sleep(cast.ToInt64(configkit.GetInt("freq", 0)) * 1000)

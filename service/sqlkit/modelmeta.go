@@ -106,7 +106,7 @@ func (th ModelMeta) init(obj any) ModelMeta {
 			if t, ok := rt.Field(i).Tag.Lookup(tag.DBTable.Name); ok {
 				th.tableName = t
 			} else if t, ok := rt.Field(i).Tag.Lookup("tablename"); ok {
-				// Deprecated
+				// Deprecated:
 				th.tableName = t
 			}
 		}
