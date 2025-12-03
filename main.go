@@ -23,7 +23,6 @@ func main() {
 	c1 := &cobra.Command{
 		Use: "test",
 		Run: func(cmd *cobra.Command, args []string) {
-
 		},
 	}
 	c1.Flags().String("test", "", "")
