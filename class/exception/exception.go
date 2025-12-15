@@ -35,6 +35,13 @@ func New(msg string, skip1 ...int) Exception {
 	}
 }
 
+func NewE(err error, skip ...int) Exception {
+	if err == nil {
+		return New("", skip...)
+	}
+	return New(err.Error(), skip...)
+}
+
 func getStackInfo(file string, line int) string {
 	return file + ":" + strconv.Itoa(line)
 }

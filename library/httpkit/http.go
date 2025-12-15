@@ -52,13 +52,21 @@ type Req struct {
 
 // Request 请求最后阻塞处理
 func Request(reqParams Req) (string, int) {
+	r, c, err := RequestE(reqParams)
+	if err != nil {
+		panic(exception.New(err.Error()))
+	}
+	return r, c
+}
+
+func RequestE(reqParams Req) (string, int, error) {
 	req, err := genRequest(reqParams)
 	if reqParams.Timeout > 0 {
 		client.Timeout = time.Duration(reqParams.Timeout) * time.Second
 	}
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(exception.New(err.Error()))
+		return "", 0, err
 	}
 	defer resp.Body.Close()
 	if reqParams.Stream {
@@ -69,20 +77,20 @@ func Request(reqParams Req) (string, int) {
 		if reqParams.OutputFilePath != "" {
 			fout, err = openFile(reqParams.OutputFilePath)
 			if err != nil {
-				panic(exception.New(err.Error()))
+				return "", 0, err
 			}
 			defer fout.Close()
 		}
 		for {
 			n, err := reader.Read(buffer)
 			if err != nil && err != io.EOF {
-				panic(exception.New(err.Error()))
+				return "", 0, err
 			}
 			if n > 0 {
 				if reqParams.OutputFilePath != "" && fout != nil {
 					_, err = fout.Write(buffer[:n])
 					if err != nil {
-						panic(exception.New(err.Error()))
+						return "", 0, err
 					}
 				} else {
 					reqParams.StreamHandler(buffer[:n])
@@ -99,22 +107,22 @@ func Request(reqParams Req) (string, int) {
 		if reqParams.OutputFilePath != "" {
 			fout, err := openFile(reqParams.OutputFilePath)
 			if err != nil {
-				panic(exception.New(err.Error()))
+				return "", 0, err
 			}
 			defer fout.Close()
 			_, err = io.Copy(fout, resp.Body)
 			if err != nil {
-				panic(exception.New(err.Error()))
+				return "", 0, err
 			}
 		} else {
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
-				panic(exception.New(err.Error()))
+				return "", 0, err
 			}
-			return string(body), resp.StatusCode
+			return string(body), resp.StatusCode, nil
 		}
 	}
-	return "", resp.StatusCode
+	return "", resp.StatusCode, nil
 }
 
 func genRequest(reqParams Req) (*http.Request, error) {
