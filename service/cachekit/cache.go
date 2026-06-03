@@ -2,7 +2,7 @@ package cachekit
 
 import (
 	"context"
-	"github.com/dgraph-io/ristretto"
+	"github.com/dgraph-io/ristretto/v2"
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
 	"github.com/mizuki1412/go-core-kit/v2/library/c"
 	"github.com/mizuki1412/go-core-kit/v2/service/rediskit"
