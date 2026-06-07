@@ -2,21 +2,22 @@ package cachekit
 
 import (
 	"context"
+	"sync"
+	"time"
+
 	"github.com/dgraph-io/ristretto/v2"
 	"github.com/mizuki1412/go-core-kit/v2/class/exception"
 	"github.com/mizuki1412/go-core-kit/v2/library/c"
 	"github.com/mizuki1412/go-core-kit/v2/service/rediskit"
-	"sync"
-	"time"
 )
 
-var _cache *ristretto.Cache
+var _cache *ristretto.Cache[string, string]
 var once sync.Once
 
 func _getCache() {
 	if _cache == nil {
 		once.Do(func() {
-			cache, err := ristretto.NewCache(&ristretto.Config{
+			cache, err := ristretto.NewCache(&ristretto.Config[string, string]{
 				NumCounters: 1e7,     // number of keys to track frequency of (10M).
 				MaxCost:     1 << 30, // maximum cost of cache (1GB).
 				BufferItems: 64,      // number of keys per Get buffer.
@@ -51,7 +52,7 @@ func _handleParam(ps []*Param) *Param {
 	return p
 }
 
-func Set(key string, value any, ps ...*Param) {
+func Set(key string, value string, ps ...*Param) {
 	p := _handleParam(ps)
 	if rediskit.HasConfig() && !p.IgnoreRedis {
 		_ = c.RecoverFuncWrapper(func() {
@@ -70,18 +71,16 @@ func Set(key string, value any, ps ...*Param) {
 	}
 }
 
-func Get(key string, ps ...*Param) any {
+func Get(key string, ps ...*Param) string {
 	p := _handleParam(ps)
-	var r any = nil
+	var r string
 	if rediskit.HasConfig() && !p.IgnoreRedis {
 		r0 := rediskit.Get(context.Background(), rediskit.GetKeyWithPrefix(key), "")
 		if r0 != "" {
 			r = r0
 		}
 	}
-	if r == nil {
-		r, _ = _cache.Get(key)
-	}
+	r, _ = _cache.Get(key)
 	return r
 }
 

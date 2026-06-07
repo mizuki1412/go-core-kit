@@ -1,11 +1,12 @@
 package context
 
 import (
+	"strings"
+	"time"
+
 	"github.com/mizuki1412/go-core-kit/v2/service/cachekit"
 	"github.com/mizuki1412/go-core-kit/v2/service/jwtkit"
 	"github.com/spf13/cast"
-	"strings"
-	"time"
 )
 
 // SetJwtCookie 存入cookie和cache
@@ -22,9 +23,9 @@ func (ctx *Context) SetJwtCookie(c jwtkit.Claims, token string) {
 	//}
 	if c.ExpiresAt != nil {
 		ctx.Proxy.SetCookie("token", token, cast.ToInt(c.ExpiresAt.Unix()-time.Now().Unix()), "/", origin, false, true)
-		cachekit.Set("token:"+token, 1, &cachekit.Param{Ttl: time.Duration(c.ExpiresAt.Unix()-time.Now().Unix()) * time.Second})
+		cachekit.Set("token:"+token, "1", &cachekit.Param{Ttl: time.Duration(c.ExpiresAt.Unix()-time.Now().Unix()) * time.Second})
 	} else {
-		cachekit.Set("token:"+token, 1)
+		cachekit.Set("token:"+token, "1")
 	}
 }
 

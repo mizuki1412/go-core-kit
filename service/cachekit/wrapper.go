@@ -1,9 +1,10 @@
 package cachekit
 
 import (
+	"time"
+
 	"github.com/mizuki1412/go-core-kit/v2/cli/configkey"
 	"github.com/mizuki1412/go-core-kit/v2/service/configkit"
-	"time"
 )
 
 type WrapParam struct {
@@ -13,12 +14,12 @@ type WrapParam struct {
 
 const defaultKeyPrefix = "__cache_"
 
-func Wrapper(wp WrapParam, f func() any) any {
+func Wrapper(wp WrapParam, f func() string) any {
 	if wp.Ttl == 0 {
 		wp.Ttl = time.Duration(configkit.GetInt(configkey.CacheWrapperTTL)) * time.Second
 	}
 	value := Get(defaultKeyPrefix + wp.Key)
-	if value == nil {
+	if value == "" {
 		value = f()
 		Set(defaultKeyPrefix+wp.Key, value, &Param{Ttl: wp.Ttl})
 	}
