@@ -113,6 +113,11 @@ func getDB(param DataSourceParam) *sqlx.DB {
 	var db *sqlx.DB
 	if param.Driver == sqlconst.Sqlite3 {
 		db = sqlx.MustOpen(getDataSourceName(param))
+		// 开启 WAL 模式，适用本地磁盘/NAS 均可
+		db.Exec("PRAGMA journal_mode=WAL")
+		db.Exec("PRAGMA busy_timeout=5000")  // 避免锁冲突直接报错
+		db.Exec("PRAGMA synchronous=NORMAL") // WAL 下 NORMAL 已足够安全，进一步提升写入性能
+		//db.SetMaxOpenConns(1) // SQLite 单写锁，多连接无益反而有害
 	} else {
 		db = sqlx.MustConnect(getDataSourceName(param))
 		if param.MaxLife > 0 {

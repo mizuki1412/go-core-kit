@@ -6,7 +6,7 @@ const (
 	Mysql     = "mysql"
 	SqlServer = "mssql"
 	Oracle    = "oracle"
-	Sqlite3   = "sqlite3"
+	Sqlite3   = "sqlite"
 	DM        = "dm"      // 达梦
 	TaosSql   = "taosSql" // tdengine
 	TaosWS    = "taosWS"  // tdengine
