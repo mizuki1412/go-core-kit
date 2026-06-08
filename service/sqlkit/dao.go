@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/mizuki1412/go-core-kit/v2/class/const/sqlconst"
 	"github.com/mizuki1412/go-core-kit/v2/library/jsonkit"
 	"github.com/mizuki1412/go-core-kit/v2/service/logkit"
 )
@@ -74,6 +75,18 @@ func (dao Dao[T]) QueryRawRows(sql string, args []any) []*T {
 func (dao Dao[T]) ExecRaw(sql string, args []any) sql.Result {
 	logkit.Debug("sql exec", "sql", sql, "args", jsonkit.ToString(args))
 	return dao.dataSource.Exec(sql, args)
+}
+
+func (dao Dao[T]) GetOriginDB() *sqlx.DB {
+	return dao.dataSource.DBPool
+}
+
+// Close 程序退出时的逻辑
+func (dao Dao[T]) Close() {
+	if dao.dataSource.Driver == sqlconst.Sqlite3 {
+		dao.GetOriginDB().Exec("PRAGMA wal_checkpoint(TRUNCATE)")
+	}
+	dao.GetOriginDB().Close()
 }
 
 /// 小功能
